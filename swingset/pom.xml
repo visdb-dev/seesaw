@@ -35,6 +35,7 @@
 		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
 		<version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
 		<version.junit-jupiter-any>5.7.0</version.junit-jupiter-any>
+		<version.metrics-core>4.1.16</version.metrics-core>
 	</properties>
 
 	<licenses>
@@ -90,6 +91,16 @@
 			<artifactId>log4j-api</artifactId>
 			<version>${version.log4j}</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<!-- log4j-core, if present, used to configure log4j shtutdown -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${version.log4j}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- https://mvnrepository.com/ *** NEED LINK *** -->
 		<dependency>
 			<groupId>com.nqadmin.rowset</groupId>
@@ -129,6 +140,12 @@
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>${version.junit-jupiter-any}</version>
 			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>${version.metrics-core}</version>
 		</dependency>
 	</dependencies>
 

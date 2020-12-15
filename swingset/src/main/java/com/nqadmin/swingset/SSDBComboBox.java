@@ -49,6 +49,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.UniformReservoir;
 import com.nqadmin.swingset.models.SSListItem;
 
 import ca.odell.glazedlists.EventList;
@@ -56,6 +60,7 @@ import ca.odell.glazedlists.EventList;
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
 
 import com.nqadmin.swingset.models.SSListItemFormat;
+import com.nqadmin.swingset.utils.SSUtils;
 
 
 // SSDBComboBox.java
@@ -170,6 +175,12 @@ import com.nqadmin.swingset.models.SSListItemFormat;
 public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 {
 	private static final long serialVersionUID = -4203338788107410027L;
+
+	private static final Histogram nItemsHistogram = SSUtils.getMetrics()
+			.histogram(MetricRegistry.name(SSDBComboBox.class, "nItems"),
+					   () -> new Histogram(new UniformReservoir()));
+	private static final Timer queryTimer = SSUtils.getMetrics()
+			.timer(MetricRegistry.name(SSDBComboBox.class, "queryTimes"));
 
 	/**
 	 * Log4j Logger for component
@@ -952,8 +963,13 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			// }
 			adjustForNullItem();
 
-			Statement statement = ssCommon.getConnection().createStatement();
-			rs = statement.executeQuery(getQuery());
+			final Timer.Context context = queryTimer.time();
+			try {
+				Statement statement = ssCommon.getConnection().createStatement();
+				rs = statement.executeQuery(getQuery());
+			} finally {
+				context.stop();
+			}
 
 			//optionColumnType = getJDBCColumnType(rs, rs.findColumn(displayColumnName));
 
@@ -981,6 +997,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				newItems.add(remodel.createOptionMappingItem(pk, opt, opt2));
 			}
 			remodel.addAll(newItems);
+			nItemsHistogram.update(newItems.size());
 			rs.close();
 
 //				// extract primary key

@@ -43,6 +43,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -63,7 +64,10 @@ import javax.swing.SwingUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDataNavigator.java
 //
@@ -84,6 +88,17 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * reverted using Undo button (has to be done manually by the user).
  */
 public class SSDataNavigator extends JPanel {
+
+	private static final Timer updateRowTimer = SSUtils.getMetrics()
+			.timer(MetricRegistry.name(SSDataNavigator.class, "updateRowTimes"));
+	private static void doUpdateRow(ResultSet rs) throws SQLException {
+		final Timer.Context context = updateRowTimer.time();
+		try {
+			rs.updateRow();
+		} finally {
+			context.stop();
+		}
+	}
 
 	private static class RowSetState {
 		private boolean inserting;
@@ -386,7 +401,8 @@ public class SSDataNavigator extends JPanel {
 							// TO THE ROW THAT SHOULD BE UNDONE.
 							return;
 						}
-						rowSet.updateRow();
+						// rowSet.updateRow();
+						doUpdateRow(rowSet);
 						dBNav.performPostUpdateOps();
 					}
 					rowSet.first();
@@ -420,7 +436,8 @@ public class SSDataNavigator extends JPanel {
 							// TO THE ROW THAT SHOULD BE UNDONE.
 							return;
 						}
-						rowSet.updateRow();
+						// rowSet.updateRow();
+						doUpdateRow(rowSet);
 						dBNav.performPostUpdateOps();
 					}
 					if ((rowSet.getRow() != 0) && !rowSet.previous()) {
@@ -456,7 +473,8 @@ public class SSDataNavigator extends JPanel {
 							// TO THE ROW THAT SHOULD BE UNDONE.
 							return;
 						}
-						rowSet.updateRow();
+						// rowSet.updateRow();
+						doUpdateRow(rowSet);
 						dBNav.performPostUpdateOps();
 					}
 
@@ -493,7 +511,8 @@ public class SSDataNavigator extends JPanel {
 							// TO THE ROW THAT SHOULD BE UNDONE.
 							return;
 						}
-						rowSet.updateRow();
+						// rowSet.updateRow();
+						doUpdateRow(rowSet);
 						dBNav.performPostUpdateOps();
 					}
 					rowSet.last();
@@ -571,7 +590,8 @@ public class SSDataNavigator extends JPanel {
 							// TO THE ROW THAT SHOULD BE UNDONE.
 							return;
 						}
-						rowSet.updateRow();
+						// rowSet.updateRow();
+						doUpdateRow(rowSet);
 						
 						// 2020-11-24: Generally redundant, but force a refresh the screen with the 
 						// values from the rowset. This will be most noticeable if you have

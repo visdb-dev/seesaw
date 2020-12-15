@@ -51,7 +51,11 @@ import javax.swing.JComboBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.UniformReservoir;
 import com.nqadmin.swingset.models.SSListItem;
+import com.nqadmin.swingset.utils.SSUtils;
 
 
 // SSComboBox.java
@@ -141,6 +145,10 @@ import com.nqadmin.swingset.models.SSListItem;
 public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 {
 	private static final long serialVersionUID = 521308332266885608L;
+	
+	private static final Histogram nItemsHistogram = SSUtils.getMetrics()
+			.histogram(MetricRegistry.name(SSComboBox.class, "nItems"),
+					   () -> new Histogram(new UniformReservoir()));
 
 	@SuppressWarnings("serial")
 	private static class Model extends SSBaseComboBox.BaseModel<Integer, String, Object>
@@ -590,6 +598,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 
 	private void setOptionsInternal(List<String> _options, List<Integer> _mappings) {
 		Objects.requireNonNull(_options);
+		nItemsHistogram.update(_options.size());
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			if (_mappings != null && _options.size() != _mappings.size()) {
 				throw new IllegalArgumentException("Options and Mappings must be the same length");

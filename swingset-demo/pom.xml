@@ -91,6 +91,16 @@
 			<artifactId>java-getopt</artifactId>
 			<version>${version.java-getopt}</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-nop -->
+		<!-- Metrics has  dependency on slf4j, use the nop implementation.
+		     This is only needed to avoid a not found message.
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<version>1.7.30</version>
+		</dependency>
+		-->
 	</dependencies>
 
 	<build>
