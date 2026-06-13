@@ -43,16 +43,8 @@
 package com.nqadmin.swingset.datasources;
 
 
-import java.awt.Component;
 import java.awt.Container;
 import java.lang.System.Logger;
-import java.util.List;
-
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -76,7 +68,7 @@ import static java.lang.System.Logger.Level.*;
 public class DbOpsCustomizerImpl implements DbOpsCustomizer {
 
 	/**
-	 * Log4j Logger for component
+	 * Logger for component
 	 */
 	protected static final Logger logger = SSUtils.getLogger();
 
@@ -88,27 +80,29 @@ public class DbOpsCustomizerImpl implements DbOpsCustomizer {
 	/**
 	 * Constructs a DbOpsCustomizerImpl with the specified container.
 	 *
-	 * @param _container	GUI Container to scan for Swing components to clear/reset
+	 * @param container	GUI Container to scan for Swing components to clear/reset
 	 */
-	public DbOpsCustomizerImpl(final Container _container) {
-		container = _container;
+	public DbOpsCustomizerImpl(final Container container) {
+		this.container = container;
 	}
 
 	/**
-	 * Performs pre-insertion operations.
+	 * Performs pre-insertion operations, in particular {@link #cleanComponents(Container) }.
 	 */
 	@Override
 	public void performPreInsertOps() {
 
 		logger.log(DEBUG, "About to call setComponents() to clear values.");
-		setComponents(container);
+		cleanComponents(container);
 
-	} // end public void performPreInsertOps() {
+	}
 
 	/**
 	 * In the specified container, clear JTextFields, reset combo boxes to empty
 	 * item and make other components of interest "clean".
-	 * Typically done for a new row.
+	 * Typically done for a new record/row. Uses
+	 * {@link SSUtils#visitSSComponents(Container, Consumer) }
+	 * to run {@link SSComponent#cleanField() }.
 	 * <p>
 	 * This is done for all SwingSet components, text fields, and text areas,
 	 * recursively looking in to the JTabbedPanes and JPanels inside the given
@@ -116,48 +110,7 @@ public class DbOpsCustomizerImpl implements DbOpsCustomizer {
 	 *
 	 * @param container container in which to recursively initialize components
 	 */
-	protected void setComponents(final Container container) {
-
-		final Component[] comps = container.getComponents();
-
-		// TODO: should more components have cleanField?
-		for (Component comp : comps) {
-			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
-
-			switch (comp) {
-			case SSComponent c -> c.cleanField();
-
-			// TODO: could add "case Container c -> setComponects(c);"
-			//		 but note that any JComponent is a Container.
-			//		 So how about "case JComponent c -> setComponects(c);".
-			//		 Avoid the small? overhead by listing JContainers
-
-			case JRootPane c ->		setComponents(c);
-			case JPanel c ->		setComponents(c);
-			case JLayeredPane c ->	setComponents(c);
-			case JTabbedPane c ->	setComponents(c);
-			case JScrollPane c ->	setComponents(c.getViewport());
-
-			// case JLabel _ ->						{ }
-			// case JButton _ ->						{ }
-			// case JMenuBar _ ->						{ }
-			// case BasicInternalFrameTitlePane _ ->	{ }
-			default -> {
-				// logger.log(WARNING, "Encountered unknown component type of: " + comp.getClass().getSimpleName() + ". Unable to clear component.");
-			}
-			}
-		}
-
-	} // end protected void setComponents(Container _container) {
-
-	/**
-	 * Find all SSComponents in this navigator's container.
-	 * @return List of SScomponents
-	 */
-	@Override
-	public List<SSComponent> findSSComponents()
-	{
-		return SSUtils.findSSComponents(container);
+	protected void cleanComponents(final Container container) {
+		SSUtils.visitSSComponents(container, comp -> comp.cleanField());
 	}
-
 } // end public class DbOpsCustomizerImpl

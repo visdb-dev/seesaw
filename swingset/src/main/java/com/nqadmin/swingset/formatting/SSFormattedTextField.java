@@ -68,7 +68,7 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.MaskFormatter;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.decorators.TextDecorationStyle;
+import com.nqadmin.swingset.decorators.TextDecorationNegative;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -394,7 +394,7 @@ public class SSFormattedTextField extends JFormattedTextField
 			public void focusGained(final FocusEvent fe) {
 				if (getDecorator() instanceof TextDecorator td) {
 					// Turn off any text decorations while focused
-					td.decorateText(TextDecorationStyle.RESET);
+					td.decorateText(TextDecorationNegative.NONE);
 				}
 
 				SwingUtilities.invokeLater(() -> { selectAll(); });
@@ -597,8 +597,8 @@ public class SSFormattedTextField extends JFormattedTextField
 		case null, default ->	false;
 		};
 		
-		textDecorator.decorateText(isNeg ? TextDecorationStyle.NEGATIVE_NUMBER
-				: TextDecorationStyle.RESET);
+		textDecorator.decorateText(isNeg ? TextDecorationNegative.NEGATIVE_NUMBER
+				: TextDecorationNegative.NONE);
 	}
 
 	/** {@inheritDoc} */

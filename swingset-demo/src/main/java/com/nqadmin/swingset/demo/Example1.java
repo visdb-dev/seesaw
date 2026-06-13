@@ -64,9 +64,10 @@ import org.netbeans.validation.api.ui.ValidationItem;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.FocusDecorator.ComponentState;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
@@ -75,7 +76,6 @@ import com.nqadmin.swingset.demo.simpval.StringValidator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 
 /**
@@ -113,7 +113,7 @@ public class Example1 extends JFrame {
 	SSDataNavigator navigator;
 	RowsModel rowsModel;
 
-	static boolean newBorderSet;
+	static int newBorderSet;
 	private void cleanup()
 	{
 		//connection = null;
@@ -121,10 +121,10 @@ public class Example1 extends JFrame {
 		//navigator.cleanup();
 		//navigator = null;
 
-		if (newBorderSet)
-			return;
-		newBorderSet = true;
+		// For DEBUG
 		// After the first time, change modified color to BLUE
+		switch (newBorderSet) {
+		case 0 -> {
 		CentralLookup.getDefault().replace(BorderDecorator.BorderDecoratorPaint.class,
 				new BorderDecorator.BorderDecoratorPaint() {
 					@Override
@@ -139,6 +139,20 @@ public class Example1 extends JFrame {
 					}
 					
 				});
+		}
+		case 1 -> {
+			// Should keep the previous
+			CentralLookup def = CentralLookup.getDefault();
+			def.lookupAll(BorderDecorator.BorderDecoratorPaint.class)
+					.forEach(p -> def.remove(p));
+			
+		}
+		case 2 -> {
+			CentralLookup.getDefault().replace(BorderDecorator.BorderDecoratorPaint.class,
+					new BorderDecorator.BorderDecoratorPaint());
+		}
+		}
+		newBorderSet++;
 	}
 
 	RowSet getRowSet() {
@@ -241,7 +255,7 @@ public class Example1 extends JFrame {
 			@Override
 			public void performPreInsertOps()
 			{
-				// SSDBNavImpl will clear the component values
+				// BaseClass clears clear the component values
 				super.performPreInsertOps();
 
 				try (final ResultSet rs = connection.createStatement(

@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.SimpleFormatter;
@@ -69,7 +70,12 @@ import java.util.logging.SimpleFormatter;
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 
 import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
@@ -191,37 +197,53 @@ public class SSUtils {
 				Set.of(RETAIN_CLASS_REFERENCE), skip+1).walk(s ->
 						s.skip(skip)
 								.findFirst());
+		// if (Boolean.FALSE) {
+		// 	// For a verbose mode.
+		// 	StackFrame frame = caller.get();
+		// 	Objects.nonNull(frame.getFileName());
+		// 	Objects.nonNull(frame.getLineNumber());
+		// }
 		String meth = caller.isEmpty() ? null
 				: caller.get().getDeclaringClass().getSimpleName() + '.' + caller.get().getMethodName();
 		return meth;
 	}
 
-
 	/**
-	 * Find all SSComponents in the specified container.
-	 * @param _container
-	 * @return List of SScomponents
+	 * Recursively find the {@linkplain SSComponent}s in container and
+	 * visit them.
+	 * 
+	 * @param container
+	 * @param visitor
 	 */
-	public static List<SSComponent> findSSComponents(Container _container)
-	{
-		ArrayList<SSComponent> l = new ArrayList<>();
-		findSSComponents(_container, l);
-		return l;
-	}
-	private static void findSSComponents(Container _container, List<SSComponent> l)
-	{
-		//
-		// TODO: Need a special case for getViewport() or anything else ???????
-		//
-		for (Component comp : _container.getComponents()) {
+	public static void visitSSComponents(Container container, Consumer<SSComponent> visitor) {
+		// TODO: should more components have cleanField?
+		final Component[] comps = container.getComponents();
+		for (Component comp : comps) {
 			switch (comp) {
-			case SSComponent c -> l.add(c);
-			case Container c -> findSSComponents(c, l);
-			default -> { }
+			case SSComponent c -> visitor.accept(c);
+			// Could also have a VisitAsSSComponent interface
+			// Would mark SSComponent, param becomes Consumer<VisitAsSSComponent>
+			// case VisitAsSSComponent c -> visitor.accept(c)
+			
+			case JRootPane c ->		visitSSComponents(c, visitor);
+			case JPanel c ->		visitSSComponents(c, visitor);
+			case JLayeredPane c ->	visitSSComponents(c, visitor);
+			case JTabbedPane c ->	visitSSComponents(c, visitor);
+			case JScrollPane c ->	visitSSComponents(c.getViewport(), visitor);
+			default -> {
+				// TODO: have a plugin that take "c" and returns true/false
+				//       for whether or not it should be visited;
+				//       i.e. if it should be treated like a container.
+			}
 			}
 		}
 	}
 
+	// public static Container findRoot(Component c) {
+	// 	return null;
+	// }
+
+	
 	/**
 	 * Notify the user of something...
 	 */

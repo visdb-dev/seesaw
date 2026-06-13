@@ -42,10 +42,10 @@ package com.nqadmin.swingset.decorators;
  * Typically used to specify text color.
  * Foreground in text JTextComponent.
  */
-public enum TextDecorationStyle
+public enum TextDecorationNegative
 {
 	/** Use the original/default text style. */
-	RESET,
+	NONE,
 
 	/** Text is a negative number. */
 	NEGATIVE_NUMBER,

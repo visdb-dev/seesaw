@@ -41,7 +41,14 @@ API options
   What other types of text decoration, other than red for negative, might
   be useful in general?
 
+  Color, font, bold/italic, & font size seem like good attributes to modify.
+  Strike-through? Field background color?
+
 Other options and/or variants?
+
+================================================================================
+
+Generalize SSUtils.visitSSComponents
 
 ================================================================================
 
@@ -49,7 +56,38 @@ Inconsistently used: SSCommon.isRestoreOnError(). Currently disabled
 
 ================================================================================
 
-DBComboBox2 - firePropertyChange, needed? Ifso use eventbus? setSeparator()
+Use metadata for a default implementation of DbOpsCustomizer pre/post ops.
+    - E.g. automatically(/assist) key generation
+
+Would like to have DbOpsCustomizerImpl automatically find ROOT container;
+then it would be stateless and can be shared. Maybe could
+
+For performPreInsertOps only allow JdbcRowSet, CachedRowSet (but not
+FilteredRowSet, JoinRowSet, WebRowSet).
+
+Maybe SSDBSupport.getDefault().isWritableType(RowSet rs)
+Better SSSupport static what is handled by SS lib. Makes it easier to find
+dependencies on library capabilities.
+interface SSSupport {
+    def boolean isWritableType(RowSet rs) {
+        return switch (rs) {
+        case FilteredRowSet, JoinRowSet, WebRowSet _ -> false;
+        case JdbcRowSet _ -> true;
+        case CachedRowSet _ -> true;
+        default -> false;
+        }
+    }
+}
+
+Might want "interface RootContainer" to use a the value of the JComponent
+client property. Could have a variety of methods.
+
+Knowing the root container probably helps to automate using SimpleValidation.
+
+================================================================================
+
+DBComboBox2
+    - firePropertyChange, needed? Ifso use eventbus? setSeparator()
 
 ================================================================================
 

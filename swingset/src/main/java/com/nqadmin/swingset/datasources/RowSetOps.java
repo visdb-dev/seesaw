@@ -44,10 +44,12 @@ package com.nqadmin.swingset.datasources;
 
 import java.lang.System.Logger;
 import java.sql.Array;
+import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,10 +73,10 @@ import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass;
+import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStart;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
-import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStart;
 
 /**
  * Utility class for working with {@link RowSet}s and {@link ResultSet}s.
@@ -94,23 +96,24 @@ public class RowSetOps {
 	/**
 	 * Inserts the context of the insert row into this {@linkplain ResultSet}
 	 * and into the database. Handle CachedRowSet.
-	 * @param _resultSet
+	 * @param resultSet
 	 * @throws SQLException
 	 */
-	public static void insertRow(ResultSet _resultSet) throws SQLException {
-		_resultSet.insertRow();
-		if (_resultSet instanceof CachedRowSet crs) {
-			logger.log(DEBUG, "using CachedRowSet");
-			_resultSet.moveToCurrentRow();
-			try {
-				RowSetState.acceptCachedRowSetChanges(crs, null);
-			} catch (SyncProviderException ex) {
-				//
-				// TODO: test CRS undoInsert after accept changes
-				//
-				crs.undoInsert();
-				throw ex;
-			}
+	public static void insertRow(ResultSet resultSet) throws SQLException {
+		resultSet.insertRow();
+		if (!(resultSet instanceof CachedRowSet crs))
+			return;
+
+		logger.log(DEBUG, "using CachedRowSet");
+		resultSet.moveToCurrentRow();
+		try {
+			RowSetState.acceptCachedRowSetChanges(crs);
+		} catch (SyncProviderException ex) {
+			//
+			// TODO: test CRS undoInsert after accept changes
+			//
+			crs.undoInsert();
+			throw ex;
 		}
 	}
 
@@ -146,28 +149,28 @@ public class RowSetOps {
 	/**
 	 * Updates the underlying database with the new contents of the current row
 	 * of this {@linkplain ResultSet} object. Handle CachedRowSet.
-	 * @param _resultSet
+	 * @param resultSet
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public static void updateRow(ResultSet _resultSet) throws SQLException {
-		_resultSet.updateRow();
-		if (!(_resultSet instanceof CachedRowSet crs))
+	public static void updateRow(ResultSet resultSet) throws SQLException {
+		resultSet.updateRow();
+		if (!(resultSet instanceof CachedRowSet crs))
 			return;
 
 		final int maxTry = 2;
 		List<ConflictRow> conflictRows = null;
 		SyncProviderException srEx = null;
-		int currentRow = _resultSet.getRow();
+		int currentRow = resultSet.getRow();
 
 		int tryCount = 1;
 		for (; tryCount <= maxTry; ++tryCount) {
 			logger.log(DEBUG, sf("CachedRowSet.acceptChanges: try %d", tryCount));
 			try {
-				RowSetState.acceptCachedRowSetChanges(crs, null);
-				ResetRowPosition.doit(_resultSet, currentRow, true);
+				RowSetState.acceptCachedRowSetChanges(crs);
+				ResetRowPosition.doit(resultSet, currentRow, true);
 				break;
-			} catch (SyncProviderException ex) {
+			} catch (SyncProviderException syncEx) {
 				if (Boolean.TRUE) {
 					// Just log and re-throw the exception and
 					// try looping to do it again and see how conflicts go.
@@ -175,8 +178,7 @@ public class RowSetOps {
 					// and imediately re-run commit. Then use the collected
 					// conflicts for the UI to pick and chose, then use
 					// UI results to resolve.
-					List<ConflictRow> cRows = Utils.collectConflictNoThrow(
-							ex.getSyncResolver(), crs);
+					List<ConflictRow> cRows = Utils.collectConflictNoThrow(syncEx.getSyncResolver(), crs);
 					Utils.dumpConflict((s) -> logger.log(DEBUG, s), cRows);
 					Utils.dumpConflict((s) -> System.err.printf("%s\n", s), cRows);
 					if(conflictRows == null) {
@@ -188,12 +190,12 @@ public class RowSetOps {
 					if(!Objects.equals(conflictRows, cRows))
 						throw new IllegalStateException("Conflicts should be equal");
 
-					ResetRowPosition.doit(_resultSet, currentRow);
-					throw ex;
+					ResetRowPosition.doit(resultSet, currentRow);
+					throw syncEx;
 				}
 				// ============================================================
 
-				srEx = ex;
+				srEx = syncEx;
 				//
 				// TODO: test CRS undoUpdate after accept changes
 				//
@@ -224,13 +226,16 @@ public class RowSetOps {
 				//		the CRS should be reloaded from the database.
 				//
 
-				ResetRowPosition rrp = new ResetRowPosition(_resultSet, currentRow);
+				ResetRowPosition rrp = new ResetRowPosition(resultSet, currentRow);
 				if (persistDB)
 					throw new SQLException("These value not persisted");
 				if (rrp.ex != null)
 					throw rrp.ex;
 				break;
 			}
+			// if AfterChanges...:w
+			// if AfterChanges...:w
+			
 		}
 
 		if (tryCount > maxTry && srEx != null)
@@ -240,77 +245,78 @@ public class RowSetOps {
 	/**
 	 * Deletes the current row from this {@linkplain ResultSet} and from the
 	 * underlying database. Handle CachedRowSet.
-	 * @param _resultSet
+	 * @param resultSet
 	 * @throws SQLException 
 	 */
-	public static void deleteRow(ResultSet _resultSet) throws SQLException {
-		_resultSet.deleteRow();
-		if (_resultSet instanceof CachedRowSet crs) {
-			logger.log(DEBUG, "using CachedRowSet");
-			try {
-				RowSetState.acceptCachedRowSetChanges(crs, null);
-			} catch (SyncProviderException ex) {
-				crs.undoDelete();
-				throw ex;
-			}
+	public static void deleteRow(ResultSet resultSet) throws SQLException {
+		resultSet.deleteRow();
+		if (!(resultSet instanceof CachedRowSet crs))
+			return;
+
+		logger.log(DEBUG, "using CachedRowSet");
+		try {
+			RowSetState.acceptCachedRowSetChanges(crs);
+		} catch (SyncProviderException ex) {
+			crs.undoDelete();
+			throw ex;
 		}
 	}
 
 	/**
 	 * Returns the number of columns in the underlying ResultSet object
 	 *
-	 * @param _resultSet ResultSet on which to operate
+	 * @param resultSet ResultSet on which to operate
 	 * @return the number of columns
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnCount(final ResultSet _resultSet) throws SQLException {
-		return _resultSet.getMetaData().getColumnCount();
+	public static int getColumnCount(final ResultSet resultSet) throws SQLException {
+		return resultSet.getMetaData().getColumnCount();
 	}
 
 	/**
 	 * Get the designated column's index
 	 *
-	 * @param _resultSet ResultSet on which to operate
-	 * @param _columnName - name of the column
+	 * @param resultSet ResultSet on which to operate
+	 * @param columnName - name of the column
 	 *
 	 * @return returns the corresponding column index (starting from 1)
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnIndex(final ResultSet _resultSet, final String _columnName) throws SQLException {
-		return _resultSet.findColumn(_columnName);
+	public static int getColumnIndex(final ResultSet resultSet, final String columnName) throws SQLException {
+		return resultSet.findColumn(columnName);
 	}
 
 	/**
 	 * Returns the column name for the column index provided
 	 *
-	 * @param _resultSet ResultSet on which to operate
-	 * @param _columnIndex - the column index where the first column is 1, second
+	 * @param resultSet ResultSet on which to operate
+	 * @param columnIndex - the column index where the first column is 1, second
 	 *                     column is 2, etc.
 	 * @return the column name of the given column index
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static String getColumnName(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
-		return _resultSet.getMetaData().getColumnName(_columnIndex);
+	public static String getColumnName(final ResultSet resultSet, final int columnIndex) throws SQLException {
+		return resultSet.getMetaData().getColumnName(columnIndex);
 	}
 
 	/**
 	 * Determine if the specified column is nullable. If the nullability
 	 * of the column is unknown, then an empty Optional is returned.
-	 * @param _resultSet RowSet on which to operate
-	 * @param _columnIndex column index
+	 * @param resultSet RowSet on which to operate
+	 * @param columnIndex column index
 	 * @return Optional of true if nullable, empty Optional if unknown.
 	 */
-	public static Optional<Boolean> isNullable(final ResultSet _resultSet, final int _columnIndex) {
+	public static Optional<Boolean> isNullable(final ResultSet resultSet, final int columnIndex) {
 		try {
-			int nullable = _resultSet.getMetaData().isNullable(_columnIndex);
+			int nullable = resultSet.getMetaData().isNullable(columnIndex);
 			return nullable == ResultSetMetaData.columnNullableUnknown
 					? Optional.empty()
 					: Optional.of(nullable == ResultSetMetaData.columnNullable);
 		} catch (SQLException ex) {
 			logger.log(ERROR, () -> sf("SQL Exception for column %d.",
-					_columnIndex, ex));
+					columnIndex, ex));
 			return Optional.empty();
 		}
 	}
@@ -318,16 +324,16 @@ public class RowSetOps {
 	/**
 	 * Determine if the specified column is nullable. If the nullability
 	 * of the column is unknown, then an empty Optional is returned.
-	 * @param _resultSet RowSet on which to operate
-	 * @param _columnName column name
+	 * @param resultSet RowSet on which to operate
+	 * @param columnName column name
 	 * @return Optional of true if nullable, empty Optional if unknown.
 	 */
-	public static Optional<Boolean> isNullable(final ResultSet _resultSet, final String _columnName) {
+	public static Optional<Boolean> isNullable(final ResultSet resultSet, final String columnName) {
 		try {
-			return isNullable(_resultSet, getColumnIndex(_resultSet, _columnName));
+			return isNullable(resultSet, getColumnIndex(resultSet, columnName));
 		} catch (SQLException ex) {
 			logger.log(ERROR, () -> sf("SQL Exception for column %s.",
-					_columnName, ex));
+					columnName, ex));
 			return Optional.empty();
 		}
 	}
@@ -338,15 +344,15 @@ public class RowSetOps {
 	 *
 	 * @see "https://docs.oracle.com/javase/7/docs/api/java/sql/Types.html"
 	 *
-	 * @param _resultSet ResultSet on which to operate
-	 * @param _columnIndex - the column index where the first column is 1, second
+	 * @param resultSet ResultSet on which to operate
+	 * @param columnIndex - the column index where the first column is 1, second
 	 *                     column is 2, etc.
 	 * @return SQL type from java.sql.Types
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
-		return _resultSet.getMetaData().getColumnType(_columnIndex);
+	public static int getColumnType(final ResultSet resultSet, final int columnIndex) throws SQLException {
+		return resultSet.getMetaData().getColumnType(columnIndex);
 	}
 
 	/**
@@ -355,15 +361,15 @@ public class RowSetOps {
 	 *
 	 * @see java.sql.JDBCType
 	 *
-	 * @param _resultSet ResultSet on which to operate
-	 * @param _columnIndex - the column index where the first column is 1, second
+	 * @param resultSet ResultSet on which to operate
+	 * @param columnIndex - the column index where the first column is 1, second
 	 *                     column is 2, etc.
 	 * @return JDBCType of the column
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static JDBCType getJDBCColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
-		return getJDBCType(getColumnType(_resultSet, _columnIndex));
+	public static JDBCType getJDBCColumnType(final ResultSet resultSet, final int columnIndex) throws SQLException {
+		return getJDBCType(getColumnType(resultSet, columnIndex));
 	}
 
 	/**
@@ -405,28 +411,28 @@ public class RowSetOps {
 	 * Retrieve the Java Class corresponding to the designated column
 	 * based on the column name.
 	 * 
-	 * @param _columnName - name of the column
+	 * @param columnName - name of the column
 	 *
-	 * @param _resultSet ResultSet on which to operate
+	 * @param resultSet ResultSet on which to operate
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Class<?> getClassColumnType(final ResultSet _resultSet, final String _columnName) throws SQLException {
-		return getClassColumnType(_resultSet, getColumnIndex(_resultSet, _columnName));
+	public static Class<?> getClassColumnType(final ResultSet resultSet, final String columnName) throws SQLException {
+		return getClassColumnType(resultSet, getColumnIndex(resultSet, columnName));
 	}
 
 	/**
 	 * Retrieve the Java Class corresponding to the designated column
 	 * based on the column index (starting from 1).
 	 * 
-	 * @param _columnIndex - index of the column
+	 * @param columnIndex - index of the column
 	 *
-	 * @param _resultSet ResultSet on which to operate
+	 * @param resultSet ResultSet on which to operate
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Class<?> getClassColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
-		JDBCType type = RowSetOps.getJDBCColumnType(_resultSet, _columnIndex);
+	public static Class<?> getClassColumnType(final ResultSet resultSet, final int columnIndex) throws SQLException {
+		JDBCType type = RowSetOps.getJDBCColumnType(resultSet, columnIndex);
 		return findJavaTypeClass(type);
 	}
 
@@ -506,13 +512,13 @@ public class RowSetOps {
 	 */
 	public static String getColumnObjectText(RSC comp)
 	{
-		final RowSet _rowSet = comp.getRowSet();
-		final String _columnName = comp.getColumnName();
+		final RowSet rowSet = comp.getRowSet();
+		final String columnName = comp.getColumnName();
 
 		String value = null;
 		try {
 			// IF THE COLUMN IS NULL SO RETURN NULL
-			if (getColumnCount(_rowSet)==0) {
+			if (getColumnCount(rowSet)==0) {
 				return null;
 			}
 
@@ -525,7 +531,7 @@ public class RowSetOps {
 			if (objectValue instanceof String s)
 				return s;
 
-			final JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
+			final JDBCType jdbcType = getJDBCType(getColumnType(rowSet, columnName));
 
 			switch (jdbcType) {
 			case INTEGER, SMALLINT, TINYINT, BIGINT, REAL, DOUBLE, FLOAT,
@@ -536,7 +542,7 @@ public class RowSetOps {
 			case DATE, TIME, TIMESTAMP ->
 				value = DateTime.getDateTimeText(objectValue, comp);
 			default -> // TODO: SSSQLExceptionUnhandledType
-				logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+				logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + columnName + ".");
 			} // end switch
 			//
 			// TODO: Convert this to use java.time.LocalDate, LocalTime,
@@ -545,7 +551,7 @@ public class RowSetOps {
 			
 
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception for column " + _columnName + ".", se);
+			logger.log(ERROR, "SQL Exception for column " + columnName + ".", se);
 		}
 
 		return value;
@@ -695,9 +701,11 @@ public class RowSetOps {
 	}
 
 	/**
-	 *
+	 * If enabled, modifify the database table associated with comp using a different
+	 * ResultSet forcing a conflict. The modification is to comp's current row
+	 * with a different value. Does nothing if not a String column.
 	 * @param comp
-	 * @param updatedValue
+	 * @param updatedValue current value for the component
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -712,9 +720,13 @@ public class RowSetOps {
 		if (fc == null || !fc.doForce())
 			return;
 		
-		try(RowSet rs = defLookup(SSDBSupport.class).getJdbcRowSet(comp.getRowSet());) {
-			rs.setCommand(comp.getRowSet().getCommand());
-			rs.execute();
+		// Get a resultSet that is probably the same as the RowSet associated
+		// with the param comp.
+		Connection conn = defLookup(SSDBSupport.class).getSharedConnection(comp.getRowSet());
+		try(Statement statement = conn.createStatement(
+				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+			ResultSet rs = statement.executeQuery(comp.getRowSet().getCommand());
+			//ResultSet rs = statement.getResultSet();
 			rs.absolute(comp.getRowSet().getRow());
 			System.err.printf("FORCE_CONFLICT: %s\n",
 					rs.getObject(comp.getColumnIndex()));
@@ -935,12 +947,12 @@ public class RowSetOps {
 	 * to the database.
 	 *
 	 * @param comp The SSComponent doing the update
-	 * @param _updatedValue Array
+	 * @param updatedValue Array
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnArray(final SSComponent comp, final Array _updatedValue) throws SSSQLNullException, SQLException {
-		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getColumnName(), comp.getAllowNull());
+	public static void updateColumnArray(final SSComponent comp, final Array updatedValue) throws SSSQLNullException, SQLException {
+		updateColumnArray(comp, comp.getRowSet(), updatedValue, comp.getColumnName(), comp.getAllowNull());
 	}
 
 	/**
@@ -952,42 +964,42 @@ public class RowSetOps {
 	 * to the database.
 	 *
 	 * @param comp The SSComponent doing the update
-	 * @param _rowSet RowSet on which to operate
-	 * @param _updatedValue Array
-	 * @param _columnName   name of the database column
-	 * @param _allowNull 	indicates if Component and underlying column can contain null values
+	 * @param rowSet RowSet on which to operate
+	 * @param updatedValue Array
+	 * @param columnName   name of the database column
+	 * @param allowNull 	indicates if Component and underlying column can contain null values
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	private static void updateColumnArray(final SSComponent comp, final RowSet _rowSet, final Array _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
+	private static void updateColumnArray(final SSComponent comp, final RowSet rowSet, final Array updatedValue, final String columnName, final boolean allowNull) throws SSSQLNullException, SQLException
 	{
-		logger.log(DEBUG, () -> "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		logger.log(DEBUG, () -> "[" + columnName + "]. Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
 
 		UndoRedo.captureInitialValue(comp); // undo/redo
 
 		// On insert row, write null if updatedValue is null, and do not perform other checks. 
 		boolean did_update = false;
 		try {
-			if (_updatedValue == null && RowSetState.isInserting(_rowSet)) {
-				_rowSet.updateNull(_columnName);
+			if (updatedValue == null && RowSetState.isInserting(rowSet)) {
+				rowSet.updateNull(columnName);
 				did_update = true;
 				return;
 			}
 			
-			if (_updatedValue == null) {
-				if (_allowNull) {
-					_rowSet.updateNull(_columnName);
+			if (updatedValue == null) {
+				if (allowNull) {
+					rowSet.updateNull(columnName);
 					did_update = true;
 					return;
 				} else
 					throw new SSSQLNullException("NULL not allowed for this field.");
 			}
 			
-			_rowSet.updateArray(_columnName, _updatedValue);
+			rowSet.updateArray(columnName, updatedValue);
 			did_update = true;
 		} finally {
 			if (did_update)
-				postColumnChangeStart(comp, _updatedValue);
+				postColumnChangeStart(comp, updatedValue);
 		}
 	}
 
@@ -1048,18 +1060,18 @@ public class RowSetOps {
 	 * change to the RowSet. A separate call is required to flush/commit the change
 	 * to the database.
 	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _value string to be type-converted as needed and updated in
+	 * @param rowSet RowSet on which to operate
+	 * @param value string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
-	 * @param _columnIndex   index of the database column
+	 * @param columnIndex   index of the database column
 	 * @param type NOT USED, the jdbc driver does the conversion
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	private static void updateColumnObjectDirect(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
+	private static void updateColumnObjectDirect(RowSet rowSet, int columnIndex, Object value, JDBCType type) throws SQLException {
 		if (Boolean.TRUE)
-			_rowSet.updateObject(_columnIndex, _value);
+			rowSet.updateObject(columnIndex, value);
 		else
-			RowSetOps_NOT_USED.updateColumnObject2(_rowSet, _columnIndex, _value, type);
+			RowSetOps_NOT_USED.updateColumnObject2(rowSet, columnIndex, value, type);
 	}
 
 	/**
@@ -1070,16 +1082,16 @@ public class RowSetOps {
 	 * change to the RowSet. A separate call is required to flush/commit the change
 	 * to the database.
 	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _value string to be type-converted as needed and updated in
+	 * @param rowSet RowSet on which to operate
+	 * @param value string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
-	 * @param _columnIndex   index of the database column
+	 * @param columnIndex   index of the database column
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObjectDirect(RowSet _rowSet, int _columnIndex, Object _value) throws SQLException {
+	public static void updateColumnObjectDirect(RowSet rowSet, int columnIndex, Object value) throws SQLException {
 		if (Boolean.TRUE)
-			_rowSet.updateObject(_columnIndex, _value);
+			rowSet.updateObject(columnIndex, value);
 		else
-			RowSetOps_NOT_USED.updateColumnObject2(_rowSet, _columnIndex, _value, getJDBCColumnType(_rowSet, _columnIndex));
+			RowSetOps_NOT_USED.updateColumnObject2(rowSet, columnIndex, value, getJDBCColumnType(rowSet, columnIndex));
 	}
 }

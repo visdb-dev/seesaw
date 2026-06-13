@@ -47,7 +47,6 @@ package com.nqadmin.swingset.decorators;
 import java.awt.Color;
 import java.awt.Insets;
 import java.lang.System.Logger;
-import java.util.Collection;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
@@ -94,17 +93,12 @@ public class BorderDecorator extends FocusDecorator
 		if (bdp == null) {
 			bdpResult = CentralLookup.getDefault().lookupResult(BorderDecoratorPaint.class);
 			bdpResult.addLookupListener((LookupEvent le) -> {
-				// could assert le.getSource == bdpResult
-				Collection<? extends BorderDecoratorPaint> c = bdpResult.allInstances();
-				if (!c.isEmpty()) {
-					BorderDecoratorPaint next = c.iterator().next();
-					bdp = next;
-				}
+				// do nothing if empty
+				bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
 			});
-			Collection<? extends BorderDecoratorPaint> c = bdpResult.allInstances();
-			if (c.isEmpty())
+			bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
+			if (bdp == null)
 				throw new IllegalStateException("BorderDecoratorPaint not found");
-			bdp = c.iterator().next();
 		}
 		return bdp;
 	}

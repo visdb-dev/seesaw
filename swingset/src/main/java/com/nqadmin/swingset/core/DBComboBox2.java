@@ -419,6 +419,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @return the connection
 	 */
+	// TODO: should this be getSharedConnection? Not necessarily, what does it get you?
 	private Connection getConnection() {
 		return connection;
 	}

@@ -1,21 +1,20 @@
-/*******************************************************************************
- * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
- * 
+/* *****************************************************************************
+ * Copyright (C) 2026, Ernie R Rael. All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,44 +26,36 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
- ******************************************************************************/
-package com.nqadmin.swingset.utils;
+ * ****************************************************************************/
+package com.nqadmin.swingset.datasources;
+
+import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.FilteredRowSet;
+import javax.sql.rowset.JdbcRowSet;
+import javax.sql.rowset.JoinRowSet;
+import javax.sql.rowset.WebRowSet;
 
 /**
- * Various Enumerations for SwingSet
+ * Specifies specific things that are supported by SS.
+ * <p>
+ * Experimental, this class may go away.
  */
-public class SSEnums {
+public interface SSSupport
+{
 	/**
-	 * Enumeration for navigation buttons.
+	 * Does SS handle the specified type of RowSet.
+	 * @param rs
+	 * @return 
 	 */
-	public enum Navigation {
-		/** Go to the first record in the RowSet */
-		First(3),
-		/** Go to the last record in the RowSet */
-		Last(4),
-		/** Go to the next record in the RowSet */
-		Next(1),
-		/** Go to the previous record in the RowSet */
-		Previous(2);
-
-		private final int value;
-
-		Navigation(final int newValue) {
-			value = newValue;
-		}
-
-		/**
-		 * @return integer corresponding to enumerated value
-		 */
-		public int getValue() {
-			return value;
-		}
+	default boolean isWritableRowSetType(RowSet rs) {
+		return switch (rs) {
+		case FilteredRowSet _ -> false;
+		case JoinRowSet _ -> false;
+		case WebRowSet _ -> false;
+		case JdbcRowSet _ -> true;
+		case CachedRowSet _ -> true;
+		default -> false;
+		};
 	}
 }

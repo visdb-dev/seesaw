@@ -564,7 +564,8 @@ final class NavigateState
 	 * After committing, it performs any post-update operations.
 	 * <p>
 	 * If writable==false, then skip the update and return as
-	 * successful, unless we have an empty rowset. 
+	 * successful, unless we have an empty rowset.
+	 * Checks {@link DbOpsCustomizer#allowUpdate() }.
 	 * 
 	 * @param performPostUpdateOps true if performPostUpdateOps() should
 	 * 	be called after successful update, otherwise false
@@ -687,7 +688,7 @@ final class NavigateState
 	 */
 
 	/** Indicator to force confirmation of RowSet deletions. */
-	/*private*/ boolean confirmDeletes = true;
+	private boolean confirmDeletes = true;
 
 	/** Indicator to allow/disallow deletions from the RowSet. */
 	private boolean deletion = true;
@@ -885,8 +886,6 @@ final class NavigateState
 	
 	private void updateEnable(RowsAction navAction, boolean flag) {
 		List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
-		if (rowsModels.isEmpty())
-			return;
 		for (RowsModel rowsModel : rowsModels) {
 			Action act = rowsModel.getAction(navAction);
 			if(act.isEnabled() != flag)
@@ -915,10 +914,10 @@ final class NavigateState
 	/**
 	 * Set whether or not the commit and cancel buttons are
 	 * always enabled, independent of whether or not there is a writable.
-	 * @param _v3Buttons true for pre v4 behavior
+	 * @param v3Buttons true for pre v4 behavior
 	 */
-	public void setV3Buttons(boolean _v3Buttons) {
-		v3Buttons = _v3Buttons;
+	public void setV3Buttons(boolean v3Buttons) {
+		this.v3Buttons = v3Buttons;
 	}
 
 	/**
@@ -940,10 +939,10 @@ final class NavigateState
 	 * Navigating away from a modified row,
 	 * commits the changes to the rowSet.
 	 * 
-	 * @param _autoCommit inidcates whether or not to enable autoCommit mode
+	 * @param autoCommit inidcates whether or not to enable autoCommit mode
 	 */
-	public void setAutoCommit(boolean _autoCommit) {
-		autoCommit = _autoCommit;
+	public void setAutoCommit(boolean autoCommit) {
+		this.autoCommit = autoCommit;
 	}
 
 	/**

@@ -70,7 +70,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import javax.sql.RowSet;
 import javax.sql.rowset.spi.SyncFactory;
 import javax.sql.rowset.spi.SyncFactoryException;
 import javax.sql.rowset.spi.SyncProvider;
@@ -86,6 +85,8 @@ import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
+import com.nqadmin.swingset.datasources.SSDBSupport;
+import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.CentralLookup;
@@ -99,8 +100,6 @@ import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.models.SSCollection;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -398,13 +397,8 @@ public class MainClass extends JFrame
 		} catch (SQLException ex) {
 		}
 		
-		CentralLookup.getDefault().add(new DefaultSSDBSupport(dbConnection) {
-			@Override
-			public RowSet getJdbcRowSet(RowSet rs) throws SQLException
-			{
-				return DemoUtil.getNewRowSet(getSharedConnection(rs), DemoUtil.RowSetSource.POOL_JDBC);
-			}
-		});
+		CentralLookup.getDefault().replace(
+				SSDBSupport.class, new DefaultSSDBSupport(dbConnection) { });
 
 		// ADD ACTION LISTENERS FOR BUTTONS
 		// TODO: can share listener OR add arg that can be switched on.
@@ -864,8 +858,9 @@ public class MainClass extends JFrame
 		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
 		//SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
 		//lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
-		//lkup.add(new ForceConflict(0));
 		//lkup.add(new SSUtils.DebugRowSetListenerFlag());
+
+		lkup.add(new ForceConflict(1));
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",

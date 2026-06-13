@@ -43,7 +43,7 @@ public class Util
 	 */
 	public static void initLookup() {
 		CentralLookup lkup = CentralLookup.getDefault();
-		lkup.replace(SSDBSupport.class, new DefaultSSDBSupport());
+		lkup.replace(SSDBSupport.class, new DefaultSSDBSupport(null));
 	}
 
 	private Util()

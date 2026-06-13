@@ -728,7 +728,7 @@ public final class RowsModel
 	interface EnqueueRowsModelEvent
 	{
 		void startRowsEvent(RowsModel model, Object compOrNav);
-		void startRowsEvent(OperatorKind _operatorKind, RowsModel model, Object compOrNav);
+		void startRowsEvent(OperatorKind operatorKind, RowsModel model, Object compOrNav);
 		void addRowSetEvent(RowSetEventType rsEventType, RowSet rs);
 		RowsEventSource finishRowsEvent(RowsModel model);
 		void postNewRowSetEvent(RowsModel model, RowSet oldRowSet);

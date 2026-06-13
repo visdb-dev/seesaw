@@ -35,8 +35,8 @@ import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.DecoratorSupplier;
 
 /**
- * This class is used internally initialize CentralLookup defaults.
- * There is no need to use this outside of the library.
+ * This class is used internally to initialize CentralLookup defaults.
+ * There is no need to invoke this outside of the library.
  * The first access to the library could be something like:
  * {@snippet lang="java":
  *     // Add application defaults to CentralLookup.
@@ -55,6 +55,9 @@ public class LookupDefaults
 	 * not including CentralLookup, to initialize
 	 * default CentralLookup elements that are required by the library
 	 * and are not already present or setup by the application.
+	 * <p>
+	 * Might be better to initialize where needed if no value.
+	 * But this does serve to document some of the things that can be put in lookup.
 	 */
 	public static void init() {
 		if (initialized)

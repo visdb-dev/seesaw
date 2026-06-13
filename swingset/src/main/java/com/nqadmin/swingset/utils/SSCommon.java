@@ -1277,12 +1277,12 @@ final class SSCommon
 
 	/**
 	 * Install the given validator into the component
-	 * @param _validator validator to install
+	 * @param validator validator to install
 	 */
-	void setValidator(Validator _validator) {
-		validator.uninstall();
-		_validator.install(ssComponent);
-		validator = _validator;
+	void setValidator(Validator validator) {
+		this.validator.uninstall();
+		validator.install(ssComponent);
+		this.validator = validator;
 	}
 	
 	/**

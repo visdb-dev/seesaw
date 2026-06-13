@@ -53,7 +53,12 @@ import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
- * Database specific handling and database access strategy.
+ * Database specific operations and access strategy.
+ * An implementation manages and uses a {@code sharedConnection},
+ * <p>
+ * This needs work, clean up. It evolved as someplace to put stuff that
+ * shouldn't be in mainline code; and it provides a way to find out where those
+ * places are. 
  */
 public interface SSDBSupport {
 
@@ -65,6 +70,82 @@ public interface SSDBSupport {
 		SSDBSupport support = CentralLookup.getDefault().lookup(SSDBSupport.class);
 		return support;
 	}
+
+	/**
+	 * For the typical simple cases run the columnRead to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 *
+	 * @param comp
+	 * @return
+	 * @throws java.sql.SQLException
+	 */
+	static Object runDbReader(SSComponent comp) throws SQLException {
+		return comp.getColumnReader()
+				.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
+	}
+
+	/**
+	 * For the typical simple cases run the columnWriter to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 * 
+	 * @param comp
+	 * @param value
+	 * @throws SQLException
+	 */
+	static void runDbWriter(SSComponent comp, Object value) throws SQLException {
+		runDbWriter(comp, value, comp.getColumnWriter());
+	}
+
+	/**
+	 * For the typical simple cases run the columnWriter to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 *
+	 * @param comp
+	 * @param value
+	 * @param columnWriter
+	 * @throws SQLException
+	 */
+	// TODO: any reason to make this public?
+	private static void runDbWriter(SSComponent comp, Object value,
+			DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
+			throws SQLException {
+		columnWriter.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
+	}
+
+	/**
+	 * Run the function with a connection to the database associated
+	 * with the specified {@code RowSet}, return the result.
+	 * @param <R>
+	 * @param rs if null, just use the {@code sharedConnection}
+	 * @param func
+	 * @return
+	 * @throws java.sql.SQLException
+	 */
+	<R> R runWithConnection(RowSet rs, FuncSQL<Connection, R> func) throws SQLException;
+
+	/**
+	 * Return a connection for quick use that
+	 * connects to the database where the row set comes from.
+	 * <em>Do not close</em> the returned connection after use.
+	 * 
+	 * @param rs row set from target database or null for a default connection.
+	 * @return connection or null if none found
+	 * @throws java.sql.SQLException
+	 */
+	Connection getSharedConnection(RowSet rs) throws SQLException;
+
+	/**
+	 * Return a connection that connects to the database where the row set comes from;
+	 * <em>close when finished</em>.
+	 * Tries url, dataSource.
+	 * @param rs row set from target database
+	 * @return connection
+	 * @throws java.sql.SQLException
+	 */
+	Connection getConnection(RowSet rs) throws SQLException;
 
 	/**
 	 * Like Runnable, but throws.
@@ -173,87 +254,4 @@ public interface SSDBSupport {
 
 		public void apply(T t, U u, V v, W w) throws SQLException;
 	}
-
-	/**
-	 * For the typical simple cases run the columnRead to set the value.
-	 * Note that the columnWriter typically ignores the comp argument, but
-	 * there for special cases.
-	 *
-	 * @param comp
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	static Object runDbReader(SSComponent comp) throws SQLException {
-		return comp.getColumnReader()
-				.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
-	}
-
-	/**
-	 * For the typical simple cases run the columnWriter to set the value.
-	 * Note that the columnWriter typically ignores the comp argument, but
-	 * there for special cases.
-	 * 
-	 * @param comp
-	 * @param value
-	 * @throws SQLException
-	 */
-	static void runDbWriter(SSComponent comp, Object value) throws SQLException {
-		runDbWriter(comp, value, comp.getColumnWriter());
-	}
-
-	/**
-	 * For the typical simple cases run the columnWriter to set the value.
-	 * Note that the columnWriter typically ignores the comp argument, but
-	 * there for special cases.
-	 *
-	 * @param comp
-	 * @param value
-	 * @param columnWriter
-	 * @throws SQLException
-	 */
-	// TODO: any reason to make this public?
-	private static void runDbWriter(SSComponent comp, Object value,
-			DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
-			throws SQLException {
-		columnWriter.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
-	}
-
-	/**
-	 * Run the function with a connection to the database associated
-	 * with the specified {@code RowSet}, return the result.
-	 * @param <R>
-	 * @param rs
-	 * @param func
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	<R> R runWithConnection(RowSet rs, FuncSQL<Connection, R> func) throws SQLException;
-
-	/**
-	 * Return a connection, that <em>should not be closed</em>, for short term use that
-	 * connects to the database where the row set comes from.
-	 * @param rs row set from target database
-	 * @return connection
-	 * @throws java.sql.SQLException
-	 */
-	Connection getSharedConnection(RowSet rs) throws SQLException;
-
-	/**
-	 * Return a connection that connects to the database where the row set comes from;
-	 * <em>close when finished</em>.
-	 * Tries url, dataSource.
-	 * @param rs row set from target database
-	 * @return connection
-	 * @throws java.sql.SQLException
-	 */
-	Connection getConnection(RowSet rs) throws SQLException;
-
-	/** A row set with a connection (dataSource, url, or whatever)
-	 * that connects to same database as specified row set.
-	 * Should be closed when done with it.
-	 * @param rs row set from target database
-	 * @return rowset for "temporary" use.
-	 * @throws java.sql.SQLException
-	 */
-	RowSet getJdbcRowSet(RowSet rs) throws SQLException;
 }

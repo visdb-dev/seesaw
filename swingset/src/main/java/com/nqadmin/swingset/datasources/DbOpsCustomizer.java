@@ -42,63 +42,60 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
-import java.util.Collections;
-import java.util.List;
-
-import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.navigate.RowsAction;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 /**
  * Interface that provides a set of methods to perform custom operations before
- * a record is added, after a record is added, before a record is deleted and
- * after a record is deleted, and in addition to other actions and whether or not
- * certain actions are allowed. This interface has only default methods, so it
- * can be instantiated using {@code new CustomizeDbOps() {}}.
+ * and/or after certain database related operations;
+ * for example add record, delete record.
+ * There are also other methods to prevent/allow or assist
+ * certain actions, for example {@code allowDeletion()} or {@code performCancelOps()}.
  * <p>
- * performPreInsertOps() is called when the user presses the insert button.
+ * In this class' documentation there are references to {@link RowsAction}
+ * enum values which have associated actions. The actions
+ * are typically invoked by a <b>navigator button push</b> which invokes the
+ * associated action,
+ * for example see {@link SSDataNavigator}
  * <p>
- * performPostInsertOps() is called when the user presses the commit button
- * after updating the values for the newly inserted row. If the user presses the
- * Undo button after the insert button is pressed the insertion is cancelled and
- * this function will not be called.
+ * This interface has only default methods, none of which do anything; it
+ * can be instantiated by doing {@code new CustomizeDbOps() {}}.
  * <p>
- * performPreDeletionOps() is called when the user presses the delete button,
- * but just before the deleteRow() method is called on the RowSet.
- * <p>
- * performPostDeletionOps() is called when the user presses the delete button
- * and after the deleteRow() method is called on the RowSet.
- * <p>
- * Note that both the performPreDeletionOps() and performPostDeletionOps() will
- * be executed when the user presses the delete button.
- * <p>
- * Generally the user will want to use/extend DbOpsCustomizerImpl as it has an
- * implementation of performPreInsertOps() that will clear/reset component
+ * Generally the user will want to use/extend {@link DbOpsCustomizerImpl} as it has an
+ * implementation of {@link DbOpsCustomizerImpl#performPreInsertOps()}
+ * that will clear/reset {@link com.nqadmin.swingset.utils.SSComponent SSComponent}
  * values when a new record is added.
  */
 // TODO: rename SSDBCustomOps
 public interface DbOpsCustomizer {
-
 	/**
-	 * This function will be called after performPreDeletionOps is called but before
-	 * the row is deleted.
+	 * This function is called as the first step, before inserting the row into
+	 * the database, of {@link RowsAction#ACT_COMMIT}.
 	 *
-	 * @return true if the row can be deleted else false.
-	 */
-	default boolean allowDeletion() {
-		return true;
-	}
-
-	/**
-	 * This function is called just before inserting the row into the database
-	 *
-	 * @return true is row can be inserted else false.
+	 * @return true if row can be inserted, false aborts the operation
 	 */
 	default boolean allowInsertion() {
 		return true;
 	}
 
 	/**
-	 * This functions is called just before calling the updateRow on the rowset.
+	 * This function is called as the first step, before performPreDeletionOps
+	 * is called, of {@link RowsAction#ACT_DELETE}.
+	 *
+	 * @return true if the row can be deleted else false and the action is aborted
+	 */
+	default boolean allowDeletion() {
+		return true;
+	}
+
+	/**
+	 * This functions is called just before doing something that is sensitive
+	 * to a row being dirty. When it returns true, it is followed by
+	 * rowSet.updateRow(). Note that the default for {@code AutoCommit} is false.
+	 * So the behavior of {@link SSDataNavigator} in conjunction with
+	 * {@link RowsAction} is that when the current row is dirty only
+	 * commit and undo are enabled.
 	 *
 	 * @return true is the row can be updated else false.
 	 */
@@ -107,87 +104,70 @@ public interface DbOpsCustomizer {
 	}
 
 	/**
-	 * Method to perform operations when the user is on the insert row and cancels
-	 * the insert by clicking on the undo button.
+	 * This method is invoked by {@link RowsAction#ACT_REVERT}, the undo
+	 * button, to perform operations after
+	 * either rowSet.cancelRowUpdates or rowSet.moveToCurrentRow.
+	 * Only meaningful if either the current row
+	 * is modified, or a row is being inserted.
 	 */
-	default void performCancelOps() {
-		// no action by default
-
-	}
-
-	/**
-	 * Method to perform navigation-related operations.
-	 *
-	 * @param _navigationType type of navigation that is occurring
-	 */
-	default void performNavigationOps(final Navigation _navigationType) {
-		// no action by default
-
-	}
-
-	/**
-	 * Method to perform post-deletion operations.
-	 * <p>
-	 * The RowSet listener also provides the notification after the deletion of
-	 * the row.
-	 */
-	default void performPostDeletionOps() {
-		// no action by default
-
-	}
-
-	/**
-	 * Method to perform post-insertion operations.
-	 * <p>
-	 * In addition to this you can have a listener on the RowSet attached to a
-	 * SSDataNavigator to get notified when a row is inserted.
-	 */
-	default void performPostInsertOps() {
-		// no action by default
-
-	}
-
-	/**
-	 * Method to perform operations after the updateRow has been called.
-	 */
-	default void performPostUpdateOps() {
-		// no action by default
-
-	}
-
-	/**
-	 * Method to perform pre-deletion operations.
-	 * <p>
-	 * RowSet provides notification before the deletion of a row.
-	 */
-	default void performPreDeletionOps() {
-		// no action by default
-
-	}
-
-	/**
-	 * Method to perform pre-insertion operations.
-	 */
-	default void performPreInsertOps() {
-		// no action by default
-
-	}
+	default void performCancelOps() { }
 
 	/**
 	 * Method to perform operations when the user hits the refresh button.
+	 * This method is invoked at the end of {@link RowsAction#ACT_REFRESH};
+	 * note the rowSet's query is re-executed and the cursor is positioned
+	 * at the first row.
 	 */
-	default void performRefreshOps() {
-		// no action by default
-
-	}
+	default void performRefreshOps() { }
 
 	/**
-	 * Find all the SSComponents in the navigator window.
-	 * @return
+	 * Method to perform navigation-related operations, in particular at the
+	 * end of
+	 * {@link RowsAction#ACT_FIRST}, {@link RowsAction#ACT_LAST},
+	 * {@link RowsAction#ACT_NEXT}, and {@link RowsAction#ACT_PREVIOUS}.
+	 *
+	 * @param navigationType type of navigation that was done
 	 */
-	default List<SSComponent> findSSComponents() {
-		return Collections.emptyList();
-	}
+	default void performNavigationOps(final Navigation navigationType) { }
 
-} // end public interface CustomizeDbOps {
+	/**
+	 * Method to perform pre-insertion operations by {@link RowsAction#ACT_ADD}
+	 * after rowSet.moveToInsertRow. Typically initializes all the columns'
+	 * {@code SSComponent}s. See {@link DbOpsCustomizerImpl#performPreInsertOps()}.
+	 */
+	default void performPreInsertOps() { }
+	
+	/**
+	 * Method to perform post-insertion operations during 
+	 * {@link RowsAction#ACT_COMMIT} after rowSet.insertRow.
+	 * If the insert is aborted, {@link RowsAction#ACT_REVERT} cancelling
+	 * a pending insert, this is not called.
+	 * <p>
+	 * In addition to this, a listener on the RowSet is
+	 * notified after the RowSet is modified.
+	 */
+	default void performPostInsertOps() { }
+
+	/**
+	 * Method to perform pre-deletion operations; it is used for
+	 * {@link RowsAction#ACT_DELETE}, invoked just before rowSet.deleteRow().
+	 */
+	default void performPreDeletionOps() { }
+
+	/**
+	 * Method to perform post-deletion operations; it is used for
+	 * {@link RowsAction#ACT_DELETE}, invoked just after rowSet.deleteRow().
+	 * <p>
+	 * In addition to this, a listener on the RowSet is
+	 * notified after the RowSet is modified.
+	 */
+	default void performPostDeletionOps() { }
+
+	/**
+	 * Method to perform operations at the end of {@link RowsAction#ACT_COMMIT}
+	 * when the current row is modified, i.e. not on the insert row.
+	 * It is invoked after rowSet.updateRow().
+	 */
+	default void performPostUpdateOps() { }
+}
 

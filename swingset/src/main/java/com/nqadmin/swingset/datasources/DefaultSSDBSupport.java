@@ -52,22 +52,32 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.sql.RowSet;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 /**
+ * Simple assists for working with database. There is typically a shared
+ * connection, the {@code defaultConnection}.
+ * TODO: clarify spec how many connections are supported.
  * TODO: instead of RowSet should take RSC since different columns
  *       could be from different database.
  */
+// TODO: clarify semantics of how many connections are supported
 public class DefaultSSDBSupport implements SSDBSupport
 {
-	private Connection fallbackConnection;
+	private final Connection sharedConnection;
 
-	public DefaultSSDBSupport()
+	/**
+	 * Save the specified connection as the sharedConnection.
+	 * It can be retrieved with a {@code null} param to
+	 * {@link #getSharedConnection(javax.sql.RowSet)}.
+	 * 
+	 * @param sharedConnection 
+	 */
+	public DefaultSSDBSupport(Connection sharedConnection)
 	{
-		this(null);
-	}
-
-	public DefaultSSDBSupport(Connection tempConn)
-	{
-		this.fallbackConnection = tempConn;
+		if (!SSUtils.isJunit())
+			Objects.requireNonNull(sharedConnection);
+		this.sharedConnection = sharedConnection;
 	}
 
 	/**
@@ -99,9 +109,7 @@ public class DefaultSSDBSupport implements SSDBSupport
 
 	/**
 	 * {@inheritDoc }
-	 * @param rs
-	 * @return
-	 * @throws SQLException
+	 * Typically the default connection 
 	 */
 	// TODO: Probably should handle more than one connection, like multiple databases
 	// TODO: Is there a better way to tell if connections is good for the RowSet?
@@ -109,13 +117,15 @@ public class DefaultSSDBSupport implements SSDBSupport
 	@Override
 	public Connection getSharedConnection(RowSet rs) throws SQLException
 	{
-		if (fallbackConnection == null)
+		if (sharedConnection == null)
 			return null;
-		if (fallbackConnection.isClosed())
+		if (sharedConnection.isClosed())
 			throw new IllegalStateException("Shared connection isClosed");
-		if (Objects.equals(fallbackConnection.getCatalog(),
+		if (rs == null)
+			return sharedConnection;
+		if (Objects.equals(sharedConnection.getCatalog(),
 				rs.getMetaData().getCatalogName(1)))
-			return fallbackConnection;
+			return sharedConnection;
 		return null;
 	}
 
@@ -148,18 +158,4 @@ public class DefaultSSDBSupport implements SSDBSupport
 		return null;
 	}
 	private InitialContext ctx;
-
-
-	/**
-	 *
-	 * @param rs
-	 * @return
-	 * @throws SQLException
-	 */
-	@Override
-	public RowSet getJdbcRowSet(RowSet rs) throws SQLException
-	{
-		return null;
-	}
-	
 }

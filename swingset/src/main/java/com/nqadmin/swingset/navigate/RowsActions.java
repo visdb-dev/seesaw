@@ -632,7 +632,7 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_DELETE);
 			try {
-				if (getNavState().confirmDeletes) {
+				if (getNavState().getConfirmDeletes()) {
 					final int answer = JOptionPane.showConfirmDialog(dlgParent(e),
 							"Are you sure you want to delete this record?", "Delete Present Record",
 							JOptionPane.YES_NO_OPTION);

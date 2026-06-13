@@ -59,6 +59,7 @@ import org.openide.util.WeakListeners;
 
 import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.SSSQLException;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.nqadmin.swingset.utils.SSUtils.DebugRowSetListenerFlag;
 
@@ -90,7 +91,7 @@ public class RowSetState
 	 * Determine if the column in our rowset is a primary key.
 	 * Throw an exception if problem is encountered.
 	 * 
-	 * @param _columnName Must be a column in associated RowSet.
+	 * @param columnName Must be a column in associated RowSet.
 	 * @return true if primary key else false
 	 */
 	// TODO: isKey: base this on labelName, not columnName?
@@ -305,12 +306,12 @@ public class RowSetState
 
 	/**
 	 * Set or clear the state indicating that the CachedRowSet is accepting changes.
-	 * @param _crs modify state for this.
+	 * @param crs modify state for this.
 	 * @param flag state set to this.
 	 */
-	private static void setAcceptingCachedRowSetChanges(CachedRowSet _crs, boolean flag) {
-		if (_crs != null) {
-			getRowSetState(_crs).acceptingCachedRowSetChanges = flag;
+	private static void setAcceptingCachedRowSetChanges(CachedRowSet crs, boolean flag) {
+		if (crs != null) {
+			getRowSetState(crs).acceptingCachedRowSetChanges = flag;
 		}
 	}
 
@@ -327,40 +328,115 @@ public class RowSetState
 	/**
 	 * A {@linkplain CachedRowSet} requires an extra step to effect changes
 	 * in its underlying data source;
-	 * this method does {@link #acceptCachedRowSetChanges(CachedRowSet, Runnable)} on the given {@linkplain CachedRowSet}.
+	 * this method does {@link CachedRowSet#acceptChanges() } on the
+	 * specified {@linkplain CachedRowSet}.
 	 * Set the state for the CachedRowSet so that it's listeners can ignore
-	 * the extra events.
+	 * the extra events while the changes are accepted.
+	 * @param crs accept change on this.
+	 * @throws SQLException
+	 */
+	public static void acceptCachedRowSetChanges(CachedRowSet crs) throws SQLException {
+		try {
+			setAcceptingCachedRowSetChanges(crs, true);
+			crs.acceptChanges();
+		} finally {
+			setAcceptingCachedRowSetChanges(crs, false);
+		}
+
+	}
+
+	/**
+	 * A {@linkplain CachedRowSet} requires an extra step to effect changes
+	 * in its underlying data source;
+	 * this method does {@link CachedRowSet#acceptChanges() } on the
+	 * specified {@linkplain CachedRowSet}.
+	 * Set the state for the CachedRowSet so that it's listeners can ignore
+	 * the extra events while the changes are accepted.
 	 * The runnable {@code runAfterChanges}, if not null, is executed after
 	 * acceptChanges on the CachedRowSet is successful.
-	 * @param _crs accept change on this.
+	 * @param crs accept change on this.
 	 * @param runAfterCachedRowSetChanges execute if not null
 	 * @throws SQLException
 	 */
 	//
-	// TODO: Flag to always runAfterChanges
+	// TODO: Flag to always runAfterChanges - if not then skip if SQL error,
 	//		 Maybe instead of runnable,
 	//		 something that contains the flag,
-	//		 something that can throw SQLException
+	//		 something that can throw SQLException,
+	//		 something that gets sqlEx,
 	//
-	public static void acceptCachedRowSetChanges(
-			CachedRowSet _crs, Runnable runAfterCachedRowSetChanges) throws SQLException {
-		SQLException sqlEx = null;
+	@SuppressWarnings("unused")
+	private static void NOT_USED_acceptCachedRowSetChanges (
+			CachedRowSet crs, Runnable runAfterCachedRowSetChanges) throws SQLException {
+		SyncProviderException syncEx = null;
+		Exception afterEx = null;
 		try {
-			setAcceptingCachedRowSetChanges(_crs, true);
-			_crs.acceptChanges();
+			setAcceptingCachedRowSetChanges(crs, true);
+			crs.acceptChanges();
 			//if (runAfterChanges != null) {
 			//	runAfterChanges.run();		// assume if acceptChanges throws, don't need "code"
 			//}
 		} catch(SyncProviderException ex) {
-			sqlEx = ex;
+			syncEx = ex;
 		} finally {
 			if (runAfterCachedRowSetChanges != null) {
-				runAfterCachedRowSetChanges.run();
+				try { runAfterCachedRowSetChanges.run();
+				} catch (Exception ex) { afterEx = ex; }
 			}
-			setAcceptingCachedRowSetChanges(_crs, false);
+			setAcceptingCachedRowSetChanges(crs, false);
 		}
-		if (sqlEx != null)
-			throw sqlEx;
+		if (syncEx != null) {
+			if (afterEx == null) throw syncEx;
+			else throw new NOT_USED_SSSQLSyncProviderException("Exception after Sync", syncEx, afterEx);
+		}
+
+		if (syncEx != null || afterEx != null)
+			throw new NOT_USED_SSSQLSyncProviderException("handling aceptChanges", syncEx, afterEx);
+
+	}
+
+	/**
+	 *
+	 * A wrapper exception for exceptions that occur while the SS library is
+	 * accepting changes to a {@link javax.sql.rowset.CachedRowSet},
+	 * see {@link com.nqadmin.swingset.navigate.RowSetState#acceptingCachedRowSetChanges}.
+	 * This may contain two exceptions; one from {@code crs.acceptChanges()}, the
+	 * other from {@code runAfterCachedRowSetChanges}
+	 */
+	// TODO: handle flags argument to acceptCachedRowSetChanges.
+	@SuppressWarnings("serial")
+	private static class NOT_USED_SSSQLSyncProviderException extends SSSQLException
+	{
+		private final Throwable causeAfter;
+
+		/**
+		 *
+		 * @param reason
+		 * @param cause
+		 * @param causeAfter
+		 */
+		public NOT_USED_SSSQLSyncProviderException(String reason, SyncProviderException cause, Throwable causeAfter)
+		{
+			super(reason, cause);
+			this.causeAfter = causeAfter;
+		}
+
+		/**
+		 * May be null.
+		 * @return
+		 */
+		@Override
+		public SyncProviderException getCause() {
+			return (SyncProviderException) super.getCause();
+		}
+
+		/**
+		 * Throwable that occurred while executing after {@code crs.acceptChanges}.
+		 * @return may be null
+		 */
+		public Throwable getCauseAfter() {
+			return causeAfter;
+		}
 	}
 	
 }
