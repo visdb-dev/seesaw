@@ -48,6 +48,31 @@ Other options and/or variants?
 
 ================================================================================
 
+TextStyles
+    - put LoadStatus in the exception, always throw if there's an error.
+    - Get rid of "justify"?
+    - YAML?
+    - TextArea: in general; scrollbars: either, ...; more stuff
+    - TextArea: make sure everything is captured by memento.
+
+decorateText/TextDecorator
+    Discard current scheme?
+
+    Have a lazy helper class in an SSComp, SSComponent.getTextDecorator()
+        - InitializeTextDecoration
+          - If using style for default, set/apply the style.
+          - If needed, save original state once, lazily.
+        - One possibility/option, use FocusDecorator's ComponentState
+          to dynamically apply a style.
+          - Can specify the styles in an EnumMap during initializaiton
+
+    Issues with preffered size? Adjust size dyncamically?
+    Setting sizes while setting up components seems best.
+    Could look at all styles for ComponentState, pick the biggest font to size;
+    or at least suggest a size/range-of-sizes.
+
+================================================================================
+
 Generalize SSUtils.visitSSComponents
 
 ================================================================================

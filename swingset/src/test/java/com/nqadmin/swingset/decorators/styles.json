@@ -1,0 +1,21 @@
+{
+  "default": {
+    "foreground": "#333333",
+    "background": "#FFFFFF",
+    "fontFamily": "Monospaced",
+    "fontSize": 16,
+    "alignment": "left"
+  },
+  "warning": {
+    "inherits": "default",
+    "background": "#FFF3CD",
+    "alignment": "center"
+  },
+  "criticalError": {
+    "inherits": "warning",
+    "foreground": "#721C24",
+    "alignment": "right",
+    "bold": true,
+    "strikethrough": true
+  }
+}
