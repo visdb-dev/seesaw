@@ -85,6 +85,8 @@ Git/Maven:
     `cd ./swingset/swingset/`
     `mvn clean package -Prelease`   # javadoc target/reports/apidocs/index.html
         # jar:file:///.../target/swingset-5.0.0-SNAPSHOT-javadoc.jar!/index.html
+  or
+    `mvn javadoc:javadoc -P release` # only builds javadoc; no compile or tests
 
 ## DEPENDENCY INTEGRATION
 

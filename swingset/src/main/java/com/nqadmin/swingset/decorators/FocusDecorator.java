@@ -48,7 +48,6 @@ import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.utils.SSComponent;
@@ -88,8 +87,6 @@ public abstract class FocusDecorator
 		boolean isError() {
 			return this == ERROR || this == FOCUSED_ERROR;
 		}
-
-		// TODO: isModified, isError
 	}
 
 	/**
@@ -100,12 +97,12 @@ public abstract class FocusDecorator
 	public ComponentState getComponentState(ValidationResult valid) {
 		ComponentState borderState;
 		if (valid.all()) {
-			borderState = getComponent().isDirty()
+			borderState = getSSComponent().isDirty()
 					? ComponentState.MODIFIED
 					: ComponentState.CLEAN;
 		} else
 			borderState = ComponentState.ERROR;
-		if (fcomp().isFocusOwner()) {
+		if (focusComp().isFocusOwner()) {
 			borderState = switch(borderState) {
 			case CLEAN -> ComponentState.FOCUSED_CLEAN;
 			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
@@ -138,13 +135,31 @@ public abstract class FocusDecorator
 	@Override
 	public void install(SSComponent component) {
 		this.component = component;
-		fcomp().addFocusListener(this);
+		focusComp().addFocusListener(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void uninstall() {
-		fcomp().removeFocusListener(this);
+		focusComp().removeFocusListener(this);
+	}
+
+	/**
+	 * Return the SSComponent associated with this decorator.
+	 * 
+	 * @return the component
+	 */
+	public SSComponent getSSComponent() {
+		return component;
+	}
+
+	/**
+	 * Convenience method to get the SSComponent cast as a JComponent.
+	 * 
+	 * @return the SSComponent as a JComponent
+	 */
+	protected JComponent jComp() {
+		return (JComponent) component;
 	}
 
 	/**
@@ -153,12 +168,18 @@ public abstract class FocusDecorator
 	 * 
 	 * @return focus target
 	 */
-	// TODO: fcomp() - maybe just return jc() and dynamically override
-	//		 in combobox components, but would want to wrap default
-	//		 so the default decorator can be change but fcomp() is overridden.
-	protected Component fcomp() {
-		return !(jc() instanceof JComboBox) ? jc()
-				: ((JComboBox)jc()).getEditor().getEditorComponent();
+	protected Component focusComp() {
+		return getSSComponent().getFocusTarget();
+	}
+
+	/**
+	 * Return the JComponent that gets decorated.
+	 * It may not be the same as whats returned by {@link #getSSComponent() }.
+	 * 
+	 * @return the JComponent
+	 */
+	protected JComponent decoComp() {
+		return getSSComponent().getDecorateTarget();
 	}
 
 	/**
@@ -176,30 +197,11 @@ public abstract class FocusDecorator
 			default               -> { handled = false; yield null; }
 			};
 			if (textColor != null) {
-				jc().setForeground(textColor);
+				decoComp().setForeground(textColor);
 			}
 			return handled;
 		}
 		return false;
-	}
-
-	/**
-	 * Return the SSComponent associated with this decorator.
-	 * 
-	 * @return the component
-	 */
-	public SSComponent getComponent() {
-		return component;
-	}
-
-	/**
-	 * Return the JComponent that gets decorated.
-	 * It may not be the same as whats returned by {@link #getComponent() }.
-	 * 
-	 * @return the JComponent
-	 */
-	protected JComponent jc() {
-		return (JComponent) component;
 	}
     
 }

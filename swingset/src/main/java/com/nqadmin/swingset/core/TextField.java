@@ -55,7 +55,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
-import com.nqadmin.swingset.utils.SSTextSupport.SSPlainDocument;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -112,7 +111,9 @@ public class TextField extends JTextField implements SSComponent
 	 */
 	@Override
 	protected Document createDefaultModel() {
-		return new SSPlainDocument(this);
+		Document doc = super.createDefaultModel();
+		return doc;
+		// return new SSPlainDocument(this);
 	}
 
 	/**

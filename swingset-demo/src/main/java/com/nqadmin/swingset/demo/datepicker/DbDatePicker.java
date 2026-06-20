@@ -26,8 +26,6 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
-import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
-import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -37,8 +35,14 @@ import static java.lang.System.Logger.Level.DEBUG;
 import static java.sql.JDBCType.DATE;
 
 /**
- * Example of building a component that interoperates with SS but is not
- * in the SS library.
+ * Date picker that gets it's value from a database column and sends
+ * date changes back to the database. Undo/redo and more is supported,
+ * see {@link SSComponent}.
+ * The datapick is based on
+ * <a href="https://github.com/LGoodDatePicker/LGoodDatePicker">LGoodDatePicker</a>.
+ * <p>
+ * It is an example of building a component that inter-operates with SS but is not
+ * part of the SS library.
  */
 @SuppressWarnings("serial")
 public class DbDatePicker extends DatePicker implements SSComponent
@@ -59,27 +63,6 @@ public class DbDatePicker extends DatePicker implements SSComponent
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
-	 * Create date picker.
-	 */
-	public DbDatePicker()
-	{
-		super(initialSettings());
-
-		// @SuppressWarnings("LeakingThisInConstructor")
-		// Border b = SSUtils.createEmptyBorder(this);
-		// setBorder(b);
-		//setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
-
-		finishSSCommon();
-	}
-
-	private static DatePickerSettings initialSettings()
-	{
-		DatePickerSettings dps = new DatePickerSettings();
-		return dps;
-	}
-
-	/**
 	 * Create date picker and bind it to the specified column in the
 	 * given RowSet.
 	 *
@@ -94,10 +77,34 @@ public class DbDatePicker extends DatePicker implements SSComponent
 		rowsModel.bind(this, boundColumnName);
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * Create date picker.
+	 */
+	public DbDatePicker()
+	{
+		super(initialSettings());
+
+		finishSSCommon();
+	}
+	
+	private static DatePickerSettings initialSettings()
+	{
+		DatePickerSettings dps = new DatePickerSettings();
+		return dps;
+	}
+
+	/**
+	 * Set custom Decorate/FocusTarget.
+	 * {@inheritDoc }
+	 */
 	@Override
-	public void metadataChange() {
-		getSettings().setAllowEmptyDates(getAllowNull());
+	public void customInit()
+	{
+		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
+
+		// Highlight the date text field when this component gets focus.
+		setDecorateTarget(getComponentDateTextField());
+		setFocusTarget(getComponentDateTextField());
 	}
 
 	/** {@inheritDoc } */
@@ -106,6 +113,12 @@ public class DbDatePicker extends DatePicker implements SSComponent
 	{
 		if (jdbcType != DATE)
 			throw new IllegalArgumentException(sf("Date Picker column type must be DATE"));
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void metadataChange() {
+		getSettings().setAllowEmptyDates(getAllowNull());
 	}
 	
 	/** {@inheritDoc } */
@@ -117,16 +130,6 @@ public class DbDatePicker extends DatePicker implements SSComponent
 		} else {
 			setDateToToday();
 		}
-	}
-
-	/**
-	 * Highlight the date text field when this component gets focus.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public Decorator createDefaultDecorator() {
-		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
-		return new AlternateBorderDecorator(getComponentDateTextField());
 	}
 
 	private Hook hook;

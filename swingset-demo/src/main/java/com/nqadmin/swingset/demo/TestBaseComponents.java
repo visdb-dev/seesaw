@@ -76,7 +76,6 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
-import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.models.SSCollection;
@@ -421,10 +420,10 @@ public class TestBaseComponents extends JFrame
 		// validators for text fields
 		Function<String, Boolean> validator = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
 		if (activeComps.contains(TEXT_FIELD)) {
-			txtSSTextField.setValidator(TextComponentValidator.create(validator));
+			txtSSTextField.setPluginValidator(TextComponentValidator.create(validator));
 		}
 		if (activeComps.contains(TEXT_FIELD_B)) {
-			txtSSTextFieldB.setValidator(TextComponentValidator.create(validator));
+			txtSSTextFieldB.setPluginValidator(TextComponentValidator.create(validator));
 		}
 		
 		// Bind the components to their database columns.
@@ -450,7 +449,8 @@ public class TestBaseComponents extends JFrame
 			lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-30, MainClass.ssDimVeryTall.height));
 			lstScrollPane = new JScrollPane(lstSSList);
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
-			lstSSList.setDecorator(new AlternateBorderDecorator(lstScrollPane, lstSSList));
+			lstSSList.setDecorateTarget(lstScrollPane);
+			lstSSList.setFocusTarget(lstSSList);
 		}
 		
 		JScrollPane lstScrollPane2 = null;
@@ -459,20 +459,21 @@ public class TestBaseComponents extends JFrame
 			lstSSList2.setPreferredSize(new Dimension(MainClass.ssDimTall.width-30, MainClass.ssDimVeryTall.height));
 			lstScrollPane2 = new JScrollPane(lstSSList2);
 			lstScrollPane2.setPreferredSize(MainClass.ssDimTall);
-			lstSSList2.setDecorator(new AlternateBorderDecorator(lstScrollPane2, lstSSList2));
+			lstSSList2.setDecorateTarget(lstScrollPane2);
+			lstSSList2.setFocusTarget(lstSSList2);
 		}
 		
 		// Setup the container and layout the components.
-		final Container contentPane = getContentPane();
-		contentPane.setLayout(new GridBagLayout());
+		final Container mainPane = getContentPane();
+		mainPane.setLayout(new GridBagLayout());
 		final GridBagConstraints constraints = new GridBagConstraints();
 		
 		// Add the components, there's a special case with the list scroll pane.
-		buildGui_add(contentPane, constraints, lstScrollPane, lstScrollPane2);
+		buildGui_add(mainPane, constraints, lstScrollPane, lstScrollPane2);
 
 		constraints.gridx = 0;
 		constraints.gridwidth = 2;
-		contentPane.add(navigator, constraints);
+		mainPane.add(navigator, constraints);
 		
 		// Disable the primary key.
 		txtSwingSetBaseTestPK.setEnabled(false);
@@ -645,21 +646,21 @@ public class TestBaseComponents extends JFrame
 		}
 	}
 
-	private void buildGui_add(Container contentPane, GridBagConstraints constraints, JScrollPane jspList, JScrollPane jspList2)
+	private void buildGui_add(Container mainPane, GridBagConstraints constraints, JScrollPane jspList, JScrollPane jspList2)
 	{
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 
 		for (Comp comp : getActiveCompInfo()) {
 			constraints.gridx = 0;
-			contentPane.add(comp.label, constraints);
+			mainPane.add(comp.label, constraints);
 			constraints.gridx = 1;
 			if(comp.comp == lstSSList)
-				contentPane.add(jspList, constraints);
+				mainPane.add(jspList, constraints);
 			else if(comp.comp == lstSSList2)
-				contentPane.add(jspList2, constraints);
+				mainPane.add(jspList2, constraints);
 			else
-				contentPane.add((JComponent)comp.comp, constraints);
+				mainPane.add((JComponent)comp.comp, constraints);
 			constraints.gridy++;
 		}
 	}

@@ -754,8 +754,8 @@ public class RowSetOps {
 	public static void updateColumnText(SSComponent comp, String updatedValue)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{ 
-		// TODO: This is only for debug
-		checkForceConflict(comp, updatedValue);
+		checkForceConflict(comp, updatedValue); // TODO: This is only for debug
+
 		updateColumnText(comp, comp.getRowSet(), updatedValue,
 						 comp.getColumnIndex(), comp.getAllowNull());
 	}

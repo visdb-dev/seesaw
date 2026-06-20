@@ -121,10 +121,10 @@ public class CheckBox extends JCheckBox implements SSComponent
 	/**
 	 * Creates an object of CheckBox.
 	 *
-	 * @param _text Checkbox label
+	 * @param text Checkbox label
 	 */
-	public CheckBox(final String _text) {
-		super(_text);
+	public CheckBox(final String text) {
+		super(text);
 		logger.log(Level.DEBUG, () -> sf("original border: %s",
 				BorderDecorator.asString(getBorder(), this)));
 		// JCheckBox disables painting the borders.

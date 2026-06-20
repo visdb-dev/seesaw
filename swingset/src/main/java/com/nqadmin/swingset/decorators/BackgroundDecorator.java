@@ -70,9 +70,9 @@ public class BackgroundDecorator extends FocusDecorator
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		ValidationResult valid = getComponent().allValidate();
+		ValidationResult valid = getSSComponent().allValidate();
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
-				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
+				decoComp().getClass().getSimpleName(), focusComp().isFocusOwner(), valid.comp(), valid.all()));
 
 
 		ComponentState state = getComponentState(valid);
@@ -80,7 +80,7 @@ public class BackgroundDecorator extends FocusDecorator
 				: state.isModified() ? modifiedBackgroundColor
 				: state.isFocused() ? focusBackgroundColor
 				: standardBackgroundColor;
-		jc().setBackground(color);
+		decoComp().setBackground(color);
 
 		return valid.all();
 	}
@@ -106,10 +106,10 @@ public class BackgroundDecorator extends FocusDecorator
 	}
 
 	/**
-	 * @param _focusBackgroundColor the new background color to use
+	 * @param focusBackgroundColor the new background color to use
 	 */
-	public void setFocusBackgroundColor(final Color _focusBackgroundColor) {
-		focusBackgroundColor = _focusBackgroundColor;
+	public void setFocusBackgroundColor(final Color focusBackgroundColor) {
+		this.focusBackgroundColor = focusBackgroundColor;
 	}
 
 	/**
@@ -120,5 +120,4 @@ public class BackgroundDecorator extends FocusDecorator
 	{
 		return DecoratorStyle.BACKGROUND;
 	}
-    
 }

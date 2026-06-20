@@ -54,9 +54,11 @@ CREATE TABLE IF NOT EXISTS supplier_data
 ( 
     supplier_id INTEGER DEFAULT nextval('supplier_data_seq') NOT NULL PRIMARY KEY,
     supplier_name VARCHAR(50), 
-    status SMALLINT NOT NULL CHECK (status <= 999 and status <> 321), 
-    city VARCHAR(50)
+    status SMALLINT CONSTRAINT NN_supplier_data_status NOT NULL,
+    city VARCHAR(50),
+    CONSTRAINT CHK_supplier_data_status CHECK (status <= 999 and status <> 321)
 );
+    // status SMALLINT NOT NULL CHECK (status <= 999 and status <> 321), 
 
 MERGE INTO supplier_data VALUES (2,'Jones',  10, 'Paris') ;
 MERGE INTO supplier_data VALUES (5,'Adams', 30, 'Athens');

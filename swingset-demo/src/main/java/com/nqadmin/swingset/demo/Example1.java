@@ -192,9 +192,9 @@ public class Example1 extends JFrame {
 			return valid;
 		};
 		if (!USE_SIMPLE_VALIDATION) {
-			txtSupplierName.setValidator(TextComponentValidator.create(
+			txtSupplierName.setPluginValidator(TextComponentValidator.create(
 					validateSupplierName));
-			txtSupplierCity.setValidator(TextComponentValidator.create(
+			txtSupplierCity.setPluginValidator(TextComponentValidator.create(
 					(str) -> !str.matches(".*X")));
 		} else {
 			SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");

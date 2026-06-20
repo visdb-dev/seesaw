@@ -74,8 +74,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
-import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -220,6 +218,26 @@ public class Image extends JPanel implements SSComponent
 		rowsModel.bind(this, columnName);
 	}
 
+	/**
+	 * Add custom button for loading image from disk saving to database.
+	 * Add some preferredSize handling.
+	 */
+	// TODO: remove the prefered size stuff, let programmer handle it.
+	// TODO: make custom components optional, not builtin.
+	@Override
+	public void customInit()
+	{
+		// SET PREFERRED DIMENSIONS
+		setPreferredSize(preferredSize);
+
+		// ADD LABEL & BUTTON TO PANEL
+		addComponents();
+
+		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
+		setDecorateTarget(btnUpdateImage);
+		setFocusTarget(btnUpdateImage);
+	}
+
 	/** {@inheritDoc } */
 	@Override
 	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
@@ -232,20 +250,8 @@ public class Image extends JPanel implements SSComponent
 	// TODO: Why do decorators interfere with Image?
 	// In particular the following lines from BorderDecorator
 	// cause a miniscule scrollpane. Maybe some kind of decorator wrapper?
-	//		jc().setBorder(jc().isFocusOwner() ? focusBorder : standardBorder);
-	//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
-	
-	// TODO: This is a workaround because if default decorator is used
-	//		 then the Image doesn't display properly.
-	/**
-	 * Highlight the update button when this component gets focus.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public Decorator createDefaultDecorator() {
-		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
-		return new AlternateBorderDecorator(btnUpdateImage);
-	}
+	//		decoComp().setBorder(decoComp().isFocusOwner() ? focusBorder : standardBorder);
+	//		decoComp().setForeground(textColor != null ? textColor : Color.BLACK);
 
 	/**
 	 * Adds the label and button to the panel
@@ -274,22 +280,6 @@ public class Image extends JPanel implements SSComponent
 		Dimension dimension = getPreferredSize();
 		lblImage.setPreferredSize(new Dimension((int) dimension.getWidth(), (int) dimension.getHeight() - 20));
 		updateUI();
-	}
-
-	/**
-	 * Add custom button for loading image from disk saving to database.
-	 * Add some preferredSize handling.
-	 */
-	// TODO: remove the prefered size stuff, let programmer handle it.
-	// TODO: make custom components optional, not builtin.
-	@Override
-	public void customInit()
-	{
-		// SET PREFERRED DIMENSIONS
-		setPreferredSize(preferredSize);
-
-		// ADD LABEL & BUTTON TO PANEL
-		addComponents();
 	}
 	
 	/**

@@ -43,6 +43,7 @@
 package com.nqadmin.swingset.utils;
 
 import java.awt.AWTKeyStroke;
+import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -62,6 +63,7 @@ import javax.sql.RowSet;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -141,7 +143,7 @@ final class SSCommon
 	private SSCommon(SSComponent ssComponent, boolean finishInit) {
 		this.ssComponent = ssComponent;
 		decorator = Decorator.nullDecorator;
-		validator = Validator.nullValidator;
+		pluginValidator = Validator.nullValidator;
 		busReceiver = new BusReceiver();
 		if (finishInit)
 			finishInit();
@@ -192,8 +194,8 @@ final class SSCommon
 	private SSCommon finishInit() {
 		if (!isFullyInitialized) {
 			isFullyInitialized = true;
-			initDecorator();
 			init();
+			initDecorator();
 
 			// TODO: Get rid of this; use rowsModel.register
 			WeakEventBus.register(busReceiver, getGlobalEventBus());
@@ -268,19 +270,21 @@ final class SSCommon
 	private DbWriter<RowSet, Integer, SSComponent, Object> columnWriter;
 
 	private Decorator decorator;
-	private Validator validator;
+	private Validator pluginValidator;
 
 	// For error handling.
 	// TODO: handle initialization through a plugin. When retrieving
 	//       value, pass table name, column name, comp. So need to wait
 	//       for bind/rowset. Have a flag to indicate been initialized.
-	private boolean beepOnError = true;
+
 	// DO NOT CHANGE restoreOnError WITHOUT VISITING setColumn
 	// AND if(!isResotreOnError()). Flag must be controlled in
 	// conjunction with SSTextSupport and any other callers
 	// to setColumn(DbWriter
 	private final boolean restoreOnError = false; // easiest/safest?
-	private boolean dialogOnError = false;
+
+	private boolean beepOnError = true;
+	private boolean dialogOnError = true;
 
 	boolean skipValidateHasError;
 
@@ -1275,14 +1279,37 @@ final class SSCommon
 	// TODO:	May need a plugin for whether or not to allow decorate().
 	//			Incorporate check into Validator? Decorator? ChangeHandler?
 
+	private Component focusTarget;
+	private JComponent decorateTarget;
+
+	Component getFocusTarget() {
+		if (focusTarget != null)
+			return focusTarget;
+		return getSSComponent() instanceof JComboBox<?> jcb
+				? jcb.getEditor().getEditorComponent()
+				: (Component)getSSComponent();
+	}
+
+	void setFocusTarget(Component focusTarget) {
+		this.focusTarget = focusTarget;
+	}
+
+	JComponent getDecorateTarget() {
+		return decorateTarget != null ? decorateTarget : (JComponent)getSSComponent();
+	}
+
+	void setDecorateTarget(JComponent decorateTarget) {
+		this.decorateTarget = decorateTarget;
+	}
+
 	/**
-	 * Install the given validator into the component
-	 * @param validator validator to install
+	 * Install the given pluginValidator into the component
+	 * @param pluginValidator pluginValidator to install
 	 */
-	void setValidator(Validator validator) {
-		this.validator.uninstall();
-		validator.install(ssComponent);
-		this.validator = validator;
+	void setPluginValidator(Validator pluginValidator) {
+		this.pluginValidator.uninstall();
+		pluginValidator.install(ssComponent);
+		this.pluginValidator = pluginValidator;
 	}
 	
 	/**
@@ -1293,8 +1320,8 @@ final class SSCommon
 	 */
 	boolean pluginValidate()
 	{
-		// Invoke the user's validator
-		return validator.validate();
+		// Invoke the per instance pluginValidator.
+		return pluginValidator.validate();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -1302,7 +1329,7 @@ final class SSCommon
 	// The idea is to extend the decorators to handle a variety of component
 	// types and ways to decorate. Wonder how to do that?
 	//
-	// TODO: Could have one interface that is both validator and decorator
+	// TODO: Could have one interface that is both pluginValidator and decorator
 	//		 and whatever else is needed: InputVerifier, ???.
 	//
 
@@ -1353,16 +1380,6 @@ final class SSCommon
 	 * Find the default decorator for this component type and set it.
 	 */
 	private void initDecorator() {
-		// For now just pick any decorator as the default.
-		// Probably want to get it from a factory/provider and use this
-		// component type as part of the decision. If a component wants to
-		// extend behavior, could get the current decorator, delegate to it,
-		// with some custom behavior used by the component.
-
-		// Is the following snippet a good way to override the default?
-		//		decorator deco = getSSComponent().createDefaultDecorator();
-		// where the default implementation returns null
-
 		setDecorator(getSSComponent().createDefaultDecorator());
 	}
 

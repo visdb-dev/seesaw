@@ -97,7 +97,7 @@ public class SVUtils {
 				jtc, sval);
 		SimpleValValidatorDecorator deco = new SimpleValValidatorDecorator(textVali);
 		comp.setDecorator(deco);
-		comp.setValidator(deco.getValidator());
+		comp.setPluginValidator(deco.getValidator());
 		return textVali;
 	}
 	

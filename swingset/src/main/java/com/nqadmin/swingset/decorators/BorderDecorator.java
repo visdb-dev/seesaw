@@ -145,16 +145,16 @@ public class BorderDecorator extends FocusDecorator
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		ValidationResult valid = getComponent().allValidate();
+		ValidationResult valid = getSSComponent().allValidate();
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
-				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
+				decoComp().getClass().getSimpleName(), focusComp().isFocusOwner(), valid.comp(), valid.all()));
 		Border b;
 		ComponentState borderState = getComponentState(valid);
 		b = getBorder(borderState);
 
-		jc().setBorder(b);
+		decoComp().setBorder(b);
 		// Why is the following here? It was in ss_formatted_text_field.
-		jc().setForeground(textColor != null ? textColor : Color.BLACK);
+		decoComp().setForeground(textColor != null ? textColor : Color.BLACK);
 		return valid.all();
 	}
 
@@ -181,13 +181,13 @@ public class BorderDecorator extends FocusDecorator
 		if (state == ComponentState.CLEAN)
 			return defaultBorder;
 		logger.log(TRACE, () -> String.format("%s %s",
-				state, asString(jc().getInsets())));
+				state, asString(decoComp().getInsets())));
 		Border b;
-		if (jc().getBorder() instanceof CompoundBorder cb) {
-			b = emptyLine_empty(cb.getOutsideBorder().getBorderInsets(jc()),
-					cb.getInsideBorder().getBorderInsets(jc()), state);
+		if (decoComp().getBorder() instanceof CompoundBorder cb) {
+			b = emptyLine_empty(cb.getOutsideBorder().getBorderInsets(decoComp()),
+					cb.getInsideBorder().getBorderInsets(decoComp()), state);
 		} else {
-			b = empty_line(jc().getInsets(), state);
+			b = empty_line(decoComp().getInsets(), state);
 		}
 		return b;
 	}
@@ -201,17 +201,17 @@ public class BorderDecorator extends FocusDecorator
 	protected void setupDefaultBorder() {
 		if (defaultBorder == null) {
 			logger.log(DEBUG, () -> {
-				Border b = jc().getBorder();
-				String bi = asString(jc().getInsets());
+				Border b = decoComp().getBorder();
+				String bi = asString(decoComp().getInsets());
 				String bc = b != null ? b.getClass().getSimpleName() : null;
-				String bs = asString(b, jc());
+				String bs = asString(b, decoComp());
 				return String.format("%s-%s %s %s",
-					jc().getClass().getSimpleName(), bc, bi, bs);
+					decoComp().getClass().getSimpleName(), bc, bi, bs);
 			});
-			Border b = jc().getBorder();
+			Border b = decoComp().getBorder();
 			if (b == null) {
 				b = createDefaultBorder();
-				jc().setBorder(b);
+				decoComp().setBorder(b);
 			}
 			defaultBorder = b;
 		}
@@ -224,7 +224,7 @@ public class BorderDecorator extends FocusDecorator
 	 * @return an empty border
 	 */
 	protected Border createDefaultBorder() {
-		Insets i = jc().getInsets();
+		Insets i = decoComp().getInsets();
 		return BorderFactory.createEmptyBorder(Math.max(1, i.top),
 											   Math.max(1, i.left),
 											   Math.max(1, i.bottom),
@@ -379,8 +379,8 @@ public class BorderDecorator extends FocusDecorator
 		Objects.requireNonNull(outside);
 		Objects.requireNonNull(inside);
 		Objects.requireNonNull(state);
-		//Insets inside = cb.getInsideBorder().getBorderInsets(jc());
-		//Insets outside = cb.getOutsideBorder().getBorderInsets(jc());
+		//Insets inside = cb.getInsideBorder().getBorderInsets(decoComp());
+		//Insets outside = cb.getOutsideBorder().getBorderInsets(decoComp());
 		Border decoratingBorder = getDecoratingBorder(state);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(
@@ -414,8 +414,8 @@ public class BorderDecorator extends FocusDecorator
 		Objects.requireNonNull(outside);
 		Objects.requireNonNull(inside);
 		Objects.requireNonNull(state);
-		//Insets inside = cb.getInsideBorder().getBorderInsets(jc());
-		//Insets outside = cb.getOutsideBorder().getBorderInsets(jc());
+		//Insets inside = cb.getInsideBorder().getBorderInsets(decoComp());
+		//Insets outside = cb.getOutsideBorder().getBorderInsets(decoComp());
 		Border decoratingBorder = getDecoratingBorder(state);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(

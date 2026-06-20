@@ -107,12 +107,44 @@ interface SSSupport {
 Might want "interface RootContainer" to use a the value of the JComponent
 client property. Could have a variety of methods.
 
-Knowing the root container probably helps to automate using SimpleValidation.
+Knowing the root container may help to automate using SimpleValidation.
+
+================================================================================
+
+Support/assistance for not querying database from EventQueue.
+
+================================================================================
+
+javadoc
+-------
+Supported column types
+
+================================================================================
+
+document
+--------
+best practices, use named constraints for better error messages
+
+    PRIMARY KEY: Uniquely identifies each record.
+        Commonly named: PK_TableName_ColumnName.
+    FOREIGN KEY: Links a column to a primary key in another table to enforce referential integrity.
+        Commonly named: FK_TableName_ParentTable.
+    UNIQUE: Restricts columns from containing duplicate values.
+        Commonly named: UQ_TableName_ColumnName.
+    CHECK: Restricts the range or format of accepted values.
+        Commonly named: CHK_TableName_ColumnName.
+    DEFAULT: Automatically applies a default fallback value if none is provided.
+        Commonly named: DF_TableName_ColumnName. 
+
+    NOT NULL
+        Commonly named: NN_TableName_ColumnName. 
 
 ================================================================================
 
 DBComboBox2
     - firePropertyChange, needed? Ifso use eventbus? setSeparator()
+    - If a metadatachange is issued when setAllowNull is manually change
+      then combobox2 would not need to override setallownull. BUT TEST.
 
 ================================================================================
 

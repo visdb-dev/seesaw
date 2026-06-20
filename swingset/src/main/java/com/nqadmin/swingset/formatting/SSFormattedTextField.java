@@ -96,7 +96,7 @@ import static java.lang.System.Logger.Level.*;
  * checks (like date validation) beyond what is provided by the
  * Formatter/FormatterFactory (which generally only handles display of values
  * and/or character masks). Add application validity checks with
- * {@link #setValidator(com.nqadmin.swingset.decorators.Validator)}.
+ * {@link #setPluginValidator(com.nqadmin.swingset.decorators.Validator)}.
  * <br>see {@link FormattedTextFieldVerifier} which locks focus while data is invalid.
  * <br>see {@link SSFormattedTextFieldListener} which may update the database.
  *

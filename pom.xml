@@ -38,7 +38,7 @@
 		<version.maven>3.9.6</version.maven>
 		<java-release>25</java-release>
 		<!-- source/target for using frgaal -->
-		<version.frgaal>24.0.0</version.frgaal>
+		<version.frgaal>25.0.0</version.frgaal>
 		<java-source>24</java-source>
 		<java-target>17</java-target>
 

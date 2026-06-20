@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.awt.Component;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
@@ -52,6 +53,7 @@ import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
+import com.nqadmin.swingset.core.CheckBox;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
@@ -70,20 +72,60 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 /**
  * This Interface presents a {@link RowSet} column as seen by the visual
- * components in the library. It has default methods supporting binding
+ * components in the SS library. It has default methods supporting binding
  * a {@linkplain RowSet} column to this component, dbms access,
- * undo/redo, validation, decoration. A database column is associated
+ * undo/redo, validation, decoration. Most of these default methods bounce
+ * to an internal SSCommon class and would be declared final if java
+ * supported that. A database column is associated
  * with this component via {@link RowsModel#bind(SSComponent,String) }.
- * There are only a few methods, and the class Hook, that need to be implemented
+ * There are only two methods, and the Hook, that need to be implemented
  * by the visual component: {@link #cleanField() }, {@link #getSSComponentHook() }.
+ * See {@link Hook} for a complete example.
  * <p>
- * There are several methods that can be overridden for
- * customization, notification, and verification: {@link #customInit() },
+ * The basic components for application use and/or subclassing are found in
+ * <a href="../core/package-summary.html">core components</a>.
+ * They are subclassed into a
+ * <a href="../package-summary.html">compatibility layer</a>
+ * as a replacement for the original SS library.
+ * <p>
+ * There are several methods that can be overridden; they
+ * perform customization, receive notification, and do verification:
+ * {@link #customInit() },
  * {@link #checkColumnType(JDBCType) }, {@link #metadataChange() },
  * {@link #finishBind() }, {@link #baseValidate() }, {@link #componentValidate()},
  * and {@link #createDefaultDecorator()}.
  * <p>
- * Typical usage: {@code class MyComponent extends SomeJComponent implements SScomponent}
+ * There are multiple levels of validation. 
+ * The validators are executed in the
+ * following order, see {@link allValidate};
+ * if there's an error, validation stops, and see {@link ValidationResult}.
+ * <ol>
+ * <li>{@code baseValidate()} - method, defaults true<br>
+ * This checks that the SSComponent's value is more or less correct.
+ * For example a mask formatter's valid indicator,
+ * {@link javax.swing.JFormattedTextField#isEditValid};
+ * or a {@link com.nqadmin.swingset.core.TextField} subclass could check that there's only characters.
+ * <li>{@code componentValidate()} - method default true<br>
+ * A subclass of something that does baseValidate, can use this for more
+ * specific validation.
+ * <li>optionally check rowsModel.hasError(SSComponent)
+ * <li>{@code pluginValidate} - Application specific validation, per component instance.
+ * <br>
+ * Set at run time with {@link #setPluginValidator(Validator)}.
+ * For example check for specific values; or other columns or ...
+ * Could be used to apply additional constraints if the database schema
+ * can't be changed.
+ * </ol>
+ * <p>
+ * When creating an SSComponent, typical usage: {@snippet lang="java":
+ *     class MyComponent extends SomeJComponent implements SScomponent {
+ *         MyComponent() {
+ *             // ...
+ *             // finishSSCommon() MUST BE CALLED AT END OF CONSTRUCTOR
+ *             finishSSCommon(); // @link substring="finishSSCommon" target="SSComponent#finishSSCommon"
+ *         }
+ *     }
+ * }
  */
 public interface SSComponent extends RSC
 {
@@ -94,14 +136,21 @@ public interface SSComponent extends RSC
 
 	/**
 	 * Return the {@linkplain Hook} used by SSCommon.
+	 * An SSComponent must create a Hook.
+	 * See {@link Hook} for a complete example.
 	 * <p>
 	 * <b>Generally should not be used except by SSCommon</b>.
 	 * @return Hook
 	 */
 	Hook getSSComponentHook();
+
 	
 	/**
-	 * An SSComponent must create a Hook.
+	 * An SSComponent must create a Hook. The hook is used by the SS library
+	 * to tell the component to read and display the current database value.
+	 * Here's a complete example based on {@link CheckBox}.
+	 * {@snippet lang="java" class=MyCheckBox region=hook_example}
+	 * }
 	 * <p>
 	 * <b>Generally should not be used except by SSCommon</b>.
 	 */
@@ -120,60 +169,52 @@ public interface SSComponent extends RSC
 
 		/**
 		 * Updates the value stored and displayed in the SwingSet component
-		 * based on value obtained with getColumn*().
-		 * Use {@code ssComponent.getSSCommon().updateSSComponent()}.
+		 * based on value obtained from the database with getColumn*().
 		 * <p>
-		 * This method is invoked by SSCommon and insures removal (and subsequent
-		 * restoration) of the component's listener.
+		 * Before this method, invoked by SSCommon, is called the component's
+		 * listener is removed; it is restored when the call returns.
+		 * The idea is to prevent event loops.
 		 */
 		protected abstract void updateSSComponent();
 
 		/**
-		 * Return the listener that should detect a change in value for the current
-		 * component.
+		 * Return the listener used by this SSComponent to detect changes
+		 * in value for the current component.
 		 * <p>
-		 * IMPORTANT: A component will have exactly one listener for component
-		 * changes related to RowSet binding so this method will only be called
-		 * one time in the SSCommon constructor to obtain that listener.
+		 * A component generally has exactly one listener for
+		 * detecting JComponent changes related to a database column, so this method
+		 * will only be called one time in the SSCommon constructor to obtain
+		 * that listener.
 		 * <p>
-		 * Generally the developer will need to return an instance of an inner class
-		 * that implements the appropriate listener for the JComponent
-		 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
-		 * for a class extending JSlider, DocumentListener for a class extending
-		 * JTextField, etc.).
+		 * Usually the developer returns an instance of an inner class
+		 * that implements the appropriate listener for the superclass
+		 * JComponent, for example ItemListener for an SSComponent class
+		 * extending JCheckBox, ChangeListener for a class extending JSlider.
 		 * <p>
 		 * If the component is JTextComponent then the implementation can return
-		 * an instance of SSCommon.SSCommonDocumentListener().
-		 * <p>
-		 * A typical implementation might look like: {@code
-		 * 	return new SSCheckBoxListener();
+		 * an instance of {@link SSTextSupport#getSSDocumentListener(JTextComponent) }
+		 * which helps with per keystroke component decoration.
+		 * For example: {@snippet :
+		 *     protected SSDocumentListener getSSComponentListener() {
+		 *     	   return SSTextSupport.getSSDocumentListener(TextField.this);
+		 *     }
 		 * }
+		 * But typically, just subclass {@link com.nqadmin.swingset.core.TextField}
+		 * and it's taken care of.
 		 * 
-		 * OR (for a JTextComponent): {@code
-		 * 	return getSSCommon().getSSDocumentListener();
-		 * }
-		 * 
-		 * @return single change listener for the current SwingSet component to trigger RowSet update
+		 * @return event listener that triggers database column update
 		 */
 		protected abstract EventListener getSSComponentListener();
 
 		/**
-		 * Method to add SSComponent listener. DO NOT CALL THIS METHOD DIRECTLY;
-		 * use {@code ssComponent.getSSCommon().addSSComponentListener()}.
-		 * <p>
-		 * IMPORTANT: All listeners related to binding should be added/removed
-		 * using getSSCommon().
+		 * Method to add SSComponent's listener.
 		 * 
 		 * @param eventListener 
 		 */
 		protected abstract void addSSComponentListener(EventListener eventListener);
 
 		/**
-		 * Method to remove SSComponent listener. DO NOT CALL THIS METHOD DIRECTLY;
-		 * use {@code ssComponent.getSSCommon().removeSSComponentListener()}.
-		 * <p>
-		 * IMPORTANT: All listeners related to binding should be added/removed
-		 * using getSSCommon().
+		 * Method to remove SSComponent's listener.
 		 * 
 		 * @param eventListener
 		 */
@@ -192,12 +233,18 @@ public interface SSComponent extends RSC
 		}
 
 		/**
-		 * Invoked by ssComponent.finishSSCommon which
-		 * should be invoked as the last statement
-		 * in the SSComponent's constructor, but before bind.
+		 * Invoked by ssComponent.finishSSCommon.
 		 */
-		protected final void finishSSCommon() {
-			ssCommon = SSCommon.createFinish(ssComponent, ssCommon);
+		final void finishSSCommon() {
+			// Make sure ssCommon is initialized before doing createFinish.
+			// createFinish invokes the SSComponent to initialize some
+			// things; and SSComponent may use getSSCommon. Don't want to
+			// construct a 2nd SSCommon.
+			getSSCommon();
+			SSCommon ssCommon2 = SSCommon.createFinish(ssComponent, ssCommon);
+			if (ssCommon != ssCommon2) {
+				throw new IllegalStateException("Multiple SSCommon created");
+			}
 		}
 	}
 
@@ -257,6 +304,9 @@ public interface SSComponent extends RSC
 
 	/**
 	 * Returns the SSCommon associated with this Swingset component.
+	 * 
+	 * <b>Generally only used by SSComponent and SSCommon. This method
+	 * is exporting a non public class.</b>.
 	 *
 	 * @return common SwingSet component data and methods
 	 */
@@ -418,7 +468,9 @@ public interface SSComponent extends RSC
 	/**
 	 * Used when making a change to the database.
 	 * Typically used by a component listener. It avoids extra RowSet events.
-	 * May bring up a dialog if there is no row to change.
+	 * See {@link Hook} for example usage.
+	 * May bring up a dialog if there is no row to change, which would
+	 * usually indicate some kind of internal error.
 	 * @param r code that changes the database
 	 * @throws java.sql.SQLException
 	 */
@@ -743,24 +795,58 @@ public interface SSComponent extends RSC
 	// Validation/Decoration
 	//
 
-	// There are three levels of componenent validation.
-	// 1 - baseValidate is inherit to the component structure,
-	//     for example a mask formatters valid indicator.
-	//     This "validation" might simply return state indicator.
-	//     Defaults true.
-	// 2 - componentValidate
-	//     TODO: this is fuzzy...
-	//     Defaults true.
-	// 3 - pluginValidate
-	//     Application specific validation for a component instance.
+	/**
+	 * Typically an SSComponent is both the decorate component and focus component
+	 * for use with decorators.
+	 * But an SSComponent may be grouped with other components, and some
+	 * other component may be the the focused component.
+	 * @return the component that gets focus when this component is active
+	 */
+	default Component getFocusTarget() {
+		return getSSCommon().getFocusTarget();
+	}
 
 	/**
-	 * Install the given validator into the component;
-	 * this is the pluginValidator.
-	 * @param validator validator to install
+	 * Typically an SSComponent is both the decorate component and focus component
+	 * for use with decorators.
+	 * But an SSComponent may be grouped with other components, and some
+	 * other component may be the the focused component.
+	 * @param focusTarget 
 	 */
-	default void setValidator(Validator validator) {
-		getSSCommon().setValidator(validator);
+	default void setFocusTarget(Component focusTarget) {
+		getSSCommon().setFocusTarget(focusTarget);
+	}
+
+	/**
+	 * Typically an SSComponent is both the decorate component and focus component
+	 * for use with decorators.
+	 * But an SSComponent may be grouped with other components, and some
+	 * other component may be the the focused component.
+	 * @return the component that is decorate decorated 
+	 */
+	default JComponent getDecorateTarget() {
+		return getSSCommon().getDecorateTarget();
+	}
+
+	/**
+	 * Typically an SSComponent is both the decorate component and focus component
+	 * for use with decorators.
+	 * But an SSComponent may be grouped with other components, and some
+	 * other component may be decorate decorated.
+	 * @param decorateTarget
+	 */
+	default void setDecorateTarget(JComponent decorateTarget) {
+		getSSCommon().setDecorateTarget(decorateTarget);
+	}
+
+	/**
+	 * Install the specified pluginValidator into this component.
+	 * Each instance can have a unique validator.
+	 * This is run after all the other validations succeed.
+	 * @param pluginValidator validator to install
+	 */
+	default void setPluginValidator(Validator pluginValidator) {
+		getSSCommon().setPluginValidator(pluginValidator);
 	}
 
 	/**
@@ -770,16 +856,16 @@ public interface SSComponent extends RSC
 	 * constraints that are context independent; e.g. {@literal month <= 12}.
 	 * There may be additional checks defined by {@link #componentValidate() }
 	 * and/or a {@link Validator}, see
-	 * {@link #setValidator(Validator) }; those are check after baseValidate.
+	 * {@link #setPluginValidator(Validator) }; those are checked after baseValidate.
 	 * The default implementation returns true.
 	 * 
 	 * @return false for error in data, otherwise true
 	 */
-	 //{@link #setValidator(com.nqadmin.swingset.decorators.Validator) }; those are check after baseValidate.
+	 //{@link #setPluginValidator(com.nqadmin.swingset.decorators.Validator) }; those are check after baseValidate.
 	default boolean baseValidate() { return true; }
 
 	/**
-	 * This has component specific validation, for example for a SSDateField.
+	 * This has component specific validation, it is called after baseValidate.
 	 * @return true if successful validation for the type of component
 	 */
 	default boolean componentValidate() { return true; }
@@ -791,13 +877,16 @@ public interface SSComponent extends RSC
 	 * @param comp result of base and componentValidate()
 	 * @param other this component is the target of an error event,
 	 * see {@link RowsModel#hasError(SSComponent) }
+	 * @param plugin result of pluginValidate
 	 * @param all true if everything validated
 	 */
-	record ValidationResult(boolean base, boolean comp, boolean other, boolean all){}
+	record ValidationResult(
+			boolean base, boolean comp, boolean other, boolean plugin, boolean all){}
 
 	/**
-	 * Run the validators: baseValidate, componentValidate, pluginValidate;
-	 * and possibly check RowsModel.hasError().
+	 * Run the validators: baseValidate, componentValidate,
+	 * possibly check RowsModel.hasError(),
+	 * pluginValidate.
 	 * The checks are done in order, they stop with any failure.
 	 * @return result
 	 */
@@ -810,8 +899,9 @@ public interface SSComponent extends RSC
 			if (rowsModel != null && rowsModel.getRowSet() != null)
 				otherValid = !rowsModel.hasError(this);
 		}
-		boolean allValid = otherValid && getSSCommon().pluginValidate();
-		return new ValidationResult(baseValid, compValid, otherValid, allValid);
+		boolean pluginValid = otherValid && getSSCommon().pluginValidate();
+
+		return new ValidationResult(baseValid, compValid, otherValid, pluginValid, pluginValid);
 	}
 
 	/**
