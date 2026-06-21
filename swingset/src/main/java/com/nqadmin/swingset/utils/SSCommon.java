@@ -73,13 +73,15 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.ConvertType;
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.datasources.SSDBSupport.ConsumerSQL;
+import com.nqadmin.swingset.datasources.RowSetOps.DbUpdate;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbWriter;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbUpdater;
+import com.nqadmin.swingset.datasources.SSDBSupport.FunctionSQL;
 import com.nqadmin.swingset.datasources.SSDBSupport.RunnableSQL;
 import com.nqadmin.swingset.datasources.SSSQLConversionException;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
+import com.nqadmin.swingset.datasources.SSSQLRuntimeException;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.DecoratorSupplier;
@@ -98,6 +100,7 @@ import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingCachedRowSetChanges;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStart;
 import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
 import static com.nqadmin.swingset.utils.SSUtils.JDBCTypeMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.NullabilityMismatch;
@@ -266,8 +269,8 @@ final class SSCommon
 	/** true for component bound with RowSet not null. */
 	boolean fullyBound;
 
-	private DbReader<RowSet, Integer, SSComponent, ?> columnReader;
-	private DbWriter<RowSet, Integer, SSComponent, Object> columnWriter;
+	private DbReader<RowSet, Integer, SSComponent> columnReader;
+	private DbUpdater<RowSet, Integer, SSComponent, Object> columnUpdater;
 
 	private Decorator decorator;
 	private Validator pluginValidator;
@@ -280,7 +283,7 @@ final class SSCommon
 	// DO NOT CHANGE restoreOnError WITHOUT VISITING setColumn
 	// AND if(!isResotreOnError()). Flag must be controlled in
 	// conjunction with SSTextSupport and any other callers
-	// to setColumn(DbWriter
+	// to setColumn(DbUpdater
 	private final boolean restoreOnError = false; // easiest/safest?
 
 	private boolean beepOnError = true;
@@ -764,11 +767,11 @@ final class SSCommon
 		return RowSetOps.getColumn(ssComponent);
 	}
 
-	DbReader<RowSet, Integer, SSComponent, ?> getColumnReader() {
+	DbReader<RowSet, Integer, SSComponent> getColumnReader() {
 		return columnReader;
 	}
 
-	void setColumnReader(DbReader<RowSet, Integer, SSComponent, ?> columnReader) {
+	void setColumnReader(DbReader<RowSet, Integer, SSComponent> columnReader) {
 		// TODO: Want some checking like this, but there may be special circumstances.
 		//       For example, handling LONGVARCHAR may want stream.
 		// TODO: Need plugin support?
@@ -854,11 +857,20 @@ final class SSCommon
 	 * @param value value to write to bound database column
 	 * @return true if no error
 	 */
-	boolean setColumn(Object value, ConsumerSQL<Object> op) {
+	private boolean setColumn(Object value, FunctionSQL<Object, DbUpdate> updater) {
 		logger.log(DEBUG, () -> sf("%s: '%s' {%s}", getColumnForLog(), value, SSUtils.getCaller(4)));
+		try {
+			UndoRedo.captureInitialValue(getSSComponent());
+		} catch (SQLException ex) {
+			String msg = sf("%s undo/redo initial capture failed", getColumnForLog());
+			logger.log(Level.ERROR, msg, ex);
+			throw new SSSQLRuntimeException(msg, ex);
+		}
+
 		boolean ok = false;
 		try {
-			op.accept(value);
+			DbUpdate dbUpdate = updater.apply(value);
+			postColumnChangeStart(getSSComponent(), dbUpdate.value());
 			ok = true;
 		} catch(SQLException | NumberFormatException ex) {
 			if (isDialogOnError())
@@ -867,8 +879,7 @@ final class SSCommon
 			if (!ok) {
 				if (isBeepOnError())
 					SSUtils.beep();
-				if (!isRestoreOnError())
-					postColumnChangeStartError(getSSComponent(), value);
+				postColumnChangeStartError(getSSComponent(), value);//!isRestoreOnError())
 			}
 		}
 		boolean fOK = ok;
@@ -876,12 +887,12 @@ final class SSCommon
 		return ok;
 	}
 
-	DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
-		return columnWriter;
+	DbUpdater<RowSet, Integer, SSComponent, Object> getColumnUpdater() {
+		return columnUpdater;
 	}
 
-	void setColumnWriter(DbWriter<RowSet, Integer, SSComponent, Object> columnWriter) {
-		this.columnWriter = columnWriter;
+	void setColumnUpdater(DbUpdater<RowSet, Integer, SSComponent, Object> columnUpdater) {
+		this.columnUpdater = columnUpdater;
 	}
 
 	private void userErrorReporting(Object value, Exception ex)
@@ -1140,7 +1151,7 @@ final class SSCommon
 		this.dialogOnError = dialogOnError;
 	}
 
-	boolean isRestoreOnError() {
+	boolean isRestoreOnError_NOT_USED() {
 		return restoreOnError;
 	}
 

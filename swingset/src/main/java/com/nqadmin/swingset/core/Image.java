@@ -74,6 +74,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -199,8 +200,14 @@ public class Image extends JPanel implements SSComponent
 		setColumnReader((rs, cidx, _) -> {
 			return rs.getBytes(cidx);
 		});
-		setColumnWriter((rs, cidx, _, value) -> {
-			rs.updateBytes(cidx, (byte[]) value);
+		setColumnUpdater((rs, cidx, _, value) -> {
+			if (value == null) {
+				rs.updateNull(cidx);
+				return RowSetOps.UPDATE_NULL;
+			} else {
+				rs.updateBytes(cidx, (byte[]) value);
+				return new RowSetOps.DbUpdate(value);
+			}
 		});
 	}
 

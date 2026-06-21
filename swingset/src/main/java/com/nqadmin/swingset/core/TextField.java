@@ -49,7 +49,6 @@ import java.lang.System.Logger;
 import java.util.EventListener;
 
 import javax.swing.JTextField;
-import javax.swing.text.Document;
 
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -105,16 +104,15 @@ public class TextField extends JTextField implements SSComponent
 			rowsModel.bind(this, columnName);
 	}
 
-	/**
-	 * Part of the scheme to keep text field in sync with data base.
-	 * See {@link SSTextSupport.SSPlainDocument}.
-	 */
-	@Override
-	protected Document createDefaultModel() {
-		Document doc = super.createDefaultModel();
-		return doc;
-		// return new SSPlainDocument(this);
-	}
+	// /**
+	//  * Part of the scheme to keep text field in sync with data base.
+	//  */
+	// @Override
+	// protected Document createDefaultModel() {
+	// 	Document doc = super.createDefaultModel();
+	// 	return doc;
+	// 	// return new SSPlainDocument(this);
+	// }
 
 	/**
 	 * Add focus listener that selects all text.

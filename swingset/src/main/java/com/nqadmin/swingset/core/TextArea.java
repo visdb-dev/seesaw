@@ -70,7 +70,7 @@ public class TextArea extends JTextArea implements SSComponent {
 	/**
 	 * Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization.

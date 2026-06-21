@@ -27,6 +27,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.utils;
 
@@ -42,11 +47,11 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
-import static java.lang.System.Logger.Level.*;
 import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
+import static java.lang.System.Logger.Level.*;
 
 /**
- * Support classes used with SSComponents that extend JTextComponent.
+ * Support for use with SSComponents that extend JTextComponent.
  */
 public class SSTextSupport
 {
@@ -69,7 +74,110 @@ public class SSTextSupport
 		// TODO: assert not called before
 		return new SSTextSupport.SSDocumentListener(comp);
 	}
-	
+
+	/**
+	 * Document listener provided for convenience for SwingSet Components that are
+	 * based on JTextComponents. SwingSet components that need a Document listener
+	 * to trigger a change to the bound RowSet should return an instance of
+	 * SSCommonDocumentListener() when implementing the abstract method
+	 * getSSComponentListener().
+	 * <p>
+	 * This listener updates the underlying RowSet when there is a change to the Document
+	 * object. E.g., a call to setText() on a JTextField.
+	 * <p>
+	 * removeUpdate() and insertUpdate() both call changedUpdate().
+	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
+	 * the display after the last method is called.
+	 * <p>
+	 * DocumentListener events generally, but not always get fired twice any time
+	 * there is an update to the JTextField: a removeUpdate() followed by
+	 * insertUpdate()
+	 * <a href="https://stackoverflow.com/questions/15209766/why-jtextfield-settext-will-fire-documentlisteners-removeupdate-before-change#15213813">as described here</a>.
+	 */
+	// <a href="https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield">partial solution</a>.
+	public static class SSDocumentListener implements DocumentListener {
+		/**
+		 * variables needed to consolidate calls to removeUpdate() and insertUpdate()
+		 * from DocumentListener
+		 */
+		private int lastChange = 0;
+		private int lastNotifiedChange = 0;
+		private final SSCommon ssCommon;
+
+		/** Create DocumentListener for the component.
+		 * @param comp associated component
+		 */
+		public SSDocumentListener(SSComponent comp) {
+			this.ssCommon = comp.getSSCommon();
+		}
+
+		private void updateTextComponent()
+		{
+			String text = ((JTextComponent) ssCommon.getSSComponent()).getText();
+			// update decorator per keystroke.
+			// ISSUE: when decorator uses NavigateState.errorComponents,
+			// as accessed through RowsModel.hasError(comp), that state may
+			// still be there, since it's updated by RowSet event,
+			// which comes from setColumnText.
+			try {
+				ssCommon.skipValidateHasError = true;
+				if (!ssCommon.decorate()) {
+					postColumnChangeStartError(ssCommon.getSSComponent(), text);
+					return;
+				}
+			} finally {
+				ssCommon.skipValidateHasError = false;
+			}
+			ssCommon.setColumnText(text);
+		}
+
+		/**
+		 * Coalesce events so that updateTextComponent is only called one.
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void changedUpdate(final DocumentEvent de)
+		{
+			lastChange++;
+			logger.log(TRACE, () -> SSUtils.sf(
+					"%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
+					ssCommon.getColumnForLog(), lastChange, lastNotifiedChange));
+			// Delay updateTextComponent until all Document listeners inovked for event.
+			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+			SwingUtilities.invokeLater(() -> {
+				if (lastNotifiedChange != lastChange) {
+					lastNotifiedChange = lastChange;
+					try {
+						ssCommon.dbChange(() -> updateTextComponent());
+					} catch (SQLException ex) {
+						logger.log(Logger.Level.ERROR, (String) null, ex);
+					}
+				}
+			});
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void insertUpdate(final DocumentEvent de)
+		{
+			logger.log(TRACE, () -> SSUtils.sf("%s - insertUpdate().", ssCommon.getColumnForLog()));
+			changedUpdate(de);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void removeUpdate(final DocumentEvent de)
+		{
+			logger.log(TRACE, () -> SSUtils.sf("%s - removeUpdate().", ssCommon.getColumnForLog()));
+			changedUpdate(de);
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// Everything following is private, targetted for removal
+	//
+
 	/**
 	 * For JTextField to track previous text field value.
 	 * Used in conjunction with {@link SSDocumentListener}.
@@ -82,8 +190,8 @@ public class SSTextSupport
 	 * https://github.com/bpangburn/swingset/pull/178<br>
 	 *
 	 */
-	@SuppressWarnings(value = "serial")
-	public static class SSPlainDocument extends PlainDocument
+	@SuppressWarnings(value = {"serial", "unused"})
+	private static class SSPlainDocument extends PlainDocument
 	{
 		
 		DocumentFilter filter;
@@ -101,7 +209,8 @@ public class SSTextSupport
 			try {
 				String prev = fb.getDocument().getText(0, fb.getDocument().getLength());
 				logger.log(TRACE, () -> "Capture previous text value: " + prev);
-				if (ssCommon.getEventListener() instanceof SSDocumentListener listener)
+				if (ssCommon.getEventListener() instanceof
+						SSDocumentListenerWithRestoreOnError listener)
 					listener.previousValue = prev;
 			} catch (BadLocationException ex) {
 				logger.log(DEBUG, "Capture previous text value", ex);
@@ -167,7 +276,7 @@ public class SSTextSupport
 	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
 	 * the display on the last method called.
 	 */
-	public static class SSDocumentListener implements DocumentListener
+	private static class SSDocumentListenerWithRestoreOnError implements DocumentListener
 	{
 
 		/**
@@ -183,7 +292,7 @@ public class SSTextSupport
 		/** Create DocumentListener for the component.
 		 * @param comp associated component
 		 */
-		public SSDocumentListener(SSComponent comp)
+		public SSDocumentListenerWithRestoreOnError(SSComponent comp)
 		{
 			this.ssCommon = comp.getSSCommon();
 		}
@@ -236,7 +345,7 @@ public class SSTextSupport
 				ok = ssCommon.setColumnText(text);
 			} finally {
 				if (!ok) {
-					if (ssCommon.isRestoreOnError()) {
+					if (ssCommon.isRestoreOnError_NOT_USED()) {
 						// restore previous text value
 						if (previousValue != null) {
 							if (ssCommon.isSSComponentListenerAdded()) {

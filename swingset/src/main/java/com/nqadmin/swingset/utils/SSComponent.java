@@ -57,7 +57,7 @@ import com.nqadmin.swingset.core.CheckBox;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbWriter;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbUpdater;
 import com.nqadmin.swingset.datasources.SSDBSupport.RunnableSQL;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
@@ -73,7 +73,7 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 /**
  * This Interface presents a {@link RowSet} column as seen by the visual
  * components in the SS library. It has default methods supporting binding
- * a {@linkplain RowSet} column to this component, dbms access,
+ * a {@linkplain RowSet} column to this component, DBMS access with type conversion,
  * undo/redo, validation, decoration. Most of these default methods bounce
  * to an internal SSCommon class and would be declared final if java
  * supported that. A database column is associated
@@ -86,14 +86,29 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  * <a href="../core/package-summary.html">core components</a>.
  * They are subclassed into a
  * <a href="../package-summary.html">compatibility layer</a>
- * as a replacement for the original SS library.
+ * as a replacement for the
+ * <a href="https://github.com/bpangburn/swingset">original SwingSet library</a>.
  * <p>
- * There are several methods that can be overridden; they
+ * There are several methods that are typically overridden; they
  * perform customization, receive notification, and do verification:
  * {@link #customInit() },
  * {@link #checkColumnType(JDBCType) }, {@link #metadataChange() },
  * {@link #finishBind() }, {@link #baseValidate() }, {@link #componentValidate()},
  * and {@link #createDefaultDecorator()}.
+ * <p>
+ * The methods for reading and updating database columns are
+ * {@link #getColumnText() getColumn*()} and {@link #setColumnText(String) setColumn*}.
+ * With {@link #getColumnText() }, {@link #setColumnText(String) }
+ * and {@link #getColumnObject(Class) } values are converted as needed,
+ * see {@link com.nqadmin.swingset.datasources.ConvertType}.
+ * For unhandled {@code JDBCType}s, {@link #getColumn() }
+ * and {@link #setColumn(Object) } are available;
+ * see {@link #setColumnReader(DbReader)}
+ * and {@link #setColumnUpdater(DbUpdater) }.
+ * <p>
+ * There are methods about column state, status and metadata;
+ * like {@link #getAllowNull() [sg]etAllowNull()}, {@link #isDirty() },
+ * {@link #getColumnJDBCType() }.
  * <p>
  * There are multiple levels of validation. 
  * The validators are executed in the
@@ -113,9 +128,10 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  * <br>
  * Set at run time with {@link #setPluginValidator(Validator)}.
  * For example check for specific values; or other columns or ...
- * Could be used to apply additional constraints if the database schema
- * can't be changed.
+ * Can apply constraints while editing and avoid errors at commit.
  * </ol>
+ * <p>
+ * There are {@link Decorator}s that visually indicate the components state.
  * <p>
  * When creating an SSComponent, typical usage: {@snippet lang="java":
  *     class MyComponent extends SomeJComponent implements SScomponent {
@@ -150,7 +166,6 @@ public interface SSComponent extends RSC
 	 * to tell the component to read and display the current database value.
 	 * Here's a complete example based on {@link CheckBox}.
 	 * {@snippet lang="java" class=MyCheckBox region=hook_example}
-	 * }
 	 * <p>
 	 * <b>Generally should not be used except by SSCommon</b>.
 	 */
@@ -332,7 +347,7 @@ public interface SSComponent extends RSC
 	 * @param rowsModel holds RowSet to be used.
 	 * @param columnName Name of the column to which this check box should be bound
 	 * 
-	 * @deprecated Use rowsModel.bind(sscomp, columnName)
+	 * @deprecated Use {@link RowsModel#bind(Map) RowsModel.bind(...)}
 	 */
 	@Deprecated
 	default void bind(RowsModel rowsModel, String columnName)
@@ -355,7 +370,7 @@ public interface SSComponent extends RSC
 	 * Transition support.
 	 * @param rowSet
 	 * @param columnName
-	 * @deprecated use RowsModel not RowSet
+	 * @deprecated Use {@link RowsModel#bind(Map) RowsModel.bind(...)}
 	 */
 	@Deprecated
 	default void bind(RowSet rowSet, String columnName)
@@ -420,7 +435,7 @@ public interface SSComponent extends RSC
 
 	/**
 	 * Sets the value of the bound database column using the SSComponent's
-	 * {@link DbWriter}. See {@link #getColumnWriter() }.
+	 * {@link DbUpdater}. See {@link #getColumnUpdater() }.
 	 * NPE if no columnReader. Useful for dealing with JDBCTypes not handled
 	 * internally.
 	 * 
@@ -445,7 +460,7 @@ public interface SSComponent extends RSC
 	 * 
 	 * @return the DbReader used to fetch values from the database
 	 */
-	default DbReader<RowSet, Integer, SSComponent, ?> getColumnReader() {
+	default DbReader<RowSet, Integer, SSComponent> getColumnReader() {
 		return getSSCommon().getColumnReader();
 	}
 
@@ -457,11 +472,12 @@ public interface SSComponent extends RSC
 	 * 
 	 * The {@code columnReader} is typically invoked like
 	 * {@code .apply(comp.getRowSet(), comp.getColumnIndex(), comp)}.
-	 * The comp is rarely used, and provided for complex situations.
-	 * 
+	 * The comp is rarely used, and provided just in case.
+	 * For example with a BLOB or BINARY column 
+	 * {@snippet lang="java" class=DbReaderDbUpdater region=setColumnReader}
 	 * @param columnReader the DbReader used to fetch values from the database
 	 */
-	default void setColumnReader(DbReader<RowSet, Integer, SSComponent, ?> columnReader) {
+	default void setColumnReader(DbReader<RowSet, Integer, SSComponent> columnReader) {
 		getSSCommon().setColumnReader(columnReader);
 	}
 
@@ -527,8 +543,8 @@ public interface SSComponent extends RSC
 	 * Updates the value of the bound database column;
 	 * method used by SwingSet component listeners to update the underlying RowSet.
 	 * Sets the value of the bound database column using the SSComponent's
-	 * {@link DbWriter}. See {@link #getColumnWriter() }.
-	 * NPE if no columnWriter. Useful for dealing with JDBCTypes not handled
+	 * {@link DbUpdater}. See {@link #getColumnUpdater() }.
+	 * NPE if no columnUpdater. Useful for dealing with JDBCTypes not handled
 	 * internally.
 	 * Does not commit the update row.
 	 * 
@@ -540,35 +556,37 @@ public interface SSComponent extends RSC
 	}
 
 	/**
-	 * Get the columnWriter used by {@link #setColumn(Object)}.
+	 * Get the columnUpdater used by {@link #setColumn(Object)}.
 	 * This is useful for dealing with ColumnTypes that are are not
 	 * handled internally, like BLOB and VARBINARY.
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
-	 * The {@code columnWriter} is typically invoked like
+	 * The {@code columnUpdater} is typically invoked like
 	 * {@code .apply(comp.getRowSet(), comp.getColumnIndex(), comp, value)}.
 	 * The comp is rarely used, and provided for complex situations.
 	 * 
-	 * @return the DbWriter used to update to the database
+	 * @return the DbUpdater used to update to the database
 	 */
-	default DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
-		return getSSCommon().getColumnWriter();
+	default DbUpdater<RowSet, Integer, SSComponent, Object> getColumnUpdater() {
+		return getSSCommon().getColumnUpdater();
 	}
 
 	/**
-	 * Set the columnWriter used by {@link #setColumn(Object)}.
+	 * Set the columnUpdater used by {@link #setColumn(Object)}.
 	 * This is useful for dealing with ColumnTypes that are are not
 	 * handled internally, like BLOB and VARBINARY.
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
-	 * The {@code columnWriter} is typically invoked like
+	 * The {@code columnUpdater} is typically invoked like
 	 * {@code .apply(comp.getRowSet(), comp.getColumnIndex(), comp, value)}.
-	 * The comp is rarely used, and provided for complex situations.
+	 * The comp is rarely used, and provided just in case.
+	 * For example with a BLOB or BINARY column: 
+	 * {@snippet lang="java" class=DbReaderDbUpdater region=setColumnUpdater}
 	 * 
-	 * @param columnWriter the DbWriter used to update the database
+	 * @param columnUpdater the DbUpdater used to update the database
 	 */
-	default void setColumnWriter(DbWriter<RowSet,Integer,SSComponent,Object> columnWriter) {
-		getSSCommon().setColumnWriter(columnWriter);
+	default void setColumnUpdater(DbUpdater<RowSet,Integer,SSComponent,Object> columnUpdater) {
+		getSSCommon().setColumnUpdater(columnUpdater);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -658,7 +676,7 @@ public interface SSComponent extends RSC
 	 * Based on java.sql.Types
 	 *
 	 * @return the data type of the bound column
-	 * @deprecated use getBoundColumnJDBCType
+	 * @deprecated use {@link #getColumnJDBCType}
 	 */
 	@Deprecated
 	default int getBoundColumnType() {
@@ -696,7 +714,7 @@ public interface SSComponent extends RSC
 	 * Sets the database column name bound to the Swingset component
 	 *
 	 * @param boundColumnName the columnName to set
-	 * @deprecated Use bind()
+	 * @deprecated Use {@link RowsModel#bind(Map) RowsModel.bind(...)}
 	 */
 	@Deprecated
 	default void setBoundColumnName(final String boundColumnName) {

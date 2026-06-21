@@ -73,7 +73,6 @@ import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass;
-import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStart;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
@@ -490,7 +489,7 @@ public class RowSetOps {
 		Objects.requireNonNull(rsc);
 
 		if (rsc instanceof SSComponent comp) {
-			SSDBSupport.DbReader<RowSet, Integer, SSComponent, ?> columnReader = comp.getColumnReader();
+			SSDBSupport.DbReader<RowSet, Integer, SSComponent> columnReader = comp.getColumnReader();
 			if (columnReader != null)
 				return comp.getColumnReader()
 						.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
@@ -736,6 +735,17 @@ public class RowSetOps {
 	}
 
 	/**
+	 * This wraps a value written to the database. In some cases, especially
+	 * for text columns, before writing a string is converted. DbUpdate
+	 * holds the actual value, after conversion, written to the database.
+	 * Also there is a special value, {@link #UPDATE_NULL}, used when
+	 * {@link RowSet#updateNull(int)} is used to update the database.
+	 */
+	public record DbUpdate(Object value) {}
+	/** The actual value written to the database */
+	public static DbUpdate UPDATE_NULL = new DbUpdate(JDBCType.NULL);
+
+	/**
 	 * The String updatedValue is converted to an object and
 	 * {@link RowSet#updateObject(int, java.lang.Object) }
 	 * or {@link RowSet#updateNull(int) } is used.
@@ -747,16 +757,17 @@ public class RowSetOps {
 	 * @param comp The SSComponent doing the update
 	 * @param updatedValue string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
+	 * @return actual item written to the database, throws if nothing written
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
-	public static void updateColumnText(SSComponent comp, String updatedValue)
+	public static DbUpdate updateColumnText(SSComponent comp, String updatedValue)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{ 
 		checkForceConflict(comp, updatedValue); // TODO: This is only for debug
 
-		updateColumnText(comp, comp.getRowSet(), updatedValue,
+		return updateColumnText(comp, comp.getRowSet(), updatedValue,
 						 comp.getColumnIndex(), comp.getAllowNull());
 	}
 
@@ -780,7 +791,7 @@ public class RowSetOps {
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
 	// TODO: test this and conversions
-	private static void updateColumnText(SSComponent comp, RowSet
+	private static DbUpdate updateColumnText(SSComponent comp, RowSet
 			rowSet, String updatedValue, int columnIndex, boolean allowNull)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{
@@ -793,88 +804,78 @@ public class RowSetOps {
 		if (!textUpdateOK.contains(jdbcType)) {
 			// TODO: internal error exception?
 			logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + comp.getColumnForLog() + ".");
-			return;
+			throw new SSSQLUnhandledTypeException(sf("'%s' can't be used as text", jdbcType));
 		}
 
-		UndoRedo.captureInitialValue(comp); // undo/redo
-
-		boolean did_update = false;
 		Object dbValue = null;
-		try {
-			// On insert row, write null if updatedValue is null or empty string,
-			// and do not perform other checks.
-			// TODO: isBlank???
-			if ((updatedValue == null || updatedValue.isEmpty()) && RowSetState.isInserting(rowSet)) {
-				rowSet.updateNull(columnIndex);
-				did_update = true;
-				return;
-			}
-			
-			/*
-			* FIRST - NULL HANDLING:
-			*
-			* For character-based columns where _allowNull==true, we write null rather than an empty string
-			* We do this because a column could allow null, but have a UNIQUE constraint and each null
-			* should be unique.
-			*
-			* We want to enter this code under 3 conditions:
-			*  1. updateColumnText() is passed a null string
-			*  2. updateColumnText() is passed an empty string (any column type)
-			*  3. updateColumnText() is passed a 'blank' (whitespace) string
-			*     for a non-character-based field (e.g., "" or "   " for a double)
-			*
-			* If !allowNull then a character based field with 0 or more blank spaced
-			* will be allowed and code will continue to the switch/case statement below.
-			*/
-			if (updatedValue == null
-					|| updatedValue.isEmpty()
-					|| (updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
-				if (allowNull) {
-					rowSet.updateNull(columnIndex);
-					did_update = true;
-					return;
-				} else if (!textUpdateEmptyOK.contains(jdbcType)) {
-					// This will throw an exception for a non-char type, but allow
-					// a char-based type with an empty string to continue to the
-					// switch/case below and write the empty string via
-					// rowSet.updateString(_columnName, _updatedValue)
-					//
-					// Note that if there is a UNIQUE constraint on such a text
-					// column then repeatedly writing the same number (0 to N)
-					// spaces should throw an SQL exception
-					// (as should any other duplicate string)
-			
-					// TODO: Have a method "CreateMessage(RSC) see also
-					//		 SSFormattedTextField, SSCommon
-					// NOTE: in following should mention column name
-					throw new SSSQLNullException("Null values are not allowed for this field.");
-				}
-			}
-			assert(updatedValue != null);
-			
-			/*
-			 * SECOND - update non-null values based on string conversions
-			 */
-			switch (jdbcType) {
-			
-			case INTEGER, SMALLINT, TINYINT, BIGINT,
-					REAL, DOUBLE, FLOAT, DECIMAL, NUMERIC,
-					BOOLEAN, BIT,
-					CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
-				dbValue = convertToType(updatedValue, jdbcType);
-				//dbValue = updatedValue; // Let DB convert.
-			case DATE, TIME, TIMESTAMP -> // TODO: use convertObjectType when...
-				dbValue = getSQLDateTimeObject(updatedValue, comp);
-			default ->
-				// TODO: SSSQLExceptionUnhandledType
-				throw new IllegalStateException("switch cases out of sync");
-			} // end switch
-			rowSet.updateObject(columnIndex, dbValue);
-			did_update = true;
-		} finally {
-			if (did_update) // component is not in error
-				postColumnChangeStart(comp, dbValue);
+		// On insert row, write null if updatedValue is null or empty string,
+		// and do not perform other checks.
+		// TODO: isBlank???
+		if ((updatedValue == null || updatedValue.isEmpty()) && RowSetState.isInserting(rowSet)) {
+			rowSet.updateNull(columnIndex);
+			return UPDATE_NULL;
 		}
+		
+		/*
+		* FIRST - NULL HANDLING:
+		*
+		* For character-based columns where _allowNull==true, we write null rather than an empty string
+		* We do this because a column could allow null, but have a UNIQUE constraint and each null
+		* should be unique.
+		*
+		* We want to enter this code under 3 conditions:
+		*  1. updateColumnText() is passed a null string
+		*  2. updateColumnText() is passed an empty string (any column type)
+		*  3. updateColumnText() is passed a 'blank' (whitespace) string
+		*     for a non-character-based field (e.g., "" or "   " for a double)
+		*
+		* If !allowNull then a character based field with 0 or more blank spaced
+		* will be allowed and code will continue to the switch/case statement below.
+		*/
+		if (updatedValue == null
+				|| updatedValue.isEmpty()
+				|| (updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
+			if (allowNull) {
+				rowSet.updateNull(columnIndex);
+				return UPDATE_NULL;
+			} else if (!textUpdateEmptyOK.contains(jdbcType)) {
+				// This will throw an exception for a non-char type, but allow
+				// a char-based type with an empty string to continue to the
+				// switch/case below and write the empty string via
+				// rowSet.updateString(_columnName, _updatedValue)
+				//
+				// Note that if there is a UNIQUE constraint on such a text
+				// column then repeatedly writing the same number (0 to N)
+				// spaces should throw an SQL exception
+				// (as should any other duplicate string)
+		
+				// TODO: Have a method "CreateMessage(RSC) see also
+				//		 SSFormattedTextField, SSCommon
+				// NOTE: in following should mention column name
+				throw new SSSQLNullException("Null values are not allowed for this field.");
+			}
+		}
+		assert(updatedValue != null);
+		
+		/*
+		 * SECOND - update non-null values based on string conversions
+		 */
+		switch (jdbcType) {
+		
+		case INTEGER, SMALLINT, TINYINT, BIGINT,
+				REAL, DOUBLE, FLOAT, DECIMAL, NUMERIC,
+				BOOLEAN, BIT,
+				CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
+			dbValue = convertToType(updatedValue, jdbcType);
+			//dbValue = updatedValue; // Let DB convert.
+		case DATE, TIME, TIMESTAMP -> // TODO: use convertObjectType when...
+			dbValue = getSQLDateTimeObject(updatedValue, comp);
+		default ->
+			// TODO: SSSQLExceptionUnhandledType
+			throw new IllegalStateException("switch cases out of sync");
+		} // end switch
+		rowSet.updateObject(columnIndex, dbValue);
+		return new DbUpdate(dbValue);
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
 
 	/**
@@ -887,55 +888,47 @@ public class RowSetOps {
 	 *
 	 * @param comp The SSComponent doing the update
 	 * @param updatedValue value to write to underlying RowSet column
+	 * @return actual item written to the database, throws if nothing written
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject(SSComponent comp, Object updatedValue)
+	public static DbUpdate updateColumnObject(SSComponent comp, Object updatedValue)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{
 		if (updatedValue instanceof String s) {
 			// This method doesn't have all the string checks,
 			// use updateColumnText if String Object.
-			updateColumnText(comp, s);
-			return;
+			return updateColumnText(comp, s);
 		}
 		final RowSet rowSet = comp.getRowSet();
 		final int columnIndex = comp.getColumnIndex();
 		boolean allowNull = comp.getAllowNull();
 		logger.log(DEBUG, () -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
 
-		UndoRedo.captureInitialValue(comp); // undo/redo
-
-		boolean did_update = false;
-		try {
-			// On insert row, write null and do not perform other checks.
-			if (updatedValue == null) {
-				if (RowSetState.isInserting(rowSet) || allowNull) {
-					rowSet.updateNull(columnIndex);
-					did_update = true;
-					return;
-				} else
-					throw new SSSQLNullException("NULL not allowed for this field.");
-			}
-
-			//_rowSet.updateObject(_columnIndex, _updatedValue);
-			JDBCType jdbcType = comp.getColumnJDBCType();
-			// TODO: Maybe a component field that says use jdbc conversion.
-			//		 Better, checkDriverConvertToType(),
-			//		 so "obj = convertObjectTypeIfNeeded(...)"
-			// TODO: Why isn't updateObject(index, object, type) used anywhere?
-			//		 Could always catch SQLFeatureNotSupportedException and do
-			//		 manual conversions as a last resort.
-			// TODO: It's weird that updateObject(idx,obj,type) javadoc says
-			//		 "type to be sent to the database". Does that mean the specified
-			//		 conversions for setObject kick in at that point?
-			Object obj = convertToType(updatedValue, jdbcType);
-			updateColumnObjectDirect(rowSet, columnIndex, obj, jdbcType);
-			did_update = true;
-		} finally {
-			if (did_update)
-				postColumnChangeStart(comp, updatedValue);
+		Object dbValue;
+		// On insert row, write null and do not perform other checks.
+		if (updatedValue == null) {
+			if (RowSetState.isInserting(rowSet) || allowNull) {
+				rowSet.updateNull(columnIndex);
+				return UPDATE_NULL;
+			} else
+				throw new SSSQLNullException("NULL not allowed for this field.");
 		}
+
+		//_rowSet.updateObject(_columnIndex, _updatedValue);
+		JDBCType jdbcType = comp.getColumnJDBCType();
+		// TODO: Maybe a component field that says use jdbc conversion.
+		//		 Better, checkDriverConvertToType(),
+		//		 so "obj = convertObjectTypeIfNeeded(...)"
+		// TODO: Why isn't updateObject(index, object, type) used anywhere?
+		//		 Could always catch SQLFeatureNotSupportedException and do
+		//		 manual conversions as a last resort.
+		// TODO: It's weird that updateObject(idx,obj,type) javadoc says
+		//		 "type to be sent to the database". Does that mean the specified
+		//		 conversions for setObject kick in at that point?
+		dbValue = convertToType(updatedValue, jdbcType);
+		updateColumnObjectDirect(rowSet, columnIndex, dbValue, jdbcType);
+		return new DbUpdate(dbValue);
 	}
 
 	/**
@@ -948,11 +941,12 @@ public class RowSetOps {
 	 *
 	 * @param comp The SSComponent doing the update
 	 * @param updatedValue Array
+	 * @return actual item written to the database, throws if nothing written
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnArray(final SSComponent comp, final Array updatedValue) throws SSSQLNullException, SQLException {
-		updateColumnArray(comp, comp.getRowSet(), updatedValue, comp.getColumnName(), comp.getAllowNull());
+	public static DbUpdate updateColumnArray(final SSComponent comp, final Array updatedValue) throws SSSQLNullException, SQLException {
+		return updateColumnArray(comp, comp.getRowSet(), updatedValue, comp.getColumnName(), comp.getAllowNull());
 	}
 
 	/**
@@ -965,65 +959,51 @@ public class RowSetOps {
 	 *
 	 * @param comp The SSComponent doing the update
 	 * @param rowSet RowSet on which to operate
-	 * @param updatedValue Array
+	 * @param dbValue Array
 	 * @param columnName   name of the database column
 	 * @param allowNull 	indicates if Component and underlying column can contain null values
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	private static void updateColumnArray(final SSComponent comp, final RowSet rowSet, final Array updatedValue, final String columnName, final boolean allowNull) throws SSSQLNullException, SQLException
+	private static DbUpdate updateColumnArray(@SuppressWarnings("unused") SSComponent comp,
+			RowSet rowSet, Array dbValue, String columnName, boolean allowNull)
+			throws SSSQLNullException, SQLException
 	{
-		logger.log(DEBUG, () -> "[" + columnName + "]. Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
+		logger.log(DEBUG, () -> "[" + columnName + "]. Update to: " + dbValue + ". Allow null? [" + allowNull + "]");
 
-		UndoRedo.captureInitialValue(comp); // undo/redo
-
-		// On insert row, write null if updatedValue is null, and do not perform other checks. 
-		boolean did_update = false;
-		try {
-			if (updatedValue == null && RowSetState.isInserting(rowSet)) {
-				rowSet.updateNull(columnName);
-				did_update = true;
-				return;
-			}
-			
-			if (updatedValue == null) {
-				if (allowNull) {
-					rowSet.updateNull(columnName);
-					did_update = true;
-					return;
-				} else
-					throw new SSSQLNullException("NULL not allowed for this field.");
-			}
-			
-			rowSet.updateArray(columnName, updatedValue);
-			did_update = true;
-		} finally {
-			if (did_update)
-				postColumnChangeStart(comp, updatedValue);
+		// On insert row, write null if dbValue is null,
+		// and do not perform other checks. 
+		if (dbValue == null && RowSetState.isInserting(rowSet)) {
+			rowSet.updateNull(columnName);
+			return UPDATE_NULL;
 		}
+		
+		if (dbValue == null) {
+			if (allowNull) {
+				rowSet.updateNull(columnName);
+				return UPDATE_NULL;
+			} else
+				throw new SSSQLNullException("NULL not allowed for this field.");
+		}
+		
+		rowSet.updateArray(columnName, dbValue);
+		return new DbUpdate(dbValue);
 	}
 
 	/**
-	 * Update the RowSet using {@code columnWriter}. ColumnWriter is
+	 * Update the RowSet using {@code columnUpdater}. columnUpdater is
 	 * expected to do a rowSet.update*.
 	 * 
 	 * @param comp
 	 * @param value
+	 * @return actual item written to the database, throws if nothing written
 	 * @throws SQLException
 	 */
-	public static void updateColumn(SSComponent comp, Object value)
+	public static DbUpdate updateColumn(SSComponent comp, Object value)
 			throws SQLException
 	{
-		UndoRedo.captureInitialValue(comp);
-
-		boolean did_update = false;
-		try {
-			SSDBSupport.runDbWriter(comp, value);
-			did_update = true;
-		} finally {
-			if (did_update)
-				postColumnChangeStart(comp, value);
-		}
+		DbUpdate dbUpdate = SSDBSupport.runDbUpdater(comp, value);
+		return dbUpdate;
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -1061,8 +1041,7 @@ public class RowSetOps {
 	 * to the database.
 	 *
 	 * @param rowSet RowSet on which to operate
-	 * @param value string to be type-converted as needed and updated in
-	 *                      underlying RowSet column
+	 * @param value updated in underlying RowSet column
 	 * @param columnIndex   index of the database column
 	 * @param type NOT USED, the jdbc driver does the conversion
 	 * @throws SQLException  thrown if a database error is encountered

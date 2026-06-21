@@ -89,7 +89,7 @@ public class DefaultSSDBSupport implements SSDBSupport
 	 * @return 
 	 */
 	@Override
-	public <R> R runWithConnection(RowSet rs, FuncSQL<Connection, R> func)
+	public <R> R runWithConnection(RowSet rs, FunctionSQL<Connection, R> func)
 			throws SQLException
 	{
 		Connection conn01 = getSharedConnection(rs);

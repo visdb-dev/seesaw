@@ -252,7 +252,7 @@ public class ConvertTypeTest
 	 * @throws Exception
 	 */
 	@Test
-	@SuppressWarnings("ThrowableResultIgnored")
+	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
 	public void testConvertBoolean() throws Exception
 	{
 		System.out.println("convertBoolean");
@@ -398,7 +398,7 @@ public class ConvertTypeTest
 	 * @throws java.lang.Exception
 	 */
 	@Test
-	@SuppressWarnings("ThrowableResultIgnored")
+	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
 	public void testConvertObjectType_Object_Class() throws Exception
 	{
 		System.out.println("convertObjectType_Class");
@@ -458,6 +458,7 @@ public class ConvertTypeTest
 	 * @throws java.lang.Exception
 	 */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testFindJavaTypeClass() throws Exception
 	{
 		System.out.println("findJavaTypeClass");

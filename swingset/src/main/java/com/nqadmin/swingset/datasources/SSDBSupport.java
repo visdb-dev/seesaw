@@ -48,6 +48,7 @@ import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
+import com.nqadmin.swingset.datasources.RowSetOps.DbUpdate;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponent;
 
@@ -73,7 +74,7 @@ public interface SSDBSupport {
 
 	/**
 	 * For the typical simple cases run the columnRead to set the value.
-	 * Note that the columnWriter typically ignores the comp argument, but
+	 * Note that the columnUpdater typically ignores the comp argument, but
 	 * there for special cases.
 	 *
 	 * @param comp
@@ -86,33 +87,35 @@ public interface SSDBSupport {
 	}
 
 	/**
-	 * For the typical simple cases run the columnWriter to set the value.
-	 * Note that the columnWriter typically ignores the comp argument, but
+	 * For the typical simple cases run the columnUpdater to set the value.
+	 * Note that the columnUpdater typically ignores the comp argument, but
 	 * there for special cases.
 	 * 
 	 * @param comp
 	 * @param value
+	 * @return actual item written to the database, throws if nothing written
 	 * @throws SQLException
 	 */
-	static void runDbWriter(SSComponent comp, Object value) throws SQLException {
-		runDbWriter(comp, value, comp.getColumnWriter());
+	static DbUpdate runDbUpdater(SSComponent comp, Object value) throws SQLException {
+		return runDbUpdater(comp, value, comp.getColumnUpdater());
 	}
 
 	/**
-	 * For the typical simple cases run the columnWriter to set the value.
-	 * Note that the columnWriter typically ignores the comp argument, but
+	 * For the typical simple cases run the columnUpdater to set the value.
+	 * Note that the columnUpdater typically ignores the comp argument, but
 	 * there for special cases.
 	 *
 	 * @param comp
 	 * @param value
-	 * @param columnWriter
+	 * @param columnUpdater
+	 * @return actual item written to the database, throws if nothing written
 	 * @throws SQLException
 	 */
 	// TODO: any reason to make this public?
-	private static void runDbWriter(SSComponent comp, Object value,
-			DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
+	private static DbUpdate runDbUpdater(SSComponent comp, Object value,
+			DbUpdater<RowSet, Integer, SSComponent, Object> columnUpdater)
 			throws SQLException {
-		columnWriter.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
+		return columnUpdater.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
 	}
 
 	/**
@@ -124,7 +127,7 @@ public interface SSDBSupport {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
-	<R> R runWithConnection(RowSet rs, FuncSQL<Connection, R> func) throws SQLException;
+	<R> R runWithConnection(RowSet rs, FunctionSQL<Connection, R> func) throws SQLException;
 
 	/**
 	 * Return a connection for quick use that
@@ -176,7 +179,7 @@ public interface SSDBSupport {
 	 * @param <T>
 	 * @param <R>
 	 */
-	interface FuncSQL<T,R> {
+	interface FunctionSQL<T,R> {
 
 		/**
 		 * Run the function.
@@ -213,10 +216,9 @@ public interface SSDBSupport {
 	 * @param <T>
 	 * @param <U>
 	 * @param <V>
-	 * @param <R>
 	 */
 
-	interface DbReader<T,U,V,R>  {
+	interface DbReader<T,U,V>  {
 
 		/**
 		 * Run the function
@@ -224,11 +226,11 @@ public interface SSDBSupport {
 		 * @param t
 		 * @param u
 		 * @param v
-		 * @return
+		 * @return value read from database
 		 * @throws SQLException
 		 */
 
-		public R apply(T t, U u, V v) throws SQLException;
+		public Object apply(T t, U u, V v) throws SQLException;
 	}
 
 	/**
@@ -240,7 +242,7 @@ public interface SSDBSupport {
 	 * @param <V>
 	 * @param <W>
 	 */
-	interface DbWriter<T,U,V,W>  {
+	interface DbUpdater<T,U,V,W>  {
 
 		/**
 		 * Run the function
@@ -249,9 +251,10 @@ public interface SSDBSupport {
 		 * @param u
 		 * @param v
 		 * @param w
+		 * @return The actual item written to the database
 		 * @throws SQLException
 		 */
 
-		public void apply(T t, U u, V v, W w) throws SQLException;
+		public DbUpdate apply(T t, U u, V v, W w) throws SQLException;
 	}
 }
