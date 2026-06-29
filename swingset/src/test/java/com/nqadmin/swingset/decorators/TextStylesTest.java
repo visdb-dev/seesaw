@@ -250,6 +250,78 @@ public class TextStylesTest
 
 		""";
 
+	String keep_json = """
+		{
+			"init1": {
+				"foreground": "blue",
+				"background": "yellow",
+				"opaque": false,
+				"fontFamily": "Serif",
+				"fontSize": 10,
+				"bold": true,
+				"italic": true,
+				"underline": true,
+				"strikethrough": true,
+				"alignment": "right",
+				"linewrap"  : "keep",
+				"wordwrap"  : "keep",
+				"scrollbars": "keep",
+				"autoscroll": "keep"
+			},
+
+			"try1": {
+				"foreground": "keep",
+				"background": "keep",
+				"opaque": "keep",
+				"fontFamily": "keep",
+				"fontSize": 14,
+				"bold": "keep",
+				"italic": false,
+				"underline": false,
+				"strikethrough": "keep",
+				"alignment": "center",
+				"linewrap"  : "keep",
+				"wordwrap"  : "keep",
+				"scrollbars": "keep",
+				"autoscroll": "keep"
+			},
+			"try2": {
+				"foreground": "keep",
+				"background": "keep",
+				"opaque": true,
+				"fontFamily": "keep",
+				"fontSize": "keep",
+				"bold": false,
+				"italic": "keep",
+				"underline": "keep",
+				"strikethrough": false,
+				"alignment": "keep",
+				"linewrap"  : "keep",
+				"wordwrap"  : "keep",
+				"scrollbars": "keep",
+				"autoscroll": "keep"
+			},
+			"default": {
+				"foreground": "default",
+				"background": "default",
+				"opaque": "default",
+				"fontFamily": "default",
+				"fontSize": "default",
+				"bold": "default",
+				"italic": "default",
+				"underline": "default",
+				"strikethrough": "default",
+				"alignment": "default",
+				"linewrap"  : "default",
+				"wordwrap"  : "default",
+				"scrollbars": "default",
+				"autoscroll": "default"
+			},
+			"empty": {
+			}
+		}
+		""";
+
 	/** Recursively get all the names in the AttributeSet */
 	private Set<Object> getAllAttributeNames(AttributeSet as) {
 		if (as == null)
@@ -505,27 +577,99 @@ also a test of memento.
 
 		EventQueue.invokeAndWait(() -> {
 			JTextField textField = new JTextField();
-			TextStyles.TextComponentStyleMemento mementoOrig
-					= new TextStyles.TextComponentStyleMemento(textField);
+			TextStyles.ComponentMemento mementoOrig = TextStyles.getMemento(textField);
 			AttributeSet style = TextStyles.getStyle("warning");
 			TextStyles.applyStyle(textField, style);
-			TextStyles.TextComponentStyleMemento mementoNew
-					= new TextStyles.TextComponentStyleMemento(textField);
+			TextStyles.ComponentMemento mementoNew = TextStyles.getMemento(textField);
 			
-			String expect = "TextComponentStyleMemento{foreground=java.awt.Color[r=51,g=51,b=51], background=java.awt.Color[r=255,g=243,b=205], font=java.awt.Font[family=Monospaced,name=Monospaced,style=plain,size=16], opaque=true, alignment=4, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+			String expect = "TextComponentStyleMemento{foreground=#333333, background=#fff3cd, font=java.awt.Font[family=Monospaced,name=Monospaced,style=plain,size=16], opaque=true, underline=false, strikethrough=false, alignment=right, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
 			assertEquals(expect, mementoNew.toString());
 			
 			mementoOrig.restoreTo(textField);
-			TextStyles.TextComponentStyleMemento mementoRestored
-					= new TextStyles.TextComponentStyleMemento(textField);
+			TextStyles.ComponentMemento mementoRestored = TextStyles.getMemento(textField);
 			assertEquals(mementoOrig, mementoRestored);
+		});
+	}
+
+	/**
+	 * Check out "keep".
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws InvocationTargetException
+	 */
+	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	public void testApplyStyle_JTextField_keep() throws IOException, InterruptedException, InvocationTargetException
+	{
+		System.out.println("applyStyle keep");
+
+		Reader reader = new StringReader(keep_json);
+		TextStyles.loadStylesFromJson(reader);
+
+		EventQueue.invokeAndWait(() -> {
+			JTextField textField = new JTextField();
+			TextStyles.ComponentMemento mementoOrig = TextStyles.getMemento(textField);
+			//System.out.println(sf("mementoOrig %s\n", mementoOrig));
+			String expectOrig = "TextComponentStyleMemento{foreground=#333333, background=#ffffff, font=javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12], opaque=true, underline=false, strikethrough=false, alignment=10, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+			assertEquals(expectOrig, mementoOrig.toString());
+
+			TextStyles.applyStyle(textField, TextStyles.getStyle("init1"));
+			TextStyles.ComponentMemento mementoInit1 = TextStyles.getMemento(textField);
+			//System.out.println(sf("mementoInit1 %s\n", mementoInit1));
+			String expectInit1 = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, font=java.awt.Font[family=Serif,name=Serif,style=bolditalic,size=10], opaque=false, underline=true, strikethrough=true, alignment=right, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+			assertEquals(expectInit1, mementoInit1.toString());
+
+			// when style attriute not included, should keep current value
+			TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
+			assertEquals(expectInit1, mementoInit1.toString());
+
+			TextStyles.applyStyle(textField, TextStyles.getStyle("try1"));
+			TextStyles.ComponentMemento mementoTry = TextStyles.getMemento(textField);
+			//System.out.println(sf("mementoInit1Try1 %s\n", mementoTry));
+			String expectInit1Try1 = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, font=java.awt.Font[family=Serif,name=Serif,style=bold,size=14], opaque=false, underline=false, strikethrough=true, alignment=center, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+			assertEquals(expectInit1Try1, mementoTry.toString());
+
+			// when style attriute not included, should keep current value
+			TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
+			assertEquals(expectInit1Try1, mementoTry.toString());
+
+			TextStyles.applyStyle(textField, TextStyles.getStyle("default"));
+			TextStyles.ComponentMemento mementoDefault = TextStyles.getMemento(textField);
+			//System.out.println(sf("mementoInit1Try1Default %s\n", mementoDefault));
+			String expectDefault = "TextComponentStyleMemento{foreground=#000000, background=#ffffff, font=java.awt.Font[family=Monospaced,name=Monospaced,style=plain,size=12], opaque=true, underline=false, strikethrough=false, alignment=left, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+			assertEquals(expectDefault, mementoDefault.toString());
+
+			// when style attriute not included, should keep current value
+			TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
+			assertEquals(expectDefault, mementoDefault.toString());
+
+			textField = new JTextField();
+			mementoOrig = TextStyles.getMemento(textField);
+			//System.out.println(sf("mementoOrig %s\n", mementoOrig));
+			assertEquals(expectOrig, mementoOrig.toString());
+
+			TextStyles.applyStyle(textField, TextStyles.getStyle("init1"));
+			mementoInit1 = TextStyles.getMemento(textField);
+			//System.out.println(sf("mementoInit %s\n", mementoInit1));
+			assertEquals(expectInit1, mementoInit1.toString());
+
+			TextStyles.applyStyle(textField, TextStyles.getStyle("try2"));
+			mementoTry = TextStyles.getMemento(textField);
+			System.out.println(sf("mementoInit1Try2 %s\n", mementoTry));
+			String expectInit1Try2 = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, font=java.awt.Font[family=Serif,name=Serif,style=italic,size=10], opaque=true, underline=true, strikethrough=false, alignment=right, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+			assertEquals(expectInit1Try2, mementoTry.toString());
+
+			TextStyles.applyStyle(textField, TextStyles.getStyle("default"));
+			mementoDefault = TextStyles.getMemento(textField);
+			System.out.println(sf("mementoInit1Try2Default %s\n", mementoDefault));
+			assertEquals(expectDefault, mementoDefault.toString());
 		});
 	}
 
 	/**
 	 * Test of applyStyle method, of class TextDecoratorStyles.
 	 */
-	/// @Test
+	// / @Test
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testApplyStyle_JTextArea_AttributeSet()
 	{

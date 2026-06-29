@@ -29,46 +29,24 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
-import java.util.function.Supplier;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
- * Like a factory for Decorator.
+ * Any kind of decorator.
  */
-public class DecoratorSupplier
-{
-	private final Supplier<Decorator> supplier;
-	private final Decorator.DecoratorStyle style;
-
-	/** create a decorator supplier
-	 * @param supplier */
-	public DecoratorSupplier(Supplier<Decorator> supplier)
-	{
-		this(supplier, supplier.get().getDecoratorStyle());
-	}
-
-	/** create a decorator supplier
-	 * @param supplier
-	 * @param style
+public interface AnyDecorator {
+	/** Install this decorator into the component. Installs listeners
+	 * @param component the componenet
 	 */
-	public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style)
-	{
-		this.supplier = supplier;
-		this.style = style;
-	}
+	void install(SSComponent component);
+
+	/** Remove decorator/listeners from component. */
+	void uninstall();
 	
 	/**
-	 * Create and return a decorator.
-	 * @return decorator
+	 * Return the SSComponent associated with this decorator.
+	 * 
+	 * @return the component
 	 */
-	public Decorator get() {
-		return supplier.get();
-	}
-
-	/**
-	 * Decorator style.
-	 * @return decorator style
-	 */
-	public Decorator.DecoratorStyle getDecoratorStyle() {
-		return style;
-	}
+	SSComponent getSSComponent();
 }

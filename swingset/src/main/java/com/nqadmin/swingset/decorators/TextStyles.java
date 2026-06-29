@@ -38,7 +38,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,46 +58,6 @@ import static java.lang.System.Logger.Level.*;
 //
 // TODO: CLEANUP DEFAULT/NO-DEFAULT behavior, related javadoc
 //
-
-// TABLE WITHOUT DEFAULTS
-// <table border="1">
-// <caption>Attributes in a TextStyle</caption>
-// <thead>
-// <tr>
-// <th> Attribute Name </th><th> Acceptable Values </th><th> Target Component</th>
-// </tr>
-// </thead>
-// 
-// <tbody>
-// <tr>
-// <td> foreground </td><td> Color: #ff2277, name </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> background </td><td> Color: #ff2277, name </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> fontFamily </td><td> String </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> fontSize </td><td> int </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> bold </td><td> true, false </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> italic </td><td> true, false </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> underline </td><td> true, false </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> strikethrough </td><td> true, false </td><td> JTextField, JTextArea </td>
-// </tr><tr>
-// <td> alignment </td><td> "left", "center", "right" </td><td> JTextField Only  </td>
-// </tr><tr>
-// <td> linewrap </td><td> true, false </td><td> JTextArea Only  </td>
-// </tr><tr>
-// <td> wordwrap </td><td> true, false </td><td> JTextArea Only  </td>
-// </tr><tr>
-// <td> scrollbars </td><td> "both", "vertical", "horizontal",<br>"asneeded", "none" </td><td> JTextArea Only </td>
-// </tr><tr>
-// <td> autoscroll </td><td> true, false </td><td> JTextArea Only </td>
-// </tr>
-// </tbody>
-// </table>
 
 /**
  * This class manages a hierarchy of named TextStyles; a TextStyle is an
@@ -138,7 +100,10 @@ import static java.lang.System.Logger.Level.*;
  * <td> foreground </td><td> Color: #ff2277, name </td><td>BLACK</td>
  * <td> JTextField, JTextArea </td>
  * </tr><tr>
- * <td> background </td><td> Color: #ff2277, name </td><td>not opaque</td>
+ * <td> background </td><td> Color: #ff2277, name </td><td>WHITE</td>
+ * <td> JTextField, JTextArea </td>
+ * </tr><tr>
+ * <td> opaque </td><td> true,false </td><td>true</td>
  * <td> JTextField, JTextArea </td>
  * </tr><tr>
  * <td> fontFamily </td><td> String </td><td>"Monospaced"</td>
@@ -179,6 +144,12 @@ import static java.lang.System.Logger.Level.*;
  * </table>
  * <p>
  * <ul>
+ * <li>
+ * There are two special words, <b>"keep"</b> and <b>"default"</b>, which are acceptable
+ * values for any style attribute. "keep" means that the current component
+ * value be unaltered when the style is applied. "default" means use the default value.
+ * <li>
+ * If an attribute is not specified, then "keep" is assumed.
  * <li>
  * If a color starts with "#" try {@link Color#decode(String)}, next try
  * matching the value to a name of a color as seen in {@link Color}'s fields.
@@ -233,11 +204,14 @@ import static java.lang.System.Logger.Level.*;
 public class TextStyles {
     private static final Logger logger = SSUtils.getLogger();
     
-    // Custom attribute keys for JTextArea specific wrapping features
+    // Custom attribute keys
+    private static final String OPAQUE = "opaque";
     private static final String LINE_WRAP_KEY = "linewrap";
     private static final String WORD_WRAP_KEY = "wordwrap";
     private static final String SCROLLBARS_KEY = "scrollbars";
     private static final String AUTOSCROLL_KEY = "autoscroll";
+	private static final String KEEP = "keep";
+	private static final String DEFAULT = "default";
 
     // Global registries populated by file loader
     private static final Map<String, SimpleAttributeSet> registry = new ConcurrentHashMap<>();
@@ -249,6 +223,14 @@ public class TextStyles {
 			= Collections.newSetFromMap(new ConcurrentHashMap<>());
 	private static final Set<String> newStyleNames
 			= Collections.newSetFromMap(new ConcurrentHashMap<>());
+	private static final WeakHashMap<JComponent, ComponentMemento> resetMementos
+			= new WeakHashMap<>();
+
+	/**
+	 * Use as {@link #applyStyle(JComponent, RESET) } to restore to value
+	 * before any TextStyles were applied.
+	 */
+	public static final AttributeSet RESET = new AttributeSetDelegate(null);
 
 	// During apply, the original AI code modified components even if they
 	// were not set in properties. This flag controls that behavior.
@@ -261,7 +243,6 @@ public class TextStyles {
 	//		but background does not; which means after changing background to
 	//		something weird, then applying something without background leaves
 	//		the weird background.
-	private static final boolean APPLY_DOES_DEFAULTS = true;
 
 	private TextStyles() { }
 
@@ -282,7 +263,7 @@ public class TextStyles {
 	 * @return AttributeSet or null if doesn't exist
 	 */
 	public static AttributeSet getStyle(String styleName) {
-		if (newStyleNames.contains(styleName))
+		if (styleName == null || newStyleNames.contains(styleName))
 			return null;
 		AttributeSet style = readOnlyRegistry.get(styleName);
 		if (style != null)
@@ -293,6 +274,7 @@ public class TextStyles {
 		SimpleAttributeSet newAttrs = new SimpleAttributeSet();
 		flatten(getResolvedStyle(styleName), newAttrs);
 		newAttrs.removeAttribute(StyleConstants.ResolveAttribute);
+		newAttrs.removeAttribute(StyleConstants.NameAttribute);
 		AttributeSet roAttrs = new AttributeSetDelegate(newAttrs);
 		readOnlyRegistry.put(styleName, roAttrs);
 		return roAttrs;
@@ -305,7 +287,8 @@ public class TextStyles {
 		newAttrs.addAttributes(origAttrs);
 	}
 
-	static synchronized void clearStyles() {
+	@SuppressWarnings("unused")
+	private static synchronized void clearStyles() {
 		verifyNotEDT();
 		logger.log(INFO, () -> sf("{%s} is clearing all styles.", SSUtils.getCaller(5)));
 		registry.clear();
@@ -426,6 +409,8 @@ public class TextStyles {
         for (SimpleAttributeSet attrSet : registry.values()) {
             if (attrSet != null) {
                 totalIndividualAttributesParsed += attrSet.getAttributeCount();
+				if (attrSet.isDefined(StyleConstants.NameAttribute))
+					totalIndividualAttributesParsed -= 1;
             }
         }
 
@@ -493,8 +478,6 @@ public class TextStyles {
         // style.getAttributeNames().asIterator().forEachRemaining(name -> {
         // });
         for (Enumeration<?> names = style.getAttributeNames(); names.hasMoreElements();) {
-        // Enumeration<?> names = style.getAttributeNames();
-        // while (names.hasMoreElements()) {
             Object name = names.nextElement();
             
             // Filter out custom properties handled by the secondary parser block
@@ -503,16 +486,20 @@ public class TextStyles {
                 continue;
             }
             }
+			if (name == StyleConstants.NameAttribute)
+				continue;
             
             Object value = style.getAttribute(name);
             String cleanName = name.toString();
+
+			boolean isSpecial = KEEP.equals(value) || DEFAULT.equals(value);
             
             // Translate the abstract styling keys to human-friendly layout strings
             // Taken out, better to match style files, See StyleDiagnosticEngine
 
             // Most known key names are simple lower case words except Alignment.
             // And translate value to knows strings
-            if (cleanName.contains("Alignment")) {
+            if (!isSpecial && cleanName.contains("Alignment")) {
                 cleanName = "alignment";
                 int align = StyleConstants.getAlignment(style);
                 value = (align == StyleConstants.ALIGN_CENTER) ? "center" : (align == StyleConstants.ALIGN_RIGHT) ? "right" : "left";
@@ -626,7 +613,7 @@ public class TextStyles {
     }
 
 
-	private static void loadStylesStarted() {
+	private static void loadStylesStarting() {
 		initialStyleNames.clear();
 		newStyleNames.clear();
 		initialStyleNames.addAll(registry.keySet());
@@ -674,7 +661,7 @@ public class TextStyles {
 
     private static LoadStatus loadStylesFromProperties(Properties props) throws IOException {
 		boolean cleanFinish = false;
-		loadStylesStarted();
+		loadStylesStarting();
 		LoadStatus status;
 		try {
 			for (String key : props.stringPropertyNames()) {
@@ -691,7 +678,11 @@ public class TextStyles {
 					inheritanceMap.put(configName, value.trim());
 				} else {
 					SimpleAttributeSet attributeSet = registry.computeIfAbsent(
-							configName, k -> new SimpleAttributeSet());
+							configName, k -> {
+								SimpleAttributeSet attrSet = new SimpleAttributeSet();
+								attrSet.addAttribute(StyleConstants.NameAttribute, configName);
+								return attrSet;
+							});
 					mapPropertyToAttributeSet(attributeSet, propertyName, value);
 				}
 			}
@@ -728,7 +719,7 @@ public class TextStyles {
 
     private static LoadStatus loadStylesFromJson(String _content) throws IOException {
 		boolean cleanFinish = false;
-		loadStylesStarted();
+		loadStylesStarting();
 		LoadStatus status;
 		try {
 			String content = _content.trim();
@@ -748,7 +739,12 @@ public class TextStyles {
 					throw new IllegalArgumentException(sf("StyleName '%s' already defined in this load", configName));
 
 				
-				SimpleAttributeSet attributeSet = registry.computeIfAbsent(configName, k -> new SimpleAttributeSet());
+				SimpleAttributeSet attributeSet = registry.computeIfAbsent(
+						configName, k -> {
+							SimpleAttributeSet attrSet = new SimpleAttributeSet();
+							attrSet.addAttribute(StyleConstants.NameAttribute, configName);
+							return attrSet;
+						});
 				Pattern pairPattern = Pattern.compile("\"([^\"]+)\"\\s*:\\s*(?:\"([^\"]+)\"|([^,\\s]+))");
 				Matcher pairMatcher = pairPattern.matcher(body);
 				
@@ -771,10 +767,136 @@ public class TextStyles {
 		return status;
     }
 
+	/** like Runnable, but IOException */
+	public interface RunIO {
+
+		/**
+		 * Run operation that might throw IOException.
+		 * @throws IOException
+		 */
+		void run() throws IOException;
+	}
+
+	/**
+	 * Convenience method; if this is called on the EDT, run the load on different thread.
+	 * Warning: if EDT, this will hang the EDT until load completes;
+	 * which is quickly unless blocked by a current load from a file.
+	 * @param load runnable that does the load
+	 * @throws java.io.IOException
+	 */
+	// TODO: could add dialog with spinner
+	public static void loadFromAnyThread(RunIO load) throws IOException {
+		//System.err.printf("******* LOADING: %s\n", Instant.now());
+		if (!EventQueue.isDispatchThread()) {
+			load.run();
+		} else {
+			SwingWorker<Object, Object> sw = new SwingWorker<>() {
+				@Override
+				protected Object doInBackground() throws Exception {
+					load.run();
+					return null;
+				}
+			};
+			sw.execute();
+			Throwable ex = null;
+			try {
+				sw.get(); // Waits for completion.
+			} catch (InterruptedException x) {
+				ex = x;
+			} catch (ExecutionException x) {
+				ex = x.getCause();
+			}
+			if (ex != null) {
+				if (ex instanceof IOException iox)
+					throw iox;
+				throw new IOException("Problem loading TextStyles", ex);
+			}
+		}
+		//System.err.printf("******* LOADED: %s\n", Instant.now());
+	}
+
+	/** Convert, and return, style name to AttributeSet name */
+	private static Object styleAttrName2AttrName(String key) {
+		Object attrName = switch (key) {
+        case "alignment" -> StyleConstants.Alignment;
+        case "foreground" -> StyleConstants.Foreground;
+        case "background" -> StyleConstants.Background;
+        case "opaque" -> OPAQUE;
+        case "fontFamily" -> StyleConstants.FontFamily;
+        case "fontSize" -> StyleConstants.FontSize;
+        case "bold" -> StyleConstants.Bold;
+        case "italic" -> StyleConstants.Italic;
+        case "underline" -> StyleConstants.Underline;
+        case "strikethrough" -> StyleConstants.StrikeThrough;
+
+        // JTextArea Only Layouts (Stored as custom attribute objects)
+        case "linewrap" -> LINE_WRAP_KEY;
+        case "wordwrap" -> WORD_WRAP_KEY;
+        case "scrollbars" -> SCROLLBARS_KEY;
+        case "autoscroll" -> AUTOSCROLL_KEY;
+		default -> throw new IllegalArgumentException(sf("Unhandled style attribute name '%s'", key));
+		};
+		return attrName;
+	}
+
+	/**
+	 * keep: mean do not modify existing value;<br>
+	 * useDflt: if value is null;<br>
+	 * dflt: null means special handling.
+	 */
+	record ValueDefault(boolean keep, boolean useDflt, Object value, Object dflt) {
+		ValueDefault(Object value, Object dflt) {
+			this(value == null || KEEP.equals(value), DEFAULT.equals(value),
+					value, dflt);
+		}
+	}
+
+	private static ValueDefault styleAttrName2Default(String key, AttributeSet attrSet) {
+		Object dflt;
+		Object attrName = switch (key) {
+        case "foreground" -> { dflt = Color.BLACK; yield StyleConstants.Foreground; }
+        case "background" -> { dflt = Color.WHITE; yield StyleConstants.Background; }
+		case "opaque" -> { dflt = true; yield OPAQUE; }
+        case "fontFamily" -> { dflt = "Monospaced"; yield StyleConstants.FontFamily; }
+        case "fontSize" -> { dflt = 12; yield StyleConstants.FontSize; }
+        case "bold" -> { dflt = false; yield StyleConstants.Bold; }
+        case "italic" -> { dflt = false; yield StyleConstants.Italic; }
+        case "underline" -> { dflt = false; yield StyleConstants.Underline; }
+        case "strikethrough" -> { dflt = false; yield StyleConstants.StrikeThrough; }
+
+		// JTextField only
+        case "alignment" -> { dflt = StyleConstants.ALIGN_LEFT; yield StyleConstants.Alignment; }
+        // JTextArea Only Layouts (Stored as custom attribute objects)
+        case "linewrap"   -> { dflt = false; yield LINE_WRAP_KEY; }
+        case "wordwrap"   -> { dflt = false; yield WORD_WRAP_KEY; }
+        case "scrollbars" -> { dflt = "asneeded"; yield SCROLLBARS_KEY; }
+        case "autoscroll" -> { dflt = null; yield AUTOSCROLL_KEY; }
+		default -> throw new IllegalArgumentException(sf("Unhandled style attribute name '%s'", key));
+		};
+
+		return new ValueDefault(attrSet.getAttribute(attrName), dflt);
+	}
+
     /**
      * Maps raw properties out of files to the SimpleAttributeSet.
      */
-    private static void mapPropertyToAttributeSet(SimpleAttributeSet attributeSet, String key, String value) {
+    private static void mapPropertyToAttributeSet(SimpleAttributeSet attrSet, String key, String value) {
+		Object attrName = styleAttrName2AttrName(key);
+		if (attrSet.isDefined(attrName)) {
+			String msg = sf("AttrName '%s' already set in '%s'",
+					key, attrSet.getAttribute(StyleConstants.NameAttribute));
+			logger.log(WARNING, msg);
+			throw new IllegalArgumentException(msg);
+		}
+		if (value.equals("keep")) {
+			attrSet.addAttribute(attrName, "keep");
+			return;
+		}
+		if (value.equals("default")) {
+			attrSet.addAttribute(attrName, "default");
+			return;
+		}
+
         switch (key) {
         // JTextField Only Layout
         case "alignment" -> {
@@ -783,37 +905,40 @@ public class TextStyles {
             case "center" -> StyleConstants.ALIGN_CENTER;
             case "right" -> StyleConstants.ALIGN_RIGHT;
             case "left" -> StyleConstants.ALIGN_LEFT;
-            case "justify" -> StyleConstants.ALIGN_JUSTIFIED;
             default -> { throw new IllegalArgumentException(sf("'%s' not for '%s'", cleanAlign, key)); }
             };
-            StyleConstants.setAlignment(attributeSet, alignValue);
+            StyleConstants.setAlignment(attrSet, alignValue);
         }
 
         // Shared Core Attributes
-        case "foreground" -> StyleConstants.setForeground(attributeSet, parseColor(value));
-        case "background" -> StyleConstants.setBackground(attributeSet, parseColor(value));
-        case "fontFamily" -> StyleConstants.setFontFamily(attributeSet, value);
-        case "fontSize" -> StyleConstants.setFontSize(attributeSet, Integer.parseInt(value));
-        case "bold" -> StyleConstants.setBold(attributeSet, Boolean.parseBoolean(value));
-        case "italic" -> StyleConstants.setItalic(attributeSet, Boolean.parseBoolean(value));
-        case "underline" -> StyleConstants.setUnderline(attributeSet, Boolean.parseBoolean(value));
-        case "strikethrough" -> StyleConstants.setStrikeThrough(attributeSet, Boolean.parseBoolean(value));
+        case "foreground" -> StyleConstants.setForeground(attrSet, parseColor(value));
+        case "background" -> StyleConstants.setBackground(attrSet, parseColor(value));
+        case "opaque" -> attrSet.addAttribute(OPAQUE, Boolean.valueOf(value));
+        case "fontFamily" -> StyleConstants.setFontFamily(attrSet, value);
+        case "fontSize" -> StyleConstants.setFontSize(attrSet, Integer.parseInt(value));
+        case "bold" -> StyleConstants.setBold(attrSet, Boolean.parseBoolean(value));
+        case "italic" -> StyleConstants.setItalic(attrSet, Boolean.parseBoolean(value));
+        case "underline" -> StyleConstants.setUnderline(attrSet, Boolean.parseBoolean(value));
+        case "strikethrough" -> StyleConstants.setStrikeThrough(attrSet, Boolean.parseBoolean(value));
 
         // JTextArea Only Layouts (Stored as custom attribute objects)
-        case "linewrap" -> attributeSet.addAttribute(LINE_WRAP_KEY, Boolean.valueOf(value));
-        case "wordwrap" -> attributeSet.addAttribute(WORD_WRAP_KEY, Boolean.valueOf(value));
+        case "linewrap" -> attrSet.addAttribute(LINE_WRAP_KEY, Boolean.valueOf(value));
+        case "wordwrap" -> attrSet.addAttribute(WORD_WRAP_KEY, Boolean.valueOf(value));
 
-        // New Scroll Specific Conversions
+        // Scroll Specific
         case "scrollbars" -> {
             String val = value.trim().toLowerCase();
             switch (val) {
             case "horizontal", "vertical", "both", "none", "asneeded" -> { }
             default -> { throw new IllegalArgumentException(sf("'%s' not for '%s'", val, key)); }
             }
-            attributeSet.addAttribute(SCROLLBARS_KEY, val);
+            attrSet.addAttribute(SCROLLBARS_KEY, val);
         }
-        case "autoscroll" -> attributeSet.addAttribute(AUTOSCROLL_KEY, Boolean.valueOf(value));
+        case "autoscroll" -> attrSet.addAttribute(AUTOSCROLL_KEY, Boolean.valueOf(value));
         }
+		// Something should always gets set.
+		if (!attrSet.isDefined(attrName))
+			throw new IllegalStateException(sf("Nothing was set for %s", attrName));
     }
     
     /**
@@ -870,7 +995,12 @@ public class TextStyles {
                 }
             }
         } catch (IllegalAccessException | IllegalArgumentException e) {
-			logger.log(ERROR, () -> sf("Reflection failed for color property: %s", val), e);
+			String msg = sf("Reflection failed for color property: %s", val);
+			logger.log(ERROR, msg , e);
+			RuntimeException ex = e instanceof IllegalAccessException
+					? new IllegalArgumentException(msg, e)
+					: (RuntimeException)e;
+			throw ex;
         }
         
         // 3. Ultimate safe fallback baseline
@@ -878,30 +1008,54 @@ public class TextStyles {
         return Color.BLACK;
     }
 
+    // This is probably good enough...
+    private static JScrollPane findScrollPane(JTextArea c) {
+        return (JScrollPane)SwingUtilities.getAncestorOfClass(JScrollPane.class, c);
+    }
+
     /**
      * Styling engine for: JTextField
 	 * 
-	 * @param textField
+	 * @param jComponent
 	 * @param style 
      */
-	public static synchronized void applyStyle(JTextField textField, AttributeSet style) {
+	public static void applyStyle(JComponent jComponent, AttributeSet style) {
 		verifyEDT();
+		ComponentMemento resetMemento = resetMementos.get(jComponent);
+		if (style == RESET) {
+			// Could remove the resetMemento map entry, but performance waste
+			// since RESET is common; instead could have "forgetResetMemento" method
+			if (resetMemento != null) {
+				resetMemento.restoreTo(jComponent);
+			}
+			return;
+		}
+		if (resetMemento == null)
+			resetMementos.put(jComponent, getMemento(jComponent));
+
+		if (jComponent instanceof JTextArea textArea) {
+			applyStyle(textArea, style);
+			return;
+		}
+
 		// [JTextField Only Attribute]: Horizontal Component Position Alignment
-		boolean hasAlignment = style.getAttribute(StyleConstants.Alignment) != null;
-		if (hasAlignment || APPLY_DOES_DEFAULTS) {
-			int alignment = StyleConstants.getAlignment(style);
-			switch (alignment) {
-			case StyleConstants.ALIGN_CENTER: textField.setHorizontalAlignment(JTextField.CENTER); break;
-			case StyleConstants.ALIGN_RIGHT:  textField.setHorizontalAlignment(JTextField.RIGHT); break;
-			case StyleConstants.ALIGN_LEFT:
-			case StyleConstants.ALIGN_JUSTIFIED: // JTextField does not support true body justification, fall back to left
-			default:
-				textField.setHorizontalAlignment(JTextField.LEFT); break;
+		if (jComponent instanceof JTextField textField) {
+			ValueDefault vd = styleAttrName2Default("alignment", style);
+			if (!vd.keep) {
+				int alignment = (int) (vd.useDflt() ? vd.dflt() : vd.value());
+				switch (alignment) {
+				case StyleConstants.ALIGN_CENTER: textField.setHorizontalAlignment(JTextField.CENTER); break;
+				case StyleConstants.ALIGN_RIGHT:  textField.setHorizontalAlignment(JTextField.RIGHT); break;
+				case StyleConstants.ALIGN_LEFT:
+				case StyleConstants.ALIGN_JUSTIFIED: // JTextField does not support true body justification, fall back to left
+				default:
+					textField.setHorizontalAlignment(JTextField.LEFT); break;
+				}
 			}
 		}
 		
 		// Apply shared core layout decorations (Colors & Fonts)
-		applyCoreTextAttributes(textField, style);
+		applyCoreStyle(jComponent, style);
 	}
 
     /**
@@ -910,39 +1064,35 @@ public class TextStyles {
 	 * @param textArea
 	 * @param style 
      */
-    public static synchronized void applyStyle(JTextArea textArea, AttributeSet style) {
+    private static void applyStyle(JTextArea textArea, AttributeSet style) {
 		verifyEDT();
         // [JTextArea Only Attribute]: Multi-line Line wrapping configuration
-        Object lineWrapAttr = style.getAttribute(LINE_WRAP_KEY);
-        if (lineWrapAttr instanceof Boolean attr) {
-            textArea.setLineWrap(attr);
-        } else if (APPLY_DOES_DEFAULTS) {
-			textArea.setLineWrap(false); // Default standard
-        }
+		boolean isOn;
+		ValueDefault vd = styleAttrName2Default("linewrap", style);
+		if (!vd.keep()) {
+			isOn = (boolean) (vd.useDflt ? vd.dflt() : vd.value());
+			textArea.setLineWrap(isOn);
+		}
 
         // [JTextArea Only Attribute]: Word boundary wrap breaking configuration
-        Object wordWrapAttr = style.getAttribute(WORD_WRAP_KEY);
-        if (wordWrapAttr instanceof Boolean attr) {
-            textArea.setWrapStyleWord(attr);
-        } else if (APPLY_DOES_DEFAULTS) {
-            textArea.setWrapStyleWord(false); // Default standard
-        }
+		vd = styleAttrName2Default("wordwrap", style);
+		if (!vd.keep()) {
+			isOn = (boolean) (vd.useDflt ? vd.dflt() : vd.value());
+			textArea.setWrapStyleWord(isOn);
+		}
 
         // Apply shared core layout decorations (Colors & Fonts)
-        applyCoreTextAttributes(textArea, style);
+        applyCoreStyle(textArea, style);
 
         JScrollPane jsp = findScrollPane(textArea);
         if (jsp == null)
             return;
 
-        int vsb = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED;
-        int hsb = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED;
-		if (!APPLY_DOES_DEFAULTS) {
-			vsb = -1;
-			hsb = -1;
-		}
-
-        if (style.getAttribute(SCROLLBARS_KEY) instanceof String policy) {
+		vd = styleAttrName2Default("scrollbars", style);
+		if (!vd.keep()) {
+			String policy = (String) (vd.useDflt ? vd.dflt() : vd.value());
+			int vsb = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED;
+			int hsb = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED;
             switch (policy) {
                 case "asneeded" -> {
                     vsb = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED;
@@ -965,145 +1115,102 @@ public class TextStyles {
                     hsb = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER;
                 }
             }
-        }
-		if (vsb != -1) { // if not APPLY_DOES_DEFAULTS
 			jsp.setVerticalScrollBarPolicy(vsb);
 			jsp.setHorizontalScrollBarPolicy(hsb);
 		}
 
-		// NOTE: never had a default
-        if (style.getAttribute(AUTOSCROLL_KEY) instanceof Boolean autoScroll) {
-            DefaultCaret caret = (DefaultCaret) textArea.getCaret();
-            caret.setUpdatePolicy(autoScroll ? DefaultCaret.ALWAYS_UPDATE : DefaultCaret.NEVER_UPDATE); 
-        }
-    }
-
-    // This is probably good enough...
-    private static JScrollPane findScrollPane(JTextArea c) {
-        return (JScrollPane)SwingUtilities.getAncestorOfClass(JScrollPane.class, c);
+		vd = styleAttrName2Default("autoscroll", style);
+		// NOTE: for autoscroll, the default is to do nothing
+		if (!vd.useDflt()) {
+			DefaultCaret caret = (DefaultCaret) textArea.getCaret();
+			if (!vd.keep())
+				caret.setUpdatePolicy((boolean) vd.value()
+						? DefaultCaret.ALWAYS_UPDATE : DefaultCaret.NEVER_UPDATE); 
+		}
     }
 
     /**
      * Extracts and applies properties common to all JTextComponent fields.
+	 * @param component
+	 * @param style
      */
-    private static void applyCoreTextAttributes(JComponent textComponent, AttributeSet style) {
+    private static void applyCoreStyle(JComponent component, AttributeSet style) {
         // 1. Process Core Component Foreground/Background Colors
 
-        // Color fg = StyleConstants.getForeground(style);
-        // textComponent.setForeground(fg != null ? fg : Color.BLACK);
-		// NOTE: never returns null, defaults black
-        textComponent.setForeground(StyleConstants.getForeground(style));
+		ValueDefault vd = styleAttrName2Default("foreground", style);
+		if (!vd.keep()) {
+			component.setForeground((Color)(vd.useDflt ? vd.dflt() : vd.value()));
+		}
 
-		// TODO: APPLY_DOES_DEFAULT handling
-		// NOTE: never returns null, defaults black
-        if (style.getAttribute(StyleConstants.Background) != null) {
-			Color bg = StyleConstants.getBackground(style);
-            textComponent.setBackground(bg);
-            textComponent.setOpaque(true);
-        } else if (APPLY_DOES_DEFAULTS) {
-            textComponent.setOpaque(false);
-        }
+		vd = styleAttrName2Default("background", style);
+		if (!vd.keep()) {
+			component.setBackground((Color)(vd.useDflt ? vd.dflt() : vd.value()));
+		}
+
+		vd = styleAttrName2Default("opaque", style);
+		if (!vd.keep()) {
+			component.setOpaque((boolean) (vd.useDflt() ? vd.dflt() : vd.value()));
+		}
 
         // 2. Process Core Font Typography configurations
 
         Map<TextAttribute, Object> fontAttributes = new HashMap<>();
-		Font currentFont = textComponent.getFont();
+		Font currentFont = component.getFont();
 
-		String family;
-		if (APPLY_DOES_DEFAULTS) {
-			// NOTE: never returns null, so "family == null" is always false
-			family = StyleConstants.getFontFamily(style);
-			if (family == null) family = "SansSerif";
-		} else {
-			family = style.getAttribute(StyleConstants.Family) != null
-					? StyleConstants.getFontFamily(style)
-					: currentFont.getFamily();
-		}
+		vd = styleAttrName2Default("fontFamily", style);
+		String family = vd.keep() ? currentFont.getFamily()
+				: (String) (vd.useDflt() ?  vd.dflt() : vd.value());
         
-        int size;
-		if (APPLY_DOES_DEFAULTS) {
-			// NOTE: "size == 0" awlay false (unless set 0 by user
-			size = StyleConstants.getFontSize(style);
-			if (size <= 0) size = 12;
-		} else {
-			size = style.getAttribute(StyleConstants.FontSize) != null
-					? StyleConstants.getFontSize(style)
-					: currentFont.getSize();
-		}
+		vd = styleAttrName2Default("fontSize", style);
+		int size = vd.keep ? currentFont.getSize()
+				: (int) (vd.useDflt() ? vd.dflt() : vd.value());
 
         fontAttributes.put(TextAttribute.FAMILY, family);
         fontAttributes.put(TextAttribute.SIZE, (float) size);
         
 		Map<TextAttribute, ?> currentFontAttributes = currentFont.getAttributes();
 
-		//
-		// TODO:
-		//		NOTE: the javadoc for StyleConstants.isUnderline does not match
-		//		what the code does. Or it's confusing at best.
-		//
-		//		There is a problem with underline and strikethrough.
-		//		There is no way to know if the attribute has been set.
-		//		There is UNDERLINE_ON, but no UNDERLINE_OFF.
-		//		Probably the fix is to introduce UNDERLINE_OFF
-		//		and check for it as needed.
-		//		BUT our parser sets the attribute to true/false so
-		//		everthing is probably OK.
-		//
+		vd = styleAttrName2Default("underline", style);
+		boolean isOn = vd.keep()
+				? TextAttribute.UNDERLINE_ON.equals(
+						currentFontAttributes.get(TextAttribute.UNDERLINE))
+				: vd.useDflt() ? false : (boolean)vd.value();
+		if (isOn)
+			fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 
-		if (APPLY_DOES_DEFAULTS) {
-			if (StyleConstants.isUnderline(style)) {
-				fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-			}
-		} else {
-			if (style.getAttribute(StyleConstants.Underline) != null) {
-				if (StyleConstants.isUnderline(style))
-					fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-			} else {
-				if (TextAttribute.UNDERLINE_ON.equals(
-						currentFontAttributes.get(TextAttribute.UNDERLINE)))
-					fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-			}
-		}
+		vd = styleAttrName2Default("strikethrough", style);
+		isOn = vd.keep()
+				? TextAttribute.STRIKETHROUGH_ON.equals(
+						currentFontAttributes.get(TextAttribute.STRIKETHROUGH))
+				: vd.useDflt() ? false : (boolean)vd.value();
+		if (isOn)
+			fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
 
-		if (APPLY_DOES_DEFAULTS) {
-			if (StyleConstants.isStrikeThrough(style)) {
-				fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-			}
-		} else {
-			if (style.getAttribute(StyleConstants.StrikeThrough) != null) {
-				if (StyleConstants.isStrikeThrough(style)) {
-					fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-				}
-			} else {
-				if (TextAttribute.STRIKETHROUGH_ON.equals(
-						currentFontAttributes.get(TextAttribute.STRIKETHROUGH)))
-					fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-			}
-		}
-
+		int currentFontStyle = currentFont.getStyle();
         int fontStyle = Font.PLAIN;
-		if (APPLY_DOES_DEFAULTS) {
-			if (StyleConstants.isBold(style)) fontStyle |= Font.BOLD;
-			if (StyleConstants.isItalic(style)) fontStyle |= Font.ITALIC;
-		} else {
-			int currentFontStyle = currentFont.getStyle();
-			fontStyle |= style.getAttribute(StyleConstants.Bold) != null
-					? (StyleConstants.isBold(style) ? Font.BOLD : 0)
-					: (currentFontStyle & Font.BOLD);
-			fontStyle |= style.getAttribute(StyleConstants.Italic) != null
-					? (StyleConstants.isItalic(style) ? Font.ITALIC : 0)
-					: (currentFontStyle & Font.ITALIC);
-		}
+		vd = styleAttrName2Default("bold", style);
+		isOn = vd.keep() ? (currentFontStyle & Font.BOLD) != 0
+				: (boolean) (vd.useDflt() ? vd.dflt() : vd.value());
+		fontStyle |= isOn ? Font.BOLD : 0;
+
+		vd = styleAttrName2Default("italic", style);
+		isOn = vd.keep() ? (currentFontStyle & Font.ITALIC) != 0
+				: (boolean) (vd.useDflt() ? vd.dflt() : vd.value());
+		fontStyle |= isOn ? Font.ITALIC : 0;
 
         Font baseFont = new Font(family, fontStyle, size);
-        textComponent.setFont(baseFont.deriveFont(fontAttributes));
-        textComponent.repaint();
+        component.setFont(baseFont.deriveFont(fontAttributes));
+        component.repaint();
     }
 
+	static ComponentMemento getMemento(JComponent c) {
+		return new ComponentMemento(c);
+	}
+
 	/**
-	 * For saving and restoring component state change by styles.
+	 * For saving and restoring component state changed by styles.
 	 */
-	public static class TextComponentStyleMemento {
+	public static class ComponentMemento {
         // Shared Core Core Properties
         private final Color foreground;
         private final Color background;
@@ -1123,61 +1230,62 @@ public class TextStyles {
         /**
          * Capture state snapshot;
          * Accepts any standard JTextComponent (JTextField, JTextArea, JPasswordField, etc.)
-		 * @param textComponent
+		 * @param jComponent
          */
-        public TextComponentStyleMemento(JTextComponent textComponent) {
-            Objects.requireNonNull(textComponent);
+        public ComponentMemento(JComponent jComponent) {
+            Objects.requireNonNull(jComponent);
 			verifyEDT();
             // Capture Shared Core Layout Parameters
-            this.foreground = textComponent.getForeground();
-            this.background = textComponent.getBackground();
-            this.font = textComponent.getFont();
-            this.opaque = textComponent.isOpaque();
+            foreground = jComponent.getForeground();
+            background = jComponent.getBackground();
+            font = jComponent.getFont();
+            opaque = jComponent.isOpaque();
+
 
 			// JTextField parameters
-            if (textComponent instanceof JTextField textField) {
-				this.alignment = textField.getHorizontalAlignment();
+            if (jComponent instanceof JTextField textField) {
+				alignment = textField.getHorizontalAlignment();
 			}
 			
 			// Identify type and pull multi-line parameters if it's a JTextArea
-            if (textComponent instanceof JTextArea textArea) {
-                this.isTextArea = true;
-                this.lineWrap = textArea.getLineWrap();
-                this.wordWrap = textArea.getWrapStyleWord();
+            if (jComponent instanceof JTextArea textArea) {
+                isTextArea = true;
+                lineWrap = textArea.getLineWrap();
+                wordWrap = textArea.getWrapStyleWord();
                 JScrollPane jsp = findScrollPane(textArea);
                 if (jsp != null) {
                     vsb =  jsp.getVerticalScrollBarPolicy();
                     hsb =  jsp.getHorizontalScrollBarPolicy();
                 }
             } else {
-                this.isTextArea = false;
+                isTextArea = false;
             }
         }
 
         /**
          * Restore state snapshot;
          * Restores all core attributes and conditionally re-applies multi-line rules.
-		 * @param textComponent
+		 * @param jComponent
          */
-        public void restoreTo(JTextComponent textComponent) {
-			Objects.requireNonNull(textComponent);
+        public void restoreTo(JComponent jComponent) {
+			Objects.requireNonNull(jComponent);
 			verifyEDT();
             // Restore Shared Layout States
-            textComponent.setForeground(this.foreground);
-            textComponent.setBackground(this.background);
-            textComponent.setFont(this.font);
-            textComponent.setOpaque(this.opaque);
+            jComponent.setForeground(foreground);
+            jComponent.setBackground(background);
+            jComponent.setFont(font);
+            jComponent.setOpaque(opaque);
 
             // Safely re-apply specific wrap layers only if targets match up
 
-            if (!this.isTextArea && textComponent instanceof JTextField textField) {
-				textField.setHorizontalAlignment(this.alignment);
+            if (!isTextArea && jComponent instanceof JTextField textField) {
+				textField.setHorizontalAlignment(alignment);
 			}
 
-            if (this.isTextArea && textComponent instanceof JTextArea textArea) {
-                //JTextArea textArea = (JTextArea) textComponent;
-                textArea.setLineWrap(this.lineWrap);
-                textArea.setWrapStyleWord(this.wordWrap);
+            if (isTextArea && jComponent instanceof JTextArea textArea) {
+                //JTextArea textArea = (JTextArea) jComponent;
+                textArea.setLineWrap(lineWrap);
+                textArea.setWrapStyleWord(wordWrap);
                 JScrollPane jsp = findScrollPane(textArea);
                 if (jsp != null) {
                     jsp.setVerticalScrollBarPolicy(vsb);
@@ -1185,14 +1293,33 @@ public class TextStyles {
                 }
             }
             
-            textComponent.repaint();
+            jComponent.repaint();
         }
 
 		/** {@inheritDoc} */
 		@Override
 		public String toString()
 		{
-			return "TextComponentStyleMemento{" + "foreground=" + foreground + ", background=" + background + ", font=" + font + ", opaque=" + opaque + ", alignment=" + alignment + ", isTextArea=" + isTextArea + ", lineWrap=" + lineWrap + ", wordWrap=" + wordWrap + ", vsb=" + vsb + ", hsb=" + hsb + '}';
+			String hexFore = sf("#%06x", (0xFFFFFF & foreground.getRGB()));
+			String hexBack = sf("#%06x", (0xFFFFFF & background.getRGB()));
+			Map<TextAttribute, ?> currentFontAttributes = font.getAttributes();
+			boolean underline = TextAttribute.UNDERLINE_ON.equals(
+					currentFontAttributes.get(TextAttribute.UNDERLINE));
+			boolean strikethrough = TextAttribute.STRIKETHROUGH_ON.equals(
+					currentFontAttributes.get(TextAttribute.STRIKETHROUGH));
+			String stringAlignment = switch (alignment) {
+			case JTextField.LEFT -> "left";
+			case JTextField.CENTER -> "center";
+			case JTextField.RIGHT -> "right";
+			default -> "" + alignment;
+			};
+
+			return "TextComponentStyleMemento{" + "foreground=" + hexFore
+					+ ", background=" + hexBack + ", font=" + font + ", opaque=" + opaque
+					+ ", underline=" + underline + ", strikethrough=" + strikethrough
+					+ ", alignment=" + stringAlignment + ", isTextArea=" + isTextArea
+					+ ", lineWrap=" + lineWrap + ", wordWrap=" + wordWrap
+					+ ", vsb=" + vsb + ", hsb=" + hsb + '}';
 		}
 
 		/** {@inheritDoc} */
@@ -1213,7 +1340,7 @@ public class TextStyles {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			final TextComponentStyleMemento other = (TextComponentStyleMemento) obj;
+			final ComponentMemento other = (ComponentMemento) obj;
 			if (this.opaque != other.opaque)
 				return false;
 			if (this.alignment != other.alignment)

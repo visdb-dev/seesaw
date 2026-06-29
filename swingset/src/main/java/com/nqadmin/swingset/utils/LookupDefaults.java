@@ -29,15 +29,29 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.awt.EventQueue;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.System.Logger.Level;
+
+import javax.swing.SwingWorker;
+
 import com.nqadmin.swingset.decorators.BackgroundDecorator;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.DecoratorSupplier;
+import com.nqadmin.swingset.decorators.TextStyles;
 
 /**
- * This class is used internally to initialize CentralLookup defaults.
- * There is no need to invoke this outside of the library.
- * The first access to the library could be something like:
+ * This class is used internally to initialize CentralLookup defaults
+ * and text style defaults.
+ * For CentralLookup, only elements that are not already set are initialized.
+ * It is invoked automatically when either SSComponent/SSCommon
+ * or RowsModel is referenced (impossible to use library without these).
+ * <p>
+ * Certain initialization access to this library does not force this initialization,
+ * for example first access to the library could be something like:
  * {@snippet lang="java":
  *     // Add application defaults to CentralLookup.
  *     CentralLookup lkup = CentralLookup.getDefault();
@@ -48,8 +62,9 @@ import com.nqadmin.swingset.decorators.DecoratorSupplier;
 public class LookupDefaults
 {
 	private LookupDefaults() { }
+	private static final System.Logger logger = System.getLogger(LookupDefaults.class.getName());
 
-	static boolean initialized;
+	private static boolean initialized;
 	/**
 	 * This is automatically called around first library use,
 	 * not including CentralLookup, to initialize
@@ -62,6 +77,9 @@ public class LookupDefaults
 	public static void init() {
 		if (initialized)
 			return;
+
+		initStyles();
+
 		CentralLookup lkup = CentralLookup.getDefault();
 
 		//
@@ -79,9 +97,9 @@ public class LookupDefaults
 		boolean hasBorder = false;
 		boolean hasBackground = false;
 		for (var deco : decos) {
-			if (deco.getStyle().equals(Decorator.DecoratorStyle.BORDER))
+			if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BORDER))
 				hasBorder = true;
-			if (deco.getStyle().equals(Decorator.DecoratorStyle.BACKGROUND))
+			if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BACKGROUND))
 				hasBackground = true;
 		}
 		if (!hasBorder)
@@ -97,4 +115,55 @@ public class LookupDefaults
 
 		initialized = true;
 	}
+
+	private static boolean initializedStyles;
+
+	/**
+	 * Set up the default styles; does nothing if any styles are already set.
+	 * If an app wants to add some of it own styles, with names that do not
+	 * conflict, this should be called first rather than waiting for the
+	 * default initialization.
+	 * If an app want to replace the default styles then add them before
+	 * this is called.
+	 */
+	public static void initStyles() {
+		if (initializedStyles)
+			return;
+		
+		if (!TextStyles.getStyleNames().isEmpty())
+			return;
+
+		if (EventQueue.isDispatchThread()) {
+			String msg = "LookupDefaults.initStyles() invoked from EDT.";
+			Exception ex = new Exception(msg);
+			logger.log(Level.ERROR, msg, ex);
+
+			// Problem if EDT tries to access TextStyles before loading complete.
+			new SwingWorker<Object, Object>() {
+				@Override
+				protected Object doInBackground() throws Exception
+				{
+					initStyles();
+					return null;
+				}
+			}.execute();
+			return;
+		}
+
+		Reader reader = new StringReader(DEFAULT_STYLES_JSON);
+		try {
+			TextStyles.loadStylesFromJson(reader);
+		} catch (IOException ex) {
+			logger.log(Level.ERROR, (String) null, ex);
+		}
+		initializedStyles = true;
+	}
+	/** This can be manually loaded if the Styles get cleared. */
+	public static final String DEFAULT_STYLES_JSON = """
+        {
+          "negative_number": {
+            "foreground": "red"
+          }
+        }
+        """;
 }

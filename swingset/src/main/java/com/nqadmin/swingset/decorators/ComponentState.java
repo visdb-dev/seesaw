@@ -27,48 +27,70 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
+
 package com.nqadmin.swingset.decorators;
 
-import java.util.function.Supplier;
+import com.nqadmin.swingset.utils.SSComponent;
 
-/**
- * Like a factory for Decorator.
- */
-public class DecoratorSupplier
+/** The state of a component, focused/dirty/modified.
+ * Used to create a proper decoration */
+// TODO: may want to treat as bit field for: error/focus/warning/dirty
+public enum ComponentState
 {
-	private final Supplier<Decorator> supplier;
-	private final Decorator.DecoratorStyle style;
+	/** not focused, no error, not modified */
+	CLEAN,
+	/** focus gained, no error, not modified */
+	FOCUSED_CLEAN,
+	/** modified without focus */
+	MODIFIED,
+	/** modified with focus */
+	FOCUSED_MODIFIED,
+	/** error with/without focus */
+	ERROR,
+	/** error with/without focus */
+	FOCUSED_ERROR;
 
-	/** create a decorator supplier
-	 * @param supplier */
-	public DecoratorSupplier(Supplier<Decorator> supplier)
+	/** focused?
+	 * @return  */
+	public boolean isFocused()
 	{
-		this(supplier, supplier.get().getDecoratorStyle());
+		return this == FOCUSED_CLEAN || this == FOCUSED_MODIFIED || this == FOCUSED_ERROR;
 	}
 
-	/** create a decorator supplier
-	 * @param supplier
-	 * @param style
-	 */
-	public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style)
+	/** modified?
+	 * @return  */
+	public boolean isModified()
 	{
-		this.supplier = supplier;
-		this.style = style;
+		return this == MODIFIED || this == FOCUSED_MODIFIED;
 	}
-	
-	/**
-	 * Create and return a decorator.
-	 * @return decorator
-	 */
-	public Decorator get() {
-		return supplier.get();
+
+	/** focused?
+	 * @return  */
+	public boolean isError()
+	{
+		return this == ERROR || this == FOCUSED_ERROR;
 	}
 
 	/**
-	 * Decorator style.
-	 * @return decorator style
+	 * Determine the state of the component about focus/clean/dirty/error.
+	 * @param comp
+	 * @param valid
+	 * @return the component state
 	 */
-	public Decorator.DecoratorStyle getDecoratorStyle() {
-		return style;
+	public static ComponentState getComponentState(SSComponent comp, SSComponent.ValidationResult valid)
+	{
+		ComponentState borderState;
+		if (valid.all())
+			borderState = comp.isDirty() ? ComponentState.MODIFIED : ComponentState.CLEAN;
+		else
+			borderState = ComponentState.ERROR;
+		if (comp.getFocusTarget().isFocusOwner())
+			borderState = switch (borderState) {
+			case CLEAN -> ComponentState.FOCUSED_CLEAN;
+			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
+			case ERROR -> ComponentState.FOCUSED_ERROR;
+			default -> throw new IllegalStateException("Unexpected value: " + (borderState));
+			};
+		return borderState;
 	}
 }

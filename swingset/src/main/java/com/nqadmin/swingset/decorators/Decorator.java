@@ -51,7 +51,7 @@ import com.nqadmin.swingset.utils.SSComponent;
  * <p>
  * TODO: eventually define a factory to create these
  */
-public interface Decorator
+public interface Decorator extends AnyDecorator
 {
 
 	/**
@@ -95,18 +95,10 @@ public interface Decorator
 	//  */
 	// default void decorate(boolean isValid) { decorate(); }
 
-	/** Install this decorator into the component. Installs listeners
-	 * @param component the componenet
-	 */
-	void install(SSComponent component);
-
-	/** Remove decorator/listeners from component. */
-	void uninstall();
-
 	/** This border's style, 
 	 * 
 	 * @return  decorator style */
-	DecoratorStyle getStyle();
+	DecoratorStyle getDecoratorStyle();
     
 	/**
 	 * A decorator that does nothing.
@@ -122,6 +114,9 @@ public interface Decorator
 		@Override public void uninstall() { }
 
 		/** {@inheritDoc} */
-		@Override public DecoratorStyle getStyle() { return DecoratorStyle.NONE; }
+		@Override public DecoratorStyle getDecoratorStyle() { return DecoratorStyle.NONE; }
+
+		@Override
+		public SSComponent getSSComponent() { return null; }
 	};
 }

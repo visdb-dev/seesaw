@@ -86,7 +86,8 @@ public class BorderDecorator extends FocusDecorator
 	private static Lookup.Result<BorderDecoratorPaint> bdpResult;
 
 	/**
-	 * @return the object from lookup.
+	 * Listens to lookup for the value.
+	 * @return the current value from lookup.
 	 */
 	protected static BorderDecoratorPaint getBorderDecoratorPaint()
 	{
@@ -127,8 +128,9 @@ public class BorderDecorator extends FocusDecorator
 		}
 		
 		/**
-		 * Determine border for specified ComponentState; typically a
-		 * solid or dashed border.
+		 * Create a border for specified ComponentState; typically a colored
+		 * solid or dashed border. This single line width border is typically
+		 * one component of a compound border.
 		 * @param state
 		 * @return Border
 		 */
@@ -142,19 +144,32 @@ public class BorderDecorator extends FocusDecorator
 		}
 	}
 
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	void debugCheck(ComponentState borderState) {
+		if (logger.isLoggable(DEBUG)) {
+			String caller = SSUtils.getCaller(3);
+			if (caller.contains("focusGained") || caller.contains("focusLost"))
+				; //System.out.println("");
+			else
+				; //System.out.println("");
+		}
+	}
+
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		ValidationResult valid = getSSComponent().allValidate();
+		final ValidationResult valid = getSSComponent().allValidate();
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
 				decoComp().getClass().getSimpleName(), focusComp().isFocusOwner(), valid.comp(), valid.all()));
 		Border b;
-		ComponentState borderState = getComponentState(valid);
+		ComponentState borderState = ComponentState.getComponentState(getSSComponent(), valid);
+		debugCheck(borderState);
 		b = getBorder(borderState);
 
 		decoComp().setBorder(b);
-		// Why is the following here? It was in ss_formatted_text_field.
-		decoComp().setForeground(textColor != null ? textColor : Color.BLACK);
+
+		handleTextDecorator(valid);
+
 		return valid.all();
 	}
 
@@ -461,7 +476,7 @@ public class BorderDecorator extends FocusDecorator
 	 * {@inheritDoc }
 	 */
 	@Override
-	public DecoratorStyle getStyle()
+	public DecoratorStyle getDecoratorStyle()
 	{
 		return DecoratorStyle.BORDER;
 	}

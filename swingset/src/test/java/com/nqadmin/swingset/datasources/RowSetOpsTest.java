@@ -30,6 +30,8 @@
 package com.nqadmin.swingset.datasources;
 
 
+import java.awt.EventQueue;
+import java.lang.System.Logger;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -38,7 +40,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import javax.sql.RowSet;
 
@@ -55,9 +56,8 @@ import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 
-import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
-import static java.util.logging.Level.INFO;
+import static java.lang.System.Logger.Level.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -65,9 +65,13 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class RowSetOpsTest
 {
-	private static final Logger LOG = Logger.getLogger(getLoggerName());
-	
-	/** x */
+
+	//private static final Logger logger = Logger.getLogger(getLoggerName());
+	private static final Logger logger = System.getLogger(RowSetOpsTest.class.getName());
+
+	/**
+	 * x
+	 */
 	public RowSetOpsTest()
 	{
 	}
@@ -112,7 +116,7 @@ public class RowSetOpsTest
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testDB() throws Exception
 	{
-		LOG.log(INFO, "TEST: DB");
+		logger.log(INFO, "TEST: DB");
 		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
 		RowsModel rowsModel = getRowsModel(rs);
@@ -178,7 +182,7 @@ public class RowSetOpsTest
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ResultOfObjectAllocationIgnored"})
 	public void testGetColumnObject_RSC_Class() throws Exception
 	{
-		LOG.log(INFO, "TEST: getColumnObject");
+		logger.log(INFO, "TEST: getColumnObject");
 
 		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
@@ -199,7 +203,7 @@ public class RowSetOpsTest
 	private void updateColumnText(String col, String sVal, Object val)
 			throws Exception
 	{
-		LOG.log(INFO, "    " + col);
+		logger.log(INFO, "    " + col);
 		SSComponent comp = new SSTextField(g_rm, col);
 		RowSetOps.updateColumnText(comp, sVal);
 		g_rm.commit();
@@ -219,7 +223,7 @@ public class RowSetOpsTest
 	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public void testUpdateColumnText() throws Exception
 	{
-		LOG.log(INFO, "TEST: updateColumnText");
+		logger.log(INFO, "TEST: updateColumnText");
 		RowSet rs;
 		RowsModel rowsModel;
 
@@ -264,22 +268,28 @@ public class RowSetOpsTest
 		rs.setCommand("SELECT * FROM tbl");
 		g_rm = getRowsModel(rs);
 
-		updateColumnText("c_integer", "13", 13);
-		updateColumnText("c_smallint", "14", 14);
-		updateColumnText("c_tinyint", "15", 15);
-		updateColumnText("c_bigint", "16", 16L);
-		updateColumnText("c_decimal", "17.1", new BigDecimal("17.1"));
-		updateColumnText("c_numeric", "18", new BigDecimal("18"));
-
-		updateColumnText("c_real", "19.3", 19.3F);
-		updateColumnText("c_double", "20.3", 20.3);
-		updateColumnText("c_float", "21.3", 21.3);
-
-		updateColumnText("c_boolean", "true", true);
-
-		updateColumnText("c_char", "one", "one");
-		updateColumnText("c_varchar", "two", "two");
-		updateColumnText("c_nchar", "three", "three");
+		EventQueue.invokeAndWait(() -> {
+			try {
+				updateColumnText("c_integer", "13", 13);
+				updateColumnText("c_smallint", "14", 14);
+				updateColumnText("c_tinyint", "15", 15);
+				updateColumnText("c_bigint", "16", 16L);
+				updateColumnText("c_decimal", "17.1", new BigDecimal("17.1"));
+				updateColumnText("c_numeric", "18", new BigDecimal("18"));
+				
+				updateColumnText("c_real", "19.3", 19.3F);
+				updateColumnText("c_double", "20.3", 20.3);
+				updateColumnText("c_float", "21.3", 21.3);
+				
+				updateColumnText("c_boolean", "true", true);
+				
+				updateColumnText("c_char", "one", "one");
+				updateColumnText("c_varchar", "two", "two");
+				updateColumnText("c_nchar", "three", "three");
+			} catch (Exception ex) {
+				logger.log(ERROR, ex.getMessage(), ex);
+			}
+		});
 
 		//g_rs = null;
 		//g_nav = null;
@@ -328,7 +338,7 @@ public class RowSetOpsTest
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ResultOfObjectAllocationIgnored"})
 	public void testGetColumnObject_RSC() throws Exception
 	{
-		LOG.log(INFO, "TEST: getColumnObject");
+		logger.log(INFO, "TEST: getColumnObject");
 		RSC comp = null;
 		Object expResult = null;
 		Object result = RowSetOps.getColumnObject(comp);
@@ -345,7 +355,7 @@ public class RowSetOpsTest
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testUpdateColumnObject() throws Exception
 	{
-		LOG.log(INFO, "TEST: updateColumnObject");
+		logger.log(INFO, "TEST: updateColumnObject");
 		SSComponent comp = null;
 		Object _updatedValue = null;
 		RowSetOps.updateColumnObject(comp, _updatedValue);
@@ -362,7 +372,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testInsertRow() throws Exception
 //	{
-//		LOG.log(INFO, "insertRow");
+//		logger.log(INFO, "insertRow");
 //		ResultSet _resultSet = null;
 //		RowSetOps.insertRow(_resultSet);
 //		// TODO review the generated test code and remove the default call to fail.
@@ -375,7 +385,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateRow() throws Exception
 //	{
-//		LOG.log(INFO, "updateRow");
+//		logger.log(INFO, "updateRow");
 //		ResultSet _resultSet = null;
 //		RowSetOps.updateRow(_resultSet);
 //		// TODO review the generated test code and remove the default call to fail.
@@ -388,7 +398,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testDeleteRow() throws Exception
 //	{
-//		LOG.log(INFO, "deleteRow");
+//		logger.log(INFO, "deleteRow");
 //		ResultSet _resultSet = null;
 //		RowSetOps.deleteRow(_resultSet);
 //		// TODO review the generated test code and remove the default call to fail.
@@ -401,7 +411,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnCount() throws Exception
 //	{
-//		LOG.log(INFO, "getColumnCount");
+//		logger.log(INFO, "getColumnCount");
 //		ResultSet _resultSet = null;
 //		int expResult = 0;
 //		int result = RowSetOps.getColumnCount(_resultSet);
@@ -416,7 +426,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnIndex() throws Exception
 //	{
-//		LOG.log(INFO, "getColumnIndex");
+//		logger.log(INFO, "getColumnIndex");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		int expResult = 0;
@@ -432,7 +442,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnName() throws Exception
 //	{
-//		LOG.log(INFO, "getColumnName");
+//		logger.log(INFO, "getColumnName");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		String expResult = "";
@@ -448,7 +458,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testIsNullable_ResultSet_int()
 //	{
-//		LOG.log(INFO, "isNullable");
+//		logger.log(INFO, "isNullable");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		Optional<Boolean> expResult = null;
@@ -464,7 +474,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testIsNullable_ResultSet_String()
 //	{
-//		LOG.log(INFO, "isNullable");
+//		logger.log(INFO, "isNullable");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		Optional<Boolean> expResult = null;
@@ -480,7 +490,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnArray()
 //	{
-//		LOG.log(INFO, "getColumnArray");
+//		logger.log(INFO, "getColumnArray");
 //		SSComponentInterface comp = null;
 //		Array expResult = null;
 //		Array result = RowSetOps.getColumnArray(comp);
@@ -495,7 +505,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnObjectLegacy() throws Exception
 //	{
-//		LOG.log(INFO, "getColumnObjectLegacy");
+//		logger.log(INFO, "getColumnObjectLegacy");
 //		RSC comp = null;
 //		Object expResult = null;
 //		Object result = RowSetOps.getColumnObjectLegacy(comp);
@@ -510,7 +520,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnText()
 //	{
-//		LOG.log(INFO, "getColumnText");
+//		logger.log(INFO, "getColumnText");
 //		SSComponentInterface comp = null;
 //		String expResult = "";
 //		String result = RowSetOps.getColumnText(comp);
@@ -525,7 +535,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnObjectText()
 //	{
-//		LOG.log(INFO, "getColumnObjectText");
+//		logger.log(INFO, "getColumnObjectText");
 //		RSC comp = null;
 //		String expResult = "";
 //		String result = RowSetOps.getColumnObjectText(comp);
@@ -540,7 +550,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnType_ResultSet_int() throws Exception
 //	{
-//		LOG.log(INFO, "getColumnType");
+//		logger.log(INFO, "getColumnType");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		int expResult = 0;
@@ -556,7 +566,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetJDBCColumnType_ResultSet_int() throws Exception
 //	{
-//		LOG.log(INFO, "getJDBCColumnType");
+//		logger.log(INFO, "getJDBCColumnType");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		JDBCType expResult = null;
@@ -572,7 +582,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnType_ResultSet_String() throws Exception
 //	{
-//		LOG.log(INFO, "getColumnType");
+//		logger.log(INFO, "getColumnType");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		int expResult = 0;
@@ -588,7 +598,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetJDBCColumnType_ResultSet_String() throws Exception
 //	{
-//		LOG.log(INFO, "getJDBCColumnType");
+//		logger.log(INFO, "getJDBCColumnType");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		JDBCType expResult = null;
@@ -604,7 +614,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetClassColumnType_ResultSet_String() throws Exception
 //	{
-//		LOG.log(INFO, "getClassColumnType");
+//		logger.log(INFO, "getClassColumnType");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		Class expResult = null;
@@ -620,7 +630,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetClassColumnType_ResultSet_int() throws Exception
 //	{
-//		LOG.log(INFO, "getClassColumnType");
+//		logger.log(INFO, "getClassColumnType");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		Class expResult = null;
@@ -636,7 +646,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnArray() throws Exception
 //	{
-//		LOG.log(INFO, "updateColumnArray");
+//		logger.log(INFO, "updateColumnArray");
 //		SSComponentInterface comp = null;
 //		SSArray _updatedValue = null;
 //		RowSetOps.updateColumnArray(comp, _updatedValue);
@@ -650,7 +660,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testCheckForceConflict() throws Exception
 //	{
-//		LOG.log(INFO, "checkForceConflict");
+//		logger.log(INFO, "checkForceConflict");
 //		SSComponentInterface comp = null;
 //		String _updatedValue = "";
 //		RowSetOps.checkForceConflict(comp, _updatedValue);
@@ -664,7 +674,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObjectDirect_4args() throws Exception
 //	{
-//		LOG.log(INFO, "updateColumnObjectDirect");
+//		logger.log(INFO, "updateColumnObjectDirect");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;
@@ -680,7 +690,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObjectDirect_3args() throws Exception
 //	{
-//		LOG.log(INFO, "updateColumnObjectDirect");
+//		logger.log(INFO, "updateColumnObjectDirect");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;
@@ -695,7 +705,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObject1() throws Exception
 //	{
-//		LOG.log(INFO, "updateColumnObject1");
+//		logger.log(INFO, "updateColumnObject1");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;
@@ -710,7 +720,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObject2() throws Exception
 //	{
-//		LOG.log(INFO, "updateColumnObject2");
+//		logger.log(INFO, "updateColumnObject2");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;

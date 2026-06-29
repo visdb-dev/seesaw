@@ -30,6 +30,7 @@
 package com.nqadmin.swingset.navigate;
 
 import java.lang.System.Logger;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
@@ -39,9 +40,9 @@ import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.navigate.Utils.postColumnUndoRedo;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
-import static com.nqadmin.swingset.navigate.Utils.postColumnUndoRedo;
 
 /**
  * UndoRedo static commands.
@@ -55,8 +56,14 @@ public enum UndoRedo
 
 	/**
 	 * Value and error status of item on the undo/redo stack.
+	 * "codedValue" because a null is represented by JDBCType.NULL
+	 * when rs.updateNull was used.
 	 */
-	public record Change(Object value, boolean isError){};
+	public record Change(Object codedValue, boolean isError) {
+		public Object value() {
+			return codedValue == JDBCType.NULL ? null : codedValue;
+		}
+	};
 
 	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
 

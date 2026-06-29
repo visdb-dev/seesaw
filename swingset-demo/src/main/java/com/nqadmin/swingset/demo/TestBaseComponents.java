@@ -41,6 +41,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.Connection;
@@ -76,7 +78,10 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.decorators.ComponentState;
+import com.nqadmin.swingset.decorators.ComponentStateTextDecorator;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
+import com.nqadmin.swingset.decorators.TextStyles;
 import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbArray;
@@ -288,7 +293,7 @@ public class TestBaseComponents extends JFrame
 	 * @param _dbConn database connection
 	 * @param _hints dynamic information on collection model, other
 	 */
-	@SuppressWarnings("LeakingThisInConstructor")
+	@SuppressWarnings({"LeakingThisInConstructor", "CallToPrintStackTrace"})
 	public TestBaseComponents(final Connection _dbConn, Map<String, Object> _hints)
 	{
 		// SET SCREEN TITLE
@@ -417,13 +422,22 @@ public class TestBaseComponents extends JFrame
 		replaceComponent(NAV, cmbSSDBComboNav);
 		replaceComponent(DB_COMBO, cmbSSDBComboBox);
 
-		// validators for text fields
+		// validators for the text fields
 		Function<String, Boolean> validator = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
 		if (activeComps.contains(TEXT_FIELD)) {
 			txtSSTextField.setPluginValidator(TextComponentValidator.create(validator));
 		}
 		if (activeComps.contains(TEXT_FIELD_B)) {
 			txtSSTextFieldB.setPluginValidator(TextComponentValidator.create(validator));
+			try {
+				setupOurTextStyles();
+			} catch (IOException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
+			txtSSTextFieldB.setTextDecorator(new ComponentStateTextDecorator(Map.of(
+					ComponentState.ERROR, "testComponents_componentStateError",
+					ComponentState.MODIFIED, "testComponents_componentStateModified"
+			)));
 		}
 		
 		// Bind the components to their database columns.
@@ -485,6 +499,28 @@ public class TestBaseComponents extends JFrame
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
 		}
 		pack();
+	}
+
+	/**
+	 * Add styles used by this test; doesn't return until complete.
+	 */
+	@SuppressWarnings("CallToPrintStackTrace")
+	private void setupOurTextStyles() throws IOException {
+		if (TextStyles.getStyle("testComponents_componentStateError") != null)
+			return;
+		StringReader reader = new StringReader("""
+                "testComponents_componentStateError": {
+                  "fontSize": 14,
+                  "italic": false,
+                  "strikethrough": true
+                },
+                "testComponents_componentStateModified": {
+                  "fontSize": "default",
+                  "italic": true,
+                  "strikethrough": false
+                }
+                """);
+		TextStyles.loadFromAnyThread(() -> TextStyles.loadStylesFromJson(reader));
 	}
 
 	private DbOpsCustomizer createDbNav() {

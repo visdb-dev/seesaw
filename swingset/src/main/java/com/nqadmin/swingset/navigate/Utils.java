@@ -225,6 +225,7 @@ public class Utils
 	 * 
 	 * @param tag 
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void dumpLatestEvents(String tag) {
 		StringBuilder sb = latestEvents(tag, N_DUMP, null);
 		System.err.println(sb.toString());

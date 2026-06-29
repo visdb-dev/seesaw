@@ -68,8 +68,9 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.MaskFormatter;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.decorators.TextDecorationNegative;
+import com.nqadmin.swingset.decorators.BaseTextDecorator;
 import com.nqadmin.swingset.decorators.TextDecorator;
+import com.nqadmin.swingset.decorators.TextStyles;
 import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -392,11 +393,11 @@ public class SSFormattedTextField extends JFormattedTextField
 		addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent fe) {
-				if (getDecorator() instanceof TextDecorator td) {
-					// Turn off any text decorations while focused
-					td.decorateText(TextDecorationNegative.NONE);
-				}
-
+				// While focused, editing, show regular
+				// This assumes that decorate() is not invoked while this has
+				// focus, a JFormatterTextField characteristic.
+				if (getTextDecorator() instanceof NegativeNumberTextDecorator)
+					TextStyles.applyStyle((JComponent)SSFormattedTextField.this, TextStyles.RESET);
 				SwingUtilities.invokeLater(() -> { selectAll(); });
 			}
 		});
@@ -553,24 +554,6 @@ public class SSFormattedTextField extends JFormattedTextField
 		decorate();
 	}
 
-	// TODO: is this needed? If it is, put it in SSComponent
-	private boolean textDecoratorEnabled = true;
-	/**
-	 * Set/reset the flag to enable text decoration.
-	 * @param flag
-	 */
-	public final void setTextDecoratorEnabled(boolean flag) {
-		textDecoratorEnabled = flag;
-	}
-
-	/**
-	 * Whether or not text decoration is enabled.
-	 * @return true if enabled
-	 */
-	public final boolean isTextDecoratorEnabled() {
-		return textDecoratorEnabled;
-	}
-
 	/**
 	 * Decorate text based on current value of this component.
 	 * The following default text decorator distinguishes negative
@@ -581,24 +564,38 @@ public class SSFormattedTextField extends JFormattedTextField
 	// Note: this might make more sense in NumberField.
 	// TODO: should this be updated while focused and any value change?
 	// TODO: should this be in SSComponentInterface?
-	public void decorateText() {
-		if (!isTextDecoratorEnabled())
-			return;
-		if (!(getDecorator() instanceof TextDecorator textDecorator))
-			return;
 
-		Object value = getValue();
-		boolean isNeg = switch(value) {
-		case Double val ->		val < 0.0;
-		case Float val ->		val < 0.0;
-		case Long val ->		val < 0;
-		case Integer val ->		val < 0;
-		case BigDecimal val ->	val.signum() < 0;
-		case null, default ->	false;
-		};
-		
-		textDecorator.decorateText(isNeg ? TextDecorationNegative.NEGATIVE_NUMBER
-				: TextDecorationNegative.NONE);
+	static class NegativeNumberTextDecorator extends BaseTextDecorator {
+		@Override
+		public void decorateText() {
+			if (!(getSSComponent() instanceof SSFormattedTextField ftf))
+				return;
+
+			// TODO: if SSFormattedTextField not focus locked,
+			//       something special needed?
+
+			Object value = ftf.getValue();
+			boolean isNeg = switch(value) {
+			case Double val ->		val < 0.0;
+			case Float val ->		val < 0.0;
+			case Long val ->		val < 0;
+			case Integer val ->		val < 0;
+			case BigDecimal val ->	val.signum() < 0;
+			case null, default ->	false;
+			};
+			TextStyles.applyStyle(decoComp(),
+					isNeg ? TextStyles.getStyle("negative_number") : TextStyles.RESET);
+		}
+	}
+
+	/**
+	 * {@inheritDoc }
+	 * @return negative number decorator
+	 */
+	@Override
+	public TextDecorator createDefaultTextDecorator()
+	{
+		return new NegativeNumberTextDecorator();
 	}
 
 	/** {@inheritDoc} */
@@ -613,6 +610,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * insufficient information to determine the result, true is returned.
 	 * @return true if there is user input
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public boolean containsUserText() {
 
 		AbstractFormatter f = getFormatter();
@@ -620,7 +618,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		case MaskFormatter mf -> FormatterAssist.containsUserText( getText(), mf);
 		default -> {
 			if (f instanceof FormatterAssist fa) {
-				System.err.printf("NOTICE ME HERE: %s", fa);
+				System.err.printf("**************\nNOTICE ME HERE: %s\n**************\n", fa);
 			}
 			yield !getText().isEmpty();	// TODO: isBlank()?
 		}

@@ -29,46 +29,9 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
-import java.util.function.Supplier;
-
 /**
- * Like a factory for Decorator.
+ * The only thing missing is decorateText.
  */
-public class DecoratorSupplier
+public abstract class BaseTextDecorator extends BaseAnyDecorator implements TextDecorator
 {
-	private final Supplier<Decorator> supplier;
-	private final Decorator.DecoratorStyle style;
-
-	/** create a decorator supplier
-	 * @param supplier */
-	public DecoratorSupplier(Supplier<Decorator> supplier)
-	{
-		this(supplier, supplier.get().getDecoratorStyle());
-	}
-
-	/** create a decorator supplier
-	 * @param supplier
-	 * @param style
-	 */
-	public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style)
-	{
-		this.supplier = supplier;
-		this.style = style;
-	}
-	
-	/**
-	 * Create and return a decorator.
-	 * @return decorator
-	 */
-	public Decorator get() {
-		return supplier.get();
-	}
-
-	/**
-	 * Decorator style.
-	 * @return decorator style
-	 */
-	public Decorator.DecoratorStyle getDecoratorStyle() {
-		return style;
-	}
 }

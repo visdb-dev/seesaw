@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,29 +26,65 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
  * ****************************************************************************/
-
 package com.nqadmin.swingset.decorators;
 
+import javax.swing.JComponent;
+
+import com.nqadmin.swingset.utils.SSComponent;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 /**
- * Typically used to specify text color.
- * Foreground in text JTextComponent.
+ * Used for both Decorator and TextDecorator.
  */
-public enum TextDecorationNegative
+public abstract class BaseAnyDecorator implements AnyDecorator
 {
-	/** Use the original/default text style. */
-	NONE,
+	private SSComponent ssComponent;
 
-	/** Text is a negative number. */
-	NEGATIVE_NUMBER,
+	/** Install this decorator into the component. Installs listeners
+	 * @param component the component
+	 */
+	@Override
+	public void install(SSComponent component) {
+		if (this.ssComponent != null)
+			throw new IllegalStateException(sf("'%s' allready installed in '%s'",
+					this.getClass().getSimpleName(), ssComponent.getClass().getSimpleName()));
+		this.ssComponent = component;
+	}
 
-	/** Do not change anything. */
-	NO_CHANGE;
+	/** Remove decorator/listeners from component. */
+	@Override
+	public void uninstall() {
+		this.ssComponent = null;
+	}
+	
+	/**
+	 * Return the SSComponent associated with this decorator.
+	 * 
+	 * @return the component
+	 */
+	@Override
+	public final SSComponent getSSComponent() {
+		return ssComponent;
+	}
+
+	/**
+	 * Convenience method to get the SSComponent cast as a JComponent.
+	 * 
+	 * @return the SSComponent as a JComponent
+	 */
+	protected final JComponent jComp() {
+		return (JComponent) getSSComponent();
+	}
+
+	/**
+	 * Return the JComponent that gets decorated and TextDecorated.
+	 * It may not be the same as whats returned by {@link #getSSComponent() }.
+	 * 
+	 * @return the JComponent
+	 */
+	protected final JComponent decoComp() {
+		return getSSComponent().getDecorateTarget();
+	}
 }

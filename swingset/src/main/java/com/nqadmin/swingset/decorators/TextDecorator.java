@@ -35,22 +35,42 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.decorators;
 
+import com.nqadmin.swingset.utils.SSComponent;
+
 /**
- * Optional decorate interface to change text style.
+ * Decorator that adjusts text style.
  */
-public interface TextDecorator
+public interface TextDecorator extends AnyDecorator
 {
 	/**
 	 * Modify the text according to style; commonly modifies text color.
-	 * Signature of {@literal "enum<?>"} is so plugin authors can override and
-	 * define their own styles.
-	 * 
-	 * @param style why the text is decorated
-	 * @param <E> any enum can be used
-	 * @return true if the style was handled; false if unknown style
+	 * See {@link TextStyles}.
 	 */
-	<E extends Enum<E>> boolean decorateText(E style);
+	void decorateText();
+
+	/**
+	 * TextDecorator that does nothing
+	 */
+	public static TextDecorator nullTextDecorator = new TextDecorator()
+	{
+		@Override public void decorateText() { }
+
+		@Override public void install(SSComponent component) { }
+
+		@Override public void uninstall() { }
+
+		@Override
+		public SSComponent getSSComponent()
+		{
+			return null;
+		}
+	};
 }

@@ -43,12 +43,9 @@
 
 package com.nqadmin.swingset.decorators;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-
-import javax.swing.JComponent;
 
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
@@ -56,69 +53,9 @@ import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 /**
  * Base class for decorators that use Focus.
  */
-public abstract class FocusDecorator
-		implements Decorator, FocusListener, TextDecorator
+public abstract class FocusDecorator extends BaseAnyDecorator
+		implements Decorator, FocusListener
 {
-	/** The state of a component. Used to create the proper decoration */
-	// TODO: may want to treat as bit field for: error/focus/warning/dirty
-	public enum ComponentState {
-		/** not focused, no error, not modified */
-		CLEAN,
-		/** focus gained, no error, not modified */
-		FOCUSED_CLEAN,
-		/** modified without focus */
-		MODIFIED,
-		/** modified with focus */
-		FOCUSED_MODIFIED,
-		/** error with/without focus */
-		ERROR,
-		/** error with/without focus */
-		FOCUSED_ERROR;
-
-		boolean isFocused() {
-			return this == FOCUSED_CLEAN || this == FOCUSED_MODIFIED
-					|| this == FOCUSED_ERROR;
-		}
-
-		boolean isModified() {
-			return this == MODIFIED || this == FOCUSED_MODIFIED;
-		}
-
-		boolean isError() {
-			return this == ERROR || this == FOCUSED_ERROR;
-		}
-	}
-
-	/**
-	 * Determine the state of the component.
-	 * @param valid
-	 * @return the component state
-	 */
-	public ComponentState getComponentState(ValidationResult valid) {
-		ComponentState borderState;
-		if (valid.all()) {
-			borderState = getSSComponent().isDirty()
-					? ComponentState.MODIFIED
-					: ComponentState.CLEAN;
-		} else
-			borderState = ComponentState.ERROR;
-		if (focusComp().isFocusOwner()) {
-			borderState = switch(borderState) {
-			case CLEAN -> ComponentState.FOCUSED_CLEAN;
-			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
-			case ERROR -> ComponentState.FOCUSED_ERROR;
-			default -> throw new IllegalStateException("Unexpected value: " + (borderState));
-			};
-		}
-
-		return borderState;
-	}
-
-	/** this component */
-	private SSComponent component;
-	/** current color set by decorateText() */
-	protected Color textColor;
-
 	/** Apply decoration */
 	@Override
 	public void focusGained(FocusEvent e) {
@@ -134,32 +71,15 @@ public abstract class FocusDecorator
 	/** {@inheritDoc} */
 	@Override
 	public void install(SSComponent component) {
-		this.component = component;
+		super.install(component);
 		focusComp().addFocusListener(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void uninstall() {
+		super.uninstall();
 		focusComp().removeFocusListener(this);
-	}
-
-	/**
-	 * Return the SSComponent associated with this decorator.
-	 * 
-	 * @return the component
-	 */
-	public SSComponent getSSComponent() {
-		return component;
-	}
-
-	/**
-	 * Convenience method to get the SSComponent cast as a JComponent.
-	 * 
-	 * @return the SSComponent as a JComponent
-	 */
-	protected JComponent jComp() {
-		return (JComponent) component;
 	}
 
 	/**
@@ -173,35 +93,15 @@ public abstract class FocusDecorator
 	}
 
 	/**
-	 * Return the JComponent that gets decorated.
-	 * It may not be the same as whats returned by {@link #getSSComponent() }.
-	 * 
-	 * @return the JComponent
+	 * Deal with a TextDecorator for this component.
+	 * @param valid
 	 */
-	protected JComponent decoComp() {
-		return getSSComponent().getDecorateTarget();
+	protected void handleTextDecorator(ValidationResult valid) {
+		TextDecorator td = getSSComponent().getTextDecorator();
+		assert td != null;
+		if (td instanceof ComponentStateTextDecorator std)
+			std.decorateText(valid);
+		else
+			td.decorateText();
 	}
-
-	/**
-	 * Set the color of the text/foreground according to style.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public <E extends Enum<E>> boolean decorateText(E _style) {
-		if (_style instanceof TextDecorationNegative style) {
-			boolean handled = true;
-			textColor = switch (style) {
-			case NEGATIVE_NUMBER  -> Color.RED;
-			case NONE             -> Color.BLACK;
-			case NO_CHANGE        -> null;
-			default               -> { handled = false; yield null; }
-			};
-			if (textColor != null) {
-				decoComp().setForeground(textColor);
-			}
-			return handled;
-		}
-		return false;
-	}
-    
 }

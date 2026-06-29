@@ -29,46 +29,48 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
-import java.util.function.Supplier;
+import java.util.EnumMap;
+import java.util.Map;
+
+import javax.swing.text.AttributeSet;
+
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
- * Like a factory for Decorator.
+ * This TextDecorator applies a named TextStyle based on ComponentState.
+ * There is a map of ComponentState to text style name.
+ * If no style name is available for a ComponentState, {@link TextStyles#RESET}
+ * is used.
  */
-public class DecoratorSupplier
+public class ComponentStateTextDecorator extends BaseTextDecorator
 {
-	private final Supplier<Decorator> supplier;
-	private final Decorator.DecoratorStyle style;
+	private final EnumMap<ComponentState, String> styleNames = new EnumMap<>(ComponentState.class);
 
-	/** create a decorator supplier
-	 * @param supplier */
-	public DecoratorSupplier(Supplier<Decorator> supplier)
+	/** Create using specified map.
+	 * @param map
+	 */
+	public ComponentStateTextDecorator(Map<ComponentState, String> map)
 	{
-		this(supplier, supplier.get().getDecoratorStyle());
+		styleNames.putAll(map);
 	}
 
-	/** create a decorator supplier
-	 * @param supplier
-	 * @param style
+	/** Decorate the text according to {@code valid}.
+	 * @param valid
 	 */
-	public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style)
+	public void decorateText(SSComponent.ValidationResult valid)
 	{
-		this.supplier = supplier;
-		this.style = style;
-	}
-	
-	/**
-	 * Create and return a decorator.
-	 * @return decorator
-	 */
-	public Decorator get() {
-		return supplier.get();
+		ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
+		AttributeSet style = TextStyles.getStyle(styleNames.get(state));
+		TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
 	}
 
 	/**
-	 * Decorator style.
-	 * @return decorator style
+	 * Validate the component and decorate the text accordingly.
 	 */
-	public Decorator.DecoratorStyle getDecoratorStyle() {
-		return style;
+	@Override
+	public void decorateText()
+	{
+		SSComponent.ValidationResult valid = getSSComponent().allValidate();
+		decorateText(valid);
 	}
 }

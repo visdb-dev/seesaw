@@ -860,7 +860,10 @@ public class MainClass extends JFrame
 		//lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
 		//lkup.add(new SSUtils.DebugRowSetListenerFlag());
 
-		lkup.add(new ForceConflict(1));
+		// Enable this to force CachedRowSet conflict
+		//lkup.add(new ForceConflict(1));
+
+		//LookupDefaults.init();
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",

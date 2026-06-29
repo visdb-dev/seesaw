@@ -229,12 +229,12 @@ public class DemoUtil {
 		RowSet rs;
 		switch (whichRowSet) {
 			case SHARE_JDBC -> {
-				rs = RowSetProvider.newFactory().createJdbcRowSet();
+				rs = rsFactory.createJdbcRowSet();
 				rs.setDataSourceName(getDsName(connection));
 				logger.log(DEBUG, () -> "DataSource: " + getDsName(connection));
 			}
 			case POOL_CACHED -> {
-				rs = RowSetProvider.newFactory().createCachedRowSet();
+				rs = rsFactory.createCachedRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
 				if(defLookup(MainClass.H2Workaround.class) != null) {
 					// https://github.com/h2database/h2database/issues/4010
@@ -245,7 +245,7 @@ public class DemoUtil {
 				logger.log(DEBUG, () -> "DataSource: " + DataSourcePool.DATA_SOURCE_NAME);
 			}
 			case POOL_JDBC -> {
-				rs = RowSetProvider.newFactory().createJdbcRowSet();
+				rs = rsFactory.createJdbcRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
 				logger.log(DEBUG, () -> sf("JDBC: DataSource: %s", DataSourcePool.DATA_SOURCE_NAME));
 			}

@@ -42,14 +42,14 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo.simpval;
 
+import com.nqadmin.swingset.decorators.BaseAnyDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
-import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * A combined validator/decorator using the Simple Validation framework.
  */
-public class SimpleValValidatorDecorator implements Decorator
+public class SimpleValValidatorDecorator extends BaseAnyDecorator implements Decorator
 {
 	private final SSTextComponentValidationItem valItem;
 	/** decorator name */
@@ -64,15 +64,6 @@ public class SimpleValValidatorDecorator implements Decorator
 	public boolean decorate() {
 		valItem.performValidation();
 		return !valItem.hasFatalProblem();
-	}
-
-	@Override
-	public void install(SSComponent component) {
-		// No listeners to install
-	}
-
-	@Override
-	public void uninstall() {
 	}
 
 	// TODO: this does decoration as well. Does SwingSet need a split architecture?
@@ -92,7 +83,7 @@ public class SimpleValValidatorDecorator implements Decorator
 	 * @return
 	 */
 	@Override
-	public Decorator.DecoratorStyle getStyle()
+	public Decorator.DecoratorStyle getDecoratorStyle()
 	{
 		return decoratorStyle;
 	}

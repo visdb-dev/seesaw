@@ -60,6 +60,7 @@ import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbUpdater;
 import com.nqadmin.swingset.datasources.SSDBSupport.RunnableSQL;
 import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
@@ -957,6 +958,38 @@ public interface SSComponent extends RSC
 	 */
 	default boolean decorate() {
 		return getSSCommon().decorate();
+	}
+
+	/**
+	 * Create and return this components {@link TextDecorator};
+	 * setup during construction.
+	 * If this method is not overriden, a textDecorator that does nothing.
+	 * 
+	 * @return textDecorator
+	 */
+	default TextDecorator createDefaultTextDecorator() {
+		return SSCommon.createDefaultTextDecorator();
+	}
+
+	/**
+	 * Return the text decorator used by this component.
+	 * @return the textDecorator
+	 */
+	default TextDecorator getTextDecorator() {
+		return getSSCommon().getTextDecorator();
+	}
+
+	/**
+	 * Install the specified text decorator.
+	 * @param textDeco decorator to install
+	 */
+	default void setTextDecorator(TextDecorator textDeco) {
+		getSSCommon().setTextDecorator(textDeco);
+	}
+
+	/** Run the decorator */
+	default void decorateText() {
+		getSSCommon().decorateText();
 	}
 
 	// Methods that have the word Bound in them

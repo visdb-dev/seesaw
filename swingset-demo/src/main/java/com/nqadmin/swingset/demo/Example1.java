@@ -69,7 +69,7 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.decorators.BorderDecorator;
-import com.nqadmin.swingset.decorators.FocusDecorator.ComponentState;
+import com.nqadmin.swingset.decorators.ComponentState;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.simpval.SVUtils;
 import com.nqadmin.swingset.demo.simpval.StringValidator;

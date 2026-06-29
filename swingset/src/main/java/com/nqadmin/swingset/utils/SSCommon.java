@@ -85,6 +85,7 @@ import com.nqadmin.swingset.datasources.SSSQLRuntimeException;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.DecoratorSupplier;
+import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.navigate.ColumnChangeDoneEvent;
@@ -146,6 +147,7 @@ final class SSCommon
 	private SSCommon(SSComponent ssComponent, boolean finishInit) {
 		this.ssComponent = ssComponent;
 		decorator = Decorator.nullDecorator;
+		textDecorator = TextDecorator.nullTextDecorator;
 		pluginValidator = Validator.nullValidator;
 		busReceiver = new BusReceiver();
 		if (finishInit)
@@ -198,7 +200,7 @@ final class SSCommon
 		if (!isFullyInitialized) {
 			isFullyInitialized = true;
 			init();
-			initDecorator();
+			initDecorators();
 
 			// TODO: Get rid of this; use rowsModel.register
 			WeakEventBus.register(busReceiver, getGlobalEventBus());
@@ -448,7 +450,7 @@ final class SSCommon
 	}
 
 	/**
-	 * Indicates if the components value change listener is currently added/enabled
+	 * Indicates if the components value change listener is currently added/enabled.
 	 *
 	 * @return true if the components value change listener is added/enabled, otherwise false
 	 */
@@ -1007,7 +1009,7 @@ final class SSCommon
 	 * <p>
 	 * Based on java.sql.JDBCType
 	 *
-	 * @return the enum value corresponding to the data type of the bound column
+	 * @return the enum corresponding to the data type of the bound column
 	 */
 	JDBCType getColumnJDBCType() {
 		return columnJDBCType;
@@ -1247,7 +1249,7 @@ final class SSCommon
 	 * Goes directly to RowSet, does <em>not</em> go through RowSetOps.
 	 * Whether the command was undo or redo generally doesn't matter.
 	 * @param cmd undo or redo
-	 * @param value the new value
+	 * @param change the new value
 	 * @throws java.sql.SQLException if...
 	 */
 	void undoRedoUpdateObject(UndoRedo cmd, Change change) throws SQLException
@@ -1267,7 +1269,7 @@ final class SSCommon
 			getRowSet().updateObject(getColumnIndex(), obj); // TODO: Use RowSetOps?
 		} catch (SQLException ex) {
 			if (!change.isError())
-				throw new IllegalStateException("EXCEPTION BUT NOT ERROR");
+				throw new IllegalStateException("EXCEPTION BUT NOT ERROR", ex);
 		}
 		updateSSComponent();
 	}
@@ -1344,20 +1346,21 @@ final class SSCommon
 	//		 and whatever else is needed: InputVerifier, ???.
 	//
 
+	/** Use lookup to find the default decorator */
 	static Decorator createDefaultDecorator() {
 		CentralLookup lkup = CentralLookup.getDefault();
-		Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
-		if (style == null) {
+		Decorator.DecoratorStyle decoratorStyle = lkup.lookup(Decorator.DecoratorStyle.class);
+		if (decoratorStyle == null) {
 			logger.log(Level.ERROR, "Lookup of default DecoratorStyle returns null");
-			style = Decorator.DecoratorStyle.BORDER;
+			decoratorStyle = Decorator.DecoratorStyle.BORDER;
 		}
 
 		var decos = lkup.lookupAll(DecoratorSupplier.class);
 		for (var deco : decos) {
-			if (deco.getStyle().equals(style))
+			if (deco.getDecoratorStyle().equals(decoratorStyle))
 				return deco.get();
 		}
-		logger.log(Level.ERROR, sf("Style '%s' not found in lookup", style));
+		logger.log(Level.ERROR, sf("Style '%s' not found in lookup", decoratorStyle));
 		return new BorderDecorator();
 	}
 
@@ -1390,8 +1393,35 @@ final class SSCommon
 	/**
 	 * Find the default decorator for this component type and set it.
 	 */
-	private void initDecorator() {
+	private void initDecorators() {
 		setDecorator(getSSComponent().createDefaultDecorator());
+		setTextDecorator(getSSComponent().createDefaultTextDecorator());
 	}
 
+	static TextDecorator createDefaultTextDecorator() {
+		return TextDecorator.nullTextDecorator;
+	}
+
+	private TextDecorator textDecorator;
+	/**
+	 * Return the decorator used by this component.
+	 * @return the decorator
+	 */
+	TextDecorator getTextDecorator() {
+		return textDecorator;
+	}
+
+	/**
+	 * Install the given decorator.
+	 * @param deco decorator to install
+	 */
+	void setTextDecorator(TextDecorator textDeco) {
+		textDecorator.uninstall();
+		textDeco.install(getSSComponent());
+		textDecorator = textDeco;
+	}
+
+	void decorateText() {
+		textDecorator.decorateText();
+	}
 }
