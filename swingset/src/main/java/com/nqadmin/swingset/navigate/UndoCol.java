@@ -152,6 +152,19 @@ final class UndoCol
 	}
 
 	/**
+	 * This is always called if ESC, even if there is only 1 item on stack.
+	 * Some components have intermediate values that aren't on the undo/redo
+	 * stack, so always return the value from the database to set the component.
+	 */
+	private Change cancelEdits() {
+		// If don't clear stack, it's like a super undo, keeping redo stack.
+		// changes.subList(1, changes.size()).clear();
+		needNewSlot = true;
+		curIdx = 0;
+		return changes.get(0);
+	}
+
+	/**
 	 * Update the undo history with a change.
 	 * A bunch of changes in a row, go to the same slot.
 	 * On the first change for the column grab the database value as an object.
@@ -217,6 +230,7 @@ final class UndoCol
 		return switch(cmd) {
 		case UNDO -> hasPrev() ? prevValue() : UndoRedo.NO_CHANGE;
 		case REDO -> hasNext() ? nextValue() : UndoRedo.NO_CHANGE;
+		case ESC -> cancelEdits();
 		};
 	}
 

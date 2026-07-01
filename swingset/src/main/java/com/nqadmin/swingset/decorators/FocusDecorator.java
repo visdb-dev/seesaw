@@ -48,12 +48,11 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import com.nqadmin.swingset.utils.SSComponent;
-import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 
 /**
  * Base class for decorators that use Focus.
  */
-public abstract class FocusDecorator extends BaseAnyDecorator
+public abstract class FocusDecorator extends BaseDecorator
 		implements Decorator, FocusListener
 {
 	/** Apply decoration */
@@ -90,18 +89,5 @@ public abstract class FocusDecorator extends BaseAnyDecorator
 	 */
 	protected Component focusComp() {
 		return getSSComponent().getFocusTarget();
-	}
-
-	/**
-	 * Deal with a TextDecorator for this component.
-	 * @param valid
-	 */
-	protected void handleTextDecorator(ValidationResult valid) {
-		TextDecorator td = getSSComponent().getTextDecorator();
-		assert td != null;
-		if (td instanceof ComponentStateTextDecorator std)
-			std.decorateText(valid);
-		else
-			td.decorateText();
 	}
 }

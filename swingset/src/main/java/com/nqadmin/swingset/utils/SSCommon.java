@@ -54,6 +54,7 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -1192,6 +1193,20 @@ final class SSCommon
 
 	private static final String UNDO_ACTION_KEY = "SwingSetColumnUndo";
 	private static final String REDO_ACTION_KEY = "SwingSetColumnRedo";
+	private static final String ESC_ACTION_KEY = "SSEscCancelColumnEdit";
+	// ftf.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), new Object())
+	// "reset-field-edit", is JFormattedTextField.CancelAction
+	// does: ftf.setValue(ftf.getValue())
+	private static void addInputMap(JComponent jc, int cond, Map<String, KeyStroke> map) {
+		InputMap im = new InputMap();
+		for (Map.Entry<String, KeyStroke> entry : map.entrySet()) {
+			if (entry.getValue() != null)
+				im.put(entry.getValue(), entry.getKey());
+		}
+		im.setParent(jc.getInputMap(cond));
+		jc.setInputMap(cond, im);
+	}
+
 	/**
 	 * Setup undo/redo action bindings for a component.
 	 * @param comp
@@ -1199,31 +1214,33 @@ final class SSCommon
 	static void setupUndoRedoKeys(SSComponent comp)
 	{
 		logger.log(DEBUG, () -> sf("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
-
 		JComponent jc = (JComponent)comp;
-
-		//int cond = JComponent.WHEN_FOCUSED;
 		KeyStroke ksUndo = KeyStroke.getKeyStroke("ctrl Z");
 		KeyStroke ksRedo = KeyStroke.getKeyStroke("ctrl Y");
-		int cond = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
-		InputMap im = new InputMap();
-		im.put(ksUndo, UNDO_ACTION_KEY);
-		im.put(ksRedo, REDO_ACTION_KEY);
-		im.setParent(jc.getInputMap(cond));
-		jc.setInputMap(cond, im);
+		KeyStroke ksEsc = KeyStroke.getKeyStroke("ESCAPE");
+		
+		Map<String, KeyStroke> map;
+		if (Boolean.TRUE /*&& !(comp instanceof SSFormattedTextField)*/)
+			map = Map.of(UNDO_ACTION_KEY, ksUndo, REDO_ACTION_KEY, ksRedo, ESC_ACTION_KEY, ksEsc);
+		else
+			map = Map.of(UNDO_ACTION_KEY, ksUndo, REDO_ACTION_KEY, ksRedo);
+
+		addInputMap(jc, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, map);
+		addInputMap(jc, JComponent.WHEN_FOCUSED, map);
 		ActionMap am = new ActionMap();
 		am.put(UNDO_ACTION_KEY, new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			@Override public void actionPerformed(ActionEvent e) {
 				UndoRedo.undoRedo(comp, UndoRedo.UNDO);
 			}
 		});
 		am.put(REDO_ACTION_KEY, new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			@Override public void actionPerformed(ActionEvent e) {
 				UndoRedo.undoRedo(comp, UndoRedo.REDO);
+			}
+		});
+		am.put(ESC_ACTION_KEY, new AbstractAction() {
+			@Override public void actionPerformed(ActionEvent e) {
+				UndoRedo.undoRedo(comp, UndoRedo.ESC);
 			}
 		});
 		am.setParent(jc.getActionMap());
@@ -1395,6 +1412,8 @@ final class SSCommon
 	 */
 	private void initDecorators() {
 		setDecorator(getSSComponent().createDefaultDecorator());
+		// setDecorator must be first
+		// so text deco creation can disable being called from it.
 		setTextDecorator(getSSComponent().createDefaultTextDecorator());
 	}
 

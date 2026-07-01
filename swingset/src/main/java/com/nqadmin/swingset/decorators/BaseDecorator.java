@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,61 +27,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.demo;
+package com.nqadmin.swingset.decorators;
 
-import javax.swing.text.DefaultFormatterFactory;
-
-import com.nqadmin.swingset.formatting.Field;
-import com.nqadmin.swingset.formatting.SSFormat;
-import com.nqadmin.swingset.formatting.SSMaskFormatterFactory;
-
-import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
+import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 
 /**
- * A simple field for debug that is not in the formatting package.
+ * Some handling for the TextDecorator; {@link #handleTextDecorator(ValidationResult)}
+ * should be called at the end of subclass' decorate().
  */
-@SuppressWarnings("serial")
-public class DebugField extends Field {
-	/**
-	 *  Creates a default SSDateField object using the default date format.
-	 */
-	public DebugField(){
-		this(CUSTOM);
-	}
+public abstract class BaseDecorator extends BaseAnyDecorator implements Decorator
+{
+	private boolean decorateTextEnabled = true;
 
-	/**
-	 *  Creates a new instance of SSDateField with the specified format.
-	 *  @param format - an enum format to be used while the date field is in edit mode
+	/** Focus decorators typically decorate text as well;
+	 * this can be used to control that behavior.
+	 * @param flag 
 	 */
-	public DebugField(SSFormat format) {
-		this(createFormatterFactory(format));
-	}
-
-	/**
-	 * Creates an object of SSDateField with the specified formatter factory
-	 * @param factory - formatter factory to be used
-	 */
-	public DebugField(AbstractFormatterFactory factory) {
-		super(factory);
-	}
-
 	@Override
-	public void cleanField()
-	{
-		setValue(getAllowNull() ? null : 777);
+	public void setDecorateTextEnabled(boolean flag) {
+		decorateTextEnabled = flag;
 	}
 
 	/**
-	 * Create mask formatter factory with specified format pattern.
-	 * @param _format - Format to be used for date while in editing mode.
-	 * @return a DefaultFormatterFactory for the specified date format
+	 * Deal with a TextDecorator for this component.
+	 * @param valid
 	 */
-	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
-		SSFormat format = SSFormat.getActualFormat(_format);
-		String formatMask = "###";
-		
-		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.ssFormat(format)
-				.build();
+	protected void handleTextDecorator(ValidationResult valid) {
+		if (!decorateTextEnabled)
+			return;
+		TextDecorator td = getSSComponent().getTextDecorator();
+		assert td != null;
+		if (td instanceof ComponentStateTextDecorator std)
+			std.decorateText(valid);
+		else
+			td.decorateText();
 	}
 }

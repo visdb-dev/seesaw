@@ -928,7 +928,7 @@ public interface SSComponent extends RSC
 	 * setup during construction. The default is generally good for
 	 * a single {@linkplain JComponent}, for example a {@linkplain com.nqadmin.swingset.SSTextField}.
 	 * When a visual component is made up of multiple components a custom
-	 * border may be required.
+	 * decorator may be required.
 	 * 
 	 * @return decorator
 	 */

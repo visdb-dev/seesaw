@@ -29,12 +29,17 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
+import java.lang.System.Logger;
 import java.util.EnumMap;
 import java.util.Map;
 
 import javax.swing.text.AttributeSet;
 
 import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * This TextDecorator applies a named TextStyle based on ComponentState.
@@ -44,6 +49,8 @@ import com.nqadmin.swingset.utils.SSComponent;
  */
 public class ComponentStateTextDecorator extends BaseTextDecorator
 {
+	private static final Logger logger = SSUtils.getLogger();
+
 	private final EnumMap<ComponentState, String> styleNames = new EnumMap<>(ComponentState.class);
 
 	/** Create using specified map.
@@ -62,8 +69,10 @@ public class ComponentStateTextDecorator extends BaseTextDecorator
 		ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
 		AttributeSet style = TextStyles.getStyle(styleNames.get(state));
 		TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
+		logger.log(DEBUG, sf("Style: %s",
+				jComp().getClientProperty(TextStyles.STYLE_NAME)));
 	}
-
+	
 	/**
 	 * Validate the component and decorate the text accordingly.
 	 */

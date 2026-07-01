@@ -66,13 +66,13 @@ public class SVUtils {
 	 * @return 
 	 */
 	@SafeVarargs
-	public static SSTextComponentValidationItem createDefaultTextValidator(
+	public static TextComponentValidationItem createDefaultTextValidator(
 			JTextComponent comp, Validator<String>... validators
 	) {
 		Validator<String> merged = ValidatorUtils.merge(validators);
 		Validator<Document> validator = Converter.find(
 				String.class, Document.class).convert(merged);
-		SSTextComponentValidationItem valItem = new SSTextComponentValidationItem(
+		TextComponentValidationItem valItem = new TextComponentValidationItem(
 				comp, ValidationStrategy.DEFAULT,
 				SwingComponentDecorationFactory.getDefault().decorationFor(comp),
 				validator);
@@ -93,7 +93,7 @@ public class SVUtils {
 
 	public static ValidationItem decorator(JTextComponent jtc, StringValidator sval) {
 		SSComponent comp = (SSComponent) jtc;
-		SSTextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(
+		TextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(
 				jtc, sval);
 		SimpleValValidatorDecorator deco = new SimpleValValidatorDecorator(textVali);
 		comp.setDecorator(deco);

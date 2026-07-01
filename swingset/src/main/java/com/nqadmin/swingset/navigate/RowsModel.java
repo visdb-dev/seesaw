@@ -166,7 +166,7 @@ public final class RowsModel
 		if (creator != null)
 			dbOps = creator.create(rs, rowsModel);
 
-		if (dbOps == null) { dbOps = new DbOpsCustomizer() { }; }
+		if (dbOps == null) { dbOps = new DbOpsCustomizer() { }; } // no-op
 		return dbOps;
 	}
 

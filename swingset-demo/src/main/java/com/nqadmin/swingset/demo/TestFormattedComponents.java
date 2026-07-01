@@ -51,9 +51,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
 import com.nqadmin.swingset.formatting.SSDateField;
 import com.nqadmin.swingset.formatting.SSFormat;
@@ -67,7 +68,6 @@ import com.nqadmin.swingset.formatting.SSTimestampField;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 /**
  * This example demonstrates all of the Formatted SwingSet Components.
@@ -217,8 +217,8 @@ public class TestFormattedComponents extends JFrame {
 		rowsModel.bind(fmtSSTimeField, "ss_time_field");
 		rowsModel.bind(fmtSSTimestampField, "ss_timestamp_field");
 		
-		//fmtDebugField.bind(rowsModel, "");
-		//fmtDebugFieldNull.bind(rowsModel, "");
+		// rowsModel.bind(fmtDebugField, "ss_integer_field");
+		// rowsModel.bind(fmtDebugFieldNull, "ss_integer_field");
 		fmtDebugField.setAllowNull(false);
 		fmtDebugField.setText("333");
 		

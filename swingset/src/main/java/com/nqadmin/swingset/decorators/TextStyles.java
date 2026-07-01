@@ -226,6 +226,9 @@ public class TextStyles {
 	private static final WeakHashMap<JComponent, ComponentMemento> resetMementos
 			= new WeakHashMap<>();
 
+	/** Client property key */
+	public static final Object STYLE_NAME = new Object();
+
 	/**
 	 * Use as {@link #applyStyle(JComponent, RESET) } to restore to value
 	 * before any TextStyles were applied.
@@ -274,7 +277,6 @@ public class TextStyles {
 		SimpleAttributeSet newAttrs = new SimpleAttributeSet();
 		flatten(getResolvedStyle(styleName), newAttrs);
 		newAttrs.removeAttribute(StyleConstants.ResolveAttribute);
-		newAttrs.removeAttribute(StyleConstants.NameAttribute);
 		AttributeSet roAttrs = new AttributeSetDelegate(newAttrs);
 		readOnlyRegistry.put(styleName, roAttrs);
 		return roAttrs;
@@ -288,7 +290,8 @@ public class TextStyles {
 	}
 
 	@SuppressWarnings("unused")
-	private static synchronized void clearStyles() {
+	// package for testing
+	/*private*/ static synchronized void clearStyles() {
 		verifyNotEDT();
 		logger.log(INFO, () -> sf("{%s} is clearing all styles.", SSUtils.getCaller(5)));
 		registry.clear();
@@ -1014,7 +1017,9 @@ public class TextStyles {
     }
 
     /**
-     * Styling engine for: JTextField
+     * Styling engine for: JComponent.
+	 * The style's name is saved as the JCompoent's
+	 * {@link #STYLE_NAME} ClientProperty.
 	 * 
 	 * @param jComponent
 	 * @param style 
@@ -1028,8 +1033,14 @@ public class TextStyles {
 			if (resetMemento != null) {
 				resetMemento.restoreTo(jComponent);
 			}
+			jComponent.putClientProperty(STYLE_NAME, null);
 			return;
 		}
+
+		// There are no exceptions thrown during applyStyle, so just do it now.
+		// If there is a problem, this could be a bread crumb.
+		jComponent.putClientProperty(STYLE_NAME, style.getAttribute(StyleConstants.NameAttribute));
+
 		if (resetMemento == null)
 			resetMementos.put(jComponent, getMemento(jComponent));
 

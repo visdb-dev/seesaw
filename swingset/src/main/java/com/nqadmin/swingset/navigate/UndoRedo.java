@@ -52,7 +52,10 @@ public enum UndoRedo
 	/** Undo command */
 	UNDO,
 	/** Redo command */
-	REDO;
+	REDO,
+	/** Cancel edit, clear stack */
+	ESC,
+	;
 
 	/**
 	 * Value and error status of item on the undo/redo stack.

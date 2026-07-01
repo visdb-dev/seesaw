@@ -31,13 +31,13 @@ import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
  */
 // TODO: Make this independent of Document, just use a string?
 //		 Set the string on every change to text, after change needs validation?
-public class SSTextComponentValidationItem extends ValidationListener<JTextComponent>
+public class TextComponentValidationItem extends ValidationListener<JTextComponent>
         //implements DocumentListener, FocusListener, Runnable
 {
     private Validator<Document> validator;
     private boolean hasFatalProblem = false;
 
-    public SSTextComponentValidationItem(JTextComponent component,
+    public TextComponentValidationItem(JTextComponent component,
 										 ValidationStrategy strategy,
 										 ValidationUI validationUI,
 										 Validator<Document> validator

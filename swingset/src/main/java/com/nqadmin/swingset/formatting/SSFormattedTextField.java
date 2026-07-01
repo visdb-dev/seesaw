@@ -595,6 +595,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	@Override
 	public TextDecorator createDefaultTextDecorator()
 	{
+		// SSFormattedTextField handles its own text decoration
+		getDecorator().setDecorateTextEnabled(false);
 		return new NegativeNumberTextDecorator();
 	}
 

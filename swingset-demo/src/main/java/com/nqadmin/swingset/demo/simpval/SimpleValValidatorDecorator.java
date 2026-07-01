@@ -42,20 +42,20 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo.simpval;
 
-import com.nqadmin.swingset.decorators.BaseAnyDecorator;
+import com.nqadmin.swingset.decorators.BaseDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 
 /**
  * A combined validator/decorator using the Simple Validation framework.
  */
-public class SimpleValValidatorDecorator extends BaseAnyDecorator implements Decorator
+public class SimpleValValidatorDecorator extends BaseDecorator
 {
-	private final SSTextComponentValidationItem valItem;
+	private final TextComponentValidationItem valItem;
 	/** decorator name */
-	public static final Decorator.DecoratorStyle decoratorStyle = new Decorator.DecoratorStyle("SimpleValidatorDecorator");
+	public static final Decorator.DecoratorStyle SIMPLE_VALIDATOR = new Decorator.DecoratorStyle("SIMPLE_VALIDATOR");
 
-	public SimpleValValidatorDecorator(SSTextComponentValidationItem valItem) {
+	public SimpleValValidatorDecorator(TextComponentValidationItem valItem) {
 		this.valItem = valItem;
 		this.validator = () -> valItem.validate();
 	}
@@ -85,7 +85,6 @@ public class SimpleValValidatorDecorator extends BaseAnyDecorator implements Dec
 	@Override
 	public Decorator.DecoratorStyle getDecoratorStyle()
 	{
-		return decoratorStyle;
+		return SIMPLE_VALIDATOR;
 	}
-	
 }

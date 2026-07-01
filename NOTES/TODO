@@ -37,20 +37,38 @@ API options
 
 - ESC handling options
 
+    - after ESC about undo/redo stack the curIdx is set to BottomOfStack.
+      Should the stack be cleared?
+
+
 Other options and/or variants?
 
 ================================================================================
 
 TextStyles
     - YAML?
-    - TextArea: in general; scrollbars: either, ...; more stuff?
-    - TextArea: make sure everything is captured by memento.
+    - jackson handles both yaml and json.
+    - Isn't json now a subset of yaml?
 
 decorateText/TextDecorator
     Issues with preffered size? Adjust size dyncamically?
     Setting sizes while setting up components seems best.
     Could look at all styles for ComponentState, pick the biggest font to size;
     or at least suggest a size/range-of-sizes.
+
+    Eventually define a factory to create Decorators?
+
+    Minimize/optimize calling ValidateAll and decorate and decorate text.
+    Cache current state. But it's interactive and don't want to complicate
+    things and have decorator get out of sync...
+
+    TODO: Take an existing style, add/remove stuff to make a new style,
+          actually, that's just the inheritance scheme.
+
+Could
+    - Should there be a mechanism to track/listen changes in ComponentState?
+    - Cache currentState in ComponentStateTextDecorator?
+    - replaceStyle? RemoveStyle
 
 ================================================================================
 

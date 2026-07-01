@@ -48,14 +48,11 @@ import com.nqadmin.swingset.utils.SSComponent;
 /**
  * Component decorator gives a visual indication of the component state.
  * Typically both component and its validator are checked.
- * <p>
- * TODO: eventually define a factory to create these
  */
 public interface Decorator extends AnyDecorator
 {
-
 	/**
-	 * Decorator style.
+	 * Decorator style primarily used with {@link DecoratorSupplier}.
 	 */
 	public static class DecoratorStyle {
 		private final String style;
@@ -99,6 +96,17 @@ public interface Decorator extends AnyDecorator
 	 * 
 	 * @return  decorator style */
 	DecoratorStyle getDecoratorStyle();
+
+	/**
+	 * Decorators typically invoke a component's TextDecorator as as well;
+	 * use this method to control that behavior.
+	 * <p>
+	 * A Decorator should default to true.
+	 * A decorator may choose to never decorate text; should document this.
+	 * 
+	 * @param flag 
+	 */
+	void setDecorateTextEnabled(boolean flag);
     
 	/**
 	 * A decorator that does nothing.
@@ -118,5 +126,8 @@ public interface Decorator extends AnyDecorator
 
 		@Override
 		public SSComponent getSSComponent() { return null; }
+
+		@Override
+		public void setDecorateTextEnabled(boolean flag) { }
 	};
 }

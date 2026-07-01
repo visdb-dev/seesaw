@@ -396,7 +396,8 @@ public class TextStylesTest
 		AttributeSet result = TextStyles.getStyle("foo");
 		assertEquals(null, result);
 
-		Set<String> expect = Set.of("bold:true","size:16",
+		Set<String> expect = Set.of(
+				"name:criticalError", "bold:true","size:16",
 				"Alignment:2","family:Monospaced",
 				"background:java.awt.Color[r=255,g=243,b=205]",
 				"foreground:java.awt.Color[r=114,g=28,b=36]");
@@ -430,6 +431,7 @@ public class TextStylesTest
 			Set<String> asPairs = getAttributeStringPairs(TextStyles.getStyle("warning"));
 
 			Set<String> expect = Set.of(
+					"name:warning",
 					"scrollbars:vertical", "linewrap:true", "wordwrap:false",
 					"Alignment:1", "foreground:java.awt.Color[r=51,g=51,b=51]",
 					"autoscroll:true", "background:java.awt.Color[r=255,g=243,b=205]");
