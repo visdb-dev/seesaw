@@ -150,7 +150,7 @@ public class Example4 extends JFrame {
 		}
 
 		// DEBUG
-		//rowsModel.setWritable(false);
+		//rowsModel.setAllowWrite(false);
 		
 		// Setup navigator query.
 		// Use the "order by" to exercise SSSyncManager's "perform a manual loop"

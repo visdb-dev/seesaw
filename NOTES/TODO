@@ -1,4 +1,6 @@
 
+================================================================================
+
 Names case conversion. Per dbms/platform plugin. Maybe only needed for metadata
 access. For example, H2 converts column_name to COLUMN_NAME. Currently using
 map with case insensitive key. See RowSetState TreeMap
@@ -108,7 +110,21 @@ Knowing the root container may help to automate using SimpleValidation.
 
 ================================================================================
 
-Support/assistance for not querying database from EventQueue.
+DbMetadataCache
+    Cach
+
+
+Using metadata to detect deleted rows.
+    DatabaseMetaData.ownDeletesAreVisible vs DatabaseMetaData.deletesAreDetected Controversy
+    https://stackoverflow.com/questions/38214241/databasemetadata-owndeletesarevisible-vs-databasemetadata-deletesaredetected-con
+
+================================================================================
+
+Support/assistance for not querying database from EventQueue and/or
+non-intrusive dialog with please wait (but only if somethings taking too long)
+    - When waiting for a database op to complete how about
+      - disable any fields associated with rowset affecte by op.
+      - spinner/icon/badge on waiting fields
 
 ================================================================================
 
@@ -313,10 +329,6 @@ Notes
 
 
 ================================================================================
-
-Using metadata to detect deleted rows.
-    DatabaseMetaData.ownDeletesAreVisible vs DatabaseMetaData.deletesAreDetected Controversy
-    https://stackoverflow.com/questions/38214241/databasemetadata-owndeletesarevisible-vs-databasemetadata-deletesaredetected-con
 
 ================================================================================
 ============================= BUGS =============================================
@@ -634,10 +646,14 @@ Field tooltip with format/...
 
 ============== NAVIGATION
 
-Rework combo navigation somehow; maybe there's a navigator "thing"/interface.
-There's weirdness aound combo box navigation. Maybe SSSyncManager needs to be
-in navigation. Maybe navigation/utils need to be together. Maybe this combo
-navigator stuff needs specialized broadcast/events.
+SSSyncManager - Rework combo navigation somehow
+    - maybe there's a navigator "thing"/interface.
+      Implement it in DBComboBox?
+    - Maybe SSSyncManager needs to be in navigation.
+    - Maybe this combo navigator stuff needs specialized broadcast/events.
+    - genericize for key type: SSSyncManager<K>
+    - Handle multiple Navigators
+
 
 See SSDBComboBox::execute() uses SSUtils.updateSSComponent_HACK.
 Maybe there needs to be broadcast/event about the query so that SSCommon can

@@ -53,6 +53,7 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
 import com.nqadmin.swingset.mock.Util;
+import com.nqadmin.swingset.navigate.RowsAction;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 
@@ -206,7 +207,8 @@ public class RowSetOpsTest
 		logger.log(INFO, "    " + col);
 		SSComponent comp = new SSTextField(g_rm, col);
 		RowSetOps.updateColumnText(comp, sVal);
-		g_rm.commit();
+		//g_rm.commit(); in conjunction with skipping enabled check.
+		g_rm.getAction(RowsAction.ACT_COMMIT).actionPerformed(null);
 		Object co = RowSetOps.getColumnObject(comp);
 		//assertTrue(co.getClass() == val.getClass());
 		if (val instanceof BigDecimal bd)
@@ -268,6 +270,7 @@ public class RowSetOpsTest
 		rs.setCommand("SELECT * FROM tbl");
 		g_rm = getRowsModel(rs);
 
+		g_rm.setVerifyEnabledFlag_DEBUG(false);
 		EventQueue.invokeAndWait(() -> {
 			try {
 				updateColumnText("c_integer", "13", 13);
@@ -290,6 +293,7 @@ public class RowSetOpsTest
 				logger.log(ERROR, ex.getMessage(), ex);
 			}
 		});
+		g_rm.setVerifyEnabledFlag_DEBUG(true);
 
 		//g_rs = null;
 		//g_nav = null;
@@ -319,7 +323,10 @@ public class RowSetOpsTest
 		RowSetOps.updateColumnText(comp1, sDate);
 		RowSetOps.updateColumnText(comp2, sTime);
 		RowSetOps.updateColumnText(comp3, sTimestamp);
-		rowsModel.commit();
+		rowsModel.setVerifyEnabledFlag_DEBUG(false);
+		// rowsModel.commit();
+		rowsModel.getAction(RowsAction.ACT_COMMIT).actionPerformed(null);
+		rowsModel.setVerifyEnabledFlag_DEBUG(true);
 
 		Object co;
 		co = RowSetOps.getColumnObject(comp1);

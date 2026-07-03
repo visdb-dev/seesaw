@@ -90,6 +90,7 @@ import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.LookupDefaults;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.nqadmin.swingset.utils.SSVersion;
 import com.raelity.lib.ui.Screens;
@@ -863,7 +864,7 @@ public class MainClass extends JFrame
 		// Enable this to force CachedRowSet conflict
 		//lkup.add(new ForceConflict(1));
 
-		//LookupDefaults.init();
+		LookupDefaults.init();
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",

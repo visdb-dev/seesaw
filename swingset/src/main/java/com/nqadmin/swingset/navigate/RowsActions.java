@@ -90,7 +90,7 @@ final class RowsActions
 
 	void startNavigationAction(RowsAction navAction)
 	{
-		logger.log(DEBUG, () -> sf("%s button clicked", navAction));
+		logger.log(DEBUG, () -> sf("%s action (usually button clicked)", navAction));
 		countActionPerform[navAction.ordinal()]++;
 		getNavState().disableRowsetListeningFlag(navAction.toString());    // TODO: not needed for RowsModel???
 		RowsModel.startRowsEvent(rowsModel, navAction);
@@ -132,6 +132,19 @@ final class RowsActions
 	void disableAllActions() {
 		actions.forEach((k, v) -> { v.setEnabled(false); });
 	}
+
+	private boolean disableVerifyEnabledCheck;
+	void setVerifyEnabledFlag_DEBUG(boolean flag) {
+		disableVerifyEnabledCheck = !flag;
+	}
+
+	private boolean verifyEnabled(AbstractAction act) {
+		if (act.isEnabled() || disableVerifyEnabledCheck)
+			return true;
+		logger.log(ERROR, sf("disabled action '%s' called", act.getClass().getSimpleName()),
+				new Exception("disabled action called"));
+		return false;
+	}
 	
 	/**
 	 * Action for the "First" button on the navigator.
@@ -160,6 +173,8 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_FIRST);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				if (!getNavState().commitChangesToDatabase(true))
 					return;
 
@@ -207,6 +222,8 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_PREVIOUS);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				if (!getNavState().commitChangesToDatabase(true))
 					return;
 
@@ -251,6 +268,8 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_NEXT);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				if (!getNavState().commitChangesToDatabase(true))
 					return;
 
@@ -293,6 +312,8 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_LAST);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				if (!getNavState().commitChangesToDatabase(true))
 					return;
 				
@@ -338,6 +359,8 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_COMMIT);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				if (RowSetState.isInserting(getRowSet())) {
 					// IF ON INSERT ROW ADD THE ROW.
 					// CHECK IF THE ROW CAN BE INSERTED.
@@ -426,6 +449,8 @@ final class RowsActions
 					? ACT_REVERT_FORCE : ACT_REVERT;
 			startNavigationAction(act_revert);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
 				boolean wasInserting = RowSetState.isInserting(getRowSet());
 				if (wasInserting) {
@@ -491,6 +516,8 @@ final class RowsActions
 			// TODO: use performRefreshOps? Let it return false if handle it here?
 			try {
 				//if (Boolean.TRUE /*|| getNavState().callExecute*/) {
+				if(!verifyEnabled(this))
+					return;
 
 				getRowSet().execute();
 				
@@ -543,6 +570,8 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_ADD);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				// Commit changes for current row to database
 				// Ignore return since doesn't matter if there's nothing to do.
 				getNavState().commitChangesToDatabase(true);
@@ -632,6 +661,8 @@ final class RowsActions
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_DELETE);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				if (getNavState().getConfirmDeletes()) {
 					final int answer = JOptionPane.showConfirmDialog(dlgParent(e),
 							"Are you sure you want to delete this record?", "Delete Present Record",
@@ -706,11 +737,11 @@ final class RowsActions
 			// we're in the middle of processing, possibly  a row move.
 			if (!getNavState().rowsetListenerAdded)
 				return;
-			if (!isEnabled())
-				return;
 			
 			startNavigationAction(ACT_GOTOROW);
 			try {
+				if(!verifyEnabled(this))
+					return;
 				int row = (int) getNavState().rowNumberModel.getNumber();
 
 				// TODO: commitChangesToDatabase returns false if the getRowSet()
@@ -728,15 +759,18 @@ final class RowsActions
 				// //boolean dirty = getNavState().undoRow.isDirty();
 
 				logger.log(DEBUG, () -> "Record number manually updated to " + row + ".");
+				// If row's in good range,
+				//     and
+				//        not already on current row or not ok to skip move
 				if ((row <= getNavState().rowCount) && (row > 0)
 						&& !(getRowSet().getRow() == row && e != null
 							&& RowsAction.OK_SKIP_CURSOR_MOVE.equals(e.getActionCommand()))) {
-					logger.log(WARNING, "skipping commit and cursor move");
 					if (!getNavState().commitChangesToDatabase(true))
 						return;
 					getRowSet().absolute(row);
 					getNavState().freshRow(); // only do this if row changed and commit
-				}
+				} else
+					logger.log(WARNING, "skipping commit and cursor move");
 
 				getNavState().updateNavigator();
 			} catch (final SQLException se) {

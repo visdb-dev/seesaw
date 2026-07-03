@@ -127,6 +127,7 @@ public class RowsModelEventHandlingTest
 	 * @throws java.lang.reflect.InvocationTargetException
 	 */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testBasicHandling()
 	throws SQLException, ClassNotFoundException,
 			InterruptedException, InvocationTargetException
@@ -220,6 +221,7 @@ public class RowsModelEventHandlingTest
 	 * @throws java.lang.reflect.InvocationTargetException
 	 */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testAbsorbHandling()
 			throws SQLException, ClassNotFoundException,
 			InterruptedException, InvocationTargetException
@@ -241,6 +243,8 @@ public class RowsModelEventHandlingTest
 		events.clear();
 		assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s),
 				() -> {
+					model1.next();
+					model1.next();
 					model1.first();
 					model1.next();
 					model1.next();	// merged
@@ -248,11 +252,12 @@ public class RowsModelEventHandlingTest
 					model1.next();
 					model1.next();	// merged
 				}));
-		assertEquals(4, events.size());
-		assertEquals(ACT_FIRST, events.get(0).getOperAct());
-		assertEquals(ACT_NEXT,  events.get(1).getOperAct());
-		assertEquals(ACT_FIRST, events.get(2).getOperAct());
-		assertEquals(ACT_NEXT,  events.get(3).getOperAct());
+		assertEquals(5, events.size());
+		assertEquals(ACT_NEXT,  events.get(0).getOperAct());
+		assertEquals(ACT_FIRST, events.get(1).getOperAct());
+		assertEquals(ACT_NEXT,  events.get(2).getOperAct());
+		assertEquals(ACT_FIRST, events.get(3).getOperAct());
+		assertEquals(ACT_NEXT,  events.get(4).getOperAct());
 		
 
 		System.out.println("===");
@@ -310,6 +315,7 @@ public class RowsModelEventHandlingTest
 	 * @throws java.lang.reflect.InvocationTargetException
 	 */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testNestedHandling()
 	throws SQLException, ClassNotFoundException,
 			InterruptedException, InvocationTargetException

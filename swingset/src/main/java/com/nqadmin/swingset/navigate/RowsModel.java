@@ -123,7 +123,7 @@ public final class RowsModel
 	 * Note the RowSet, if not null, must have a query to execute.
 	 * @param rs
 	 * @return 
-	 * @deprecated 
+	 * @deprecated use {@link #create(RowSet, DbOpsCustomizer) }
 	 */
 	// TODO: Is it ok to require a query?
 	//       Previously, the query was executed by SSDataNavigator.
@@ -168,21 +168,6 @@ public final class RowsModel
 
 		if (dbOps == null) { dbOps = new DbOpsCustomizer() { }; } // no-op
 		return dbOps;
-	}
-
-	/**
-	 * @return
-	 */
-	public static int count() {
-		// Can't depend on size() method when weakKeys.
-		return SSUtils.size(activeRowModels);
-	}
-
-	/**
-	 * @return
-	 */
-	public static int navCount() {
-		return NavigateState.count();
 	}
 
 	/**
@@ -237,7 +222,9 @@ public final class RowsModel
 	 * This event will cause all components to update.
 	 * @param rowsModel
 	 */
-	public static void issueRowChanged(RowsModel rowsModel)
+	// NOT USED
+	@SuppressWarnings("unused")
+	static void issueRowChanged_NOT_USED(RowsModel rowsModel)
 	{
 		startRowsEvent(rowsModel, ACT_ROW_CHANGED);
 		addRowSetEvent(RowSetEventType.ROW_CHANGED, rowsModel.getRowSet());
@@ -450,6 +437,34 @@ public final class RowsModel
 		return navState != null ? navState.getRowSet() : null;
 	}
 
+	/**
+	 * Returns DbOpsCustomizer which is used
+	 * when the insert action, and much more, is pressed, to perform custom actions.
+	 *
+	 * @return the DbOpsCustomizer
+	 */
+	public DbOpsCustomizer getDbOps() {
+		return navState != null ? navState.getDbOps() : null;
+	}
+
+	/**
+	 * Use rsOp to capture multiple RowSet eventsNextQ into a single event.
+	 * 
+	 * @param operator
+	 * @param r code that operates on a RowSet
+	 * @throws java.sql.SQLException
+	 */
+	// TODO: need javadoc examples.
+	public void rsOp(Object operator, SSDBSupport.RunnableSQL r) throws SQLException
+	{
+			RowsModel.startRowsEvent(OperatorKind.OTHER, this, operator);
+			try {
+				r.run();
+			} finally {
+				RowsModel.finishRowsEvent(this);
+			}
+	}
+
 	NavigateState getNavState() {
 		return navState;
 	}
@@ -471,28 +486,53 @@ public final class RowsModel
 		return rowsActions.get(navAction);
 	}
 
-	/**
-	 * Put all the navigation actions into the action map.
-	 * If the param is null, a new actionMap is constructed and filled
-	 * @param actionMap the actionMap to fill; may be null
-	 * @return the filled actionMap
-	 */
-	public ActionMap fillNavActionMap(ActionMap actionMap) {
-		ActionMap am = actionMap != null ? actionMap : new ActionMap();
-		Arrays.stream(RowsAction.values()).forEach(key -> {
-			if (!key.isVirtual())
-				am.put(key, getAction(key));
-		});
-		return am;
+	// These convenience methods may do nothing
+
+	/** Programmaticaly move the ResultSet cursor to the first row.
+	 * @return true if on valid row
+	 * @throws java.sql.SQLException */
+	public boolean first() throws SQLException {
+		if (!getRowSet().isFirst())
+			rowsActions.run(ACT_FIRST);
+		return getRowSet().getRow() != 0;
+	}
+	/** Programmaticaly move the ResultSet cursor to the last row.
+	 * @return true if on valid row
+	 * @throws java.sql.SQLException */
+	public boolean last() throws SQLException {
+		if (!getRowSet().isLast())
+			rowsActions.run(ACT_LAST);
+		return getRowSet().getRow() != 0;
+	}
+	/** Programmaticaly move the ResultSet cursor to the next row.
+	 * @return true if on valid row
+	 * @throws java.sql.SQLException  */
+	public boolean next() throws SQLException {
+		rowsActions.run(ACT_NEXT);
+		return getRowSet().getRow() != 0;
+
+	}
+	/** Programmaticaly move the ResultSet cursor to the previous row.
+	 * @return true if on valid row
+	 * @throws java.sql.SQLException */
+	public boolean previous() throws SQLException {
+		rowsActions.run(ACT_PREVIOUS);
+		return getRowSet().getRow() != 0;
+	}
+	/** Programmaticaly write the database with the changes. */
+	public void commit() {
+		if (isDirty())
+			rowsActions.run(ACT_COMMIT);
 	}
 
-	/**
-	 * Check if this RowsModel's rowSet's cursor is on any row or on the insert row.
-	 * @return true if cursor on a row or insert row
-	 * @throws SQLException 
-	 */
-	public boolean hasActiveRow() throws SQLException {
-		return getRow() != 0 || isOnInsertRow();
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Some state read/write.
+	//
+
+	// NOTE: SpinnerModel locked to RowSet
+	SpinnerNumberModel getSpinnerModel() {
+		return navState.rowNumberModel;
 	}
 
 	/**
@@ -502,29 +542,22 @@ public final class RowsModel
 	public int getRow() {
 		int spin_row = getSpinnerModel().getNumber().intValue();
 		if (Boolean.TRUE) { // consistency check
-			int rs_row = -1;
 			try {
-				rs_row = getRowSet().getRow();
+				int rs_row = getRowSet().getRow();
+				if (spin_row != rs_row) {
+					// TODO: Instruct to use rowsModel.setRow().
+					logger.log(ERROR, sf("spinner model, %d, out of sync with row set %d",
+							spin_row, rs_row), new IllegalStateException("getRow sync"));
+					// RESYNC SPINNER
+					setRow(getRowSet().getRow());
+					spin_row = rs_row;
+				}
 			} catch (SQLException ex) {
-			}
-			if (spin_row != rs_row) {
-				logger.log(ERROR, sf("spinner model, %d, out of sync with row set %d", spin_row, rs_row), new IllegalStateException("getRow sync"));
-				spin_row = rs_row;
+				// TODO: random sql exception
 			}
 		}
 		return spin_row;
 	}
-
-	/** Move the ResultSet cursor to the first row. */
-	public void first() { rowsActions.run(ACT_FIRST); }
-	/** Move the ResultSet cursor to the last row. */
-	public void last() { rowsActions.run(ACT_LAST); }
-	/** Move the ResultSet cursor to the next row. */
-	public void next() { rowsActions.run(ACT_NEXT); }
-	/** Move the ResultSet cursor to the previous row. */
-	public void previous() { rowsActions.run(ACT_PREVIOUS); }
-	/** Update the database with the new contents of the current row. */
-	public void commit() { rowsActions.run(ACT_COMMIT); }
 
 	/**
 	 * Move the RowSet cursor to the specified row.
@@ -574,26 +607,168 @@ public final class RowsModel
 		return getNavState() != null && getNavState().undoRow.isDirty();
 	}
 
-	// NOTE: SpinnerModel locked to RowSet
-	SpinnerNumberModel getSpinnerModel() {
-		return navState.rowNumberModel;
+	/**
+	 * Has navigation been disabled for the rowSet.
+	 * @return 
+	 */
+	public boolean canNavigate() {
+		return getNavState().canNavigate();
 	}
 
 	/**
-	 * Use rsOp to capture multiple RowSet eventsNextQ into a single event.
-	 * 
-	 * @param operator
-	 * @param r code that operates on a RowSet
-	 * @throws java.sql.SQLException
+	 * Check if this RowsModel's rowSet's cursor is on any row or on the insert row.
+	 * @return true if cursor on a row or insert row
+	 * @throws SQLException 
 	 */
-	public void rsOp(Object operator, SSDBSupport.RunnableSQL r) throws SQLException
+	public boolean hasActiveRow() throws SQLException {
+		return getRow() != 0 || isOnInsertRow();
+	}
+
+	/**
+	 * Returns true if the RowSet contains one or more rows, else false.
+	 *
+	 * @return return true if RowSet contains data else false.
+	 */
+	public boolean containsRows()
 	{
-			RowsModel.startRowsEvent(OperatorKind.OTHER, this, operator);
-			try {
-				r.run();
-			} finally {
-				RowsModel.finishRowsEvent(this);
-			}
+		return navState.containsRows();
+	}
+
+	/**
+	 * @return boolean indicating if the rowSet is on an insert row
+	 */
+	public boolean isOnInsertRow() {
+		return navState.isOnInsertRow();
+	}
+
+	/**
+	 * @param comp
+	 * @return true if the component is in an error state
+	 */
+	public boolean hasError(SSComponent comp) {
+		// TODO: check if row set has component's column name?
+		// if (!bindings.containsKey(comp))
+		// 	throw new IllegalArgumentException("Component not bound in RowsModel");
+		return navState.hasError(comp);
+	}
+
+	/**
+	 * Adjust the components error state. Used when there are multiple
+	 * components for the same column.
+	 * This execution path doesn't feel right. This shouldn't be public.
+	 * @param comp
+	 * @param isError
+	 */
+	public void adjustErrorState(SSComponent comp, boolean isError) {
+		getNavState().adjustErrorComponentState(comp, isError);
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Behavioral control methods - taken from SSDataNavigation
+	//
+
+	/**
+	 * Returns true if deletions must be confirmed by user, else false.
+	 *
+	 * @return returns true if a confirmation dialog is displayed when the user
+	 *         deletes a record, else false.
+	 */
+	public boolean getConfirmDeletes() {
+		return navState.getConfirmDeletes();
+	}
+
+	/**
+	 * Sets the confirm deletion indicator. If set to true, every time delete action
+	 * is pressed, the navigator pops up a confirmation dialog to the user. Default
+	 * value is true.
+	 *
+	 * @param confirmDeletes indicates whether or not to confirm deletions
+	 */
+	public void setConfirmDeletes(boolean confirmDeletes) {
+		navState.setConfirmDeletes(confirmDeletes);
+	}
+
+	/**
+	 * Returns true if deletions are allowed, else false.
+	 *
+	 * @return returns true if deletions are allowed, else false.
+	 */
+	public boolean getAllowDeletion() {
+		return navState.getDeletion();
+	}
+
+	/**
+	 * Enables or disables the row deletion action. This method should be used if
+	 * row deletions are not allowed. True by default.
+	 *
+	 * @param deletion indicates whether or not to allow deletions
+	 */
+	public void setAllowDeletion(boolean deletion) {
+		navState.setDeletion(deletion);
+	}
+
+	/**
+	 * Returns true if insertions are allowed, else false.
+	 *
+	 * @return returns true if insertions are allowed, else false.
+	 */
+	public boolean getAllowInsertion() {
+		return navState.getInsertion();
+	}
+
+	/**
+	 * Enables or disables the row insertion action. This method should be used if
+	 * row insertions are not allowed. True by default.
+	 *
+	 * @param insertion indicates whether or not to allow insertions
+	 */
+	public void setAllowInsertion(boolean insertion) {
+		navState.setInsertion(insertion);
+	}
+
+	/**
+	 * Returns true if the user can modify the data in the RowSet, else false.
+	 *
+	 * @return returns true if the user modifications are written back to the
+	 *         database, else false.
+	 */
+	public boolean getAllowWrite() {
+		return navState.getWritable();
+	}
+
+	/**
+	 * Enables or disables the modification-related action on the SSDataNavigator.
+	 * If the user can only navigate through the records with out making any changes set
+	 * this to false. By default, the modification-related action are enabled.
+	 *
+	 * @param writable true to enable writable-related actions; false to disable
+	 */
+	public void setAllowWrite(boolean writable) {
+		navState.setWritable(writable);
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Bus and event coalescing other random stuff
+	//
+	// TODO: put at least some of this in some other class. Maybe inner class.
+	//       Don't like all the public stuff.
+	//
+
+	/**
+	 * Put all the navigation actions into the action map.
+	 * If the param is null, a new actionMap is constructed and filled
+	 * @param actionMap the actionMap to fill; may be null
+	 * @return the filled actionMap
+	 */
+	public ActionMap fillNavActionMap(ActionMap actionMap) {
+		ActionMap am = actionMap != null ? actionMap : new ActionMap();
+		Arrays.stream(RowsAction.values()).forEach(key -> {
+			if (!key.isVirtual())
+				am.put(key, getAction(key));
+		});
+		return am;
 	}
 
 	/**
@@ -736,8 +911,64 @@ public final class RowsModel
 
 	//////////////////////////////////////////////////////////////////////
 	//
-	// Config behavioral methods - taken from SSDataNavigation
+	// Debug
 	//
+
+	/**
+	 * The number of active RowsModel; for debug.
+	 * @return
+	 */
+	public static int count() {
+		// Can't depend on size() method when weakKeys.
+		return SSUtils.size(activeRowModels);
+	}
+
+	/**
+	 * The number of active NavigateState; for debug.
+	 * @return
+	 */
+	public static int navCount() {
+		return NavigateState.count();
+	}
+
+	/** for debug.
+	 * @param flag */
+	public void setVerifyEnabledFlag_DEBUG(boolean flag) {
+		rowsActions.setVerifyEnabledFlag_DEBUG(flag);
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Deprecated
+	//
+
+	/**
+	 * Writes the present row back to the RowSet.
+	 * 
+	 * This is typically done when commit it pressed,
+	 * but it may be done programmatically.
+	 *
+	 * @return returns true if update succeeds else false.
+	 * @deprecated use {@link #commit() }
+	 */
+	@Deprecated
+	public boolean updatePresentRow() {
+		return navState.updatePresentRow();
+	}
+
+	/**
+	 * Function that passes the implementation of the SSDBNav interface. This
+	 * interface can be implemented by the developer to perform custom actions when
+	 * the insert action is pressed
+	 *
+	 * @param dBNav implementation of the SSDBNav interface
+	 * @deprecated use {@linkplain #setRowSet(javax.sql.RowSet,
+	 * com.nqadmin.swingset.datasources.DbOpsCustomizer) }
+	 */
+	@Deprecated
+	public void setDBNav(DbOpsCustomizer dBNav) {
+		navState.setDbOps(dBNav);
+	}
 	
 	/**
 	 * This is necessary for ancient MySQL jdbc driver (see FAQ).
@@ -759,117 +990,12 @@ public final class RowsModel
 	}
 
 	/**
-	 * Sets the confirm deletion indicator. If set to true, every time delete action
-	 * is pressed, the navigator pops up a confirmation dialog to the user. Default
-	 * value is true.
-	 *
-	 * @param confirmDeletes indicates whether or not to confirm deletions
-	 */
-	public void setConfirmDeletes(boolean confirmDeletes) {
-		navState.setConfirmDeletes(confirmDeletes);
-	}
-
-	/**
-	 * Returns true if deletions must be confirmed by user, else false.
-	 *
-	 * @return returns true if a confirmation dialog is displayed when the user
-	 *         deletes a record, else false.
-	 */
-	public boolean getConfirmDeletes() {
-		return navState.getConfirmDeletes();
-	}
-
-	/**
-	 * Function that passes the implementation of the SSDBNav interface. This
-	 * interface can be implemented by the developer to perform custom actions when
-	 * the insert action is pressed
-	 *
-	 * @param dBNav implementation of the SSDBNav interface
-	 * @deprecated use setDBNav(Rowset, SSDBNav)
-	 * @deprecated use {@linkplain #setRowSet(javax.sql.RowSet,
-	 * com.nqadmin.swingset.datasources.DbOpsCustomizer) }
-	 */
-	@Deprecated
-	public void setDBNav(DbOpsCustomizer dBNav) {
-		navState.setDbOps(dBNav);
-	}
-
-	/**
-	 * Returns DbOpsCustomizer which is used
-	 * when the insert action, and much more, is pressed, to perform custom actions.
-	 *
-	 * @return the DbOpsCustomizer
-	 */
-	public DbOpsCustomizer getDbOps() {
-		return navState != null ? navState.getDbOps() : null;
-	}
-
-	/**
-	 * Enables or disables the row deletion action. This method should be used if
-	 * row deletions are not allowed. True by default.
-	 *
-	 * @param deletion indicates whether or not to allow deletions
-	 */
-	public void setDeletion(boolean deletion) {
-		navState.setDeletion(deletion);
-	}
-
-	/**
-	 * Returns true if deletions are allowed, else false.
-	 *
-	 * @return returns true if deletions are allowed, else false.
-	 */
-	public boolean getDeletion() {
-		return navState.getDeletion();
-	}
-
-	/**
-	 * Returns true if insertions are allowed, else false.
-	 *
-	 * @return returns true if insertions are allowed, else false.
-	 */
-	public boolean getInsertion() {
-		return navState.getInsertion();
-	}
-
-	/**
-	 * Enables or disables the row insertion action. This method should be used if
-	 * row insertions are not allowed. True by default.
-	 *
-	 * @param insertion indicates whether or not to allow insertions
-	 */
-	public void setInsertion(boolean insertion) {
-		navState.setInsertion(insertion);
-	}
-
-	/**
-	 * Enables or disables the modification-related action on the SSDataNavigator.
-	 * If the user can only navigate through the records with out making any changes set
-	 * this to false. By default, the modification-related action are enabled.
-	 *
-	 * @param writable true to enable writable-related actions; false to disable
-	 */
-	public void setWritable(boolean writable) {
-		navState.setWritable(writable);
-	}
-
-	/**
-	 * Returns true if the user can modify the data in the RowSet, else false.
-	 *
-	 * @return returns true if the user modifications are written back to the
-	 *         database, else false.
-	 */
-	public boolean getWritable() {
-		return navState.getWritable();
-	}
-
-	/**
 	 * Enables or disables the modification-related action on the SSDataNavigator.
 	 * If the user can only navigate through the records with out making any changes
 	 * set this to false. By default, the modification-related action are enabled.
 	 *
 	 * @param modification true to enable modification-related actions; false to disable
-	 * @deprecated use setWritable
+	 * @deprecated use setAllowWrite
 	 */
 	@Deprecated
 	public void setModification(boolean modification) {
@@ -881,7 +1007,7 @@ public final class RowsModel
 	 *
 	 * @return returns true if the user modifications are written back to the
 	 *         database, else false.
-	 * @deprecated use getWritable
+	 * @deprecated use getAllowWrite
 	 */
 	@Deprecated
 	public boolean getModification() {
@@ -890,7 +1016,7 @@ public final class RowsModel
 
 	/**
 	 * @param navCombo the navCombo to set
-	 * @deprecated use {@linkplain RowsModel#setNavCombo(com.nqadmin.swingset.SSDBComboBox, com.nqadmin.swingset.utils.SSSyncManager) }
+	 * @deprecated this shouldn't be public
 	 */
 	@Deprecated
 	public void setNavCombo(SSDBComboBox navCombo) {
@@ -900,70 +1026,20 @@ public final class RowsModel
 	/**
 	 * @param navCombo the navCombo used with this RowsModel
 	 * @param syncer
+	 * @deprecated this shouldn't be public
 	 */
+	@Deprecated
 	public void setNavCombo(SSDBComboBox navCombo, SSSyncManager syncer) {
 		navState.setNavCombo(navCombo, syncer);
 	}
 
 	/**
 	 * @return the navCombo
+	 * @deprecated this shouldn't be public, if it's needed at all
 	 */
 	// TODO: what's this about? Remove it.
+	@Deprecated
 	public SSDBComboBox getNavCombo() {
 		return navState.getNavCombo();
-	}
-
-	/**
-	 * Returns true if the RowSet contains one or more rows, else false.
-	 *
-	 * @return return true if RowSet contains data else false.
-	 */
-	public boolean containsRows()
-	{
-		return navState.containsRows();
-	}
-
-	/**
-	 * @return boolean indicating if the rowSet is on an insert row
-	 */
-	public boolean isOnInsertRow() {
-		return navState.isOnInsertRow();
-	}
-
-	/**
-	 * Adjust the components error state. Used when there are multiple
-	 * components for the same column.
-	 * This execution path doesn't feel right.
-	 * @param comp
-	 * @param isError
-	 */
-	public void adjustErrorState(SSComponent comp, boolean isError) {
-		getNavState().adjustErrorComponentState(comp, isError);
-	}
-
-	/**
-	 * @param comp
-	 * @return true if the component is in an error state
-	 */
-	public boolean hasError(SSComponent comp) {
-		// TODO: check if row set has component's column name?
-		// if (!bindings.containsKey(comp))
-		// 	throw new IllegalArgumentException("Component not bound in RowsModel");
-		return navState.hasError(comp);
-	}
-
-	/**
-	 * Writes the present row back to the RowSet.
-	 * 
-	 * This is typically done when commit it pressed,
-	 * but it may be done programmatically.
-	 * 
-	 * //		This is done automatically when
-	 * //		any navigation takes place, but can also be called manually.
-	 *
-	 * @return returns true if update succeeds else false.
-	 */
-	public boolean updatePresentRow() {
-		return navState.updatePresentRow();
 	}
 }

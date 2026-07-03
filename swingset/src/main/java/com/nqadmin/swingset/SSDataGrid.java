@@ -421,7 +421,7 @@ public class SSDataGrid extends JTable
 			if (displayValues.length > 0) {
 				index = getIndexOf(_value);
 			} else {
-				logger.log(Level.ERROR, "No item in combo that corresponds to " + _value);
+				logger.log(Level.ERROR, () -> "No item in combo that corresponds to " + _value);
 			}
 
 			if (index == -1) {
@@ -758,7 +758,7 @@ public class SSDataGrid extends JTable
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Variable to indicate if rows can be deleted.

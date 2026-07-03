@@ -129,7 +129,7 @@ import static java.lang.System.Logger.Level.*;
  * reverted using Undo button (has to be done manually by the user).
  */
 //
-// TODO: package access
+// TODO: this is a package class, there shouldn't be public methods.
 //
 final class NavigateState
 {
@@ -941,8 +941,14 @@ final class NavigateState
 	 * 
 	 * @param autoCommit inidcates whether or not to enable autoCommit mode
 	 */
+	// NOTE: this method is not referenced.
 	public void setAutoCommit(boolean autoCommit) {
 		this.autoCommit = autoCommit;
+	}
+
+	private boolean lastCanNavigate;
+	boolean canNavigate() {
+		return lastCanNavigate;
 	}
 
 	/**
@@ -985,6 +991,7 @@ final class NavigateState
 		updateEnable(ACT_LAST, canNavigate && !atLast);
 		updateEnable(ACT_GOTOROW, canNavigate);
 		setNavComboEnabled(canNavigate);
+		lastCanNavigate = canNavigate;
 
 		// Handle commit, undo
 		boolean commitUndoOk = writable
@@ -1056,7 +1063,9 @@ final class NavigateState
 	 * any navigation takes place, but can also be called manually.
 	 *
 	 * @return returns true if update succeeds else false.
+	 * @deprecated use RowsModel.commit()
 	 */
+	@Deprecated
 	public boolean updatePresentRow() {
 		if (RowSetState.isInserting(getRowSet()) || (currentRow > 0)) {
 			logger.log(DEBUG, "Doing NAV_COMMIT.");
