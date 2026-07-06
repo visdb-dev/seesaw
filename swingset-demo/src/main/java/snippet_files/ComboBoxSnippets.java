@@ -45,7 +45,12 @@ public class ComboBoxSnippets extends JFrame
 			
 			// Create an instance of the SSDBComboBox with the connection object,
 			// query, and column names.
-			combo = new DBComboBox2<>(connection, query, "part_id","part_name") {};
+			combo = new DBComboBox2.Builder<Long, String, Long>()
+					.connection(connection)
+					.query(query)
+					.primaryKeyColumnName("part_id")
+					.displayColumnName("part_name")
+					.build();
 			
 			// Execute the query.
 			combo.execute();

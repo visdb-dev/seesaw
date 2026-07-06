@@ -165,7 +165,7 @@ import static java.lang.System.Logger.Level.*;
  * @since 4.0.0
  */
 @SuppressWarnings("serial")
-public abstract class ComboBox2<K,D,D2>
+public class ComboBox2<K,D,D2>
 		extends JComboBox<SSListItem>
 		implements SSComponent
 {
@@ -174,9 +174,15 @@ public abstract class ComboBox2<K,D,D2>
 
 	/** Constructor argument to indicate whether or not to use GlazedList model. */
 	public enum ModelType {
-		/** use glazed model */
+		/**
+		 * Use glazed model.
+		 * If GlazedLists is specified, it is configured strict.
+		 * Use {@link #getAutoComplete() } to change its configuration.
+		 */
 		GLAZED,
-		/** use swing model */
+		/**
+		 * Use swing model.
+		 */
 		SWING,
 	}
 
@@ -330,52 +336,6 @@ public abstract class ComboBox2<K,D,D2>
 		}
 	}
 
-	private boolean hasD2;
-
-	/** This returns whether or not {@code <D2>} is populated.
-	 * @return 
-	 */
-	public boolean hasD2() {
-		return hasD2;
-	}
-
-	private boolean d2DisplayEnabled;
-
-	/**
-	 * Should {@code <D2>} values be displayed.
-	 * @return 
-	 */
-	public boolean getD2DisplayEnabled() {
-		return d2DisplayEnabled;
-	}
-
-	/**
-	 * Set the flag controlling whether or not to display {@code <D2>}.
-	 * @param d2DisplayEnabled 
-	 */
-	public void setD2DisplayEnabled(boolean d2DisplayEnabled) {
-		this.d2DisplayEnabled = d2DisplayEnabled;
-	}
-
-	/**
-	 * This is called after the combobox is populated with items.
-	 * Both hasD2() and getD2DisplayEnabled() must be true
-	 * to display {@code <D2>}.
-	 * This method sets up the format based on {@code <D>} and {@code <D2>}
-	 * JDBCTypes. {@link SSListItemFormat} can be used directly after
-	 * the data is populated to orverride this.
-	 * @param displayValueType
-	 * @param d2Type
-	 */
-	protected void establishListItemFormat(JDBCType displayValueType, JDBCType d2Type) {
-		getListItemFormat().clear();
-		getListItemFormat().addElemType(keyVisual.getDisplayValueListItemElemIndex(),
-				displayValueType);
-		if (hasD2() && getD2DisplayEnabled()) {
-			getListItemFormat().addElemType(keyVisual.getD2ListItemElemIndex(),
-					d2Type == null ? JDBCType.JAVA_OBJECT : d2Type);
-		}
-	}
 	/** {@inheritDoc } */
 	@Override
 	public void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException
@@ -568,11 +528,80 @@ public abstract class ComboBox2<K,D,D2>
 				: null;
 	}
 
+	private static final ModelType DEFAULT_COMBO_MODEL = ModelType.SWING;
+
+	/**
+	 * To build a ComboBox2 with the specified parameters.
+	 * 
+	 * @param <K>
+	 * @param <D>
+	 * @param <D2>
+	 * @param <T> 
+	 */
+	public abstract static class AbstractB<K, D, D2, T extends AbstractB<K, D, D2, T>> {
+		private ModelType modelType = DEFAULT_COMBO_MODEL;
+		private boolean d2DisplayEnabled;
+
+		/** {@link ModelType#GLAZED} or {@link ModelType#SWING};
+		 * default: {@link ModelType#SWING}.
+		 * @param val
+		 * @return  */
+		public T modelType(ModelType val) {
+			modelType = Objects.requireNonNull(val);
+			return self();
+		}
+
+		/**
+		 * Should {@code <D2>} values be displayed; default: false.
+		 * @param val
+		 * @return 
+		 */
+		public T d2DisplayEnabled(boolean val) {
+			d2DisplayEnabled = val;
+			return self();
+		}
+
+		/** @return */
+		@SuppressWarnings("unchecked")
+		protected abstract T self();
+
+		/** @return the created ComboBox2 */
+		public abstract ComboBox2<K, D, D2> build();
+	}
+
+	/**
+	 * Builder.
+	 * @param <K>
+	 * @param <D>
+	 * @param <D2> 
+	 */
+	public static class Builder<K, D, D2> extends AbstractB<K, D, D2, Builder<K, D, D2>> {
+
+		/** self type idiom */
+		@Override
+		protected Builder<K, D, D2> self() { return this; }
+
+		/** Create ComboBox2 */
+		@Override
+		public ComboBox2<K, D, D2> build() { return new ComboBox2<>(this); }
+
+	}
+
+	/**
+	 * 
+	 * @param builder 
+	 */
+	protected ComboBox2(AbstractB<K, D, D2, ?> builder) {
+		this(builder.modelType);
+		d2DisplayEnabled = builder.d2DisplayEnabled;
+	}
+
 	/**
 	 * Create BaseComboBox, uses {@link ModelType#SWING}.
 	 */
+	// Keep a default contructor publicly available.
 	public ComboBox2() {
-		this(ModelType.SWING);
+		this(new Builder<>());
 	}
 
 	/**
@@ -580,7 +609,7 @@ public abstract class ComboBox2<K,D,D2>
 	 * @param modelType whether to use SWING or GLAZED combo model
 	 */
 	@SuppressWarnings("LeakingThisInConstructor")
-	public ComboBox2(ModelType modelType) {
+	private ComboBox2(ModelType modelType) {
 		addItemListener(new ComboBox2ItemListener());
 		finishSSCommon();
 
@@ -597,6 +626,34 @@ public abstract class ComboBox2<K,D,D2>
 		case SWING -> BaseModel.install(this);
 		};
 		keyVisual.setListItemFormat(new ShowKeyIfNullDisplayValue());
+	}
+
+	private boolean hasD2;
+
+	/** This returns whether or not {@code <D2>} is populated.
+	 * @return 
+	 */
+	public boolean hasD2() {
+		return hasD2;
+	}
+
+	private boolean d2DisplayEnabled;
+
+	/**
+	 * Should {@code <D2>} values be displayed.
+	 * @return 
+	 */
+	public boolean getD2DisplayEnabled() {
+		return d2DisplayEnabled;
+	}
+
+	/**
+	 * Set the flag controlling whether or not to display {@code <D2>}.
+	 * This should be done before the combobox is populated.
+	 * @param d2DisplayEnabled 
+	 */
+	public void setD2DisplayEnabled(boolean d2DisplayEnabled) {
+		this.d2DisplayEnabled = d2DisplayEnabled;
 	}
 
 	/**
@@ -624,6 +681,26 @@ public abstract class ComboBox2<K,D,D2>
 	 */
 	public final SSListItemFormat getListItemFormat() {
 		return keyVisual.getListItemFormat();
+	}
+
+	/**
+	 * This is called after the combobox is populated with items.
+	 * Both hasD2() and getD2DisplayEnabled() must be true
+	 * to display {@code <D2>}.
+	 * This method sets up the format based on {@code <D>} and {@code <D2>}
+	 * JDBCTypes. {@link SSListItemFormat} can be used directly after
+	 * the data is populated to orverride this.
+	 * @param displayValueType
+	 * @param d2Type
+	 */
+	protected void establishListItemFormat(JDBCType displayValueType, JDBCType d2Type) {
+		getListItemFormat().clear();
+		getListItemFormat().addElemType(keyVisual.getDisplayValueListItemElemIndex(),
+				displayValueType);
+		if (hasD2() && getD2DisplayEnabled()) {
+			getListItemFormat().addElemType(keyVisual.getD2ListItemElemIndex(),
+					d2Type == null ? JDBCType.JAVA_OBJECT : d2Type);
+		}
 	}
 
 

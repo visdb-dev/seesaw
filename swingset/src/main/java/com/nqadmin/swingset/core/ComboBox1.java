@@ -37,25 +37,46 @@ package com.nqadmin.swingset.core;
  * @param <D> displayValue type
  */
 @SuppressWarnings("serial")
-public abstract class ComboBox1<K,D> extends ComboBox2<K, D, Object>
+public class ComboBox1<K,D> extends ComboBox2<K, D, Object>
 {
 	/**
-	 * Creates an object of ComboBox.
+	 * Builder; see {@link ComboBox2.Builder}.
+	 * @param <K>
+	 * @param <D>
+	 * @param <T> 
 	 */
-	public ComboBox1() {
-		this(ModelType.SWING);
+	public abstract static class AbstractB<K, D, T extends AbstractB<K, D, T>>
+			extends ComboBox2.AbstractB<K, D, Object, T> {
+	}
+
+	/** Builder.
+	 * @param <K>
+	 * @param <D> 
+	 */
+	public static class Builder<K, D> extends AbstractB<K, D, Builder<K, D>> {
+
+		/** self type idiom */
+		@Override
+		protected Builder<K, D> self() { return this; }
+
+		/** create ComboBox1 */
+		@Override
+		public ComboBox1<K, D> build() { return new ComboBox1<>(this); }
+
+	}
+
+	/**
+	 * @param builder 
+	 */
+	protected ComboBox1(AbstractB<K, D, ?> builder) {
+		super(builder);
 	}
 
 	/**
 	 * Creates an object of ComboBox.
-	 * <p>
-	 * If useGlazedLists is specified, it is configured strict.
-	 * Use {@link #getAutoComplete() } to change its configuration
-	 * 
-	 * @param modelType whether to use SWING or GLAZED combo model
+	 * Default: see {@link ComboBox2}.
 	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	public ComboBox1(ModelType modelType) {
-		super(modelType);
+	public ComboBox1() {
+		this(new ComboBox1.Builder<>());
 	}
 }

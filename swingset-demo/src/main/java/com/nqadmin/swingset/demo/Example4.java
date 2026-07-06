@@ -74,7 +74,8 @@ import com.nqadmin.swingset.utils.SSUtils;
  * controls have to be synchronized. This is accomplished with the
  * SSSyncManager.
  * <p>
- * IMPORTANT: The SSDBComboBox and the SSRowSet queries should select the same
+ * IMPORTANT: If SSDBSupport.getDefault().createRownumQuery is not available,
+ * the SSDBComboBox and the SSRowSet queries should select the same
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
@@ -97,10 +98,8 @@ public class Example4 extends JFrame {
 	JLabel lblPartCity = new JLabel("City");
 
 	class MyComboBox2<D2> extends ComboBox2<Integer, String, D2> {
-
-		public MyComboBox2(ModelType modelType)
-		{
-			super(modelType);
+		public MyComboBox2(ModelType modelType) {
+			super(new ComboBox2.Builder<Integer, String, D2>().modelType(modelType));
 		}
 	}
 
@@ -169,16 +168,26 @@ public class Example4 extends JFrame {
 				"*", "rown", "part_data", "ORDER BY part_name");
 
 		boolean comboHasRowNum = false;
+
 		if (query != null) {
-			cmbSelectPart = new SSDBComboBox(comboModelType, connection,
-					query, "part_id", "part_name");
-			cmbSelectPart.setD2ColumnName("rown");
 			comboHasRowNum = true;
 		} else {
-			cmbSelectPart = new SSDBComboBox(comboModelType, connection,
-					orderedQuery, "part_id", "part_name");
+			query = orderedQuery;
 		}
-		// cmbSelectPart.setD2DisplayEnabled(true);
+
+		SSDBComboBox.Builder builder = new SSDBComboBox.Builder();
+		builder.modelType(comboModelType)
+				//.connection(connection)
+				.query(query)
+				.primaryKeyColumnName("part_id")
+				.displayColumnName("part_name");
+		if (comboHasRowNum)
+			builder.d2ColumnName("rown");
+
+		// builder.d2DisplayEnabled(true);
+
+		cmbSelectPart = builder.build();
+
 		
 		try {
 			cmbSelectPart.execute();
@@ -191,12 +200,16 @@ public class Example4 extends JFrame {
 		// Setup the part color combo box options to be displayed and their
 		// corresponding values.
 		
-		// cmbPartColor.setD2DisplayEnabled(true);
-		// cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"), null,
-		// 		List.of((byte)3, (byte)5, (byte)7));
+		if (Boolean.TRUE) {
+			// This is the normal case, specify an option for each mapping
+			cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"), null);
+		} else {
+			// For testing, indlude <D2> values and display them.
+			cmbPartColor.setD2DisplayEnabled(true);
+			cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"), null,
+					List.of((byte)3, (byte)5, (byte)7));
+		}
 
-		// This is the normal case, specify an option for each mapping
-		cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"), null);
 		
 		// This is used to initialize some stuff for Example4Advanced
 		cmbPartColorChangeOptions();

@@ -51,8 +51,28 @@ import com.nqadmin.swingset.core.ComboBox1;
 @SuppressWarnings("serial")
 public class SSComboBox extends ComboBox1<Integer, String>
 {
+	/** Builder */
+	public static class Builder
+			extends ComboBox1.AbstractB<Integer, String, Builder> {
+
+		/** self type idiom */
+		@Override protected Builder self() { return this; }
+
+		/** @return */
+		@Override
+		public SSComboBox build()
+		{
+			return new SSComboBox(this);
+		}
+	}
+
+	/** @param builder */
+	private SSComboBox(Builder builder) { super(builder); }
+
 	/**
-	 * Creates an object of SSComboBox.
+	 * Creates an SSComboBox.
+	 * GlazedLists is configured strict.
+	 * Use {@link #getAutoComplete() } to change its configuration.
 	 */
 	public SSComboBox() {
 		this(ModelType.GLAZED);
@@ -61,13 +81,12 @@ public class SSComboBox extends ComboBox1<Integer, String>
 	/**
 	 * Creates an object of SSComboBox.
 	 * <p>
-	 * If useGlazedLists is specified, it is configured strict.
-	 * Use {@link #getAutoComplete() } to change its configuration
+	 * If GlazedLists is specified, it is configured strict.
+	 * Use {@link #getAutoComplete() } to change its configuration.
 	 * 
 	 * @param modelType whether to use SWING or GLAZED combo model
 	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	public SSComboBox(ModelType modelType) {
-		super(modelType);
+		this(new Builder().modelType(modelType));
 	}
 } // end public class SSComboBox extends JComboBox {

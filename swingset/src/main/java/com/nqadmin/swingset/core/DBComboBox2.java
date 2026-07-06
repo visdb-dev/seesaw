@@ -53,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -94,149 +95,193 @@ import static java.lang.System.Logger.Level.*;
  * 
  * {@snippet class=ComboBoxSnippets region=init}
  * 
- * @param <K> key type
- * @param <D> displayValue type
- * @param <D2> optional extra data field type
+ * @param <K> list item key type
+ * @param <D> list item displayValue type
+ * @param <D2> list item optional extra data field type
  */
 @SuppressWarnings("serial")
-public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
+public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 {
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * Format for any date columns displayed in combo box.
-	 */
-	// TODO: Use a SSFormat.
-	private String dateFormat = "MM/dd/yyyy";
-
-	/**
-	 * The database column used to populate the first visible column of the combo
-	 * box.
-	 */
-	private String displayColumnName = "";
-
-	/**
-	 * counter for # times that execute() method is called - for testing
-	 */
-	// TODO remove this
-	protected int executeCount = 0;
 
 	/**
 	 * The column name used to query the values for the bound column keys.
 	 * This is generally the PK of the table to which a foreign key is mapped.
 	 * NOTE: This is NOT the bound column. It is the source of the keys.
 	 */
-	private String primaryKeyColumnName = "";
+	private String primaryKeyColumnName;
 
-	/** database connection to populate combobox */
-	private Connection connection = null;
+	/** The database column that populates the displayValue of combo list item. */
+	private String displayColumnName;
 
-	/**
-	 * Query used to populate combo box.
-	 */
-	private String query = "";
+	/** The database column that populates the (optional) data of combo list item. */
+	private String d2ColumnName;
 
-	/**
-	 * The database column used to populate the second (optional) visible column of
-	 * the combo box.
-	 */
-	private String d2ColumnName = null;
+	/** Query used to populate combo box. */
+	private String query;
+
+	/** database connection to populate combobox, optional. */
+	private Connection connection;
+
+	/** Format for any date columns displayed in combo box. */
+	// TODO: Use a SSFormat.
+	private String dateFormat = DEFAULT_DATE_FORMAT;
+
+	/** counter for # times that execute() method is called - for testing. */
+	protected int executeCount = 0;
 
 	// TODO: configuration option
-	private static final ModelType DEFAULT_MODEL = ModelType.GLAZED;
+	private static final ModelType DEFAULT_DBCOMBO_MODEL = ModelType.GLAZED;
+	private static final String DEFAULT_DATE_FORMAT = "MM/dd/yyyy";
 
 	/**
-	 * Creates an object of the DBComboBox.
-	 * @param modelType chose glazed or swing
+	 * To build a DBComboBox2 with the specified parameters.
+	 * @param <K>
+	 * @param <D>
+	 * @param <D2> 
+	 * @param <T> 
 	 */
-	public DBComboBox2(ModelType modelType) {
-		super(modelType);
-		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
-		keyVisual.setD2Enabled(false);
+	public abstract static class AbstractB<K, D, D2, T extends AbstractB<K, D, D2, T>>
+			extends ComboBox2.AbstractB<K, D, D2, T>
+	{
+		// all parameters are optional, at least for now
+		private Connection connection;
+		private String query;
+		private String primaryKeyColumnName;
+		private String displayColumnName;
+		private String d2ColumnName;
+		private String dateFormat = DEFAULT_DATE_FORMAT;
+
+		/**
+		 * AbstractB
+		 */
+		public AbstractB() {
+			// DBComboBox2 has a different default than ComboBox2, so set that up.
+			super.modelType(DEFAULT_DBCOMBO_MODEL);
+		}
+
+		/**
+		 * Database connection to use to populate the combobox.
+		 * If not set, used shared connection from lookup.
+		 * @param val
+		 * @return 
+		 */
+		public T connection(Connection val) {
+			connection = val;
+			return self();
+		}
+		/**
+		 * query used to retrieve the values to display in
+		 * the combo from the database. 
+		 * @param val
+		 * @return 
+		 */
+		public T query(String val) {
+			checkString(val, "query");
+			query = val;
+			return self();
+		}
+		/**
+		 * column name from the query to populate the {@code Key}
+		 * field of the combobox list item.
+		 * @param val
+		 * @return 
+		 */
+		public T primaryKeyColumnName(String val) {
+			checkString(val, "primaryKeyColumnName");
+			primaryKeyColumnName = val;
+			return self();
+		}
+		/**
+		 * column name from the query to populate the {@code displayValue}
+		 * field of the combobox list item.
+		 * @param val
+		 * @return 
+		 */
+		public T displayColumnName(String val) {
+			checkString(val, "displayColumnName");
+			displayColumnName = val;
+			return self();
+		}
+		/**
+		 * Sets the column name from the query to populate the
+		 * {@code <D2>} field of the combobox list item.
+		 * If null, the default, or blank then there is no {@code <D2>}
+		 * Use this if there's extra data to store in the
+		 * combobox list item.
+		 * @param val
+		 * @return 
+		 */
+		public T d2ColumnName(String val) {
+			d2ColumnName = val;
+			return self();
+		}
+		/**
+		 * 
+		 * When a displayed column is of type date use this format to display it.
+		 * For the pattern refer SimpleDateFormat in java.text package.
+		 * @param val
+		 * @return 
+		 */
+		public T dateFormat(String val) {
+			dateFormat = val;
+			return self();
+		}
+	}
+
+	/** Builder.
+	 * @param <K>
+	 * @param <D>
+	 * @param <D2> */
+	public static class Builder<K, D, D2> extends AbstractB<K, D, D2, Builder<K, D, D2>> {
+
+		/** self type idiom */
+		@Override
+		protected Builder<K, D, D2> self() { return this; }
+
+		/** Create DBComboBox2 */
+		@Override
+		public DBComboBox2<K, D, D2> build() { return new DBComboBox2<>(this); }
+
+	}
+
+	private static void checkString(String val, String tag) {
+		if (val == null || val.isBlank())
+			throw new IllegalArgumentException(tag + " must not be null or blank");
 	}
 
 	/**
-	 * Creates an object of the DBComboBox, uses {@link ModelType#GLAZED}.
+	 *
+	 * @param builder
+	 */
+	protected DBComboBox2(AbstractB<K, D, D2, ?> builder) {
+		super(builder);
+		// TODO: error checking: query/primaryK, displayC all must be set.
+		if (builder.primaryKeyColumnName == null || builder.primaryKeyColumnName.isBlank()
+				|| builder.displayColumnName == null || builder.displayColumnName.isBlank())
+			throw new IllegalArgumentException(
+					"Specify both primaryKeyColumnName and displayColumnName.");
+
+
+		connection = builder.connection;
+		query = builder.query;
+		primaryKeyColumnName = builder.primaryKeyColumnName;
+		displayColumnName = builder.displayColumnName;
+
+		d2ColumnName = builder.d2ColumnName;
+		keyVisual.setD2Enabled(hasD2());
+
+		dateFormat = builder.dateFormat;
+		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
+	}
+
+	/**
+	 * Create a DBComboBox2.
 	 */
 	public DBComboBox2() {
-		this(DEFAULT_MODEL);
-	}
-	
-	/**
-	 * Constructs a DBComboBox with the given parameters. It is best practice
-	 * to pair setQuery() and execute() when building a screen where
-	 * DBComboBoxes may need to be re-queried so this is the preferred constructor.
-	 *
-	 * @param connection           database connection to be used.
-	 * @param primaryKeyColumnName column name used to query/generate the combo
-	 *                             Keys
-	 * @param displayColumnName    column name used to query/generate the combo
-	 *                             DisplayValues
-	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({ "all", "OverridableMethodCallInConstructor" })
-	public DBComboBox2(Connection connection, String primaryKeyColumnName,
-			String displayColumnName) {
-		this(DEFAULT_MODEL, connection, primaryKeyColumnName, displayColumnName);
-	}
-	
-	/**
-	 * Constructs a DBComboBox with the given parameters. It is best practice
-	 * to pair setQuery() and execute() when building a screen where
-	 * DBComboBoxes may need to be re-queried so this is the preferred constructor.
-	 *
-	 * @param modelType
-	 * @param connection           database connection to be used.
-	 * @param primaryKeyColumnName column name used to query/generate the combo
-	 *                             Keys
-	 * @param displayColumnName    column name used to query/generate the combo
-	 *                             DisplayValues
-	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({ "all", "OverridableMethodCallInConstructor" })
-	public DBComboBox2(ModelType modelType, Connection connection,
-			String primaryKeyColumnName, String displayColumnName) {
-		this(modelType, connection, null, primaryKeyColumnName, displayColumnName);
-	}
+		this(new Builder<>());
 
-	/**
-	 * Constructs a DBComboBox with the given parameters.
-	 *
-	 * @param connection          database connection to be used.
-	 * @param query               query to be used to retrieve the values to display in
-	 *                            the combo from the database.
-	 * @param primaryKeyColumnName column name used to query/generate the combo Keys
-	 * @param displayColumnName    column name used to query/generate the combo DisplayValues
-	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	// TODO: Need to handle multi-column key?
-	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
-	public DBComboBox2(Connection connection, String query,
-			String primaryKeyColumnName, String displayColumnName) {
-		this(DEFAULT_MODEL, connection, query, primaryKeyColumnName, displayColumnName);
-	}
-
-	/**
-	 * Constructs a DBComboBox with the given parameters.
-	 *
-	 * @param modelType			   GLAZED or SWING
-	 * @param connection           database connection to be used.
-	 * @param query                query to be used to retrieve the values to display in
-	 *                             the combo from the database.
-	 * @param primaryKeyColumnName column name used to query/generate the combo Keys
-	 * @param displayColumnName    column name used to query/generate the combo DisplayValues
-	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	// TODO: Need to handle multi-column key?
-	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
-	public DBComboBox2(ModelType modelType, Connection connection, String query,
-			String primaryKeyColumnName, String displayColumnName) {
-		this(modelType);
-		setConnection(connection);
-		setQuery(query);
-		setPrimaryKeyColumnName(primaryKeyColumnName);
-		setDisplayColumnName(displayColumnName);
 	}
 
 	/**
@@ -270,20 +315,20 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * Populates the list model with the data by fetching it from the database.
 	 */
 	private void queryData() {
+		logger.log(DEBUG, () -> sf("%s Query [%s].", getColumnForLog(), getQuery()));
+
 		// this.data.getReadWriteLock().writeLock().lock();
 		try (Model.Remodel remodel = keyVisual.getRemodel()) {
 			logger.log(TRACE, () -> sf("%s Clearing eventList.", getColumnForLog()));
 			remodel.clear();
 			nullItem = null;
 
-			logger.log(DEBUG, () -> sf("%s Nulls allowed? [%s].",
+			logger.log(DEBUG, () -> sf("%s Nulls allowed? %s.",
 									   getColumnForLog(), getAllowNull()));
 			adjustForNullItem();
 
 			Statement statement = getConnection().createStatement();
 			try (ResultSet rs = statement.executeQuery(getQuery());) {
-				
-				logger.log(DEBUG, () -> sf("%s Query [%s].", getColumnForLog(), getQuery()));
 				
 				List<SSListItem> newItems = new ArrayList<>();
 				while (rs.next()) {
@@ -325,22 +370,13 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Sets the Connection to the database to populate combobox.
-	 *
-	 * @param connection the connection to set
-	 */
-	private void setConnection(Connection connection) {
-		this.connection = connection;
-	}
-
-	/**
 	 * Returns the Connection to the database to populate combobox.
 	 *
 	 * @return the connection
 	 */
-	// TODO: should this be getSharedConnection? Not necessarily, what does it get you?
-	private Connection getConnection() {
-		return connection;
+	private Connection getConnection() throws SQLException {
+		return connection == null
+				? SSDBSupport.getDefault().getSharedConnection(null) : connection;
 	}
 
 	/**
@@ -362,19 +398,9 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Sets database column (normally a primary key) from which to query the keys
-	 * for the bound column.
+	 * Returns the pattern in which dates are displayed.
 	 *
-	 * @param primaryKeyColumnName name of the PK value to query for the bound column keys
-	 */
-	private void setPrimaryKeyColumnName(final String primaryKeyColumnName) {
-		this.primaryKeyColumnName = primaryKeyColumnName;
-	}
-
-	/**
-	 * Returns the pattern in which dates have to be displayed
-	 *
-	 * @return returns the pattern in which dates have to be displayed
+	 * @return
 	 */
 	public String getDateFormat() {
 		return dateFormat;
@@ -399,15 +425,6 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	public String getDisplayColumnName() {
 		return displayColumnName;
-	}
-
-	/**
-	 * Sets the column name whose values have to be displayed in combo box.
-	 *
-	 * @param displayColumnName column name whose values have to be displayed.
-	 */
-	private void setDisplayColumnName(final String displayColumnName) {
-		this.displayColumnName = displayColumnName;
 	}
 
 	// NOTE: IF A LIST OF THE STRINGS IN COMBOBOX IS WANTED,
@@ -493,9 +510,9 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * @param query query to be used to get values from database (to display combo
 	 *               box items)
 	 */
-	// TODO: get rid of this, add query as argument to execute()?
-	//       In any event, should it call execute?
+	// TODO: Should this method call execute?
 	public void setQuery(final String query) {
+		checkString("query", query);
 		this.query = query;
 	}
 

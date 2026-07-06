@@ -248,7 +248,7 @@ public class TestBaseComponents extends JFrame
 	SSCheckBox chkSSCheckBox = new SSCheckBox("labeled checkbox");
 	SSComboBox cmbSSComboBox = new SSComboBox();
 	SSComboBox cmbEnumSSComboBox = new SSComboBox();
-	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
+	SSDBComboBox cmbSSDBComboBox;
 	SSImage imgSSImage = new SSImage();
 	SSLabel lblSSLabel2 = new SSLabel();
 	final SSList lstSSList;

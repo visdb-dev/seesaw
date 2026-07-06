@@ -54,24 +54,33 @@ import com.nqadmin.swingset.core.DBComboBox2;
 public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 {
 	/**
-	 * Create SSDBComboBox
-	 * @param modelType
+	 * Builder.
 	 */
-	public SSDBComboBox(ModelType modelType)
-	{
-		super(modelType);
+	public static class Builder
+			extends DBComboBox2.AbstractB<Long, Object, Object, Builder> {
+		/** self type idiom */
+		@Override protected Builder self() { return this; }
+
+		/** @return */
+		@Override public SSDBComboBox build() { return new SSDBComboBox(this); }
 	}
+	/** @param builder */
+	private SSDBComboBox(Builder builder) { super(builder); }
 
 	/**
-	 * Create SSDBComboBox
+	 * Create SSDBComboBox with GlazedLists.
+	 * GlazedLists is configured strict.
+	 * Use {@link #getAutoComplete() } to change its configuration.
 	 */
 	public SSDBComboBox()
 	{
-		super();
+		this(new Builder().modelType(ModelType.GLAZED));
 	}
 
 	/**
-	 * Create SSDBComboBox
+	 * Create SSDBComboBox with GlazedLists.
+	 * GlazedLists is configured strict.
+	 * Use {@link #getAutoComplete() } to change its configuration.
 	 * 
 	 * @param _connection
 	 * @param _primaryKeyColumnName
@@ -80,25 +89,19 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 	public SSDBComboBox(Connection _connection,
 						String _primaryKeyColumnName, String _displayColumnName)
 	{
-		super(_connection, _primaryKeyColumnName, _displayColumnName);
+		this(new Builder()
+				.modelType(ModelType.GLAZED)
+				.connection(_connection)
+				.primaryKeyColumnName(_primaryKeyColumnName)
+				.displayColumnName(_displayColumnName)
+		);
 	}
 
 	/**
-	 * Create SSDBComboBox
+	 * Create SSDBComboBox with GlazedLists.
+	 * GlazedLists is configured strict.
+	 * Use {@link #getAutoComplete() } to change its configuration.
 	 * 
-	 * @param modelType
-	 * @param _connection
-	 * @param _primaryKeyColumnName
-	 * @param _displayColumnName 
-	 */
-	public SSDBComboBox(ModelType modelType, Connection _connection,
-						String _primaryKeyColumnName, String _displayColumnName)
-	{
-		super(modelType, _connection, _primaryKeyColumnName, _displayColumnName);
-	}
-
-	/**
-	 * Create SSDBComboBox
 	 * @param _connection
 	 * @param _query
 	 * @param _primaryKeyColumnName
@@ -107,21 +110,13 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 	public SSDBComboBox(Connection _connection, String _query,
 						String _primaryKeyColumnName, String _displayColumnName)
 	{
-		super(_connection, _query, _primaryKeyColumnName, _displayColumnName);
-	}
-
-	/**
-	 * Create SSDBComboBox
-	 * @param modelType
-	 * @param _connection
-	 * @param _query
-	 * @param _primaryKeyColumnName
-	 * @param _displayColumnName 
-	 */
-	public SSDBComboBox(ModelType modelType, Connection _connection, String _query,
-						String _primaryKeyColumnName, String _displayColumnName)
-	{
-		super(modelType, _connection, _query, _primaryKeyColumnName, _displayColumnName);
+		this(new Builder()
+				.modelType(ModelType.GLAZED)
+				.connection(_connection)
+				.query(_query)
+				.primaryKeyColumnName(_primaryKeyColumnName)
+				.displayColumnName(_displayColumnName)
+		);
 	}
 
 	public void setSecondDisplayColumnName(final String secondDisplayColumnName) {
