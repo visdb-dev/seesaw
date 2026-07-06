@@ -53,13 +53,14 @@ import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 /**
  * This example displays data from the part_data table.
@@ -111,9 +112,7 @@ public class Example4 extends JFrame {
 	SSDataNavigator navigator = null;
 	RowsModel rowsModel;
 
-	/**
-	 * combo navigator and sync manger
-	 */
+	/** combo navigator and sync manger */
 	SSDBComboBox cmbSelectPart = null;
 	SSSyncManager syncManager;
 
@@ -154,10 +153,28 @@ public class Example4 extends JFrame {
 		
 		// Setup navigator query.
 		// Use the "order by" to exercise SSSyncManager's "perform a manual loop"
-		final String query = Boolean.FALSE
-				? "SELECT * FROM part_data;"
-				: "SELECT * FROM part_data order by part_name;";
-		cmbSelectPart = new SSDBComboBox(connection, query, "part_id", "part_name");
+		@SuppressWarnings("unused")
+		String simpleQuery = "SELECT * FROM part_data;";
+		@SuppressWarnings("unused")
+		String orderedQuery = "SELECT * FROM part_data order by part_name;";
+		String query = SSDBSupport.getDefault().createRownumQuery(
+				"*", "rown", "part_data", "ORDER BY part_name");
+
+		boolean comboHasRowNum = false;
+		if (query != null) {
+			// cmbSelectPart = new DBComboBox2<Long, String, Long>(connection, query,
+			// 		"part_id", "part_name");
+			// cmbSelectPart = new MyNavCombo(connection, query,
+			// 		"part_id", "part_name");
+
+			cmbSelectPart = new SSDBComboBox(connection, query,
+					"part_id", "part_name");
+			cmbSelectPart.setD2ColumnName("rown");
+			comboHasRowNum = true;
+		} else {
+			cmbSelectPart = new SSDBComboBox(connection, orderedQuery,
+					"part_id", "part_name");
+		}
 		
 		try {
 			cmbSelectPart.execute();
@@ -192,6 +209,7 @@ public class Example4 extends JFrame {
 		// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
 		syncManager = new SSSyncManager(cmbSelectPart, rowsModel);
 		syncManager.setSyncColumnName("part_id");
+		syncManager.setComboHasRowNum(comboHasRowNum);
 		syncManager.sync();
 		
 		// SET LABEL DIMENSIONS

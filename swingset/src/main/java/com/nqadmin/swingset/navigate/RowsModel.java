@@ -536,25 +536,44 @@ public final class RowsModel
 	}
 
 	/**
+	 * Use this after directly moving the cursor around, to get the
+	 * spinner back in sync
+	 * @return 
+	 */
+	// Maybe some of the Spinner logic should go into the SpinnerModel logic.
+	// In particular the resync. Also maybe the model should have a reference
+	// to the spinner, create a RowNumberSpinnerModel that only has reference.
+	public int syncRowNumber() {
+		return getRow(true);
+	}
+
+	/**
 	 * Return the associated RowSet's current row number.
 	 * @return row number
 	 */
 	public int getRow() {
+		return getRow(false);
+	}
+
+	private int getRow(boolean isSync) {
 		int spin_row = getSpinnerModel().getNumber().intValue();
-		if (Boolean.TRUE) { // consistency check
-			try {
-				int rs_row = getRowSet().getRow();
-				if (spin_row != rs_row) {
-					// TODO: Instruct to use rowsModel.setRow().
+		try {
+			int rs_row = getRowSet().getRow();
+			if (spin_row != rs_row) {
+				// TODO: Instruct to use rowsModel.setRow().
+				if (!isSync)
 					logger.log(ERROR, sf("spinner model, %d, out of sync with row set %d",
 							spin_row, rs_row), new IllegalStateException("getRow sync"));
-					// RESYNC SPINNER
-					setRow(getRowSet().getRow());
-					spin_row = rs_row;
-				}
-			} catch (SQLException ex) {
-				// TODO: random sql exception
+				// RESYNC SPINNER
+				setRow(rs_row);
+				int spin_row2 = getSpinnerModel().getNumber().intValue();
+				int rs_row2 = getRowSet().getRow();
+				if (spin_row2 != rs_row || rs_row != rs_row2)
+					throw new IllegalStateException("Spinner failed to sync");
+				spin_row = rs_row;
 			}
+		} catch (SQLException ex) {
+			// TODO: random sql exception
 		}
 		return spin_row;
 	}

@@ -42,10 +42,8 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.System.Logger;
 
@@ -115,6 +113,7 @@ public class RowNumberSpinner extends JSpinner
 		// Each RowSet has it's own SpinnerModel.
 		// Need to note model change to update spinner, no gain in wrapping spinner model.
 		@WeakSubscribe
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		public void handleNewRowSetEvent(RowsModelNewRowSetEvent ev)
 		{
 			if (ev.getRowsModel() != rowsModel)
@@ -158,9 +157,11 @@ public class RowNumberSpinner extends JSpinner
 	private final ChangeListener changeListener = (evt) -> {
 		if (rowsModel.getRowSet() == null)
 			return;
-		rowsModel.getAction(RowsAction.ACT_GOTOROW)
-				.actionPerformed(new ActionEvent(RowNumberSpinner.this,
-				AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
+		// This has problems with Example 4, nav combo not updating fields.
+		// rowsModel.getAction(RowsAction.ACT_GOTOROW)
+		// 		.actionPerformed(new ActionEvent(RowNumberSpinner.this,
+		// 		AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
+		rowsModel.getAction(RowsAction.ACT_GOTOROW).actionPerformed(null);
 	};
 
 	private void internalChangeSpinnerModel()

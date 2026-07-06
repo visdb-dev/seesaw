@@ -145,7 +145,7 @@ public class RowNumberSpinnerTest
 		events.clear();
 		assertTrue(EQ.invokeLatchWait("tick3", s -> LOG.log(INFO, s), null,
 				() -> model1.setRowSet(rs2)));
-		assertEquals(1, events.size());
+		assertEquals(2, events.size());
 		checkGoto(); // initialize state
 		// rs2 has 5 rows
 		assertEquals(5, spinner.getModel().getMaximum());
@@ -171,7 +171,7 @@ public class RowNumberSpinnerTest
 		events.clear();
 		assertTrue(EQ.invokeLatchWait("tick6", s -> LOG.log(INFO, s), null,
 				() -> model1.setRowSet(rs1)));
-		assertEquals(1, events.size());
+		assertEquals(2, events.size());
 		checkGoto(); // initialize state
 
 		// rs1 has 4 rows

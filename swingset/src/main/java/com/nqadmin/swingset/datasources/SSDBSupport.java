@@ -48,9 +48,11 @@ import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
+import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.RowSetOps.DbUpdate;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.utils.SSSyncManager;
 
 
 /**
@@ -116,6 +118,45 @@ public interface SSDBSupport {
 			DbUpdater<RowSet, Integer, SSComponent, Object> columnUpdater)
 			throws SQLException {
 		return columnUpdater.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
+	}
+
+	/**
+	 * Create a query that contains the row number of a non "order by" query.
+	 * When used in conjunction with a {@link DBComboBox2} which is acting as
+	 * a combobox navigator, the row number is used to avoid sequential searches
+	 * table searches in {@link SSSyncManager}.
+	 * For example, given {@snippet lang="java":
+	 * sup.createRownumQuery("part_id, part_name",
+	 *                       "rown",
+	 *                       "part_data",
+	 *                       "ORDER BY part_name");
+	 * }
+	 * The {@code H2} {@code SSDBSupport} uses the the {@code H2} builtin
+	 * function {@code ROWNUM()}
+	 * and returns the string {@snippet :
+	 * SELECT part_id, part_name, ROWNUM() AS rown
+	 * FROM part_data
+	 * ORDER BY part_name;
+	 * }
+	 * <p>
+	 * Note that Mariadb has ROWNUM() and Oracle has ROWNUM; they perform
+	 * a similar function. Other databases use ROW_NUMBER() in more complex
+	 * windowed queries, example fragment of a more complex query: {@snippet :
+	 * ROW_NUMBER() OVER(ORDER BY (SELECT NULL))
+	 * }
+	 * refer to your database documentation, or AI assistant, when implementing
+	 * this method.
+	 * 
+	 * @param selectColumns could be "*"
+	 * @param rownumberColumn
+	 * @param tableName
+	 * @param trailingClause for example "ORDER BY someCol"
+	 * @return query or null
+	 */
+	// Mariadb: ROWNUM(), oracle has ROWNUM.
+	default String createRownumQuery(String selectColumns, String rownumberColumn,
+			String tableName, String trailingClause) {
+		return null;
 	}
 
 	/**

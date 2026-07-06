@@ -55,6 +55,7 @@ import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -62,9 +63,12 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * Used to synchronize a data navigator and a navigation ComboBox.
- * <p>
- * IMPORTANT: The SSDBComboBox and the RowSet queries should select the same
- * records and in the same order. Otherwise the SSSyncManager will spend a lot of
+ * The combobox may contain the original row number, see
+ * {@link SSDBSupport#createRownumQuery(String, String, String, String) },
+ * {@link SSDBComboBox#setD2ColumnName(String)}
+ * and {@link #setComboHasRowNum(boolean)}<br>
+ * <b>Otherwise</b>: The SSDBComboBox and the RowSet queries should select the same
+ * records and in the same order; if not, the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
 // TODO: SSSyncManager combo key is hardcoded to Long.
@@ -145,16 +149,18 @@ public class SSSyncManager
 				// TODO: does autocommit/canModify/dirty need to be checked?
 				rowsModel.commit();
 				
-				final int indexOfPK = comboBox.getKeys().indexOf(comboPK) + 1;
+				final int guessRowNumber = comboHasRowNum
+						? ((Long)comboBox.getChosenD2()).intValue()
+						: comboBox.getKeys().indexOf(comboPK) + 1;
 				logger.log(DEBUG, ()->sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
-						rowsetPK, comboPK, indexOfPK));
+						rowsetPK, comboPK, guessRowNumber));
 				
-				getRowSet().absolute(indexOfPK);
+				getRowSet().absolute(guessRowNumber);
 				
 				final int numRecords = comboBox.getItemCount();
 				int count = 0;
 				
-				// If after positioning the rowset index at the combo index, the values
+				// If after positioning the rowset, the values
 				// don't match, perform a manual loop to try to find a match presuming
 				// records could be added/deleted by other connections, don't loop through
 				// all of the records more than once plus a cushion of "OFFSET_TO_CHECK"
@@ -183,7 +189,7 @@ public class SSSyncManager
 						int rowsetSearchFrom = 1;
 						
 						if (numRecords>OFFSET_TO_CHECK) {
-							rowsetSearchFrom = indexOfPK - OFFSET_TO_CHECK;
+							rowsetSearchFrom = guessRowNumber - OFFSET_TO_CHECK;
 						}
 						if (rowsetSearchFrom<1) {
 							rowsetSearchFrom += numRecords;
@@ -215,7 +221,7 @@ public class SSSyncManager
 			// TODO: would be nice not to need this; but...
 			// There is direct RowSet cursor positioning (not through RowsModel),
 			// so sync the RowsModel/spinner
-			rowsModel.setRow(getRowSet().getRow());
+			rowsModel.syncRowNumber();
 		}
 	}
 
@@ -346,6 +352,9 @@ public class SSSyncManager
 	
 
 	/** RowSet column used as basis for synchronization. */
+	private boolean comboHasRowNum;
+
+	/** RowSet column used as basis for synchronization. */
 	private String syncColumnName;
 
 
@@ -375,7 +384,16 @@ public class SSSyncManager
 	public void setSyncColumnName(final String syncColumnName) {
 		this.syncColumnName = syncColumnName;
 	}
-
+	
+	/**
+	 * Set this to true if the combobox item element has the rownumber
+	 * of the RowSet in {@code <D2>}.
+	 * @param comboHasRowNum
+	 */
+	public void setComboHasRowNum(boolean comboHasRowNum) {
+		this.comboHasRowNum = comboHasRowNum;
+	}
+	
 	/**
 	 * Stop synchronization between navigation components.
 	 */

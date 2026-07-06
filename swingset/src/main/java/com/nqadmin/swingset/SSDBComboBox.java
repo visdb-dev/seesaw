@@ -86,4 +86,12 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 		super(_connection, _query, _primaryKeyColumnName, _displayColumnName);
 	}
 
+	public void setSecondDisplayColumnName(final String secondDisplayColumnName) {
+		super.setD2ColumnName(secondDisplayColumnName);
+	}
+
+	public void setSeparator(final String separator) {
+		getListItemFormat().setSeparator(separator);
+	}
+
 }

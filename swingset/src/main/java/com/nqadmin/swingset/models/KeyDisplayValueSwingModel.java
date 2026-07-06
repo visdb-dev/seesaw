@@ -173,13 +173,13 @@ public class KeyDisplayValueSwingModel<K,D,D2> extends AbstractComboBoxListSwing
 	
 	/**
 	 * Change whether the layout of an SSListItem managed by this class
-	 * contains an displayValue. An exception is thrown if the item list is not empty. An
- existing displayValue2 list {@link #getDisplayValues2}
+	 * contains an displayValue. An exception is thrown if the item list is not empty.
+	 * An existing displayValue2 list {@link #getDisplayValues2}
 	 * is invalidated or validated accordingly.
 	 * @param displayValue2Enabled true if list item shall contain displayValue
 	 */
 	public void setDisplayValue2Enabled(boolean displayValue2Enabled) {
-		if(displayValue2Enabled == displayValue2Enabled) {
+		if(this.displayValue2Enabled == displayValue2Enabled) {
 			return;
 		}
 		if (!getItemList().isEmpty()) {

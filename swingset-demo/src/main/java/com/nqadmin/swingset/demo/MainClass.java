@@ -83,6 +83,7 @@ import javax.swing.SwingUtilities;
 
 import org.h2.tools.RunScript;
 
+import com.nqadmin.swingset.datasources.DbSupportFactory;
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
 import com.nqadmin.swingset.datasources.SSDBSupport;
@@ -392,14 +393,25 @@ public class MainClass extends JFrame
 			System.exit(1);
 		}
 
+		String databaseID = "";
 		try {
 			dbMeta = dbConnection.getMetaData();
-			Objects.isNull(dbMeta);
+			databaseID = dbMeta.getDatabaseProductName()
+							+ " " + dbMeta.getDatabaseProductVersion();
+			System.err.printf("Database product '%s', version '%s', MajMin '%s'\n",
+					dbMeta.getDatabaseProductName(),
+					dbMeta.getDatabaseProductVersion(),
+					"" + dbMeta.getDatabaseMajorVersion()
+							+ ":" + dbMeta.getDatabaseMinorVersion());
 		} catch (SQLException ex) {
 		}
 		
-		CentralLookup.getDefault().replace(
-				SSDBSupport.class, new DefaultSSDBSupport(dbConnection) { });
+		SSDBSupport supp = DbSupportFactory.setupLookup(dbConnection);
+		if (supp == null) {
+			logger.log(Level.ERROR, sf("No SSDBSupport found for '%s'", databaseID));
+			CentralLookup.getDefault().replace(
+					SSDBSupport.class, new DefaultSSDBSupport(dbConnection) { });
+		}
 
 		// ADD ACTION LISTENERS FOR BUTTONS
 		// TODO: can share listener OR add arg that can be switched on.

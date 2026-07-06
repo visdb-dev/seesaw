@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nqadmin.swingset.models.SSListItem;
+import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
@@ -62,54 +63,18 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * Similar to the ComboBox, but used when both the 'bound' values and the
- * 'display' values are pulled from a database table. The bound value is called
- * the 'key' and the display value the 'option'. An 'option2' may be
- * specified; in that case the display value for the key is a composite of
- * option and option2. Generally the key represents a foreign key to another
- * table, and the combobox needs to display a list of one (or more) columns from
+ * Similar to the ComboBox2, but used when both the 'bound' values and the
+ * 'display' value are pulled from a database table. The bound value is called
+ * the 'key' and the display value the 'option', which appears in the combo box.
+ * <p>
+ * This is sometimes used as a Navigator in conjunction with {@link SSSyncManager}.
+ * Generally the key represents a foreign key to another
+ * table, and the combobox displays the {@code <D>} from
  * the other table.
+ * A 2nd data, {@code <D2>} may be
+ * specified.
  * <p>
- * The inherited {@link com.nqadmin.swingset.models.SSListItemFormat} is used, see {@link
- * #getListItemFormat()}; it provides the default separator.
- * Several methods inherited from ComboBox2 directly manipulate the combobox
- * contents. These methods throw UnsupportedOperationException.
- * <p>
- * <b>Warning. This combobox may use GlazedLists which changes the contents
- * of the combo box and an item is automatically
- * inserted when {@link #getAllowNull()} is true. Do not use methods
- * that are based on index in the combo box list, unless you're sure...</b>
- * 
- * For example use 
- * {@link ComboBox2#getChosenKey() getChosenKey()}
- * not something that is based on {@code getSelectedIndex()}.
- * Change the current combo box item with methods
- * such as:
- * {@link ComboBox2#setChosenKey(java.lang.Object) setChosenKey(Long)}
- * and
- * {@link ComboBox2#setChosenDisplayValue(java.lang.Object) setChosenDisplayValue(String)}.
- * Use the methods {@link ComboBox2#hasItems() hasItems() } and
- * {@link ComboBox2#hasSelection() hasSelection() } which take into account
- * {@code getAllowNull()}.
- * <p>
- * Notice that {@link #getChosenKey() }
- * returns null in two situations related to {@link #getAllowNull() }
- * <ul>
- *   <li>nothing is selected in this combo box
- *   <li>the <em>nullItem</em> is selected in this combo box
- * </ul>
- * <p>
- * {@code getSelectedItem() == null } indicates there is no
- * combo box selection; it is different than {@code !hasSelection()}
- * when {@code getAllowNull()} is true.
- * <p>
- * If subclasses need to work directly with the combo box model,
- * refer to {@link com.nqadmin.swingset.models.KeyDisplayValueSwingModel}
- * and especially
- * {@link com.nqadmin.swingset.models.KeyDisplayValueSwingModel.Remodel}
- * <p>
- * Note, if changing both a rowSet and column name consider using the bind()
- * method rather than individual setRowSet() and setColumName() calls.
+ * <b>Refer to {@link ComboBox2} for warnings and caveats.</b>
  * <p>
  * <b>Example</b>: consider two tables
  * <ol>
@@ -133,7 +98,7 @@ import static java.lang.System.Logger.Level.*;
  * @param <D2> displayValue2 type
  */
 @SuppressWarnings("serial")
-public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
+public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 {
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
@@ -142,13 +107,13 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * Format for any date columns displayed in combo box.
 	 */
 	// TODO: Use a SSFormat.
-	protected String dateFormat = "MM/dd/yyyy";
+	private String dateFormat = "MM/dd/yyyy";
 
 	/**
 	 * The database column used to populate the first visible column of the combo
 	 * box.
 	 */
-	protected String displayColumnName = "";
+	private String displayColumnName = "";
 
 	/**
 	 * counter for # times that execute() method is called - for testing
@@ -161,7 +126,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * This is generally the PK of the table to which a foreign key is mapped.
 	 * NOTE: This is NOT the bound column. It is the source of the keys.
 	 */
-	protected String primaryKeyColumnName = "";
+	private String primaryKeyColumnName = "";
 
 	/** database connection to populate combobox */
 	private Connection connection = null;
@@ -169,13 +134,13 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	/**
 	 * Query used to populate combo box.
 	 */
-	protected String query = "";
+	private String query = "";
 
 	/**
 	 * The database column used to populate the second (optional) visible column of
 	 * the combo box.
 	 */
-	protected String secondDisplayColumnName = null;
+	private String d2ColumnName = null;
 
 	// TODO: configuration option
 	private static final ModelType USE_GLAZED_MODEL = ModelType.GLAZED;
@@ -183,11 +148,11 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	/**
 	 * Creates an object of the DBComboBox.
 	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	public DBComboBox2() {
 		super(USE_GLAZED_MODEL);
 
 		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
+		keyVisual.setDisplayValue2Enabled(false);
 	}
 	
 	/**
@@ -257,94 +222,6 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Returns the pattern in which dates have to be displayed
-	 *
-	 * @return returns the pattern in which dates have to be displayed
-	 */
-	public String getDateFormat() {
-		return dateFormat;
-	}
-
-	/**
-	 * Returns the column name whose values are displayed in the combo box.
-	 *
-	 * @return returns the name of the column used to get values for combo box
-	 *         items.
-	 */
-	public String getDisplayColumnName() {
-		return displayColumnName;
-	}
-
-	// NOTE: IF A LIST OF THE STRINGS IN COMBOBOX IS WANTED,
-	//		 THEN THE FOLLOWING CAN BE USED.
-
-	// List<String> displayValues = new ArrayList<>();
-	// try (Model.Remodel remodel = comboInfo.getRemodel()) {
-	// 	List<SSListItem> items = remodel.getEventList();
-	// 	for(SSListItem item : items) {
-	// 		displayValues.add(getListItemFormat.format(item));
-	// 	}
-	// }
-	// return displayValues;
-
-	/**
-	 * Returns the second column name whose values are also displayed in the combo
-	 * box.
-	 *
-	 * @return returns the name of the column used to get values for combo box
-	 *         items. returns NULL if the second display column is not provided.
-	 */
-	public String getSecondDisplayColumnName() {
-		return secondDisplayColumnName;
-	}
-
-	/**
-	 * Returns the text displayed in the combobox.
-	 *
-	 * @return value corresponding to the selected item in the combo. return null if
-	 *         no item is selected.
-	 */
-	public String getSelectedStringValue() {
-		Object currentItem = getSelectedItem();
-		return currentItem != null ? getListItemFormat().format(currentItem) : null;
-	}
-
-	/**
-	 * Returns the separator used when multiple columns are displayed
-	 *
-	 * @return separator used.
-	 */
-	public String getSeparator() {
-		return getListItemFormat().getSeparator();
-	}
-
-	private boolean hasDisplayValue2() {
-		return secondDisplayColumnName != null && !secondDisplayColumnName.isEmpty();
-	}
-
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	protected boolean isComboBoxNavigator() {
-		return getColumnName() == null;
-	}
-
-	/**
-	 * After this, make some adjustments.
-	 * {@inheritDoc }
-	 * 
-	 * Deprecated in SSComponentInterface.
-	 * @deprecated Use bind()
-	 */
-	@Override
-	@Deprecated
-	public void setBoundColumnName(String boundColumnName) {
-		super.setBoundColumnName(boundColumnName);
-		adjustForNullItem();
-	}
-
-	/**
 	 * Populates the list model with the data by fetching it from the database.
 	 */
 	private void queryData() {
@@ -364,9 +241,9 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 				getListItemFormat().clear();
 				getListItemFormat().addElemType(keyVisual.getDisplayValueListItemElemIndex(),
 						getJDBCColumnType(rs, rs.findColumn(displayColumnName)));
-				if (hasDisplayValue2()) {
+				if (hasD2()) {
 					getListItemFormat().addElemType(keyVisual.getDisplayValue2ListItemElemIndex(),
-							getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
+							getJDBCColumnType(rs, rs.findColumn(d2ColumnName)));
 				}
 				
 				logger.log(DEBUG, () -> sf("%s Query [%s].", getColumnForLog(), getQuery()));
@@ -385,8 +262,8 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 					logger.log(TRACE, () -> sf("%s pk: %s, opt: %s",
 							pk, getColumnForLog(), opt));
 					D2 opt2;
-					if (hasDisplayValue2()) {
-						opt2 = convertToType(rs.getObject(secondDisplayColumnName),
+					if (hasD2()) {
+						opt2 = convertToType(rs.getObject(d2ColumnName),
 											 getDisplayValue2Type());
 						logger.log(TRACE, () -> sf("%s opt2: %s", getColumnForLog(), opt2));
 					} else {
@@ -425,39 +302,11 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * When a display column is of type date you can choose the format in which it
-	 * has to be displayed. For the pattern refer SimpleDateFormat in java.text package.
-	 *
-	 * @param dateFormat pattern in which dates have to be displayed
+	 * {@inheritDoc }
 	 */
-	public void setDateFormat(final String dateFormat) {
-		final String oldValue = this.dateFormat;
-		this.dateFormat = dateFormat;
-		firePropertyChange("dateFormat", oldValue, this.dateFormat);
-		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
-	}
-
-	/**
-	 * Sets the column name whose values have to be displayed in combo box.
-	 *
-	 * @param displayColumnName column name whose values have to be displayed.
-	 */
-	private void setDisplayColumnName(final String displayColumnName) {
-		final String oldValue = this.displayColumnName;
-		this.displayColumnName = displayColumnName;
-		firePropertyChange("displayColumnName", oldValue, this.displayColumnName);
-	}
-
-	/**
-	 * Sets database column (normally a primary key) from which to query the keys
-	 * for the bound column.
-	 *
-	 * @param primaryKeyColumnName name of the PK value to query for the bound column keys
-	 */
-	private void setPrimaryKeyColumnName(final String primaryKeyColumnName) {
-		final String oldValue = this.primaryKeyColumnName;
-		this.primaryKeyColumnName = primaryKeyColumnName;
-		firePropertyChange("primaryKeyColumnName", oldValue, this.primaryKeyColumnName);
+	@Override
+	protected boolean isComboBoxNavigator() {
+		return getColumnName() == null;
 	}
 
 	/**
@@ -471,16 +320,121 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Sets the query used to display items in the combo box.
+	 * Sets database column (normally a primary key) from which to query the keys
+	 * for the bound column.
 	 *
-	 * @param query query to be used to get values from database (to display combo
-	 *               box items)
+	 * @param primaryKeyColumnName name of the PK value to query for the bound column keys
 	 */
-	// get rid of this, add query as argument to execute()?
-	public void setQuery(final String query) {
-		final String oldValue = this.query;
-		this.query = query;
-		firePropertyChange("query", oldValue, this.query);
+	private void setPrimaryKeyColumnName(final String primaryKeyColumnName) {
+		this.primaryKeyColumnName = primaryKeyColumnName;
+	}
+
+	/**
+	 * Returns the pattern in which dates have to be displayed
+	 *
+	 * @return returns the pattern in which dates have to be displayed
+	 */
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	/**
+	 * When a display column is of type date you can choose the format in which it
+	 * has to be displayed. For the pattern refer SimpleDateFormat in java.text package.
+	 *
+	 * @param dateFormat pattern in which dates have to be displayed
+	 */
+	public void setDateFormat(final String dateFormat) {
+		this.dateFormat = dateFormat;
+		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
+	}
+
+	/**
+	 * Returns the column name whose values are displayed in the combo box.
+	 *
+	 * @return returns the name of the column used to get values for combo box
+	 *         items.
+	 */
+	public String getDisplayColumnName() {
+		return displayColumnName;
+	}
+
+	/**
+	 * Sets the column name whose values have to be displayed in combo box.
+	 *
+	 * @param displayColumnName column name whose values have to be displayed.
+	 */
+	private void setDisplayColumnName(final String displayColumnName) {
+		this.displayColumnName = displayColumnName;
+	}
+
+	// NOTE: IF A LIST OF THE STRINGS IN COMBOBOX IS WANTED,
+	//		 THEN THE FOLLOWING CAN BE USED.
+
+	// List<String> displayValues = new ArrayList<>();
+	// try (Model.Remodel remodel = comboInfo.getRemodel()) {
+	// 	List<SSListItem> items = remodel.getEventList();
+	// 	for(SSListItem item : items) {
+	// 		displayValues.add(getListItemFormat.format(item));
+	// 	}
+	// }
+	// return displayValues;
+
+	/**
+	 * Returns the second column name whose values are also displayed in the combo
+	 * box.
+	 *
+	 * @return returns the name of the column used to get values for combo box
+	 *         items. returns NULL if the second display column is not provided.
+	 */
+	public String getD2ColumnName() {
+		return d2ColumnName;
+	}
+
+	/**
+	 * Sets the second display name. If more than one column have to displayed
+	 * then use this. For the parts example given above. If you have a part
+	 * description in part table. Then you can display both part name and part description.
+	 *
+	 * @param d2ColumnName column name whose values have to be displayed
+	 *                                 in the combo in addition to the first column
+	 *                                 name.
+	 */
+	public void setD2ColumnName(final String d2ColumnName) {
+		this.d2ColumnName = d2ColumnName;
+		keyVisual.setDisplayValue2Enabled(hasD2());
+	}
+
+	/**
+	 * Returns the text displayed in the combobox.
+	 *
+	 * @return value corresponding to the selected item in the combo. return null if
+	 *         no item is selected.
+	 */
+	public String getSelectedStringValue() {
+		Object currentItem = getSelectedItem();
+		return currentItem != null ? getListItemFormat().format(currentItem) : null;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public final boolean hasD2() {
+		return d2ColumnName != null && !d2ColumnName.isEmpty();
+	}
+
+	/**
+	 * {@inheritDoc }
+	 * @throws IllegalStateException if displayValue2 enabled
+	 */
+	// TODO: Needed? Remove.
+	@Override
+	public void setChosenDisplayValue(D displayValue) {
+		if (hasD2()) {
+			throw new IllegalStateException("displayValue2 enabled");
+		}
+		super.setChosenDisplayValue(displayValue);
 	}
 
 	/**
@@ -493,46 +447,19 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Sets the second display name. If more than one column have to displayed
-	 * then use this. For the parts example given above. If you have a part
-	 * description in part table. Then you can display both part name and part description.
+	 * Sets the query used to display items in the combo box.
 	 *
-	 * @param secondDisplayColumnName column name whose values have to be displayed
-	 *                                 in the combo in addition to the first column
-	 *                                 name.
+	 * @param query query to be used to get values from database (to display combo
+	 *               box items)
 	 */
-	public void setSecondDisplayColumnName(final String secondDisplayColumnName) {
-		final String oldValue = this.secondDisplayColumnName;
-		this.secondDisplayColumnName = secondDisplayColumnName;
-		keyVisual.setDisplayValue2Enabled(hasDisplayValue2());
-		firePropertyChange("secondDisplayColumnName", oldValue, this.secondDisplayColumnName);
-	}
-
-	/**
-	 * Set the separator to be used when multiple columns are displayed
-	 *
-	 * @param separator separator to be used.
-	 */
-	// TODO: 2026-04-29_BP: Make this private? Used in SSFormViewScreenHelper. Maybe set in a Constructor?
-	public void setSeparator(final String separator) {
-		final String oldValue = getListItemFormat().getSeparator();
-		getListItemFormat().setSeparator(separator);
-		firePropertyChange("separator", oldValue, separator);
-	}
-
-	/**
-	 * {@inheritDoc }
-	 * @throws IllegalStateException if displayValue2 enabled
-	 */
-	@Override
-	public void setChosenDisplayValue(D displayValue) {
-		if (hasDisplayValue2()) {
-			throw new IllegalStateException("displayValue2 enabled");
-		}
-		super.setChosenDisplayValue(displayValue);
+	// TODO: get rid of this, add query as argument to execute()?
+	//       In any event, should it call execute?
+	public void setQuery(final String query) {
+		this.query = query;
 	}
 
 	/** {@inheritDoc } */
+	// TODO: Needed? Remove.
 	@Override
 	public boolean updateDisplayValue(K key, D displayValue)
 	{
@@ -579,6 +506,20 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	@Override
 	public <T extends Enum<T>> void setDisplayValues(Class<T> enumDisplayValues) {
 		throw new UnsupportedOperationException("DBComboBox doesn't support");
+	}
+
+	/**
+	 * After this, make some adjustments.
+	 * {@inheritDoc }
+	 * 
+	 * Deprecated in SSComponentInterface.
+	 * @deprecated Use bind()
+	 */
+	@Override
+	@Deprecated
+	public void setBoundColumnName(String boundColumnName) {
+		super.setBoundColumnName(boundColumnName);
+		adjustForNullItem();
 	}
 
 } // end public class DBComboBox

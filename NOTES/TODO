@@ -110,11 +110,19 @@ Knowing the root container may help to automate using SimpleValidation.
 
 ================================================================================
 
-DbMetadataCache
-    Cach
+DbMetaDataCache
+
+Note: some information is not necessarily safe to cache.
+google search: "with jdbc is it safe to cache databasemetadata"
+
+Make this a selective cache. In particular Static/Driver info,
+capabilities/Limits. But not tables & Column details.
+Then no worry about needing to flush in some cases.
+
+Grab only what's needed for DbOpsCustomizer.
 
 
-Using metadata to detect deleted rows.
+Using metadata to detect deleted rows. Could filter without re-executing query.
     DatabaseMetaData.ownDeletesAreVisible vs DatabaseMetaData.deletesAreDetected Controversy
     https://stackoverflow.com/questions/38214241/databasemetadata-owndeletesarevisible-vs-databasemetadata-deletesaredetected-con
 
@@ -130,7 +138,7 @@ non-intrusive dialog with please wait (but only if somethings taking too long)
 
 javadoc
 -------
-Supported column types
+Supported column types and mention DbRead/DbWriter for other cases.
 
 ================================================================================
 
@@ -158,6 +166,13 @@ DBComboBox2
     - firePropertyChange, needed? Ifso use eventbus? setSeparator()
     - If a metadatachange is issued when setAllowNull is manually change
       then combobox2 would not need to override setallownull. BUT TEST.
+    - dateFormat needs work. Use SSFormat.
+    - get rid of "fire..."
+
+
+================================================================================
+
+Use builders to create components. Also to set properties.
 
 ================================================================================
 
@@ -651,7 +666,7 @@ SSSyncManager - Rework combo navigation somehow
       Implement it in DBComboBox?
     - Maybe SSSyncManager needs to be in navigation.
     - Maybe this combo navigator stuff needs specialized broadcast/events.
-    - genericize for key type: SSSyncManager<K>
+    - genericize for key type: SSSyncManager<K,RN>
     - Handle multiple Navigators
 
 

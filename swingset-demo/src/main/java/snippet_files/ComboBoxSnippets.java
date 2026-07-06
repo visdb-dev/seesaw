@@ -8,9 +8,8 @@ import javax.sql.RowSet;
 import javax.sql.rowset.JdbcRowSet;
 import javax.swing.JFrame;
 
-import com.nqadmin.swingset.SSComboBox;
-import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.core.ComboBox1;
+import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.core.Item1;
 import com.nqadmin.swingset.navigate.RowsModel;
 
@@ -21,7 +20,7 @@ import com.nqadmin.swingset.navigate.RowsModel;
 public class ComboBoxSnippets extends JFrame
 {
 	RowsModel rowsModel;
-	SSDBComboBox combo;
+	DBComboBox2<Long, String, Long> combo;
 
 	// @start region=init
 	/**
@@ -38,7 +37,7 @@ public class ComboBoxSnippets extends JFrame
 			rowSet.setCommand("SELECT * FROM shipment_data;");
 			rowSet.execute();
 			
-			// 2nd arg is SSDBNav, if null use default.
+			// 2nd arg is DbOps, if null use default.
 			rowsModel = RowsModel.create(rowSet, null);
 			
 			// Query for the combobox to map part_id to part_name.
@@ -46,7 +45,7 @@ public class ComboBoxSnippets extends JFrame
 			
 			// Create an instance of the SSDBComboBox with the connection object,
 			// query, and column names.
-			combo = new SSDBComboBox(connection, query, "part_id","part_name");
+			combo = new DBComboBox2<>(connection, query, "part_id","part_name") {};
 			
 			// Execute the query.
 			combo.execute();
@@ -66,9 +65,9 @@ public class ComboBoxSnippets extends JFrame
 	@SuppressWarnings("unused")
 	void autoGen() {
 		// @start region=auto_gen
-		SSComboBox combo = new SSComboBox();
+		ComboBox1<Long, String> combobox = new ComboBox1<>(){};
 		List<String> options = List.of("111", "2222", "33333");
-		combo.setDisplayValues(options);
+		combobox.setDisplayValues(options);
 		// @end region=auto_gen
 	}
 
@@ -77,15 +76,15 @@ public class ComboBoxSnippets extends JFrame
 	@SuppressWarnings("unused")
 	void customKey() {
 		// @start region=custom_key
-		SSComboBox combo = new SSComboBox();
+		ComboBox1<Integer, String> combobox = new ComboBox1<>(){};
 		List<String> options = List.of("111", "2222", "33333");
 		// The keys used in "my_column".
 		List<Integer> keys = List.of(1, 5, 7 );
-		combo.setDisplayValues(options, keys);
+		combobox.setDisplayValues(options, keys);
 		
 		// Next line is assuming rowsModel has been initialized
 		// and "my_column" is a column in its rowSet.
-		rowsModel.bind(combo, "my_column");
+		rowsModel.bind(combobox, "my_column");
 		// @end region=custom_key
 	}
 

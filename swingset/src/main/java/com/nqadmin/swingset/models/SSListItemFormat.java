@@ -95,6 +95,7 @@ import static java.lang.System.Logger.Level.*;
  */
 // TODO: Change to use java.time formatters.
 // TODO: API for specifying system wide defaults? Lookup?
+// TODO: interoperability with SSFormat
 @SuppressWarnings("serial")
 public class SSListItemFormat extends Format {
 	//TODO: Put default formats into a common location (not in SSListItemFormat).

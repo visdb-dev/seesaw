@@ -103,13 +103,12 @@ import static java.lang.System.Logger.Level.*;
  * these models have static methods for hooking things up to the JComboBox,
  * see {@linkplain ModelType}, which may be used in constructors to select the model type.
  * <p>
- * <b>Warning</b>.<br>
+ * <b>Warning:
  * This combo box automatically inserts an item when {@link #getAllowNull()} is true.
  * This comboBox may use GlazedLists which dynamically changes the contents
  * of the combo box list.
  * Do not use methods that are based on index in the combo box list, unless
- * you're sure...
- * <p>
+ * you're sure...</b>
  * For example use 
  * {@link ComboBox2#getChosenKey() getChosenKey()}
  * not something that is based on {@code getSelectedIndex()}.
@@ -532,7 +531,7 @@ public abstract class ComboBox2<K,D,D2>
 			getKeyType();
 		} catch(ClassCastException ex) {
 			throw new IllegalStateException(
-					sf("Non generic subclass required, like '%s<...>(){}'",
+					sf("Non generic subclass required, need '{}', like 'new %s<...>(){}'",
 							getClass().getSimpleName()),
 					ex);
 		}
@@ -882,7 +881,7 @@ public abstract class ComboBox2<K,D,D2>
 	 * {@snippet class=ComboBoxSnippets region=chosen_item}
 	 * @return the chosen item
 	 */
-	// TODO: neturn new Item2<>(SSListItem)
+	// TODO: return new Item2<>(SSListItem)
 	protected Item2<K,D,D2> getChosenItem() {
 		return new Item2<>(getChosenKey(), getChosenDisplayValue());
 	}
@@ -1097,7 +1096,7 @@ public abstract class ComboBox2<K,D,D2>
 	 * @return returns the DisplayValue object associated with the selected item
 	 * OR null if nothing is selected.
 	 */
-	public D2 getChosenDisplayValue2() {
+	public D2 getChosenD2() {
 		D2 result = null;
 		try (Model.Remodel remodel = keyVisual.getRemodel()) {
 			Object item = getSelectedItem();
