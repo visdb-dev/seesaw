@@ -157,7 +157,13 @@ public enum UndoRedo
 		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
 				comp.getClass().getSimpleName(), comp.getColumnName()));
 		try {
-			NavigateState navState = comp.getRowsModel().getNavState();
+			RowsModel rm;
+			if (comp.getColumnName() == null || (rm = comp.getRowsModel()) == null) {
+				SSUtils.beep();
+				return;
+			}
+
+			NavigateState navState = rm.getNavState();
 			Change change = navState.doUndoRedo(comp, cmd);
 			// Wait until value propogates to the component.
 			if (change != NO_CHANGE)

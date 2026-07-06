@@ -44,7 +44,7 @@ import ca.odell.glazedlists.EventList;
  * see {@link KeyDisplayValueSwingModel.Remodel}.
  * @param <K> key type; key is typically primary key
  * @param <D> displayValue type; displayValue provides display string
- * @param <D2>  displayValue2 type; if present, supplementary display string
+ * @param <D2>  d2 type; if present, extra data
  * 
  * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion javadoc</a>
  * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/AutoCompleteSupport.wmv" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion Video</a>
@@ -57,12 +57,12 @@ public class GlazedListsKeyDisplayValueInfo<K,D,D2> extends KeyDisplayValueSwing
 
 	/**
 	 * Create an empty ComboInfo.
-	 * @param displayValue2Enabled true says to provide an options2 field in SSListItem
+	 * @param d2Enabled true says to provide an options2 field in SSListItem
 	 * @param eventList which is installed into AutoCompleteSupport
 	 */
-	public GlazedListsKeyDisplayValueInfo(boolean displayValue2Enabled,
+	public GlazedListsKeyDisplayValueInfo(boolean d2Enabled,
 										  EventList<SSListItem> eventList) {
-		super(displayValue2Enabled, eventList);
+		super(d2Enabled, eventList);
 		this.eventList = eventList;
 	}
 

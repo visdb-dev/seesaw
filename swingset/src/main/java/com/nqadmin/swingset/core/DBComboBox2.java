@@ -71,8 +71,10 @@ import static java.lang.System.Logger.Level.*;
  * Generally the key represents a foreign key to another
  * table, and the combobox displays the {@code <D>} from
  * the other table.
- * A 2nd data, {@code <D2>} may be
- * specified.
+ * <p>
+ * Optional data for combobox item, {@code <D2>}, may be specified,
+ * see {@link #setD2ColumnName(String) }. This data may be displayed by the
+ * SSListItem, see {@link #setD2DisplayEnabled(boolean)} and {@link getListItemFormat()}
  * <p>
  * <b>Refer to {@link ComboBox2} for warnings and caveats.</b>
  * <p>
@@ -92,10 +94,9 @@ import static java.lang.System.Logger.Level.*;
  * 
  * {@snippet class=ComboBoxSnippets region=init}
  * 
- * Initially no DisplayValue2.
  * @param <K> key type
  * @param <D> displayValue type
- * @param <D2> displayValue2 type
+ * @param <D2> optional extra data field type
  */
 @SuppressWarnings("serial")
 public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
@@ -143,16 +144,23 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	private String d2ColumnName = null;
 
 	// TODO: configuration option
-	private static final ModelType USE_GLAZED_MODEL = ModelType.GLAZED;
+	private static final ModelType DEFAULT_MODEL = ModelType.GLAZED;
 
 	/**
 	 * Creates an object of the DBComboBox.
+	 * @param modelType chose glazed or swing
+	 */
+	public DBComboBox2(ModelType modelType) {
+		super(modelType);
+		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
+		keyVisual.setD2Enabled(false);
+	}
+
+	/**
+	 * Creates an object of the DBComboBox, uses {@link ModelType#GLAZED}.
 	 */
 	public DBComboBox2() {
-		super(USE_GLAZED_MODEL);
-
-		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
-		keyVisual.setDisplayValue2Enabled(false);
+		this(DEFAULT_MODEL);
 	}
 	
 	/**
@@ -170,15 +178,34 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	@SuppressWarnings({ "all", "OverridableMethodCallInConstructor" })
 	public DBComboBox2(Connection connection, String primaryKeyColumnName,
 			String displayColumnName) {
-		this(connection, null, primaryKeyColumnName, displayColumnName);
+		this(DEFAULT_MODEL, connection, primaryKeyColumnName, displayColumnName);
+	}
+	
+	/**
+	 * Constructs a DBComboBox with the given parameters. It is best practice
+	 * to pair setQuery() and execute() when building a screen where
+	 * DBComboBoxes may need to be re-queried so this is the preferred constructor.
+	 *
+	 * @param modelType
+	 * @param connection           database connection to be used.
+	 * @param primaryKeyColumnName column name used to query/generate the combo
+	 *                             Keys
+	 * @param displayColumnName    column name used to query/generate the combo
+	 *                             DisplayValues
+	 */
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({ "all", "OverridableMethodCallInConstructor" })
+	public DBComboBox2(ModelType modelType, Connection connection,
+			String primaryKeyColumnName, String displayColumnName) {
+		this(modelType, connection, null, primaryKeyColumnName, displayColumnName);
 	}
 
 	/**
 	 * Constructs a DBComboBox with the given parameters.
 	 *
-	 * @param connection         database connection to be used.
-	 * @param query                query to be used to retrieve the values to display in
-	 *                              the combo from the database.
+	 * @param connection          database connection to be used.
+	 * @param query               query to be used to retrieve the values to display in
+	 *                            the combo from the database.
 	 * @param primaryKeyColumnName column name used to query/generate the combo Keys
 	 * @param displayColumnName    column name used to query/generate the combo DisplayValues
 	 */
@@ -187,7 +214,25 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 	public DBComboBox2(Connection connection, String query,
 			String primaryKeyColumnName, String displayColumnName) {
-		this();
+		this(DEFAULT_MODEL, connection, query, primaryKeyColumnName, displayColumnName);
+	}
+
+	/**
+	 * Constructs a DBComboBox with the given parameters.
+	 *
+	 * @param modelType			   GLAZED or SWING
+	 * @param connection           database connection to be used.
+	 * @param query                query to be used to retrieve the values to display in
+	 *                             the combo from the database.
+	 * @param primaryKeyColumnName column name used to query/generate the combo Keys
+	 * @param displayColumnName    column name used to query/generate the combo DisplayValues
+	 */
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	// TODO: Need to handle multi-column key?
+	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
+	public DBComboBox2(ModelType modelType, Connection connection, String query,
+			String primaryKeyColumnName, String displayColumnName) {
+		this(modelType);
 		setConnection(connection);
 		setQuery(query);
 		setPrimaryKeyColumnName(primaryKeyColumnName);
@@ -237,14 +282,6 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 
 			Statement statement = getConnection().createStatement();
 			try (ResultSet rs = statement.executeQuery(getQuery());) {
-				// Configure the listItemFormat with this queries column types
-				getListItemFormat().clear();
-				getListItemFormat().addElemType(keyVisual.getDisplayValueListItemElemIndex(),
-						getJDBCColumnType(rs, rs.findColumn(displayColumnName)));
-				if (hasD2()) {
-					getListItemFormat().addElemType(keyVisual.getDisplayValue2ListItemElemIndex(),
-							getJDBCColumnType(rs, rs.findColumn(d2ColumnName)));
-				}
 				
 				logger.log(DEBUG, () -> sf("%s Query [%s].", getColumnForLog(), getQuery()));
 				
@@ -264,7 +301,7 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 					D2 opt2;
 					if (hasD2()) {
 						opt2 = convertToType(rs.getObject(d2ColumnName),
-											 getDisplayValue2Type());
+											 getD2Type());
 						logger.log(TRACE, () -> sf("%s opt2: %s", getColumnForLog(), opt2));
 					} else {
 						opt2 = null;
@@ -273,6 +310,11 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 					newItems.add(remodel.createKeyDisplayValueItem(pk, opt, opt2));
 				}
 				remodel.addAll(newItems);
+
+				// Configure the listItemFormat with this queries column types
+				establishListItemFormat(
+						getJDBCColumnType(rs, rs.findColumn(displayColumnName)),
+						hasD2() ? getJDBCColumnType(rs, rs.findColumn(d2ColumnName)) : null);
 			}
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
@@ -285,7 +327,7 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	/**
 	 * Sets the Connection to the database to populate combobox.
 	 *
-	 * @param _connection the connection to set
+	 * @param connection the connection to set
 	 */
 	private void setConnection(Connection connection) {
 		this.connection = connection;
@@ -381,20 +423,18 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	// return displayValues;
 
 	/**
-	 * Returns the second column name whose values are also displayed in the combo
-	 * box.
+	 * Returns the rowSet column name used to populate the {@code <D2>} field of
+	 * the combobox list item.
 	 *
-	 * @return returns the name of the column used to get values for combo box
-	 *         items. returns NULL if the second display column is not provided.
+	 * @return returns the column name {@code <D2>} values
 	 */
 	public String getD2ColumnName() {
 		return d2ColumnName;
 	}
 
 	/**
-	 * Sets the second display name. If more than one column have to displayed
-	 * then use this. For the parts example given above. If you have a part
-	 * description in part table. Then you can display both part name and part description.
+	 * Sets the column name . If there's extra data to store in the 
+	 * combobox list item then use this.
 	 *
 	 * @param d2ColumnName column name whose values have to be displayed
 	 *                                 in the combo in addition to the first column
@@ -402,7 +442,7 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	public void setD2ColumnName(final String d2ColumnName) {
 		this.d2ColumnName = d2ColumnName;
-		keyVisual.setDisplayValue2Enabled(hasD2());
+		keyVisual.setD2Enabled(hasD2());
 	}
 
 	/**
@@ -420,19 +460,20 @@ public abstract class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * 
 	 * @return
 	 */
+	@Override
 	public final boolean hasD2() {
 		return d2ColumnName != null && !d2ColumnName.isEmpty();
 	}
 
 	/**
 	 * {@inheritDoc }
-	 * @throws IllegalStateException if displayValue2 enabled
+	 * @throws IllegalStateException if d2 enabled
 	 */
 	// TODO: Needed? Remove.
 	@Override
 	public void setChosenDisplayValue(D displayValue) {
 		if (hasD2()) {
-			throw new IllegalStateException("displayValue2 enabled");
+			throw new IllegalStateException("d2 enabled");
 		}
 		super.setChosenDisplayValue(displayValue);
 	}

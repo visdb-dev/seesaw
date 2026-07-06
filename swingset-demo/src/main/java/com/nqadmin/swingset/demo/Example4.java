@@ -51,10 +51,10 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.core.ComboBox2;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.datasources.SSDBSupport;
@@ -81,10 +81,10 @@ import com.nqadmin.swingset.utils.SSUtils;
 @SuppressWarnings("serial")
 public class Example4 extends JFrame {
 
-	/**
-	 * Log4j2 Logger
-	 */
+	/** Logger */
     static final Logger logger = SSUtils.getLogger();
+
+	ComboBox2.ModelType comboModelType = ComboBox2.ModelType.GLAZED;
 	
 	/**
 	 * screen label declarations
@@ -96,12 +96,20 @@ public class Example4 extends JFrame {
 	JLabel lblPartWeight = new JLabel("Weight");
 	JLabel lblPartCity = new JLabel("City");
 
+	class MyComboBox2<D2> extends ComboBox2<Integer, String, D2> {
+
+		public MyComboBox2(ModelType modelType)
+		{
+			super(modelType);
+		}
+	}
+
 	/**
 	 * bound component declarations
 	 */
 	SSTextField txtPartID = new SSTextField();
 	SSTextField txtPartName = new SSTextField();
-	SSComboBox cmbPartColor = new SSComboBox();
+	MyComboBox2<Byte> cmbPartColor = new MyComboBox2<>(comboModelType) { };
 	SSTextField txtPartWeight = new SSTextField();
 	SSTextField txtPartCity = new SSTextField();
 
@@ -162,19 +170,15 @@ public class Example4 extends JFrame {
 
 		boolean comboHasRowNum = false;
 		if (query != null) {
-			// cmbSelectPart = new DBComboBox2<Long, String, Long>(connection, query,
-			// 		"part_id", "part_name");
-			// cmbSelectPart = new MyNavCombo(connection, query,
-			// 		"part_id", "part_name");
-
-			cmbSelectPart = new SSDBComboBox(connection, query,
-					"part_id", "part_name");
+			cmbSelectPart = new SSDBComboBox(comboModelType, connection,
+					query, "part_id", "part_name");
 			cmbSelectPart.setD2ColumnName("rown");
 			comboHasRowNum = true;
 		} else {
-			cmbSelectPart = new SSDBComboBox(connection, orderedQuery,
-					"part_id", "part_name");
+			cmbSelectPart = new SSDBComboBox(comboModelType, connection,
+					orderedQuery, "part_id", "part_name");
 		}
+		// cmbSelectPart.setD2DisplayEnabled(true);
 		
 		try {
 			cmbSelectPart.execute();
@@ -187,8 +191,12 @@ public class Example4 extends JFrame {
 		// Setup the part color combo box options to be displayed and their
 		// corresponding values.
 		
+		// cmbPartColor.setD2DisplayEnabled(true);
+		// cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"), null,
+		// 		List.of((byte)3, (byte)5, (byte)7));
+
 		// This is the normal case, specify an option for each mapping
-		cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"));
+		cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"), null);
 		
 		// This is used to initialize some stuff for Example4Advanced
 		cmbPartColorChangeOptions();

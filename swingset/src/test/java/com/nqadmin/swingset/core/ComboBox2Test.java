@@ -170,7 +170,7 @@ public class ComboBox2Test
 		ComboBoxIntStringLongItem cb = new ComboBoxIntStringLongItem();
 		assertEquals(Integer.class, cb.getKeyType());
 		assertEquals(String.class, cb.getDisplayValueType());
-		assertEquals(Long.class, cb.getDisplayValue2Type());
+		assertEquals(Long.class, cb.getD2Type());
 
 		// "Non generic subclass required, like '%s<...>(){}'"
 		assertThrows(IllegalStateException.class, ()->new ComboBoxSub<>());

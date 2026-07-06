@@ -55,9 +55,19 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 {
 	/**
 	 * Create SSDBComboBox
+	 * @param modelType
+	 */
+	public SSDBComboBox(ModelType modelType)
+	{
+		super(modelType);
+	}
+
+	/**
+	 * Create SSDBComboBox
 	 */
 	public SSDBComboBox()
 	{
+		super();
 	}
 
 	/**
@@ -75,6 +85,20 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 
 	/**
 	 * Create SSDBComboBox
+	 * 
+	 * @param modelType
+	 * @param _connection
+	 * @param _primaryKeyColumnName
+	 * @param _displayColumnName 
+	 */
+	public SSDBComboBox(ModelType modelType, Connection _connection,
+						String _primaryKeyColumnName, String _displayColumnName)
+	{
+		super(modelType, _connection, _primaryKeyColumnName, _displayColumnName);
+	}
+
+	/**
+	 * Create SSDBComboBox
 	 * @param _connection
 	 * @param _query
 	 * @param _primaryKeyColumnName
@@ -84,6 +108,20 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 						String _primaryKeyColumnName, String _displayColumnName)
 	{
 		super(_connection, _query, _primaryKeyColumnName, _displayColumnName);
+	}
+
+	/**
+	 * Create SSDBComboBox
+	 * @param modelType
+	 * @param _connection
+	 * @param _query
+	 * @param _primaryKeyColumnName
+	 * @param _displayColumnName 
+	 */
+	public SSDBComboBox(ModelType modelType, Connection _connection, String _query,
+						String _primaryKeyColumnName, String _displayColumnName)
+	{
+		super(modelType, _connection, _query, _primaryKeyColumnName, _displayColumnName);
 	}
 
 	public void setSecondDisplayColumnName(final String secondDisplayColumnName) {

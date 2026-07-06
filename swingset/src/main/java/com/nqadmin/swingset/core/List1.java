@@ -135,7 +135,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 		}
 
 		private Model() {
-			// false means no displayValue2
+			// false means no d2
 			super(false);
 		}
 	}

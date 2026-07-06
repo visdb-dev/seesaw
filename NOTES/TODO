@@ -162,6 +162,8 @@ best practices, use named constraints for better error messages
 
 ================================================================================
 
+SSListItemFormat SSFormat handling.
+
 DBComboBox2
     - firePropertyChange, needed? Ifso use eventbus? setSeparator()
     - If a metadatachange is issued when setAllowNull is manually change

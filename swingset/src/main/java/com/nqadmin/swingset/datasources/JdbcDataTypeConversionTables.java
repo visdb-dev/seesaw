@@ -241,7 +241,9 @@ public class JdbcDataTypeConversionTables {
 				.put(java.sql.Struct.class, STRUCT)
 				.put(java.sql.Ref.class, REF)
 				.put(java.net.URL.class, DATALINK)
-				// java.class JAVA_OBJECT)
+
+				.put(Object.class, JAVA_OBJECT)
+
 				.put(java.sql.RowId.class, ROWID)
 				.put(java.sql.NClob.class, NCLOB)
 				.put(java.sql.SQLXML.class, SQLXML)

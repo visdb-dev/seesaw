@@ -44,7 +44,7 @@ public class Item2<K,D,D2>
 {
 	private final K key;
 	private final D displayValue;
-	private final D2 displayValue2;
+	private final D2 d2;
 
 	private static final Object NO_D2 = new Object();
 
@@ -52,17 +52,17 @@ public class Item2<K,D,D2>
 	 * Create immutable item.
 	 * @param key
 	 * @param displayValue
-	 * @param displayValue2 
+	 * @param d2 
 	 */
-	public Item2(K key, D displayValue, D2 displayValue2)
+	public Item2(K key, D displayValue, D2 d2)
 	{
 		this.key = key;
 		this.displayValue = displayValue;
-		this.displayValue2 = displayValue2;
+		this.d2 = d2;
 	}
 
 	/**
-	 * Create immutable item which does not have a displayValue2.
+	 * Create immutable item which does not have a d2.
 	 * @param key
 	 * @param displayValue 
 	 */
@@ -75,10 +75,10 @@ public class Item2<K,D,D2>
 	/**
 	 * Create immutable item based on SSListItem.
 	 * @param listItem
-	 * @param hasDisplayValue2 
+	 * @param hasD2 
 	 */
 	@SuppressWarnings("unchecked")
-	Item2(SSListItem listItem, boolean hasDisplayValue2)
+	Item2(SSListItem listItem, boolean hasD2)
 	{
 		// li = (ListItem0)listItem;
 		// key = (K)li.getElem(OptionMappingSwingModel.KEY_IDX);
@@ -106,24 +106,24 @@ public class Item2<K,D,D2>
 	}
 
 	/**
-	 * displayValue2 getter.
-	 * Exception if does not have a displayValue2
+	 * d2 getter.
+	 * Exception if does not have a d2
 	 * @return 
 	 */
-	public D2 getDisplayValue2()
+	public D2 getD2()
 	{
-		if (displayValue2 == NO_D2)
-			throw new IllegalStateException("Item does not have displayValue2");
-		return displayValue2;
+		if (d2 == NO_D2)
+			throw new IllegalStateException("Item does not have d2");
+		return d2;
 	}
 
 	/**
-	 * Check if this has a displayValue2
-	 * @return true if there is a displayValue2
+	 * Check if this has a d2
+	 * @return true if there is a d2
 	 */
-	public boolean hasDisplayValue2()
+	public boolean hasD2()
 	{
-		return displayValue2 != NO_D2;
+		return d2 != NO_D2;
 	}
 
 	/** hashCode.
@@ -135,7 +135,7 @@ public class Item2<K,D,D2>
 		int hash = 7;
 		hash = 67 * hash + Objects.hashCode(this.key);
 		hash = 67 * hash + Objects.hashCode(this.displayValue);
-		hash = 67 * hash + Objects.hashCode(this.displayValue2);
+		hash = 67 * hash + Objects.hashCode(this.d2);
 		return hash;
 	}
 
@@ -158,13 +158,13 @@ public class Item2<K,D,D2>
 			return false;
 		if (!Objects.equals(this.displayValue, other.displayValue))
 			return false;
-		return Objects.equals(this.displayValue2, other.displayValue2);
+		return Objects.equals(this.d2, other.d2);
 	}
 
 }
 
 /*
-public record Item2<K,D,D2>(K getKey, D getDisplayValue, D2 getDisplayValue2)
+public record Item2<K,D,D2>(K getKey, D getDisplayValue, D2 getD2)
 {
 	private static final Object NO_D2 = new Object();
 
@@ -175,7 +175,7 @@ public record Item2<K,D,D2>(K getKey, D getDisplayValue, D2 getDisplayValue2)
 	}
 
 	@SuppressWarnings("unchecked")
-	Item2(SSListItem listItem, boolean hasDisplayValue2)
+	Item2(SSListItem listItem, boolean hasD2)
 	{
 		// li = (ListItem0)listItem;
 		// key = (K)li.getElem(OptionMappingSwingModel.KEY_IDX);
@@ -185,16 +185,16 @@ public record Item2<K,D,D2>(K getKey, D getDisplayValue, D2 getDisplayValue2)
 	}
 
 	@Override
-	public D2 getDisplayValue2()
+	public D2 getD2()
 	{
-		if (getDisplayValue2 == NO_D2)
-			throw new IllegalStateException("Item2 does not have displayValue2");
-		return getDisplayValue2;
+		if (getD2 == NO_D2)
+			throw new IllegalStateException("Item2 does not have d2");
+		return getD2;
 	}
 
-	public boolean hasDisplayValue2()
+	public boolean hasD2()
 	{
-		return getDisplayValue2 != NO_D2;
+		return getD2 != NO_D2;
 	}
 }
  */

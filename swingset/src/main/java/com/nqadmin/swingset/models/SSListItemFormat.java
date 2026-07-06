@@ -131,12 +131,12 @@ public class SSListItemFormat extends Format {
 
 		/**
 		 * Type and format for an SSListItem.
-		 * @param _type type
-		 * @param _format format
+		 * @param type type
+		 * @param format format
 		 */
-		protected ElemInfo(JDBCType _type, Format _format) {
-			this.type = _type;
-			this.format = _format;
+		protected ElemInfo(JDBCType type, Format format) {
+			this.type = type;
+			this.format = format;
 		}
 	}
 
@@ -172,20 +172,20 @@ public class SSListItemFormat extends Format {
 	 * the same order as they are added. If the same elemIndex
  	 * is added, the previous information is discarded.
 	 * 
-	 * @param _elemIndex ListItem elemIndex for formatting
-	 * @param _jdbcType type of element
-	 * @param _format format to use for the element, may be null
+	 * @param elemIndex ListItem elemIndex for formatting
+	 * @param jdbcType type of element
+	 * @param format format to use for the element, may be null
 	 */
-	public void addElemType(int _elemIndex, JDBCType _jdbcType, Format _format) {
-		Objects.requireNonNull(_jdbcType);
+	public void addElemType(int elemIndex, JDBCType jdbcType, Format format) {
+		Objects.requireNonNull(jdbcType);
 		// first make sure there's room
-		while (_elemIndex >= elemInfos.size()) {
+		while (elemIndex >= elemInfos.size()) {
 			elemInfos.add(null);
 		}
-		elemInfos.set(_elemIndex, new ElemInfo(_jdbcType, _format));
+		elemInfos.set(elemIndex, new ElemInfo(jdbcType, format));
 
 		// SSListItem is formatted in the order the items are added
-		Integer indexAsObject = _elemIndex;
+		Integer indexAsObject = elemIndex;
 		itemElemIndexes.remove(indexAsObject);
 		itemElemIndexes.add(indexAsObject);
 	}
@@ -196,40 +196,40 @@ public class SSListItemFormat extends Format {
  	 * is added, the previous information is discarded.
 	 * The default Format for this type is used.
 	 * 
-	 * @param _elemIndex ListItem elemIndex for formatting
-	 * @param _jdbcType type of element
+	 * @param elemIndex ListItem elemIndex for formatting
+	 * @param jdbcType type of element
 	 */
-	public void addElemType(int _elemIndex, JDBCType _jdbcType) {
-		addElemType(_elemIndex, _jdbcType, null);
+	public void addElemType(int elemIndex, JDBCType jdbcType) {
+		addElemType(elemIndex, jdbcType, null);
 	}
 
 	/**
 	 * Set the default Format for the specified jdbc type.
 	 * Only the {@link Format#format(Object, StringBuffer, java.text.FieldPosition)}
 	 * method is used with the argument Format.
-	 * @param _jdbcType all elements of this type use the specified format
-	 * @param _format the format
+	 * @param jdbcType all elements of this type use the specified format
+	 * @param format the format
 	 * @return the previous format
 	 */
-	public Format setFormat(JDBCType _jdbcType, Format _format) {
-		return formats.put(_jdbcType, _format);
+	public Format setFormat(JDBCType jdbcType, Format format) {
+		return formats.put(jdbcType, format);
 	}
 
 	/**
 	 * Get the default Format for the specified JDBCType.
-	 * @param _jdbcType format for this
+	 * @param jdbcType format for this
 	 * @return format or null if no format has been set
 	 */
-	public Format getFormat(JDBCType _jdbcType) {
-		return formats.get(_jdbcType);
+	public Format getFormat(JDBCType jdbcType) {
+		return formats.get(jdbcType);
 	}
 
 	/**
 	 * The separator is goes between elements in a formatted string.
-	 * @param _separator the separator
+	 * @param separator the separator
 	 */
-	public void setSeparator(String _separator) {
-		separator = _separator;
+	public void setSeparator(String separator) {
+		this.separator = separator;
 	}
 
 	/**
@@ -279,27 +279,27 @@ public class SSListItemFormat extends Format {
 	 * This method allows overriding classes to access the list item
 	 * elements directly without going through remodel.
 	 *
-	 * @param _elemIndex index of element
-	 * @param _listItem container holding the element
+	 * @param elemIndex index of element
+	 * @param listItem container holding the element
 	 * @return the element
 	 */
-	protected Object getElem(int _elemIndex, SSListItem _listItem) {
-		return ((ListItem0) _listItem).getElem(_elemIndex);
+	protected Object getElem(int elemIndex, SSListItem listItem) {
+		return ((ListItem0) listItem).getElem(elemIndex);
 	}
 
 	/**
 	 * Format the indicated element, by default use toString().
-	 * @param _sb append string value to this
-	 * @param _elemIndex index of element
-	 * @param _listItem container holding the element
+	 * @param sb append string value to this
+	 * @param elemIndex index of element
+	 * @param listItem container holding the element
 	 */
-	protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
-		Object elem = getElem(_elemIndex, _listItem);
+	protected void appendValue(StringBuffer sb, int elemIndex, SSListItem listItem) {
+		Object elem = getElem(elemIndex, listItem);
 		if (elem == null) {
 			return;
 		}
 		
-		ElemInfo elemInfo = elemInfos.get(_elemIndex);
+		ElemInfo elemInfo = elemInfos.get(elemIndex);
 		JDBCType jdbcType = elemInfo.type;
 		Format format = elemInfo.format;
 		if (format == null) {
@@ -307,7 +307,7 @@ public class SSListItemFormat extends Format {
 		}
 		if (format != null) {
 			try {
-				format.format(elem, _sb, FP0);
+				format.format(elem, sb, FP0);
 				return;
 			} catch (Exception ex) {
 				logger.log(ERROR, sf("can't format %s with %s. Exception: %s",
@@ -315,7 +315,7 @@ public class SSListItemFormat extends Format {
 			}
 		}
 		// No formatter, or formatter got an exception
-		_sb.append(elem.toString());
+		sb.append(elem.toString());
 	}
 	
 }

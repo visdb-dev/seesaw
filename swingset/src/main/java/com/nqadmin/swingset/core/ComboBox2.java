@@ -50,8 +50,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.Iterator;
@@ -67,6 +69,7 @@ import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 
 import com.google.common.reflect.TypeToken;
+import com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables;
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.GlazedListsKeyDisplayValueInfo;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
@@ -155,10 +158,10 @@ import static java.lang.System.Logger.Level.*;
  * {@link com.nqadmin.swingset.navigate.RowsModel#bind(com.nqadmin.swingset.utils.SSComponent, java.lang.String) bind()}
  * method to associate the combobox to a database column.
  * <p>
- * Initially no DisplayValue2.
+ * Initially no D2.
  * @param <K> key type
  * @param <D> displayValue type
- * @param <D2> displayValue2 type
+ * @param <D2> d2 type
  * @since 4.0.0
  */
 @SuppressWarnings("serial")
@@ -247,7 +250,7 @@ public abstract class ComboBox2<K,D,D2>
 	 * for building and manipulating the item list.
 	 * @param <K> key type
 	 * @param <D> displayValue type
-	 * @param <D2> displayValue2 type
+	 * @param <D2> d2 type
 	 */
 	protected static class BaseModel<K,D,D2> extends KeyDisplayValueSwingModel<K,D,D2>
 	{
@@ -257,13 +260,13 @@ public abstract class ComboBox2<K,D,D2>
 		 * 
 		 * @param <K> key type
 		 * @param <D> displayValue type
-		 * @param <D2> displayValue2 type
-		 * @param _jc install model into this
+		 * @param <D2> d2 type
+		 * @param jc install model into this
 		 * @return KeyDisplayValue model
 		 */
-		protected static <K,D,D2>BaseModel<K,D,D2> install(ComboBox2<K,D,D2> _jc) {
+		protected static <K,D,D2>BaseModel<K,D,D2> install(ComboBox2<K,D,D2> jc) {
 			BaseModel<K,D,D2> model = new BaseModel<>();
-			AbstractComboBoxListSwingModel.install(_jc, model);
+			AbstractComboBoxListSwingModel.install(jc, model);
 
 			return model;
 		}
@@ -282,7 +285,7 @@ public abstract class ComboBox2<K,D,D2>
 	 * for building and manipulating the EventList and supports locking.
 	 * @param <K> key type
 	 * @param <D> displayValue type
-	 * @param <D2> displayValue2 type
+	 * @param <D2> d2 type
 	 */
 	protected static class BaseGlazedModel<K,D,D2> extends GlazedListsKeyDisplayValueInfo<K,D,D2>
 	{
@@ -299,20 +302,20 @@ public abstract class ComboBox2<K,D,D2>
 		 *
 		 * @param <K> key type
 		 * @param <D> displayValue type
-		 * @param <D2> displayValue2 type
-		 * @param _jc install auto completion into this
+		 * @param <D2> d2 type
+		 * @param jc install auto completion into this
 		 * @return KeyDisplayValue model
 		 */
-		protected static <K,D,D2>BaseGlazedModel<K,D,D2> install(ComboBox2<K,D,D2> _jc) {
+		protected static <K,D,D2>BaseGlazedModel<K,D,D2> install(ComboBox2<K,D,D2> jc) {
 			BaseGlazedModel<K,D,D2> model = new BaseGlazedModel<>();
-			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormatDelegate());
+			model.autoComplete = AutoCompleteSupport.install(jc, model.getEventList(), null, model.getListItemFormatDelegate());
 			
 			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
 			model.autoComplete.setStrict(true);
 			model.autoComplete.setPositionCaretTowardZero(true);
 
 			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
-			_jc.glazedListArrowHandler();
+			jc.glazedListArrowHandler();
 
 			return model;
 		}
@@ -322,11 +325,57 @@ public abstract class ComboBox2<K,D,D2>
 		 */
 		@SuppressWarnings("Convert2Diamond")
 		protected BaseGlazedModel() {
-			// false means no DisplayValue2
+			// false means no D2
 			super(false, new BasicEventList<SSListItem>());
 		}
 	}
 
+	private boolean hasD2;
+
+	/** This returns whether or not {@code <D2>} is populated.
+	 * @return 
+	 */
+	public boolean hasD2() {
+		return hasD2;
+	}
+
+	private boolean d2DisplayEnabled;
+
+	/**
+	 * Should {@code <D2>} values be displayed.
+	 * @return 
+	 */
+	public boolean getD2DisplayEnabled() {
+		return d2DisplayEnabled;
+	}
+
+	/**
+	 * Set the flag controlling whether or not to display {@code <D2>}.
+	 * @param d2DisplayEnabled 
+	 */
+	public void setD2DisplayEnabled(boolean d2DisplayEnabled) {
+		this.d2DisplayEnabled = d2DisplayEnabled;
+	}
+
+	/**
+	 * This is called after the combobox is populated with items.
+	 * Both hasD2() and getD2DisplayEnabled() must be true
+	 * to display {@code <D2>}.
+	 * This method sets up the format based on {@code <D>} and {@code <D2>}
+	 * JDBCTypes. {@link SSListItemFormat} can be used directly after
+	 * the data is populated to orverride this.
+	 * @param displayValueType
+	 * @param d2Type
+	 */
+	protected void establishListItemFormat(JDBCType displayValueType, JDBCType d2Type) {
+		getListItemFormat().clear();
+		getListItemFormat().addElemType(keyVisual.getDisplayValueListItemElemIndex(),
+				displayValueType);
+		if (hasD2() && getD2DisplayEnabled()) {
+			getListItemFormat().addElemType(keyVisual.getD2ListItemElemIndex(),
+					d2Type == null ? JDBCType.JAVA_OBJECT : d2Type);
+		}
+	}
 	/** {@inheritDoc } */
 	@Override
 	public void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException
@@ -358,10 +407,10 @@ public abstract class ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * @return the displayValue2 index in an SSListItem
+	 * @return the d2 index in an SSListItem
 	 */
-	public int getDisplayValue2FormatIndex() {
-		return keyVisual.getDisplayValue2ListItemElemIndex();
+	public int getD2FormatIndex() {
+		return keyVisual.getD2ListItemElemIndex();
 	}
 
 	/**
@@ -433,8 +482,8 @@ public abstract class ComboBox2<K,D,D2>
 	 */
 	final public Class<K> getKeyType() {
 		if (keyType == null) {
-			//@SuppressWarnings("unchecked")
 			TypeToken<K> typeToken = new TypeToken<K>(getClass()) { };
+			checkIsClass(typeToken);
 			@SuppressWarnings("unchecked")
 			Class<K> t = (Class<K>) typeToken.getType();
 			keyType = t;
@@ -443,39 +492,47 @@ public abstract class ComboBox2<K,D,D2>
 	}
 
 	// The actual type of the displayValue.
-	private Class<D> visualType;
+	private Class<D> displayValueType;
 
 	/**
 	 * Return the actual type of the Visual parameter.
 	 * @return the type
 	 */
 	final public Class<D> getDisplayValueType() {
-		if (visualType == null) {
-			//@SuppressWarnings("unchecked")
+		if (displayValueType == null) {
 			TypeToken<D> typeToken = new TypeToken<D>(getClass()) { };
+			checkIsClass(typeToken);
 			@SuppressWarnings("unchecked")
 			Class<D> t = (Class<D>) typeToken.getType();
-			visualType = t;
+			displayValueType = t;
 		}
-		return visualType;
+		return displayValueType;
 	}
 
-	// The actual type of the displayValue.
-	private Class<D2> visual2Type;
-
+	private Class<D2> d2Type;
 	/**
 	 * Return the actual type of the Visual2 parameter.
 	 * @return the type
 	 */
-	final public Class<D2> getDisplayValue2Type() {
-		if (visual2Type == null) {
-			//@SuppressWarnings("unchecked")
+	final public Class<D2> getD2Type() {
+		if (d2Type == null) {
 			TypeToken<D2> typeToken = new TypeToken<D2>(getClass()) { };
+			checkIsClass(typeToken);
 			@SuppressWarnings("unchecked")
 			Class<D2> t = (Class<D2>) typeToken.getType();
-			visual2Type = t;
+			d2Type = t;
 		}
-		return visual2Type;
+		return d2Type;
+	}
+
+	private void checkIsClass(TypeToken<?> typeToken) {
+		if (typeToken.getType() instanceof Class<?>)
+			return;
+		throw new ClassCastException(
+				sf("'%s' unresolved, non generic subclass required,"
+						+ " use '{ }', like 'new %s<>() { }'",
+						typeToken.getType(),
+						getClass().getSimpleName()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -512,7 +569,7 @@ public abstract class ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Create BaseComboBox.
+	 * Create BaseComboBox, uses {@link ModelType#SWING}.
 	 */
 	public ComboBox2() {
 		this(ModelType.SWING);
@@ -529,11 +586,10 @@ public abstract class ComboBox2<K,D,D2>
 
 		try {
 			getKeyType();
+			getDisplayValueType();
+			getD2Type();
 		} catch(ClassCastException ex) {
-			throw new IllegalStateException(
-					sf("Non generic subclass required, need '{}', like 'new %s<...>(){}'",
-							getClass().getSimpleName()),
-					ex);
+			throw new IllegalStateException(ex.getMessage(), ex);
 		}
 
 		keyVisual = switch(modelType) {
@@ -674,7 +730,23 @@ public abstract class ComboBox2<K,D,D2>
 	 */
 	public void setDisplayValues(List<D> displayValues, List<K> keys) {
 		enumVisual = null;
-		setDisplayValuesInternal(displayValues, keys);
+		setDisplayValues(displayValues, keys, null);
+	}
+
+	/**
+	 * Sets the displayValues to be displayed in the list box along with their
+	 * corresponding keys to database values. If {@code keys} is null, then a
+	 * zero to N-1 key is automatically established.
+	 *
+	 * @param displayValues  displayValues to be displayed in the list box.
+	 * @param keys null or database values that correspond to the displayValues, 1 to 1,
+	 * in the list box.
+	 * @param d2s
+	 * @throws IllegalArgumentException if lists are not the same size.
+	 */
+	public void setDisplayValues(List<D> displayValues, List<K> keys, List<D2> d2s) {
+		enumVisual = null;
+		setDisplayValuesInternal(displayValues, keys, d2s);
 	}
 
 	/**
@@ -710,8 +782,9 @@ public abstract class ComboBox2<K,D,D2>
 	 *
 	 * @param _displayValues
 	 * @param _keys
+	 * @param _d2s
 	 */
-	protected void setDisplayValuesInternal(List<D> _displayValues, List<K> _keys) {
+	protected void setDisplayValuesInternal(List<D> _displayValues, List<K> _keys, List<D2> _d2s) {
 		Objects.requireNonNull(_displayValues);
 		if (_keys == null
 				&& getKeyType() != Integer.class
@@ -720,6 +793,8 @@ public abstract class ComboBox2<K,D,D2>
 					"Auto generated key only avaialable for int/long keys");
 		if (_keys != null && _displayValues.size() != _keys.size())
 			throw new IllegalArgumentException("DisplayValues and Keys different length");
+		if (_d2s != null && _displayValues.size() != _d2s.size())
+			throw new IllegalArgumentException("DisplayValues and D2s different length");
 		try (Model.Remodel remodel = keyVisual.getRemodel()) {
 			List<K> keys = _keys;
 			autoGeneratedKeys = false;
@@ -728,11 +803,11 @@ public abstract class ComboBox2<K,D,D2>
 				// TODO: in the future let it be implicit, don't create it?
 				List<Object> autoKeys;
 				if (getKeyType() == Integer.class)
-					autoKeys = IntStream.range(0, _displayValues.size())
-							.collect(ArrayList::new, List::add, List::addAll);
+					autoKeys = Arrays.asList(
+							IntStream.range(0, _displayValues.size()).boxed().toArray());
 				else // must be Long
-					autoKeys = LongStream.range(0, _displayValues.size())
-							.collect(ArrayList::new, List::add, List::addAll);
+					autoKeys = Arrays.asList(
+							LongStream.range(0, _displayValues.size()).boxed().toArray());
 				@SuppressWarnings("unchecked")
 				List<K> xxx = (List<K>)autoKeys;
 				keys = xxx;
@@ -740,14 +815,21 @@ public abstract class ComboBox2<K,D,D2>
 			}
 			keys = keyVisual.getDisconnectedList(keys);
 			List<D> displayValues = keyVisual.getDisconnectedList(_displayValues);
+			List<D2> d2s = keyVisual.getDisconnectedList(_d2s);
+			hasD2 = d2s != null;
+			keyVisual.setD2Enabled(hasD2());
 			
 			remodel.clear();
 			nullItem = null;
 
+			establishListItemFormat(
+					JdbcDataTypeConversionTables.classToJdbcType(getDisplayValueType()),
+					JdbcDataTypeConversionTables.classToJdbcType(getD2Type()));
+
 			// TODO first item is nullItem if getAllowNull()==true.
 			//      Impacts keys, getSelectedValue(), getSelectedIndex(), etc.
 			adjustForNullItem();
-			remodel.addAll(keys, displayValues);
+			remodel.addAll(keys, displayValues, d2s);
 		}
 	}
 
@@ -805,17 +887,17 @@ public abstract class ComboBox2<K,D,D2>
 	 * Adds an item to the existing list of items in the combo box.
 	 *
 	 * @param displayValue item that should be displayed in the combobox
-	 * @param displayValue2  second display item for combobox
+	 * @param d2  second display item for combobox
 	 * @param key  key of displayValue, commonly a primary key
 	 */
-	public void addDisplayValue(D displayValue, D2 displayValue2, K key) {
+	public void addDisplayValue(D displayValue, D2 d2, K key) {
 		try (Model.Remodel remodel = keyVisual.getRemodel()) {
 			final int index = remodel.getKeys().indexOf(key);
 			if (index >= 0) {
 				logger.log(WARNING, () -> sf("%s: Key of [%s] already exists. Creating duplicate Key with DisplayValue of '%s'.",
 					getColumnForLog(), key, displayValue));
 			}
-			remodel.add(key, displayValue, displayValue2);
+			remodel.add(key, displayValue, d2);
 		} catch (final Exception e) {
 			logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
 		}
@@ -1101,7 +1183,7 @@ public abstract class ComboBox2<K,D,D2>
 		try (Model.Remodel remodel = keyVisual.getRemodel()) {
 			Object item = getSelectedItem();
 			if (item instanceof SSListItem lItem) {
-				result = remodel.getDisplayValue2(lItem);
+				result = remodel.getD2(lItem);
 			}
 		}
 		return result;
@@ -1195,7 +1277,7 @@ public abstract class ComboBox2<K,D,D2>
 
 		@SuppressWarnings("unchecked")
 		List<D> l02 = (List<D>)l01;
-		setDisplayValuesInternal(l02, null);
+		setDisplayValuesInternal(l02, null, null);
 	}
 
 	/**
@@ -1351,7 +1433,7 @@ public abstract class ComboBox2<K,D,D2>
 	protected SSListItem createNullItem(Model.Remodel remodel) {
 		@SuppressWarnings("unchecked") K m = (K) nullElement(getKeyType());
 		@SuppressWarnings("unchecked") D o = (D) nullElement(getDisplayValueType());
-		@SuppressWarnings("unchecked") D2 o2 = (D2) nullElement(getDisplayValue2Type());
+		@SuppressWarnings("unchecked") D2 o2 = (D2) nullElement(getD2Type());
 		return remodel.createKeyDisplayValueItem(m, o, o2);
 	}
 

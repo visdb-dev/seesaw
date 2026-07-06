@@ -102,9 +102,7 @@ public class SSSyncManager
 			return;
 		}
 		
-		// ADD/REMOVE METHODS HAVE A CHECK TO ADD/REMOVE ONLY ONCE
 		removeRowsetListener();
-
 		try {
 			rowsModel.rsOp(comboBox, () -> handleComboEvent01());
 		} catch (final SQLException se) {
@@ -376,7 +374,8 @@ public class SSSyncManager
 	}
 	
 	/**
-	 * Sets column to be used as basis for synchronization.
+	 * Set the rowSet's column name to use as a basis for synchronization
+	 * with the the comboBox item's key.
 	 *
 	 * @param syncColumnName RowSet column used as basis for synchronization.
 	 */
@@ -421,8 +420,9 @@ public class SSSyncManager
 	 * Sets combo box to be synchronized.
 	 *
 	 * @param comboBox combo box to be synchronized
+	 * @deprecated just create another SSSyncManager
 	 */
-	// TODO: deprecate? done in constructor, ok to change?
+	@Deprecated
 	public void setComboBox(final SSDBComboBox comboBox) {
 		this.comboBox = comboBox;
 	}
@@ -431,8 +431,9 @@ public class SSSyncManager
 	 * Sets RowsModel actions to synchronize.
 	 *
 	 * @param rowsModel rowsModel to be synchronized
+	 * @deprecated just create another SSSyncManager
 	 */
-	// TODO: deprecate? done in constructor, ok to change?
+	@Deprecated
 	public void setRowsModel(RowsModel rowsModel) {
 		this.rowsModel = rowsModel;
 	}
