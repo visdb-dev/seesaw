@@ -53,7 +53,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -64,29 +63,63 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * Similar to the ComboBox2, but used when both the 'bound' values and the
- * 'display' value are pulled from a database table. The bound value is called
- * the 'key' and the display value the 'option', which appears in the combo box.
+ * Similar to the ComboBox2, but used when both
+ * {@code <K>}, the 'bound' value, and {@code <D>}, the
+ * 'display' value, are pulled from a database table.
+ * {@code <K>} is 
+ * the 'key' and the display value the 'text' which appears in the combo box.
  * <p>
  * This is sometimes used as a Navigator in conjunction with {@link SSSyncManager}.
  * Generally the key represents a foreign key to another
- * table, and the combobox displays the {@code <D>} from
- * the other table.
+ * table, and the combobox displays the {@code <D>}.
  * <p>
- * Optional data for combobox item, {@code <D2>}, may be specified,
+ * Optional data for combobox's item, {@code <D2>}, may be specified,
  * see {@link #setD2ColumnName(String) }. This data may be displayed by the
  * SSListItem, see {@link #setD2DisplayEnabled(boolean)} and {@link getListItemFormat()}
  * <p>
  * <b>Refer to {@link ComboBox2} for warnings and caveats.</b>
  * <p>
- * <b>Example</b>: consider two tables
+ * <a id="builders-and-generics"></a>
+ * <h2> Builders and generic type parameter capture</h2>
+ * <p>
+ * The ComboBox hierarchy depends on generic parameter type capture. It is used
+ * so that the data read from a database column is converted to the concrete
+ * type specified by the parameter type.
+ * <p>
+ * When you have a DBComboBox2 with param types that you frequently use, it is
+ * convenient to incorporate it into a re-usable class.
+ * Here's a simple example where you lock in the types, don't add anything
+ * else, MyDbComboBox.Builder just works.
+ * {@snippet class=ComboBoxSnippets region=MyDbComboBox}
+ * <p>
+ * This next example, DbComboBox2Extra, does a lot.
+ * <ol>
+ * <li> lock in {@code <K>} and {@code <D>} types
+ * <li> leaves {@code <D2>} for programmer
+ * <li> adds new generic {@code <D3>} for programmer
+ * <li> captures the type of {@code <D3>}
+ * <li> has an AbstractBuilder so the class and Builder are extendable
+ * <li> has a concrete Builder to instantiate the class
+ * </ol>
+ * {@snippet class=ComboBoxSnippets region=ExtendableDbComboBox}
+ * And a usage example
+ * {@snippet class=ComboBoxSnippets region=ExtendableDbComboBoxExample}
+ * With output {@snippet :
+ *     class java.lang.Integer
+ *     class java.lang.String 
+ *     class java.lang.Double
+ *     java.util.List<java.lang.Double>
+ *     [7.0, 6.0, 5.0]
+ * }
+ * <p>
+ * <h2>Example with two tables</h2>
  * <ol>
  * <li>part_data (part_id, part_name, ...)
  * <li>shipment_data (shipment_id, part_id, quantity, ...)
  * </ol>
  * <p>
- * Assume you would like to develop a screen for the shipment_data table and
- * you want to have a screen with a combobox where the user can choose a part
+ * Assume you would like to develop a screen for the shipment_data table
+ * including a combobox where the user can choose a part
  * and a textbox where the user can specify a quantity.
  * <p>
  * In the combobox you would want to display the part name rather than part_id
@@ -132,7 +165,8 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	protected int executeCount = 0;
 
 	// TODO: configuration option
-	private static final ModelType DEFAULT_DBCOMBO_MODEL = ModelType.GLAZED;
+	/** default model type */
+	public static final ModelType DEFAULT_MODEL_DB_COMBO2 = ModelType.GLAZED;
 	private static final String DEFAULT_DATE_FORMAT = "MM/dd/yyyy";
 
 	/**
@@ -142,8 +176,8 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * @param <D2> 
 	 * @param <T> 
 	 */
-	public abstract static class AbstractB<K, D, D2, T extends AbstractB<K, D, D2, T>>
-			extends ComboBox2.AbstractB<K, D, D2, T>
+	public abstract static class AbstractBuilder<K, D, D2, T extends AbstractBuilder<K, D, D2, T>>
+			extends ComboBox2.AbstractBuilder<K, D, D2, T>
 	{
 		// all parameters are optional, at least for now
 		private Connection connection;
@@ -154,16 +188,16 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 		private String dateFormat = DEFAULT_DATE_FORMAT;
 
 		/**
-		 * AbstractB
+		 * AbstractBuilder
 		 */
-		public AbstractB() {
+		public AbstractBuilder() {
 			// DBComboBox2 has a different default than ComboBox2, so set that up.
-			super.modelType(DEFAULT_DBCOMBO_MODEL);
+			super.modelType(DEFAULT_MODEL_DB_COMBO2);
 		}
 
 		/**
 		 * Database connection to use to populate the combobox.
-		 * If not set, used shared connection from lookup.
+		 * If not set, use shared connection from lookup.
 		 * @param val
 		 * @return 
 		 */
@@ -234,7 +268,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * @param <K>
 	 * @param <D>
 	 * @param <D2> */
-	public static class Builder<K, D, D2> extends AbstractB<K, D, D2, Builder<K, D, D2>> {
+	public static class Builder<K, D, D2> extends AbstractBuilder<K, D, D2, Builder<K, D, D2>> {
 
 		/** self type idiom */
 		@Override
@@ -255,7 +289,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @param builder
 	 */
-	protected DBComboBox2(AbstractB<K, D, D2, ?> builder) {
+	protected DBComboBox2(AbstractBuilder<K, D, D2, ?> builder) {
 		super(builder);
 		// TODO: error checking: query/primaryK, displayC all must be set.
 		if (builder.primaryKeyColumnName == null || builder.primaryKeyColumnName.isBlank()
@@ -376,7 +410,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	private Connection getConnection() throws SQLException {
 		return connection == null
-				? SSDBSupport.getDefault().getSharedConnection(null) : connection;
+				? SSUtils.dbSupport().getSharedConnection(null) : connection;
 	}
 
 	/**
@@ -453,9 +487,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * Sets the column name . If there's extra data to store in the 
 	 * combobox list item then use this.
 	 *
-	 * @param d2ColumnName column name whose values have to be displayed
-	 *                                 in the combo in addition to the first column
-	 *                                 name.
+	 * @param d2ColumnName column name whose values populate {@code <D2>}.
 	 */
 	public void setD2ColumnName(final String d2ColumnName) {
 		this.d2ColumnName = d2ColumnName;

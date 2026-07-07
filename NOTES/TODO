@@ -9,6 +9,24 @@ DBMS plugin for interpretation of SQL Exceptions to assist in better messages
 and/or error handling. For example, determine if error is a constraint violation
 and print the violated constraint.
 
+Introduce SSUtils.randomSQLException(ex, logger) for use when an exception is
+"impossible", for example rs.getRow(). Not sure what to do with it.
+Send email? Dialog?
+
+RowsModel.getNavCombo() needed? used? How is NavCombo set?
+multiple nav combos?
+
+create DBComboBox1?
+
+SSCommon.checkRowOK doesn't check canModify. Rename verifyCanModifyRow.
+    Note hasActiveRow renamed to onActiveRow
+    rowsModel.containsRows() vs hasActiveRow vs I think there's others.
+    SSCommon().checkRowOK?
+
+    Group static methods for rowset checking... hasActiveRow, other
+    There's navigate/Utils.hasActiveRow.
+    RowsModel might have some.
+
 ================================================================================
 
 setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
@@ -197,7 +215,10 @@ through only one component.
 ================================================================================
 
 Why maintain currentRow and rowCount in navigateState? How much perf gain?
-Use a method to access, simplifies flipping.
+rowCount is usded/cached by the Spinner "of ###"
+Get rid of NavigateState.currentRow variable.
+    Just use rs.getRow(), google says no database connect.
+    rowCount does seem to be needed, cached in Spinner
 
 SSDataNavigator - clean up the setRowSet/setRowsModel stuff.
 
@@ -497,7 +518,6 @@ and _STRICT is the default.
 
 ---
 In NavigateActions, should the static methods have instance counterparts,
-e.g. hasActiveRow. Then could make direct queries when a Navigation is available.
 
 ---
 When onInsertRow, visual indication new record. Color the "Add record" icon; Yellow?

@@ -25,6 +25,7 @@
 	<properties>
 		<!-- Never publish demo artifacts to Maven Central -->
 		<maven.deploy.skip>true</maven.deploy.skip>
+        <exec.mainClass>com.nqadmin.swingset.demo.MainClass</exec.mainClass>
 	</properties>
 
 	<licenses>

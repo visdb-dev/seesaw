@@ -45,15 +45,15 @@ public class ComboBox1<K,D> extends ComboBox2<K, D, Object>
 	 * @param <D>
 	 * @param <T> 
 	 */
-	public abstract static class AbstractB<K, D, T extends AbstractB<K, D, T>>
-			extends ComboBox2.AbstractB<K, D, Object, T> {
+	public abstract static class AbstractBuilder<K, D, T extends AbstractBuilder<K, D, T>>
+			extends ComboBox2.AbstractBuilder<K, D, Object, T> {
 	}
 
 	/** Builder.
 	 * @param <K>
 	 * @param <D> 
 	 */
-	public static class Builder<K, D> extends AbstractB<K, D, Builder<K, D>> {
+	public static class Builder<K, D> extends AbstractBuilder<K, D, Builder<K, D>> {
 
 		/** self type idiom */
 		@Override
@@ -68,15 +68,15 @@ public class ComboBox1<K,D> extends ComboBox2<K, D, Object>
 	/**
 	 * @param builder 
 	 */
-	protected ComboBox1(AbstractB<K, D, ?> builder) {
+	protected ComboBox1(AbstractBuilder<K, D, ?> builder) {
 		super(builder);
 	}
 
 	/**
-	 * Creates an object of ComboBox.
+	 * Creates an object of ComboBox with type params of Object.
 	 * Default: see {@link ComboBox2}.
 	 */
 	public ComboBox1() {
-		this(new ComboBox1.Builder<>());
+		this(new ComboBox1.Builder<>(){});
 	}
 }

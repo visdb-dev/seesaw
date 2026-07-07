@@ -73,12 +73,12 @@ import javax.swing.KeyStroke;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.ConvertType;
+import com.nqadmin.swingset.datasources.DbSupport.DbReader;
+import com.nqadmin.swingset.datasources.DbSupport.DbUpdater;
+import com.nqadmin.swingset.datasources.DbSupport.FunctionSQL;
+import com.nqadmin.swingset.datasources.DbSupport.RunnableSQL;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.RowSetOps.DbUpdate;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbUpdater;
-import com.nqadmin.swingset.datasources.SSDBSupport.FunctionSQL;
-import com.nqadmin.swingset.datasources.SSDBSupport.RunnableSQL;
 import com.nqadmin.swingset.datasources.SSSQLConversionException;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
@@ -686,7 +686,7 @@ final class SSCommon
 		String value = "";
 
 		try {
-			if (getRowsModel().hasActiveRow()) {
+			if (getRowsModel().onActiveRow()) {
 				value = RowSetOps.getColumnObjectText(ssComponent);
 				if (!getAllowNull() && (value == null)) {
 					value = "";
@@ -711,7 +711,7 @@ final class SSCommon
 		Object value = null;
 
 		try {
-			if (getRowsModel().hasActiveRow()) {
+			if (getRowsModel().onActiveRow()) {
 				value = RowSetOps.getColumnObject(ssComponent);
 			}
 		} catch (SQLException se) {
@@ -756,7 +756,7 @@ final class SSCommon
 		Array value = null;
 
 		try {
-			if (getRowsModel().hasActiveRow()) {
+			if (getRowsModel().onActiveRow()) {
 				value = RowSetOps.getColumnArray(ssComponent);
 			}
 		} catch (SQLException se) {
@@ -1099,13 +1099,14 @@ final class SSCommon
 	 * @param dialogOK if null or evaluates true then dialog
 	 * @return true if there's a row
 	 */
+	// TODO: check RowsModel.setAllowWrite and dbOps.allow*
 	boolean checkRowOK(Supplier<Boolean> dialogOK)
 	{
 		// Focus change events may cause listeners to trigger. Don't want
 		// to give multiple dialogs.
 		if (doingCheckRowOK) 
 			try {
-				return getRowsModel().hasActiveRow();
+				return getRowsModel().onActiveRow();
 			} catch (SQLException ex) {
 				return false;
 			}
@@ -1113,7 +1114,7 @@ final class SSCommon
 		doingCheckRowOK = true;
 		try {
 			try {
-				if (getRowsModel().hasActiveRow())
+				if (getRowsModel().onActiveRow())
 					return true;
 			} catch (SQLException ex) {
 			}

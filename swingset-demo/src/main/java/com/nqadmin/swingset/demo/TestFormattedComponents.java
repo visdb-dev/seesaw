@@ -138,7 +138,7 @@ public class TestFormattedComponents extends JFrame {
 	/**
 	 * combo navigator and sync manger
 	 */
-	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
+	SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
 	SSSyncManager syncManager;
 
 	RowSet getRowSet() {

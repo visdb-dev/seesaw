@@ -29,9 +29,9 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.mock;
 
-import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
-import com.nqadmin.swingset.datasources.SSDBSupport;
+import com.nqadmin.swingset.datasources.DefaultDbSupport;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.datasources.DbSupport;
 
 /**
  * x
@@ -43,7 +43,7 @@ public class Util
 	 */
 	public static void initLookup() {
 		CentralLookup lkup = CentralLookup.getDefault();
-		lkup.replace(SSDBSupport.class, new DefaultSSDBSupport(null));
+		lkup.replace(DbSupport.class, new DefaultDbSupport(null));
 	}
 
 	private Util()

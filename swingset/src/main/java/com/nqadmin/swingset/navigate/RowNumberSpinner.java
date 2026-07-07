@@ -161,7 +161,11 @@ public class RowNumberSpinner extends JSpinner
 		// rowsModel.getAction(RowsAction.ACT_GOTOROW)
 		// 		.actionPerformed(new ActionEvent(RowNumberSpinner.this,
 		// 		AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
-		rowsModel.getAction(RowsAction.ACT_GOTOROW).actionPerformed(null);
+		Action act = rowsModel.getAction(RowsAction.ACT_GOTOROW);
+		// if (!act.isEnabled()) {
+		// 	return;
+		// }
+		act.actionPerformed(null);
 	};
 
 	private void internalChangeSpinnerModel()

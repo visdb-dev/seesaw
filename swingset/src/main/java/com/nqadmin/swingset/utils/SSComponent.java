@@ -56,9 +56,9 @@ import javax.swing.JComponent;
 import com.nqadmin.swingset.core.CheckBox;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbUpdater;
-import com.nqadmin.swingset.datasources.SSDBSupport.RunnableSQL;
+import com.nqadmin.swingset.datasources.DbSupport.DbReader;
+import com.nqadmin.swingset.datasources.DbSupport.DbUpdater;
+import com.nqadmin.swingset.datasources.DbSupport.RunnableSQL;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.Validator;
@@ -755,7 +755,7 @@ public interface SSComponent extends RSC
 	 * Typically used in an SSComponent's listener.
 	 * @return true if there's a row
 	 */
-	// TODO: move to Utils or SSUtils. Around hasActiveRow.
+	// TODO: move to Utils or SSUtils. Around onActiveRow.
 	default boolean checkRowOK() {
 		return getSSCommon().checkRowOK();
 	}

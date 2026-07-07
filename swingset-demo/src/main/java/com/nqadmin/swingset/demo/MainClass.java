@@ -84,9 +84,8 @@ import javax.swing.SwingUtilities;
 import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.datasources.DbSupportFactory;
-import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
+import com.nqadmin.swingset.datasources.DefaultDbSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
-import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.navigate.Utils;
@@ -102,6 +101,8 @@ import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
+
+import com.nqadmin.swingset.datasources.DbSupport;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -406,11 +407,10 @@ public class MainClass extends JFrame
 		} catch (SQLException ex) {
 		}
 		
-		SSDBSupport supp = DbSupportFactory.setupLookup(dbConnection);
+		DbSupport supp = DbSupportFactory.setupLookup(dbConnection);
 		if (supp == null) {
 			logger.log(Level.ERROR, sf("No SSDBSupport found for '%s'", databaseID));
-			CentralLookup.getDefault().replace(
-					SSDBSupport.class, new DefaultSSDBSupport(dbConnection) { });
+			CentralLookup.getDefault().replace(DbSupport.class, new DefaultDbSupport(dbConnection) { });
 		}
 
 		// ADD ACTION LISTENERS FOR BUTTONS

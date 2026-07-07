@@ -2,12 +2,14 @@ package snippet_files;
 
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.JdbcRowSet;
 import javax.swing.JFrame;
 
+import com.google.common.reflect.TypeToken;
 import com.nqadmin.swingset.core.ComboBox1;
 import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.core.Item1;
@@ -19,6 +21,93 @@ import com.nqadmin.swingset.navigate.RowsModel;
 @SuppressWarnings("serial")
 public class ComboBoxSnippets extends JFrame
 {
+	Connection conn;
+	// Param type capture is important so that values read from the database
+	// are correctly converted to the right type.
+
+	// You may have 
+	// Simple example where you lock in the types, don't add anything
+	// else, MyDbComboBox.Builder just works.
+
+	// @start region=MyDbComboBox
+	static class MyDbComboBox extends DBComboBox2<Integer, String, Byte> {
+		public static class Builder
+				extends DBComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
+			@Override protected Builder self() { return this; }
+			@Override public MyDbComboBox build() { return new MyDbComboBox(this); }
+		}
+		private MyDbComboBox(Builder builder) { super(builder); }
+	}
+	
+	MyDbComboBox dbCombo = new MyDbComboBox.Builder() // NOTE: "{ }" not needed
+			.primaryKeyColumnName("keyCol")
+			.displayColumnName("dispCol")
+			.build();
+	// System.out.println(""+dbCombo.getD2Type()); // output: class java.lang.Byte
+	// @end region=MyDbComboBox
+
+	// @start region=ExtendableDbComboBox
+	static class DbComboBox2Extra<D2, D3> extends DBComboBox2<Integer, String, D2> {
+		private final D3 d3Value; // Note: not part of combo list item.
+		private final  TypeToken<D3> d3TypeToken;
+
+		public abstract static class AbstractBuilder<D2, D3, T extends AbstractBuilder<D2, D3, T>>
+				extends DBComboBox2.AbstractBuilder<Integer, String, D2, T> { 
+			private D3 d3Value;
+			// captures D3 for whatever runtime class extends this Abstractbuilder
+			private final TypeToken<D3> d3TypeToken = new TypeToken<D3>(getClass()) {};
+
+			public AbstractBuilder() {
+				// check if TypeToken is generic; verifyTypeClass throws useful msg
+				verifyTypeClass(d3TypeToken, getClass());
+			}
+
+			public T d3Data(D3 val) {
+				d3Value = val;
+				return self();
+			}
+		}
+
+		// Regular Builder for direct instantiation
+		public static class Builder<D2, D3>
+				extends AbstractBuilder<D2, D3, Builder<D2, D3>> {
+			// self type idiom
+			@Override
+			protected Builder<D2, D3> self() { return this; }
+
+			@Override
+			public DbComboBox2Extra<D2, D3> build() {
+				return new DbComboBox2Extra<>(this);
+			}
+		}
+
+		protected DbComboBox2Extra(AbstractBuilder<D2, D3, ?> builder) {
+			super(builder);
+			d3Value = builder.d3Value;
+			d3TypeToken = builder.d3TypeToken;
+		}
+
+		public D3 getD3() { return d3Value; }
+		public TypeToken<D3> getD3TypeToken() { return d3TypeToken; }
+	}
+	// @end region=ExtendableDbComboBox
+	void useExCombo() {
+		// @start region=ExtendableDbComboBoxExample
+		DbComboBox2Extra<Double, List<Double>> cbExtra
+				= new DbComboBox2Extra.Builder<Double, List<Double>>() { } // <- "{ }" NEEDED
+						.primaryKeyColumnName("aaa")
+						.displayColumnName("bbb")
+						.d3Data(new ArrayList<>())
+						.build();
+		cbExtra.getD3().addAll(List.of(7D, 6D, 5D));
+		System.out.println(""+cbExtra.getKeyType());
+		System.out.println(""+cbExtra.getDisplayValueType());
+		System.out.println(""+cbExtra.getD2Type());
+		System.out.println(""+cbExtra.getD3TypeToken());
+		System.out.println(""+cbExtra.getD3());
+		// @end region=ExtendableDbComboBoxExample
+	}
+
 	RowsModel rowsModel;
 	DBComboBox2<Long, String, Long> combo;
 
@@ -43,9 +132,9 @@ public class ComboBoxSnippets extends JFrame
 			// Query for the combobox to map part_id to part_name.
 			String query = "SELECT * FROM part_data;";
 			
-			// Create an instance of the SSDBComboBox with the connection object,
+			// Create an instance of the DBComboBox2 with the connection object,
 			// query, and column names.
-			combo = new DBComboBox2.Builder<Long, String, Long>()
+			combo = new DBComboBox2.Builder<Long, String, Long>() { } // <- "{ }" NEEDED
 					.connection(connection)
 					.query(query)
 					.primaryKeyColumnName("part_id")

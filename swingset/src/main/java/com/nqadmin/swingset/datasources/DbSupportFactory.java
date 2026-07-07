@@ -52,31 +52,31 @@ public class DbSupportFactory
 	private DbSupportFactory() { }
 	private static final System.Logger logger = SSUtils.getLogger();
 	// Something simple for now.
-	private static final HashMap<String, Function<Connection, SSDBSupport>> creators
-			= new HashMap<>(Map.of("H2", (Connection conn) -> new H2Support(conn)));
+	private static final HashMap<String, Function<Connection, DbSupport>> creators
+			= new HashMap<>(Map.of("H2", (Connection conn) -> new H2DbSupport(conn)));
 
 	/**
-	 * Create an SSDBSupport that works with the specified connection according
+	 * Create a DbSupport that works with the specified connection according
 	 * to its metadata; put it into the CentralLookup.
-	 * The connection is used the shared connection and to fetch DatabaseMetaData.
+	 * The connection is used as the shared connection and to fetch DatabaseMetaData.
 	 * @param conn
-	 * @return an SSDBSupport instance that is put into CentralLookup or null.
+	 * @return an DbSupport instance that is put into CentralLookup or null.
 	 */
-	public static SSDBSupport setupLookup(Connection conn) {
+	public static DbSupport setupLookup(Connection conn) {
 		CentralLookup lkup = CentralLookup.getDefault();
 
-		SSDBSupport dbSupport = null;
+		DbSupport dbSupport = null;
 		try {
 			DatabaseMetaData dbMeta = conn.getMetaData();
 			String name = dbMeta.getDatabaseProductName();
-			Function<Connection, SSDBSupport> creator = creators.get(name);
+			Function<Connection, DbSupport> creator = creators.get(name);
 			if (creator != null)
 				dbSupport = creator.apply(conn);
 		} catch (SQLException ex) {
 			logger.log(ERROR, (String) null, ex);
 		}
 		if (dbSupport != null)
-			lkup.replace(SSDBSupport.class, dbSupport);
+			lkup.replace(DbSupport.class, dbSupport);
 
 		return dbSupport;
 	}

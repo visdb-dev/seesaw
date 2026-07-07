@@ -45,19 +45,21 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import com.google.common.reflect.TypeToken;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.core.ComboBox2;
+import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
-import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -74,7 +76,7 @@ import com.nqadmin.swingset.utils.SSUtils;
  * controls have to be synchronized. This is accomplished with the
  * SSSyncManager.
  * <p>
- * IMPORTANT: If SSDBSupport.getDefault().createRownumQuery is not available,
+ * IMPORTANT: If {@code DbSupport.createRownumQuery()} is not available,
  * the SSDBComboBox and the SSRowSet queries should select the same
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
@@ -85,7 +87,7 @@ public class Example4 extends JFrame {
 	/** Logger */
     static final Logger logger = SSUtils.getLogger();
 
-	ComboBox2.ModelType comboModelType = ComboBox2.ModelType.GLAZED;
+	static ComboBox2.ModelType comboModelType = ComboBox2.ModelType.GLAZED;
 	
 	/**
 	 * screen label declarations
@@ -97,10 +99,105 @@ public class Example4 extends JFrame {
 	JLabel lblPartWeight = new JLabel("Weight");
 	JLabel lblPartCity = new JLabel("City");
 
-	class MyComboBox2<D2> extends ComboBox2<Integer, String, D2> {
-		public MyComboBox2(ModelType modelType) {
-			super(new ComboBox2.Builder<Integer, String, D2>().modelType(modelType));
+	static class MyComboBox2<D2> extends ComboBox2<Integer, String, D2> {
+		public static class Builder<D2>
+				extends ComboBox2.AbstractBuilder<Integer, String, D2, Builder<D2>> {
+			@Override protected Builder<D2> self() { return this; }
+			@Override public MyComboBox2<D2> build() { return new MyComboBox2<>(this); }
 		}
+		private MyComboBox2(Builder<D2> builder) { super(builder); }
+	}
+
+	static class MyDbComboBox extends DBComboBox2<Integer, String, Byte> {
+		public static class Builder
+				extends DBComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
+			@Override protected Builder self() { return this; }
+			@Override public MyDbComboBox build() { return new MyDbComboBox(this); }
+		}
+		private MyDbComboBox(Builder builder) { super(builder); }
+	}
+
+	// Concrete class, additional generric type, with type capture, extendable
+
+	static class DbComboBox2Extra<D2, D3> extends DBComboBox2<Integer, String, D2> {
+		private final D3 d3Value; // Note: not part of combo list item.
+		private final  TypeToken<D3> d3TypeToken;
+
+		public abstract static class AbstractBuilder<D2, D3, T extends AbstractBuilder<D2, D3, T>>
+				extends DBComboBox2.AbstractBuilder<Integer, String, D2, T> { 
+			private D3 d3Value;
+			// captures D3 for whatever runtime class extends this Abstractbuilder
+			private final TypeToken<D3> d3TypeToken = new TypeToken<D3>(getClass()) {};
+
+			public AbstractBuilder() {
+				// check if TypeToken is generic; verifyTypeClass throws useful msg
+				verifyTypeClass(d3TypeToken, getClass());
+			}
+
+			public T d3Data(D3 val) {
+				d3Value = val;
+				return self();
+			}
+		}
+
+		// Regular Builder for direct instantiation
+		public static class Builder<D2, D3>
+				extends AbstractBuilder<D2, D3, Builder<D2, D3>> {
+			// self type idiom
+			@Override
+			protected Builder<D2, D3> self() { return this; }
+
+			@Override
+			public DbComboBox2Extra<D2, D3> build() {
+				return new DbComboBox2Extra<>(this);
+			}
+		}
+
+		protected DbComboBox2Extra(AbstractBuilder<D2, D3, ?> builder) {
+			super(builder);
+			d3Value = builder.d3Value;
+			d3TypeToken = builder.d3TypeToken;
+		}
+
+		public D3 getD3() { return d3Value; }
+		public TypeToken<D3> getD3TypeToken() { return d3TypeToken; }
+	}
+
+	private void comboPlay() {
+		if (Boolean.TRUE)
+			return;
+		new DbComboBox2Extra.Builder<Double, List<Double>>() { };
+
+		@SuppressWarnings("unused")
+		DBComboBox2.Builder<Integer, String, Byte> b
+				= new DBComboBox2.Builder<Integer,String,Byte>(){};
+		
+		@SuppressWarnings("unused")
+		DBComboBox2<Integer,String,Byte> x1
+				= new DBComboBox2.Builder<Integer,String,Byte>() {}
+						.primaryKeyColumnName("aaa")
+						.displayColumnName("bbb")
+						.build();
+		
+		
+		MyDbComboBox dbCombo = new MyDbComboBox.Builder() // don't need {}
+				.primaryKeyColumnName("x")
+				.displayColumnName("y")
+				.build();
+		System.out.println(""+dbCombo.getD2Type());
+		
+		DbComboBox2Extra<Double, List<Double>> cbExtra
+				= new DbComboBox2Extra.Builder<Double, List<Double>>() { } // <- "{ }" NEEDED
+						.primaryKeyColumnName("aaa")
+						.displayColumnName("bbb")
+						.d3Data(new ArrayList<>())
+						.build();
+		cbExtra.getD3().addAll(List.of(7D, 6D, 5D));
+		System.out.println(""+cbExtra.getKeyType());
+		System.out.println(""+cbExtra.getDisplayValueType());
+		System.out.println(""+cbExtra.getD2Type());
+		System.out.println(""+cbExtra.getD3TypeToken());
+		System.out.println(""+cbExtra.getD3());
 	}
 
 	/**
@@ -108,7 +205,8 @@ public class Example4 extends JFrame {
 	 */
 	SSTextField txtPartID = new SSTextField();
 	SSTextField txtPartName = new SSTextField();
-	MyComboBox2<Byte> cmbPartColor = new MyComboBox2<>(comboModelType) { };
+	MyComboBox2<Byte> cmbPartColor = new MyComboBox2.Builder<Byte>() { }
+			.modelType(comboModelType).build();
 	SSTextField txtPartWeight = new SSTextField();
 	SSTextField txtPartCity = new SSTextField();
 
@@ -130,19 +228,20 @@ public class Example4 extends JFrame {
 	 */
 	@SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
 	public Example4(final Connection _dbConn) {
-		
 		// SET SCREEN TITLE
 		super("Example4");
 		DemoUtil.initExampleFrame(this, null);
-		
-		// SET CONNECTION
-		connection = _dbConn;
+
+		comboPlay();
 		
 		// SET SCREEN DIMENSIONS
 		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 		
 		// SET SCREEN POSITION
 		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+		
+		// SET CONNECTION
+		connection = _dbConn;
 		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
@@ -162,9 +261,8 @@ public class Example4 extends JFrame {
 		// Use the "order by" to exercise SSSyncManager's "perform a manual loop"
 		@SuppressWarnings("unused")
 		String simpleQuery = "SELECT * FROM part_data;";
-		@SuppressWarnings("unused")
 		String orderedQuery = "SELECT * FROM part_data order by part_name;";
-		String query = SSDBSupport.getDefault().createRownumQuery(
+		String query = SSUtils.dbSupport().createRownumQuery(
 				"*", "rown", "part_data", "ORDER BY part_name");
 
 		boolean comboHasRowNum = false;
@@ -176,11 +274,12 @@ public class Example4 extends JFrame {
 		}
 
 		SSDBComboBox.Builder builder = new SSDBComboBox.Builder();
-		builder.modelType(comboModelType)
-				//.connection(connection)
+		builder.connection(connection)
 				.query(query)
 				.primaryKeyColumnName("part_id")
 				.displayColumnName("part_name");
+		if (!comboModelType.equals(DbComboBox2Extra.DEFAULT_MODEL_DB_COMBO2))
+			builder.modelType(comboModelType);
 		if (comboHasRowNum)
 			builder.d2ColumnName("rown");
 

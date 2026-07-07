@@ -34,14 +34,14 @@ import java.sql.Connection;
 /**
  * For H2.
  */
-public class H2Support extends DefaultSSDBSupport
+public class H2DbSupport extends DefaultDbSupport
 {
 
 	/**
 	 * For H2.
 	 * @param sharedConnection
 	 */
-	public H2Support(Connection sharedConnection)
+	public H2DbSupport(Connection sharedConnection)
 	{
 		super(sharedConnection);
 	}

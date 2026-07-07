@@ -57,16 +57,20 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 	 * Builder.
 	 */
 	public static class Builder
-			extends DBComboBox2.AbstractB<Long, Object, Object, Builder> {
+			extends DBComboBox2.AbstractBuilder<Long, Object, Object, Builder> {
+
+		/** defaults to ModelTYpe.GLAZED */
+		public Builder() { modelType(ModelType.GLAZED); }
+		
 		/** self type idiom */
 		@Override protected Builder self() { return this; }
-
+		
 		/** @return */
 		@Override public SSDBComboBox build() { return new SSDBComboBox(this); }
 	}
 	/** @param builder */
 	private SSDBComboBox(Builder builder) { super(builder); }
-
+	
 	/**
 	 * Create SSDBComboBox with GlazedLists.
 	 * GlazedLists is configured strict.
@@ -74,57 +78,55 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 	 */
 	public SSDBComboBox()
 	{
-		this(new Builder().modelType(ModelType.GLAZED));
+		this(new Builder());
 	}
-
+	
 	/**
 	 * Create SSDBComboBox with GlazedLists.
 	 * GlazedLists is configured strict.
 	 * Use {@link #getAutoComplete() } to change its configuration.
-	 * 
+	 *
 	 * @param _connection
 	 * @param _primaryKeyColumnName
-	 * @param _displayColumnName 
+	 * @param _displayColumnName
 	 */
 	public SSDBComboBox(Connection _connection,
-						String _primaryKeyColumnName, String _displayColumnName)
+			String _primaryKeyColumnName, String _displayColumnName)
 	{
 		this(new Builder()
-				.modelType(ModelType.GLAZED)
 				.connection(_connection)
 				.primaryKeyColumnName(_primaryKeyColumnName)
 				.displayColumnName(_displayColumnName)
 		);
 	}
-
+	
 	/**
 	 * Create SSDBComboBox with GlazedLists.
 	 * GlazedLists is configured strict.
 	 * Use {@link #getAutoComplete() } to change its configuration.
-	 * 
+	 *
 	 * @param _connection
 	 * @param _query
 	 * @param _primaryKeyColumnName
-	 * @param _displayColumnName 
+	 * @param _displayColumnName
 	 */
 	public SSDBComboBox(Connection _connection, String _query,
-						String _primaryKeyColumnName, String _displayColumnName)
+			String _primaryKeyColumnName, String _displayColumnName)
 	{
 		this(new Builder()
-				.modelType(ModelType.GLAZED)
 				.connection(_connection)
 				.query(_query)
 				.primaryKeyColumnName(_primaryKeyColumnName)
 				.displayColumnName(_displayColumnName)
 		);
 	}
-
+	
 	public void setSecondDisplayColumnName(final String secondDisplayColumnName) {
 		super.setD2ColumnName(secondDisplayColumnName);
 	}
-
+	
 	public void setSeparator(final String separator) {
 		getListItemFormat().setSeparator(separator);
 	}
-
+	
 }

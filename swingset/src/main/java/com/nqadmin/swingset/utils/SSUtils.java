@@ -77,10 +77,14 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import com.nqadmin.swingset.datasources.SSDBSupport;
+import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+
 import com.nqadmin.swingset.navigate.RowsModel;
 
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
+
+import com.nqadmin.swingset.datasources.DbSupport;
 
 
 /**
@@ -276,6 +280,26 @@ public class SSUtils {
 	}
 
 	/**
+	 * Returns the current DbSupport from the lookup.
+	 * @return DbSupport
+	 */
+	public static DbSupport dbSupport() {
+		if (dbSupport == null) {
+			dbSupportResult = CentralLookup.getDefault().lookupResult(DbSupport.class);
+			dbSupportResult.addLookupListener((LookupEvent le)-> {
+				dbSupportResult.allInstances().stream().findFirst()
+						.ifPresent(item -> dbSupport = item);
+			});
+			dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
+			if (dbSupport == null)
+				throw new IllegalStateException("SSDBSupport not found");
+		}
+		return dbSupport;
+	}
+	private static DbSupport dbSupport;
+	private static Lookup.Result<DbSupport> dbSupportResult;
+
+	/**
 	 * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's
 	 * row set to get the database table's keys.
 	 * If not a CachedRowSet or the key is already set, do nothing.
@@ -295,7 +319,7 @@ public class SSUtils {
 			if (crs.getKeyColumns() != null)
 				return;
 			int[] keys = getPrimaryKeyColumns(
-					SSDBSupport.getDefault().getSharedConnection(crs), crs);
+					SSUtils.dbSupport().getSharedConnection(crs), crs);
 			crs.setKeyColumns(keys);
 		} catch (SQLException ex) {
 		}
@@ -392,7 +416,7 @@ public class SSUtils {
 		String table   = rsMetaData.getTableName(colIdx);
 
 		// TODO: just call all the names keys. Buggy if join ...
-		List<KeyInfo> ki = SSDBSupport.getDefault().runWithConnection(rs,
+		List<KeyInfo> ki = SSUtils.dbSupport().runWithConnection(rs,
 				conn -> {
 					DatabaseMetaData dbMetaData = conn.getMetaData();
 					// TODO: some versions of Postgress require null catalog
@@ -444,6 +468,17 @@ public class SSUtils {
 	 */
 	public static String NullabilityMismatch(boolean oldVal, boolean newVal) {
 		return sf("Nullability mismatch: old %s, new %s", oldVal, newVal);
+	}
+
+	/**
+	 * An unexpected/impossible SQL exception.
+	 * Send mail; Dialog: contact admin; ...?
+	 * @param ex
+	 * @param logger
+	 */
+	public static void randomSQLException(Exception ex, Logger logger) {
+		logger.log(Level.ERROR, ex.getMessage(), ex);
+		beep();
 	}
 
 	/**

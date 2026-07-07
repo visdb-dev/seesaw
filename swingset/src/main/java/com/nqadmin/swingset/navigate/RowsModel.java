@@ -58,7 +58,6 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
@@ -78,6 +77,8 @@ import static com.nqadmin.swingset.utils.SSUtils.NullabilityMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
+
+import com.nqadmin.swingset.datasources.DbSupport;
 
 /**
  * The RowsModel is associated with a {@link javax.sql.RowSet}.
@@ -371,6 +372,8 @@ public final class RowsModel
 		RowSet oldRowSet = getRowSet();
 		rowSetListener.unregisterFrom(oldRowSet);
 		setNavState(rs, dbOps);
+		if (rs != null)
+			getNavState().updateActionState();
 
 		rowSetListener.registerTo(rs);
 		enq.postNewRowSetEvent(this, oldRowSet);
@@ -455,7 +458,7 @@ public final class RowsModel
 	 * @throws java.sql.SQLException
 	 */
 	// TODO: need javadoc examples.
-	public void rsOp(Object operator, SSDBSupport.RunnableSQL r) throws SQLException
+	public void rsOp(Object operator, DbSupport.RunnableSQL r) throws SQLException
 	{
 			RowsModel.startRowsEvent(OperatorKind.OTHER, this, operator);
 			try {
@@ -639,7 +642,7 @@ public final class RowsModel
 	 * @return true if cursor on a row or insert row
 	 * @throws SQLException 
 	 */
-	public boolean hasActiveRow() throws SQLException {
+	public boolean onActiveRow() throws SQLException {
 		return getRow() != 0 || isOnInsertRow();
 	}
 

@@ -50,6 +50,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -59,6 +61,8 @@ import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -91,20 +95,27 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * Provide a way of displaying "options/text", corresponding to
- * "keys/mappings" in a {@code JComboBox} . The combo display values are created
+ * Provide a way of displaying "text", corresponding to
+ * "keys" in a {@code JComboBox} . The combo display values are created
  * by an {@linkplain SSListItemFormat}. If not specified, keys are auto-generated
- * [0-N); and in this case {@literal "<K>"} must be "Integer" or "Long". In some
- * applications, a key may be a key in some database table, see
- * {@linkplain DBComboBox2}. There are convenience methods for using an enum as
- * the basis of "options"/"keys", see {@link #setDisplayValues(java.lang.Class)}.
+ * [0-N); and in this case {@code <K>} must be "Integer" or "Long". In some
+ * applications, a key is a key in some database table, see
+ * {@linkplain DBComboBox2}. There are convenience methods for using an enum
+ * for both "text" and "keys", see
+ * {@link #setDisplayValues(java.lang.Class)}.
  * <p>
  * This is the base class for combo boxes; it uses/handles {@link #getAllowNull()
  * getAllowNull()}/{@link #setAllowNull(boolean) setAllowNull(boolean)},
  * and tracks metadata changes, for adding/removing nullItem to the item list.
  * In addition, there are JComboBox models for use with or without glazed lists;
  * these models have static methods for hooking things up to the JComboBox,
- * see {@linkplain ModelType}, which may be used in constructors to select the model type.
+ * see {@linkplain ModelType}, which is used with
+ * {@link Builder#modelType(com.nqadmin.swingset.core.ComboBox2.ModelType)
+ * Builder.modelType(modelType)}
+ * to select the model type.
+ * <p>
+ * See <a href="DBComboBox2.html#builders-and-generics">
+ * DBComboBox2 examples of working with {@code Builder}s.</a>
  * <p>
  * <b>Warning:
  * This combo box automatically inserts an item when {@link #getAllowNull()} is true.
@@ -434,65 +445,37 @@ public class ComboBox2<K,D,D2>
 	protected KeyDisplayValueSwingModel<K,D,D2> keyVisual;
 
 	// The actual type of the key.
-	private Class<K> keyType;
+	private TypeToken<K> keyTypeToken;
 
 	/**
 	 * Return the actual type of the Key parameter.
 	 * @return the type
 	 */
+	@SuppressWarnings("unchecked")
 	final public Class<K> getKeyType() {
-		if (keyType == null) {
-			TypeToken<K> typeToken = new TypeToken<K>(getClass()) { };
-			checkIsClass(typeToken);
-			@SuppressWarnings("unchecked")
-			Class<K> t = (Class<K>) typeToken.getType();
-			keyType = t;
-		}
-		return keyType;
+		return (Class<K>) keyTypeToken.getType();
 	}
 
 	// The actual type of the displayValue.
-	private Class<D> displayValueType;
+	private TypeToken<D> displayValueTypeToken;
 
 	/**
 	 * Return the actual type of the Visual parameter.
 	 * @return the type
 	 */
+	@SuppressWarnings("unchecked")
 	final public Class<D> getDisplayValueType() {
-		if (displayValueType == null) {
-			TypeToken<D> typeToken = new TypeToken<D>(getClass()) { };
-			checkIsClass(typeToken);
-			@SuppressWarnings("unchecked")
-			Class<D> t = (Class<D>) typeToken.getType();
-			displayValueType = t;
-		}
-		return displayValueType;
+		return (Class<D>) displayValueTypeToken.getType();
 	}
 
-	private Class<D2> d2Type;
+	private TypeToken<D2> d2TypeToken;
 	/**
 	 * Return the actual type of the Visual2 parameter.
 	 * @return the type
 	 */
+	@SuppressWarnings("unchecked")
 	final public Class<D2> getD2Type() {
-		if (d2Type == null) {
-			TypeToken<D2> typeToken = new TypeToken<D2>(getClass()) { };
-			checkIsClass(typeToken);
-			@SuppressWarnings("unchecked")
-			Class<D2> t = (Class<D2>) typeToken.getType();
-			d2Type = t;
-		}
-		return d2Type;
-	}
-
-	private void checkIsClass(TypeToken<?> typeToken) {
-		if (typeToken.getType() instanceof Class<?>)
-			return;
-		throw new ClassCastException(
-				sf("'%s' unresolved, non generic subclass required,"
-						+ " use '{ }', like 'new %s<>() { }'",
-						typeToken.getType(),
-						getClass().getSimpleName()));
+		return (Class<D2>) d2TypeToken.getType();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -528,7 +511,8 @@ public class ComboBox2<K,D,D2>
 				: null;
 	}
 
-	private static final ModelType DEFAULT_COMBO_MODEL = ModelType.SWING;
+	/** default model */
+	public static final ModelType DEFAULT_MODEL_COMBO2 = ModelType.SWING;
 
 	/**
 	 * To build a ComboBox2 with the specified parameters.
@@ -538,9 +522,22 @@ public class ComboBox2<K,D,D2>
 	 * @param <D2>
 	 * @param <T> 
 	 */
-	public abstract static class AbstractB<K, D, D2, T extends AbstractB<K, D, D2, T>> {
-		private ModelType modelType = DEFAULT_COMBO_MODEL;
+	public abstract static class AbstractBuilder<K, D, D2, T extends AbstractBuilder<K, D, D2, T>> {
+		private ModelType modelType = DEFAULT_MODEL_COMBO2;
 		private boolean d2DisplayEnabled;
+		/** TypeToken K */
+		protected final TypeToken<K> typeTokenK = new TypeToken<K>(getClass()) {};
+		/** TypeToken D */
+		protected final TypeToken<D> typeTokenD = new TypeToken<D>(getClass()) {};
+		/** TypeToken D2 */
+		protected final TypeToken<D2> typeTokenD2 = new TypeToken<D2>(getClass()) {};
+
+		/** AbstractBuilder */
+		public AbstractBuilder() {
+			verifyTypeClass(typeTokenK, getClass());
+			verifyTypeClass(typeTokenD, getClass());
+			verifyTypeClass(typeTokenD2, getClass());
+		}
 
 		/** {@link ModelType#GLAZED} or {@link ModelType#SWING};
 		 * default: {@link ModelType#SWING}.
@@ -575,7 +572,7 @@ public class ComboBox2<K,D,D2>
 	 * @param <D>
 	 * @param <D2> 
 	 */
-	public static class Builder<K, D, D2> extends AbstractB<K, D, D2, Builder<K, D, D2>> {
+	public static class Builder<K, D, D2> extends AbstractBuilder<K, D, D2, Builder<K, D, D2>> {
 
 		/** self type idiom */
 		@Override
@@ -584,16 +581,73 @@ public class ComboBox2<K,D,D2>
 		/** Create ComboBox2 */
 		@Override
 		public ComboBox2<K, D, D2> build() { return new ComboBox2<>(this); }
-
 	}
 
 	/**
 	 * 
 	 * @param builder 
 	 */
-	protected ComboBox2(AbstractB<K, D, D2, ?> builder) {
+	protected ComboBox2(AbstractBuilder<K, D, D2, ?> builder) {
 		this(builder.modelType);
 		d2DisplayEnabled = builder.d2DisplayEnabled;
+		
+		keyTypeToken = builder.typeTokenK;
+		displayValueTypeToken = builder.typeTokenD;
+		d2TypeToken = builder.typeTokenD2;
+	}
+	/**
+	 * Verify that the {@code typeToken } captured a concrete type.
+	 * @param typeToken
+	 * @param builderClass used to generate useful message
+	 * @throws IllegalArgumentException if concrete type was not captured
+	 */
+	protected static final void verifyTypeClass(TypeToken<?> typeToken, Class<?> builderClass)
+			throws IllegalArgumentException {
+		if (isConcrete(typeToken))
+			return;
+
+		// This might be handy, if "xxx.yyy.zzz$1", following give "xxx.yyy.zzz"
+		// builderClass.getEnclosingClass(); 
+		// Pattern p1 = Pattern.compile("(.*)([$][^$]+)$");
+		// Matcher m1 = p1.matcher("one.two$three$four"); // "one.two$three", "$four"
+
+		String className = builderClass.getCanonicalName();
+		boolean isDollar = false;
+		if (className == null) {
+			className = builderClass.getName(); // like "com.one.two$1"
+			isDollar = true;
+		}
+
+		Matcher matcher = Pattern.compile("(\\w+)[.$](\\w+)$").matcher(className);
+		String msgName = "Some.Builder";
+		if (matcher.find()) {
+			msgName = isDollar ? matcher.group(1) + ".Builder" : matcher.group();
+		}
+		
+		throw new IllegalArgumentException(
+				sf("'%s' unresolved, non generic subclass required,"
+						+ " See DBComboBox2 javadoc,"
+						+ " use '{ }' on the Builder, like 'new %s<>() { }'",
+						typeToken.getType(), msgName));
+	}
+
+	/** Is the TypeToken generic or not.
+	 * @param token
+	 * @return  true if not generic */
+	protected static boolean isConcrete(TypeToken<?> token) {
+		Type type = token.getType();
+		
+		if (type instanceof ParameterizedType pType) {
+			for (Type arg : pType.getActualTypeArguments()) {
+				// If any argument is still a generic TypeVariable or WildcardType, it's not concrete
+				if (!(arg instanceof Class)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		// Base case: Not a parameterized type, but is a concrete class
+		return type instanceof Class;
 	}
 
 	/**
@@ -612,14 +666,6 @@ public class ComboBox2<K,D,D2>
 	private ComboBox2(ModelType modelType) {
 		addItemListener(new ComboBox2ItemListener());
 		finishSSCommon();
-
-		try {
-			getKeyType();
-			getDisplayValueType();
-			getD2Type();
-		} catch(ClassCastException ex) {
-			throw new IllegalStateException(ex.getMessage(), ex);
-		}
 
 		keyVisual = switch(modelType) {
 		case GLAZED -> BaseGlazedModel.install(this);
@@ -818,7 +864,7 @@ public class ComboBox2<K,D,D2>
 	 * @param displayValues  displayValues to be displayed in the list box.
 	 * @param keys null or database values that correspond to the displayValues, 1 to 1,
 	 * in the list box.
-	 * @param d2s
+	 * @param d2s null or extra data values
 	 * @throws IllegalArgumentException if lists are not the same size.
 	 */
 	public void setDisplayValues(List<D> displayValues, List<K> keys, List<D2> d2s) {
@@ -1033,16 +1079,18 @@ public class ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Return the chosenItem with methods getKey() and getDisplayValue().
+	 * Return a copy of the chosenItem with methods getKey(), getDisplayValue();
+	 * if hasD2() there's getD2().
 	 * <p>
 	 * Here's an example of creating a non-generic version of
 	 * getChosenItem().
 	 * {@snippet class=ComboBoxSnippets region=chosen_item}
-	 * @return the chosen item
+	 * @return a copy of the chosen item
 	 */
 	// TODO: return new Item2<>(SSListItem)
 	protected Item2<K,D,D2> getChosenItem() {
-		return new Item2<>(getChosenKey(), getChosenDisplayValue());
+		return !hasD2() ? new Item2<>(getChosenKey(), getChosenDisplayValue())
+				: new Item2<>(getChosenKey(), getChosenDisplayValue(), getChosenD2());
 	}
 
 	/**

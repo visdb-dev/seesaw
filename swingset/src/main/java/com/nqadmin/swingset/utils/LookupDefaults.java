@@ -53,10 +53,15 @@ import com.nqadmin.swingset.decorators.TextStyles;
  * Certain initialization access to this library does not force this initialization,
  * for example first access to the library could be something like:
  * {@snippet lang="java":
- *     // Add application defaults to CentralLookup.
- *     CentralLookup lkup = CentralLookup.getDefault();
- *     lkup.add(new DefaultSSDBSupport(dbConnection));
- *     // keep adding stuff as needed
+ *     public static void main(String[] args) {
+ *         // Add application defaults to CentralLookup.
+ *         CentralLookup lkup = CentralLookup.getDefault();
+ *         // lkup.add(anInstanceofSomething);
+ *         // keep adding stuff as needed
+ *         LookupDefaults.init();
+ *         // ...
+ *         DbSupport supp = DbSupportFactory.setupLookup(dbConnection);
+ *     }
  * }
  */
 public class LookupDefaults

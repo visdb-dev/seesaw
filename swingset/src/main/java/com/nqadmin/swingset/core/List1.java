@@ -523,7 +523,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 		//		 Seems like it, it's used just about everywhere else.
 		//
 		try {
-			if (getRowsModel().hasActiveRow())
+			if (getRowsModel().onActiveRow())
 				array = dbCollection.readData(List1.this);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);

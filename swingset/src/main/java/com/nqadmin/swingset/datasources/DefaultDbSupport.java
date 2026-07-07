@@ -62,7 +62,7 @@ import com.nqadmin.swingset.utils.SSUtils;
  *       could be from different database.
  */
 // TODO: clarify semantics of how many connections are supported
-public class DefaultSSDBSupport implements SSDBSupport
+public class DefaultDbSupport implements DbSupport
 {
 	private final Connection sharedConnection;
 
@@ -73,7 +73,7 @@ public class DefaultSSDBSupport implements SSDBSupport
 	 * 
 	 * @param sharedConnection 
 	 */
-	public DefaultSSDBSupport(Connection sharedConnection)
+	public DefaultDbSupport(Connection sharedConnection)
 	{
 		if (!SSUtils.isJunit())
 			Objects.requireNonNull(sharedConnection);

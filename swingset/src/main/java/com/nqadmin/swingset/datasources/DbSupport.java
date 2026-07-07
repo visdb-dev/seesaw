@@ -50,7 +50,6 @@ import javax.sql.RowSet;
 
 import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.RowSetOps.DbUpdate;
-import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
@@ -63,17 +62,7 @@ import com.nqadmin.swingset.utils.SSSyncManager;
  * shouldn't be in mainline code; and it provides a way to find out where those
  * places are. 
  */
-public interface SSDBSupport {
-
-	/**
-	 * Find the default.
-	 * @return
-	 */
-	static SSDBSupport getDefault() {
-		SSDBSupport support = CentralLookup.getDefault().lookup(SSDBSupport.class);
-		return support;
-	}
-
+public interface DbSupport {
 	/**
 	 * For the typical simple cases run the columnRead to set the value.
 	 * Note that the columnUpdater typically ignores the comp argument, but
@@ -131,7 +120,7 @@ public interface SSDBSupport {
 	 *                       "part_data",
 	 *                       "ORDER BY part_name");
 	 * }
-	 * The {@code H2} {@code SSDBSupport} uses the the {@code H2} builtin
+	 * The {@code H2} {@code DbSupport} uses the the {@code H2} builtin
 	 * function {@code ROWNUM()}
 	 * and returns the string {@snippet :
 	 * SELECT part_id, part_name, ROWNUM() AS rown
@@ -174,6 +163,8 @@ public interface SSDBSupport {
 	 * Return a connection for quick use that
 	 * connects to the database where the row set comes from.
 	 * <em>Do not close</em> the returned connection after use.
+	 * Using this to create a ResultSet/JdbcRowSet that stays open
+	 * is <em>not quick</em>.
 	 * 
 	 * @param rs row set from target database or null for a default connection.
 	 * @return connection or null if none found

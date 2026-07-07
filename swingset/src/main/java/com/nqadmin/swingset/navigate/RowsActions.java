@@ -677,7 +677,7 @@ final class RowsActions
 				}
 				
 				// CAPTURE CURRENT ROW PRE-DELETION
-				final int tmpPosition = getNavState().currentRow;
+				final int tmpPosition = getNavState().getRow();
 				
 				// SET ANTICIPATED ROW COUNT POST-DELETION
 				final int tmpSize = getNavState().rowCount-1;

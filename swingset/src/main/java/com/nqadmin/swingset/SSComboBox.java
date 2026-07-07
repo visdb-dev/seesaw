@@ -53,7 +53,7 @@ public class SSComboBox extends ComboBox1<Integer, String>
 {
 	/** Builder */
 	public static class Builder
-			extends ComboBox1.AbstractB<Integer, String, Builder> {
+			extends ComboBox1.AbstractBuilder<Integer, String, Builder> {
 
 		/** self type idiom */
 		@Override protected Builder self() { return this; }

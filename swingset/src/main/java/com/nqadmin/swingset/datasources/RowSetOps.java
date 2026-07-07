@@ -489,7 +489,7 @@ public class RowSetOps {
 		Objects.requireNonNull(rsc);
 
 		if (rsc instanceof SSComponent comp) {
-			SSDBSupport.DbReader<RowSet, Integer, SSComponent> columnReader = comp.getColumnReader();
+			DbSupport.DbReader<RowSet, Integer, SSComponent> columnReader = comp.getColumnReader();
 			if (columnReader != null)
 				return comp.getColumnReader()
 						.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
@@ -654,7 +654,7 @@ public class RowSetOps {
 	{
 		return UndoRedo.isUndoRedoEnabled(comp)
 				? UndoRedo.fetchCurrentChange(comp).value()
-				: SSDBSupport.runDbReader(comp);
+				: DbSupport.runDbReader(comp);
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -721,7 +721,7 @@ public class RowSetOps {
 		
 		// Get a resultSet that is probably the same as the RowSet associated
 		// with the param comp.
-		Connection conn = defLookup(SSDBSupport.class).getSharedConnection(comp.getRowSet());
+		Connection conn = SSUtils.dbSupport().getSharedConnection(comp.getRowSet());
 		try(Statement statement = conn.createStatement(
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
 			ResultSet rs = statement.executeQuery(comp.getRowSet().getCommand());
@@ -1002,7 +1002,7 @@ public class RowSetOps {
 	public static DbUpdate updateColumn(SSComponent comp, Object value)
 			throws SQLException
 	{
-		DbUpdate dbUpdate = SSDBSupport.runDbUpdater(comp, value);
+		DbUpdate dbUpdate = DbSupport.runDbUpdater(comp, value);
 		return dbUpdate;
 	}
 

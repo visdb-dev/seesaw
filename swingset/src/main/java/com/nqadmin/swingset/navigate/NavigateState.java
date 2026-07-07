@@ -171,7 +171,7 @@ final class NavigateState
 	//
 
 	// TODO: Should the static methods have instance counterparts,
-	//		 e.g. hasActiveRow. Then could make direct queries when
+	//		 e.g. onActiveRow. Then could make direct queries when
 	//		 a Navigation is available.
 
 	/**
@@ -373,7 +373,7 @@ final class NavigateState
 
 	
 	/** Row number for current record in RowSet. */  // TODO: is this needed? Save much?
-	/*private*/ int currentRow = 0;
+	private int currentRow = 0;
 
 	/** Container (frame or internal frame) which contains the navigator. */
 	/*private*/ DbOpsCustomizer dbOps = new DbOpsCustomizer() {};
@@ -515,6 +515,19 @@ final class NavigateState
 	 */
 	final RowSet getRowSet() {
 		return rowSet;
+	}
+
+	/**
+	 * @return returns the RowSet's current row being used.
+	 */
+	final int getRow() {
+		return currentRow;
+		// try {
+		// 	return getRowSet().getRow();
+		// } catch (SQLException ex) {
+		// 	SSUtils.randomSQLException(ex, logger);
+		// 	return 0;
+		// }
 	}
 
 	/**
@@ -957,7 +970,7 @@ final class NavigateState
 	 * @see #updateActionStateWithDatabaseCheck() 
 	 */
 	/*private*/ void updateActionState() {
-		logger.log(TRACE, () -> sf("rowCount=%d, currentRow=%d", rowCount, currentRow));
+		logger.log(TRACE, () -> sf("rowCount=%d, currentRow=%d", rowCount, getRow()));
 		List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
 		if (rowsModels.isEmpty())
 			logger.log(DEBUG, () -> sf("No RowsModel for rowSet %s", objectID(getRowSet())));
@@ -982,8 +995,8 @@ final class NavigateState
 
 		// Handle first, prev, next, last (but there's that option for later)
 		boolean canNavigate = rowCount != 0 && !onInsertRow && !disablingAutoCommit;
-		boolean atFirst = currentRow == 1;
-		boolean atLast = currentRow == rowCount;
+		boolean atFirst = getRow() == 1;
+		boolean atLast = getRow() == rowCount;
 
 		updateEnable(ACT_FIRST, canNavigate && !atFirst);
 		updateEnable(ACT_PREVIOUS, canNavigate && !atFirst);
@@ -1050,9 +1063,9 @@ final class NavigateState
 		currentRow = getRowSet().getRow();
 
 		rowNumberModel.setMaximum(rowCount);
-		rowNumberModel.setValue(currentRow);
+		rowNumberModel.setValue(getRow());
 
-		logger.log(DEBUG, () -> "Current Row: " + currentRow + ". Row Count: " + rowCount);
+		logger.log(DEBUG, () -> "Current Row: " + getRow() + ". Row Count: " + rowCount);
 		//logger.debug("Stack trace:", new Throwable());
 
 		updateActionStateWithDatabaseCheck();
@@ -1067,7 +1080,7 @@ final class NavigateState
 	 */
 	@Deprecated
 	public boolean updatePresentRow() {
-		if (RowSetState.isInserting(getRowSet()) || (currentRow > 0)) {
+		if (RowSetState.isInserting(getRowSet()) || (getRow() > 0)) {
 			logger.log(DEBUG, "Doing NAV_COMMIT.");
 			// TODO: minor optim getAnyRowModel(getRowSet())
 			List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());

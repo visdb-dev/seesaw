@@ -35,6 +35,8 @@ import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 /**
  * Metadata cache.
  */
@@ -100,7 +102,7 @@ public class DbMetadataCache
 
 	// TODO: cache this
 	private Connection getSharedConnection(RowSet rs) throws SQLException {
-		return SSDBSupport.getDefault().getSharedConnection(rs);
+		return SSUtils.dbSupport().getSharedConnection(rs);
 	}
 	
 }

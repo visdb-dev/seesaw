@@ -55,7 +55,7 @@ import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.datasources.SSDBSupport;
+import com.nqadmin.swingset.datasources.DbSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -64,7 +64,7 @@ import static java.lang.System.Logger.Level.*;
 /**
  * Used to synchronize a data navigator and a navigation ComboBox.
  * The combobox may contain the original row number, see
- * {@link SSDBSupport#createRownumQuery(String, String, String, String) },
+ * {@link DbSupport#createRownumQuery(String, String, String, String) },
  * {@link SSDBComboBox#setD2ColumnName(String)}
  * and {@link #setComboHasRowNum(boolean)}<br>
  * <b>Otherwise</b>: The SSDBComboBox and the RowSet queries should select the same
