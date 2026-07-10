@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import com.nqadmin.swingset.utils.CentralLookup;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 import static java.lang.System.Logger.Level.ERROR;
 
@@ -50,7 +50,7 @@ import static java.lang.System.Logger.Level.ERROR;
 public class DbSupportFactory
 {
 	private DbSupportFactory() { }
-	private static final System.Logger logger = SSUtils.getLogger();
+	private static final System.Logger logger = JStuff.getLogger();
 	// Something simple for now.
 	private static final HashMap<String, Function<Connection, DbSupport>> creators
 			= new HashMap<>(Map.of("H2", (Connection conn) -> new H2DbSupport(conn)));

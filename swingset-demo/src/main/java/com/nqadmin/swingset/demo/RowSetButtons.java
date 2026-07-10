@@ -39,9 +39,9 @@ import javax.swing.JPanel;
 
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * x
@@ -49,7 +49,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 @SuppressWarnings("serial")
 public abstract class RowSetButtons extends JPanel
 {
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
 
 	record ScreenInfo(Logger logger, RowsModel rowsModel){}
 	abstract ScreenInfo getScreenInfo();

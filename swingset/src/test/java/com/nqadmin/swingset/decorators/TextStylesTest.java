@@ -62,7 +62,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

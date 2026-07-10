@@ -62,7 +62,7 @@ import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 
 import static com.nqadmin.swingset.navigate.RowsAction.*;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**

@@ -42,7 +42,7 @@ import com.google.common.collect.ImmutableList;
 import com.nqadmin.swingset.formatting.FormatterFactory.SSNullFormatter;
 
 import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter.FORMATTING_CHARS;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * Common things for working with {@link SSFormattedTextField} and their

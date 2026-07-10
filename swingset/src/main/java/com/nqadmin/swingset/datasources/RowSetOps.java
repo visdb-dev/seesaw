@@ -64,6 +64,7 @@ import javax.sql.rowset.spi.SyncResolver;
 import com.nqadmin.swingset.datasources.Utils.ConflictRow;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.UndoRedo;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -74,7 +75,7 @@ import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -88,7 +89,7 @@ public class RowSetOps {
 
 	private RowSetOps(){}
 
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
 

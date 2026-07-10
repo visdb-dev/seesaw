@@ -58,7 +58,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.nqadmin.swingset.datasources.ConvertType.Clazz.getClazz;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.sql.JDBCType.*;
 
 // TODO: Wonder if a "X --> Y" sparse matrix filled with converters... guava table.

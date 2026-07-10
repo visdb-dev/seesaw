@@ -57,12 +57,14 @@ import com.google.common.eventbus.EventBus;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
+import com.nqadmin.swingset.datasources.DbSupport;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.LookupDefaults;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
@@ -72,13 +74,11 @@ import com.raelity.lib.eventbus.WeakEventBus;
 import static com.nqadmin.swingset.navigate.RowsAction.*;
 import static com.nqadmin.swingset.navigate.RowsModelEventHandling.postAsync;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.JDBCTypeMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.NullabilityMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.datasources.DbSupport;
 
 /**
  * The RowsModel is associated with a {@link javax.sql.RowSet}.
@@ -105,7 +105,7 @@ public final class RowsModel
 {
 	static { LookupDefaults.init(); }
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	// Used like a WeakHashSet.
 	private static final Map<RowsModel,Boolean> activeRowModels

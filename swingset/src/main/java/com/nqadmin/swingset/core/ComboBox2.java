@@ -82,6 +82,7 @@ import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.navigate.ColumnChangeStartEvent;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -91,7 +92,7 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -413,7 +414,7 @@ public class ComboBox2<K,D,D2>
 	}
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * When {@link #getAllowNull() } is true, this is the null item;

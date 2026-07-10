@@ -45,7 +45,7 @@ package com.nqadmin.swingset.models;
 import java.lang.System.Logger;
 import java.sql.JDBCType;
 
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 /**
  * This is the superclass for all collection models.
@@ -57,7 +57,7 @@ public abstract class SSAbstractCollection implements SSCollection {
 	private final JDBCType jdbcType;
 
 	/** logger */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Indicate and save the type of the collection.

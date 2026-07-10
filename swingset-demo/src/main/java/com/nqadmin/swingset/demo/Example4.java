@@ -61,6 +61,7 @@ import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -85,7 +86,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 public class Example4 extends JFrame {
 
 	/** Logger */
-    static final Logger logger = SSUtils.getLogger();
+    static final Logger logger = JStuff.getLogger();
 
 	static ComboBox2.ModelType comboModelType = ComboBox2.ModelType.GLAZED;
 	

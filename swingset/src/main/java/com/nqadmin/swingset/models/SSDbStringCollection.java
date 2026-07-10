@@ -50,11 +50,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
-import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -82,7 +82,7 @@ public class SSDbStringCollection extends SSAbstractCollection {
 	private final String separatorName;
 
 	/** System Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Create model.

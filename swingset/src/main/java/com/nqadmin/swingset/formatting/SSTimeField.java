@@ -49,9 +49,9 @@ import java.text.SimpleDateFormat;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * Used to link a SSTimeField to a time column in a database.
@@ -60,7 +60,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 public class SSTimeField extends DateTimeField
 {
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
      * Create an SSTimeField using the default format.

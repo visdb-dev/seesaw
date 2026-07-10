@@ -46,8 +46,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.core.TextField;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
 import com.nqadmin.swingset.mock.TinyRS;
@@ -56,7 +56,7 @@ import com.nqadmin.swingset.navigate.EQ.BusReceiver;
 import com.raelity.lib.eventbus.WeakEventBus;
 
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
-import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
+import static com.nqadmin.swingset.utils.JStuff.getLoggerName;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
 import static java.util.logging.Level.*;
 import static org.junit.jupiter.api.Assertions.*;

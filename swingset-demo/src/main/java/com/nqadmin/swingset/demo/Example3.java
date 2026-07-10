@@ -51,18 +51,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.formatting.SSDateField;
 import com.nqadmin.swingset.formatting.SSIntegerField;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 import static com.nqadmin.swingset.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 /**
  * This example displays data from the supplier_part_data table.
@@ -78,7 +77,7 @@ public class Example3 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
 	
 	/**
 	 * screen label declarations

@@ -56,9 +56,9 @@ import javax.swing.text.JTextComponent;
 
 import com.google.common.collect.ImmutableMap;
 import com.nqadmin.swingset.formatting.SSFormat;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 import static java.sql.JDBCType.DATE;
 import static java.sql.JDBCType.TIME;
@@ -73,7 +73,7 @@ public class DateTime
 {
 	private DateTime() { }
 
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	private static final Map<JDBCType, List<DateTimeFormatter>> dateTimeParsersMap
 			= new EnumMap<>(JDBCType.class);

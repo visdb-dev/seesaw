@@ -35,10 +35,10 @@ import java.util.Map;
 
 import javax.swing.text.AttributeSet;
 
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
-import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.DEBUG;
 
 /**
@@ -49,7 +49,7 @@ import static java.lang.System.Logger.Level.DEBUG;
  */
 public class ComponentStateTextDecorator extends BaseTextDecorator
 {
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	private final EnumMap<ComponentState, String> styleNames = new EnumMap<>(ComponentState.class);
 

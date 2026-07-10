@@ -87,13 +87,13 @@ import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbArray;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
-import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompDim.*;
 import static com.nqadmin.swingset.demo.TestBaseComponents.Comps.*;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 
@@ -172,7 +172,7 @@ public class TestBaseComponents extends JFrame
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
 	
 	/**
 	 * map of 'hints' contianing info on which collection model to use

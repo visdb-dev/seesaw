@@ -73,10 +73,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -153,10 +153,10 @@ public abstract class AbstractComboBoxListSwingModel {
 	private final ComboBoxModelProxy modelProxy;
 	
 	/** System Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/** System Logger for component */
-	private static final Logger eventLogger = SSUtils.getLogger(
+	private static final Logger eventLogger = JStuff.getLogger(
 			AbstractComboBoxListSwingModel.class.getName() + ".events");
 
 	/**

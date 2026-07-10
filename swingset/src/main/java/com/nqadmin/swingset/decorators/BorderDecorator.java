@@ -58,9 +58,9 @@ import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
-import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -74,7 +74,7 @@ import static java.lang.System.Logger.Level.*;
 // TODO: could listen to components border property and adjust accordingly.
 public class BorderDecorator extends FocusDecorator
 {
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/** Typically the border that the component started with;
 	 * not focus, no error. */
@@ -147,7 +147,7 @@ public class BorderDecorator extends FocusDecorator
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	void debugCheck(ComponentState borderState) {
 		if (logger.isLoggable(DEBUG)) {
-			String caller = SSUtils.getCaller(3);
+			String caller = JStuff.getCaller(3);
 			if (caller.contains("focusGained") || caller.contains("focusLost"))
 				; //System.out.println("");
 			else

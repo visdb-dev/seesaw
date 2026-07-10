@@ -51,12 +51,13 @@ import java.util.EventListener;
 import javax.swing.JTextField;
 
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -69,7 +70,7 @@ public class TextField extends JTextField implements SSComponent
 	// losing focus; see FormattedTextField.
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Constructs a new, empty text field.

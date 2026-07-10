@@ -64,7 +64,7 @@ import com.nqadmin.swingset.SSDataValue;
 import com.nqadmin.swingset.SSTableModel;
 import com.nqadmin.swingset.datasources.RowSetOps;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**

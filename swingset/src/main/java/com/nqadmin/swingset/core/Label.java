@@ -53,10 +53,11 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * Used to display database values in a read-only JLabel.
@@ -94,7 +95,7 @@ public class Label extends JLabel implements SSComponent
 	} // end protected class LabelListener
 
 	/** Log4j Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a Label instance with

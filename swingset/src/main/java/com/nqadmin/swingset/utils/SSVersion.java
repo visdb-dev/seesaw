@@ -80,7 +80,7 @@ import static java.lang.System.Logger.Level.*;
  */
 public class SSVersion implements Comparable<SSVersion> {
 	/** Log4j Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/** Name of SwingSet version resource file. */
 	private final static String SS_VERSION_FILENAME = "swingsetVersion.properties";

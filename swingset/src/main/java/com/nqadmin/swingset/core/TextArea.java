@@ -48,12 +48,13 @@ import java.util.EventListener;
 import javax.swing.JTextArea;
 
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -70,7 +71,7 @@ public class TextArea extends JTextArea implements SSComponent {
 	/**
 	 * Logger for component
 	 */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization.

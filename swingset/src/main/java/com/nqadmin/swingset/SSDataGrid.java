@@ -90,12 +90,12 @@ import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.models.SimpleComboListSwingModel;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 import com.raelity.jdk.sun.swing.table.TableSortHeaderRenderer;
 
 import static com.nqadmin.swingset.datasources.DateTime.getDateTimeText;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -758,7 +758,7 @@ public class SSDataGrid extends JTable
 	/**
 	 * Log4j Logger for component
 	 */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Variable to indicate if rows can be deleted.

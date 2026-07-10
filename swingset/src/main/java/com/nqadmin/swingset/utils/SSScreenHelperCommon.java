@@ -58,7 +58,7 @@ import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.navigate.RowsModel;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -87,7 +87,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	public final static long hopefullyNoPKValue = -998877;
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 	
 	/**
 	 * SwingSet properties

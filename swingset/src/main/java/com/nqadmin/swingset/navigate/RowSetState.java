@@ -65,8 +65,8 @@ import com.nqadmin.swingset.utils.SSUtils.DebugRowSetListenerFlag;
 
 import static com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType.*;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * Track some global state for a row set.

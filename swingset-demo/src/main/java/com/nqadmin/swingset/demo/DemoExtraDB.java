@@ -40,10 +40,11 @@ import javax.sql.rowset.RowSetProvider;
 
 import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.navigate.RowSetState;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.demo.H2Demo.dbUrl;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * x
@@ -52,7 +53,7 @@ public class DemoExtraDB
 {
 	private DemoExtraDB() { }
 
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	// NOTE: During play, might not want the RowSet to just disapear.
 	//private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().weakValues().makeMap();

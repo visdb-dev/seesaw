@@ -104,10 +104,10 @@ import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingCachedRowSetC
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
 import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStart;
 import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.JDBCTypeMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.NullabilityMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -249,7 +249,7 @@ final class SSCommon
 	}
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/** Constant to indicate that no RowSet column index has been specified. */
 	static final int NO_COLUMN_INDEX = -1;
@@ -861,7 +861,7 @@ final class SSCommon
 	 * @return true if no error
 	 */
 	private boolean setColumn(Object value, FunctionSQL<Object, DbUpdate> updater) {
-		logger.log(DEBUG, () -> sf("%s: '%s' {%s}", getColumnForLog(), value, SSUtils.getCaller(4)));
+		logger.log(DEBUG, () -> sf("%s: '%s' {%s}", getColumnForLog(), value, JStuff.getCaller(4)));
 		try {
 			UndoRedo.captureInitialValue(getSSComponent());
 		} catch (SQLException ex) {

@@ -57,13 +57,13 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
 import com.nqadmin.swingset.navigate.RowsActions.NavGotoRowAction;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.isJunitPrint;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_UP;
 import static java.lang.System.Logger.Level.*;
@@ -90,7 +90,7 @@ import static javax.swing.KeyStroke.getKeyStroke;
 @SuppressWarnings("serial")
 public class RowNumberSpinner extends JSpinner
 {
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 	//private NavGotoRowAction gotoRowAction;
 	private RowsModel rowsModel;
 

@@ -73,12 +73,13 @@ import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
 import static com.nqadmin.swingset.models.SSCollection.convertArrayToObjectList;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -143,7 +144,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 	private Model<K,D> swingModel;
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * This model read/write the database

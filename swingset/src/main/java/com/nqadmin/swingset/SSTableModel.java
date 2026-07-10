@@ -62,12 +62,12 @@ import com.nqadmin.swingset.datasources.DateTime;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObjectDirect;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -85,7 +85,7 @@ public class SSTableModel extends AbstractTableModel {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Indicator to determine if insertions are allowed.

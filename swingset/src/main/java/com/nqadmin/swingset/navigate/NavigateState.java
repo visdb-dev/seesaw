@@ -64,6 +64,7 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -72,8 +73,8 @@ import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static com.nqadmin.swingset.navigate.RowsAction.*;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 //TODO: Handle CachedRowSet Paging
@@ -144,7 +145,7 @@ final class NavigateState
 	}
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	//
 	// TODO:
@@ -350,7 +351,7 @@ final class NavigateState
 			errorComponents.add(rsc);
 		else
 			errorComponents.remove(rsc);
-		logger.log(TRACE, () -> sf("{%s} %s error: %b, sz: %d -> %d", SSUtils.getCaller(4), rsc.getColumnForLog(), isError, sz, errorComponents.size()));
+		logger.log(TRACE, () -> sf("{%s} %s error: %b, sz: %d -> %d", JStuff.getCaller(4), rsc.getColumnForLog(), isError, sz, errorComponents.size()));
 
 		boolean compsChange = sz != errorComponents.size();
 		if (compsChange) {

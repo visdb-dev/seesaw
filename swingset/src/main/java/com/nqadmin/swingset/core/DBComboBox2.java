@@ -54,12 +54,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nqadmin.swingset.models.SSListItem;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -136,7 +137,7 @@ import static java.lang.System.Logger.Level.*;
 public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 {
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * The column name used to query the values for the bound column keys.

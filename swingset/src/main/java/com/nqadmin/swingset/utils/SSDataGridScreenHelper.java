@@ -56,8 +56,8 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableCellEditor;
 
 import com.nqadmin.swingset.SSDataGrid;
-import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
  * Helper class for designing SSDataGrid screens.
@@ -66,7 +66,7 @@ import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 @SuppressWarnings("serial")
 public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 	
 	/**  SSDataGrid used for this screen */
 	protected SSDataGrid dataGrid = new SSDataGrid();

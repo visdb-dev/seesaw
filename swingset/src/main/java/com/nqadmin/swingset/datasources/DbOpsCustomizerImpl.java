@@ -46,6 +46,7 @@ package com.nqadmin.swingset.datasources;
 import java.awt.Container;
 import java.lang.System.Logger;
 
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -70,7 +71,7 @@ public class DbOpsCustomizerImpl implements DbOpsCustomizer {
 	/**
 	 * Logger for component
 	 */
-	protected static final Logger logger = SSUtils.getLogger();
+	protected static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Screen where components to be cleared are located.

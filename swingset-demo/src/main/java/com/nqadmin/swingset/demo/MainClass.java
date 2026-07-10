@@ -83,6 +83,7 @@ import javax.swing.SwingUtilities;
 
 import org.h2.tools.RunScript;
 
+import com.nqadmin.swingset.datasources.DbSupport;
 import com.nqadmin.swingset.datasources.DbSupportFactory;
 import com.nqadmin.swingset.datasources.DefaultDbSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
@@ -90,6 +91,7 @@ import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.LookupDefaults;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.nqadmin.swingset.utils.SSVersion;
@@ -99,10 +101,8 @@ import gnu.getopt.Getopt;
 
 import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.datasources.DbSupport;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -358,7 +358,7 @@ public class MainClass extends JFrame
 	private JButton btnLogMan = new JButton("Manage Logging");
 
 	/** Logger */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	static DatabaseMetaData dbMeta;
 

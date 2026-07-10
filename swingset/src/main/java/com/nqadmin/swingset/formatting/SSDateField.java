@@ -49,7 +49,7 @@ import java.text.SimpleDateFormat;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 /**
  * Used to link a SSFormattedTextField to a date column in a database.
@@ -58,7 +58,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 @SuppressWarnings("serial")
 public class SSDateField extends DateTimeField {
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 *  Creates a default SSDateField object using the default date format.

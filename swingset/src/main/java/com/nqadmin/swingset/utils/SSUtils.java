@@ -46,7 +46,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
-import java.lang.StackWalker.StackFrame;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.file.Path;
@@ -60,7 +59,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.logging.Handler;
@@ -80,11 +78,10 @@ import javax.swing.JTabbedPane;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 
+import com.nqadmin.swingset.datasources.DbSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 
-import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
-
-import com.nqadmin.swingset.datasources.DbSupport;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 
 /**
@@ -132,84 +129,6 @@ public class SSUtils {
 
 	/** Put this in the global lookup to create debug row set listeners */
 	public static class DebugRowSetListenerFlag {
-	}
-
-	/**
-	 * Return the Logger for the caller.
-	 * This is similar to LogManager.getLogger(), except that
-	 * if getLogger fails then this method returns the root logger.
-	 * So this is suitable for UI components that might get instantiated
-	 * by a gui builder.
-	 *
-	 * See: https://github.com/bpangburn/swingset/pull/123
-	 * 
-	 * @return the Logger
-	 */
-	public static Logger getLogger() {
-		Class<?> cc = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
-				.getCallerClass();
-		return getLogger(cc.getName());
-	}
-
-	/**
-	 * Return the logger name for the caller.
-	 * @return logger name
-	 */
-	public static String getLoggerName() {
-		Class<?> cc = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
-				.getCallerClass();
-		return cc.getName();
-	}
-
-	/**
-	 * Return a logger for the name.
-	 * @param loggerName name
-	 * @return logger
-	 */
-	public static Logger getLogger(String loggerName) {
-		return System.getLogger(loggerName);
-	}
-
-	/**
-	 * Shorthand for "String.format(fmt, args)".
-	 * @param fmt format
-	 * @param args args
-	 * @return string
-	 */
-	public static String sf(String fmt, Object... args) {
-		return args.length == 0 ? fmt : String.format(fmt, args);
-	}
-
-	/**
-	 * Get a "class.method" name from the call stack.
-	 * The skip param indicates how far down the stack to look for
-	 * the caller's frame. For example, if {@code getCaller(skip)} is
-	 * used in a message supplier in a log statement need to skip more
-	 * than other cases:
-	 * {@snippet :
-	 *     void someMethod() {
-	 *         log(Level, () -> String.format("Called by: {%s}", getCaller(4)))
-	 *     }
-	 * }
-	 * logs the name of the method that called someMethod.
-	 * 
-	 * @param skip
-	 * @return "simpleClassName.methodName"
-	 */
-	public static String getCaller(int skip) {
-		Optional<StackFrame> caller = StackWalker.getInstance(
-				Set.of(RETAIN_CLASS_REFERENCE), skip+1).walk(s ->
-						s.skip(skip)
-								.findFirst());
-		// if (Boolean.FALSE) {
-		// 	// For a verbose mode.
-		// 	StackFrame frame = caller.get();
-		// 	Objects.nonNull(frame.getFileName());
-		// 	Objects.nonNull(frame.getLineNumber());
-		// }
-		String meth = caller.isEmpty() ? null
-				: caller.get().getDeclaringClass().getSimpleName() + '.' + caller.get().getMethodName();
-		return meth;
 	}
 
 	/**

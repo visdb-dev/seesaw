@@ -45,15 +45,15 @@ import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModel.EnqueueRowsModelEvent;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingCachedRowSetChanges;
 import static com.nqadmin.swingset.navigate.RowsModel.getEventBus;
 import static com.nqadmin.swingset.navigate.RowsModel.post;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
 import static com.nqadmin.swingset.utils.SSUtils.isJunitPrint;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.awt.EventQueue.isDispatchThread;
 import static java.lang.System.Logger.Level.*;
 
@@ -67,7 +67,7 @@ import static java.lang.System.Logger.Level.*;
  */
 public class RowsModelEventHandling
 {
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 	private RowsModelEventHandling() { }
 
 	record RowsEventSource(RowsModel rowsModel,

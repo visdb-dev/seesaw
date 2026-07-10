@@ -51,11 +51,11 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.utils.SSUtils.getLogger;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -64,7 +64,7 @@ import static java.lang.System.Logger.Level.*;
  */
 public class Utils
 {
-	private static final System.Logger logger = getLogger();
+	private static final System.Logger logger = JStuff.getLogger();
 
 	private Utils() { }
 

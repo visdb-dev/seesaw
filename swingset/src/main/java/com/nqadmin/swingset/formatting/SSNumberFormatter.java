@@ -35,7 +35,7 @@ import java.text.ParsePosition;
 
 import javax.swing.text.NumberFormatter;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * Number formatter that requires a parse of the complete string to succeed.

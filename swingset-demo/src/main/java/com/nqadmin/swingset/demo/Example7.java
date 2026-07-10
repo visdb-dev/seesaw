@@ -49,7 +49,7 @@ import javax.swing.JFrame;
 
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -64,7 +64,7 @@ public class Example7 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
 	
 	/**
 	 * data grid

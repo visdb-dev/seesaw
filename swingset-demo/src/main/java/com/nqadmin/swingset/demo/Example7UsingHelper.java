@@ -50,8 +50,8 @@ import javax.swing.JMenuBar;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSDataGridScreenHelper;
-import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -69,7 +69,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * unique serial id

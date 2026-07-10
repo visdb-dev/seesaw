@@ -55,9 +55,9 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.MaskFormatter;
 
 import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -104,7 +104,7 @@ import static java.lang.System.Logger.Level.*;
 public class SSMaskFormatterFactory extends FormatterFactory
 {
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 	
 	/**
 	 * To build a new FormatterFactory with the specified parameters. Unless noted,

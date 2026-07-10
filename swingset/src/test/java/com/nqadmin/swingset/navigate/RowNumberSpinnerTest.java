@@ -48,9 +48,9 @@ import com.nqadmin.swingset.navigate.EQ.BusReceiver;
 import com.raelity.lib.eventbus.WeakEventBus;
 
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
-import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
+import static com.nqadmin.swingset.utils.JStuff.getLoggerName;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.util.logging.Level.*;
 import static org.junit.jupiter.api.Assertions.*;
 

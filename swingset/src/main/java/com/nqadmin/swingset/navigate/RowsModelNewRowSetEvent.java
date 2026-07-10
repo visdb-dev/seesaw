@@ -31,8 +31,8 @@ package com.nqadmin.swingset.navigate;
 
 import javax.sql.RowSet;
 
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * This event signals the source {@link RowsModel} has a different

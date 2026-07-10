@@ -48,6 +48,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
 import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -58,7 +59,7 @@ public class SSTextSupport
 	private SSTextSupport() { }
 	
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 	
 	/**
 	 * Returns SSDocumentListener; error if not SSComponent.
@@ -139,7 +140,7 @@ public class SSTextSupport
 		public void changedUpdate(final DocumentEvent de)
 		{
 			lastChange++;
-			logger.log(TRACE, () -> SSUtils.sf(
+			logger.log(TRACE, () -> sf(
 					"%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
 					ssCommon.getColumnForLog(), lastChange, lastNotifiedChange));
 			// Delay updateTextComponent until all Document listeners inovked for event.
@@ -160,7 +161,7 @@ public class SSTextSupport
 		@Override
 		public void insertUpdate(final DocumentEvent de)
 		{
-			logger.log(TRACE, () -> SSUtils.sf("%s - insertUpdate().", ssCommon.getColumnForLog()));
+			logger.log(TRACE, () -> sf("%s - insertUpdate().", ssCommon.getColumnForLog()));
 			changedUpdate(de);
 		}
 
@@ -168,7 +169,7 @@ public class SSTextSupport
 		@Override
 		public void removeUpdate(final DocumentEvent de)
 		{
-			logger.log(TRACE, () -> SSUtils.sf("%s - removeUpdate().", ssCommon.getColumnForLog()));
+			logger.log(TRACE, () -> sf("%s - removeUpdate().", ssCommon.getColumnForLog()));
 			changedUpdate(de);
 		}
 	}
@@ -302,7 +303,7 @@ public class SSTextSupport
 		public void changedUpdate(final DocumentEvent de)
 		{
 			lastChange++;
-			logger.log(TRACE, () -> SSUtils.sf(
+			logger.log(TRACE, () -> sf(
 					"%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
 					ssCommon.getColumnForLog(), lastChange, lastNotifiedChange));
 			// Delay updateTextComponent until all Document listeners inovked for event.
@@ -354,7 +355,7 @@ public class SSTextSupport
 								listenerNeedsRestoration = true;
 							}
 							try {
-								logger.log(DEBUG, () -> SSUtils.sf("%s: restoring previous value '%s'", ssCommon.getColumnForLog(), previousValue));
+								logger.log(DEBUG, () -> sf("%s: restoring previous value '%s'", ssCommon.getColumnForLog(), previousValue));
 								((JTextComponent) ssCommon.getSSComponent()).setText(previousValue);
 							} finally {
 								if (listenerNeedsRestoration) {
@@ -376,7 +377,7 @@ public class SSTextSupport
 		@Override
 		public void insertUpdate(final DocumentEvent de)
 		{
-			logger.log(TRACE, () -> SSUtils.sf("%s - insertUpdate().", ssCommon.getColumnForLog()));
+			logger.log(TRACE, () -> sf("%s - insertUpdate().", ssCommon.getColumnForLog()));
 			changedUpdate(de);
 		}
 
@@ -384,7 +385,7 @@ public class SSTextSupport
 		@Override
 		public void removeUpdate(final DocumentEvent de)
 		{
-			logger.log(TRACE, () -> SSUtils.sf("%s - removeUpdate().", ssCommon.getColumnForLog()));
+			logger.log(TRACE, () -> sf("%s - removeUpdate().", ssCommon.getColumnForLog()));
 			changedUpdate(de);
 		}
 		

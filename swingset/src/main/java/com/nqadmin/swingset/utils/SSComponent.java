@@ -54,11 +54,11 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.core.CheckBox;
-import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.DbSupport.DbReader;
 import com.nqadmin.swingset.datasources.DbSupport.DbUpdater;
 import com.nqadmin.swingset.datasources.DbSupport.RunnableSQL;
+import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.Validator;

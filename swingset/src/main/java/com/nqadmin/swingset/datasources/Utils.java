@@ -53,9 +53,9 @@ import java.util.function.Consumer;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncResolver;
 
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 import static javax.sql.rowset.spi.SyncResolver.DELETE_ROW_CONFLICT;
 import static javax.sql.rowset.spi.SyncResolver.INSERT_ROW_CONFLICT;
@@ -67,7 +67,7 @@ import static javax.sql.rowset.spi.SyncResolver.UPDATE_ROW_CONFLICT;
 public class Utils
 {
 	private Utils() { }
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Return either the unwrapped object of the specified type or null.

@@ -29,9 +29,9 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.mock;
 
+import com.nqadmin.swingset.datasources.DbSupport;
 import com.nqadmin.swingset.datasources.DefaultDbSupport;
 import com.nqadmin.swingset.utils.CentralLookup;
-import com.nqadmin.swingset.datasources.DbSupport;
 
 /**
  * x

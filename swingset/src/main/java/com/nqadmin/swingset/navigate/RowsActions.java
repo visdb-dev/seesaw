@@ -47,12 +47,12 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
-import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.RowSetState.setInserting;
 import static com.nqadmin.swingset.navigate.RowsAction.*;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -64,7 +64,7 @@ import static java.lang.System.Logger.Level.*;
 final class RowsActions
 {
 	/** Logger for component */
-	static final Logger logger = SSUtils.getLogger();
+	static final Logger logger = JStuff.getLogger();
 
 	private final RowsModel rowsModel;
 

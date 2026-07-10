@@ -33,7 +33,7 @@ import javax.swing.JComponent;
 
 import com.nqadmin.swingset.utils.SSComponent;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * Used for both Decorator and TextDecorator.

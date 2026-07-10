@@ -48,7 +48,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.nqadmin.swingset.mock.H2;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * This is not SS directly; examine how DB does automatic conversions.

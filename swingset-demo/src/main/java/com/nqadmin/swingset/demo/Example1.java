@@ -75,7 +75,7 @@ import com.nqadmin.swingset.demo.simpval.SVUtils;
 import com.nqadmin.swingset.demo.simpval.StringValidator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.CentralLookup;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 
 /**
@@ -88,7 +88,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 @SuppressWarnings("serial")
 public class Example1 extends JFrame {
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * screen label declarations

@@ -72,13 +72,14 @@ import com.nqadmin.swingset.decorators.BaseTextDecorator;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.TextStyles;
 import com.nqadmin.swingset.navigate.Utils;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 // TODO: Review state transitions (where it can happen).
@@ -264,7 +265,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	private boolean verifyingText = false;
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
 	// AN OBJECT. FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.

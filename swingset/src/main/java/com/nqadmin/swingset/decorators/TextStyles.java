@@ -47,9 +47,9 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.text.*;
 
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 // Build with the aid of google search.
@@ -202,7 +202,7 @@ import static java.lang.System.Logger.Level.*;
  * </pre>
  */
 public class TextStyles {
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
     
     // Custom attribute keys
     private static final String OPAQUE = "opaque";
@@ -293,7 +293,7 @@ public class TextStyles {
 	// package for testing
 	/*private*/ static synchronized void clearStyles() {
 		verifyNotEDT();
-		logger.log(INFO, () -> sf("{%s} is clearing all styles.", SSUtils.getCaller(5)));
+		logger.log(INFO, () -> sf("{%s} is clearing all styles.", JStuff.getCaller(5)));
 		registry.clear();
 		inheritanceMap.clear();
 		readOnlyRegistry.clear();

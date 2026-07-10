@@ -48,8 +48,8 @@ import java.lang.System.Logger;
 
 import javax.swing.UIManager;
 
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
-import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -60,7 +60,7 @@ import static java.lang.System.Logger.Level.*;
  */
 public class BackgroundDecorator extends FocusDecorator
 {
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	private final Color standardBackgroundColor = getDefaultBackgroundColor();
 	private Color focusBackgroundColor = new Color(204, 255, 255); // Tealish

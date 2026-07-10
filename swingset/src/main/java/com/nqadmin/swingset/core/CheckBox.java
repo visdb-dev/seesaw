@@ -56,11 +56,12 @@ import javax.swing.border.Border;
 
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.sql.JDBCType.*;
 
 /**
@@ -96,7 +97,7 @@ public class CheckBox extends JCheckBox implements SSComponent
 	}
 
 	/** System Logger for component. */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Creates an object of CheckBox.

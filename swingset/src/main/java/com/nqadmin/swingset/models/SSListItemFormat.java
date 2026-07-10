@@ -54,9 +54,9 @@ import java.util.List;
 import java.util.Objects;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -118,7 +118,7 @@ public class SSListItemFormat extends Format {
 	// allow customization of date/time formats
 	private final EnumMap<JDBCType, Format> formats = new EnumMap<>(JDBCType.class);
 
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * Encapsulate info about element in SSListInfo.

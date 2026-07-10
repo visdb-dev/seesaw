@@ -37,11 +37,12 @@ import javax.sql.RowSet;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.Utils.postColumnUndoRedo;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -71,7 +72,7 @@ public enum UndoRedo
 	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	// UNDO/REDO NOTES
 	//

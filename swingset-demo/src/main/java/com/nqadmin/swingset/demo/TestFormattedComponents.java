@@ -66,8 +66,8 @@ import com.nqadmin.swingset.formatting.SSSSNField;
 import com.nqadmin.swingset.formatting.SSTimeField;
 import com.nqadmin.swingset.formatting.SSTimestampField;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSSyncManager;
-import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example demonstrates all of the Formatted SwingSet Components.
@@ -85,7 +85,7 @@ public class TestFormattedComponents extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = SSUtils.getLogger();
+    private static final Logger logger = JStuff.getLogger();
 	
 	/**
 	 * screen label declarations

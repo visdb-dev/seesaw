@@ -53,7 +53,7 @@ import java.util.Objects;
 
 import com.nqadmin.swingset.utils.SSComponent;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 
 /**
  * Read and write a collection of data items from/to database.

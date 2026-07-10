@@ -58,7 +58,7 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.datasources.DbSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -317,7 +317,7 @@ public class SSSyncManager
 	}
 
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	/**
 	 * # of records to step back if doing a sequential search because

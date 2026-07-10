@@ -54,7 +54,7 @@ import com.raelity.logman.ui.LogUI;
 import com.raelity.logman.ui.SwingLogTree;
 
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
  

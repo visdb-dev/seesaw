@@ -49,7 +49,7 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.JStuff;
 
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
@@ -72,7 +72,7 @@ public class SimpleRSC implements RSC
 	private final RowsModel rowsModel;
 	private final int index;
 	private final String name;
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	private SimpleRSC(RowsModel rowsModel, Integer index, String name) throws SQLException
 	{

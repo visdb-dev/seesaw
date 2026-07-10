@@ -256,7 +256,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		}
 	}
 	
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	private SSDBComboBox comboNav; // Combo navigator.
 	private String comboNavDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator

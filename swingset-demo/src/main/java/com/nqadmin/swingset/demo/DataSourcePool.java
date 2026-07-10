@@ -68,10 +68,11 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
 
 import com.nqadmin.swingset.demo.MainClass.H2Trace;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -82,7 +83,7 @@ public class DataSourcePool {
 
 	/** Data source name for binding lookup.  */
 	public static final String DATA_SOURCE_NAME = "PoolDataSource";
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = JStuff.getLogger();
 
 	private static DataSource ds;
 	private static JdbcConnectionPool cp;
