@@ -55,7 +55,6 @@ import java.util.List;
 
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.utils.JStuff;
-import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
@@ -70,7 +69,8 @@ import static java.lang.System.Logger.Level.*;
  * {@code <K>} is 
  * the 'key' and the display value the 'text' which appears in the combo box.
  * <p>
- * This is sometimes used as a Navigator in conjunction with {@link SSSyncManager}.
+ * This is sometimes used as a Navigator in conjunction with
+ * {@link com.nqadmin.swingset.utils.SSSyncManager}.
  * Generally the key represents a foreign key to another
  * table, and the combobox displays the {@code <D>}.
  * <p>
@@ -372,20 +372,13 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 					// TODO: Can't use RowSetOps.getColumnObject(comp, class)
 					//       because RSC take a RowSet (not a ResultSet),
 					//       maybe more so because there's the undo/redo stuff.
-					K pk = convertToType(rs.getObject(getPrimaryKeyColumnName()),
-										 getKeyType());
-					D opt = convertToType(rs.getObject(displayColumnName),
-										  getDisplayValueType());
+					K pk = convertToType(rs.getObject(getPrimaryKeyColumnName()), getKeyType());
+					D opt = convertToType(rs.getObject(displayColumnName), getDisplayValueType());
 					logger.log(TRACE, () -> sf("%s pk: %s, opt: %s",
 							pk, getColumnForLog(), opt));
-					D2 opt2;
-					if (hasD2()) {
-						opt2 = convertToType(rs.getObject(d2ColumnName),
-											 getD2Type());
-						logger.log(TRACE, () -> sf("%s opt2: %s", getColumnForLog(), opt2));
-					} else {
-						opt2 = null;
-					}
+					D2 opt2 = hasD2() ? convertToType(rs.getObject(d2ColumnName), getD2Type())
+							: null;
+					logger.log(TRACE, () -> sf("%s opt2: %s", getColumnForLog(), opt2));
 					
 					newItems.add(remodel.createKeyDisplayValueItem(pk, opt, opt2));
 				}

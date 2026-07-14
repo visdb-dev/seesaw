@@ -91,7 +91,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 *
 		 */
 		@Override
-		public boolean allowDeletion() {
+		public boolean allowDelete() {
 			boolean allow;
 			allow = ssDBNavAllowDeletion();
 			return allow;
@@ -102,7 +102,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 * inserted.
 		 */
 		@Override
-		public boolean allowInsertion() {
+		public boolean allowInsert() {
 			boolean allow;
 			allow = ssDBNavAllowInsertion();
 			return allow;

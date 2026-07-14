@@ -32,11 +32,14 @@ package com.nqadmin.swingset.demo;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.function.Consumer;
 
 import javax.sql.RowSet;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import com.nqadmin.swingset.demo.Example1.DbOpsCustomizerAllows;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.JStuff;
@@ -51,20 +54,20 @@ public abstract class RowSetButtons extends JPanel
 {
     private static final Logger logger = JStuff.getLogger();
 
-	record ScreenInfo(Logger logger, RowsModel rowsModel){}
-	abstract ScreenInfo getScreenInfo();
+	record AppInfo(Logger logger, RowsModel rowsModel, DbOpsCustomizerAllows dbOps){}
+	abstract AppInfo getAppInfo();
 
 	/** Override for notification of "next" button press. */
 	void nextRowSetButtonPush() {
-		ScreenInfo lm = getScreenInfo();
-		setNextDebugRowSet(lm.logger, lm.rowsModel);
+		AppInfo ai = getAppInfo();
+		setNextDebugRowSet(ai.logger, ai.rowsModel);
 	}
 
 	/** Override for notification of "null" button press. */
 	void nullRowSet() {
-		ScreenInfo si = getScreenInfo();
-		si.logger.log(Level.INFO, "nullRowSet");
-		si.rowsModel.setRowSet(null);
+		AppInfo ai = getAppInfo();
+		ai.logger.log(Level.INFO, "nullRowSet");
+		ai.rowsModel.setRowSet(null);
 	}
 
 	/**
@@ -119,6 +122,15 @@ public abstract class RowSetButtons extends JPanel
 	private void init() {
 		JButton button;
 		String text;
+
+		allowText = text = "<html><center>allow<br>{what}</center></html>";
+		allowButton = button = new JButton(text);
+		add(button);
+		changeAllow();
+		button.addActionListener((e) -> {
+			changeAllow();
+			outStuff();
+		});
 
 		text = "<html><center>next<br>RS</center></html>";
 		button = new JButton(text);
@@ -203,5 +215,67 @@ public abstract class RowSetButtons extends JPanel
 		this.tableLoopCount = tableLoopCount;
 		this.tableLoopRowCountBase = tableLoopRowCount;
 		this.tableLoopIndex = tableLoopCount - 1; // next will be first of sequence
+	}
+
+	record Allow(String name, Consumer<AppInfo> doOp){};
+	private int allowIdx;
+	private JButton allowButton;
+	private String allowText;
+	private final List<Allow> allow1 = List.of(
+			new Allow("all", null),
+			new Allow("n-upd", ai -> ai.rowsModel.setAllowUpdate(false)),
+			new Allow("n+upd", ai -> ai.rowsModel.setAllowUpdate(true)),
+			new Allow("n-ins", ai -> ai.rowsModel.setAllowInsert(false)),
+			new Allow("n+ins", ai -> ai.rowsModel.setAllowInsert(true)),
+			new Allow("n-del", ai -> ai.rowsModel.setAllowDelete(false)),
+			new Allow("n+del", ai -> ai.rowsModel.setAllowDelete(true)),
+			new Allow("n-wrt", ai -> ai.rowsModel.setAllowWrite(false)),
+			new Allow("n+wrt", ai -> ai.rowsModel.setAllowWrite(true)),
+			new Allow("d-upd", ai -> ai.dbOps.allowUpdate(false)),
+			new Allow("d+upd", ai -> ai.dbOps.allowUpdate(true)),
+			new Allow("d-ins", ai -> ai.dbOps.allowInsert(false)),
+			new Allow("d+ins", ai -> ai.dbOps.allowInsert(true)),
+			new Allow("d-del", ai -> ai.dbOps.allowDelete(false)),
+			new Allow("d+del", ai -> ai.dbOps.allowDelete(true))
+	);
+	private final List<Allow> allow2 = List.of(
+			new Allow("all", null),
+			new Allow("n-upd", ai -> ai.rowsModel.setAllowUpdate(false)),
+			new Allow("n-ins", ai -> ai.rowsModel.setAllowInsert(false)),
+			new Allow("n-del", ai -> ai.rowsModel.setAllowDelete(false)),
+			new Allow("n+del", ai -> ai.rowsModel.setAllowDelete(true)),
+			new Allow("n+upd", ai -> ai.rowsModel.setAllowUpdate(true)),
+			new Allow("n+ins", ai -> ai.rowsModel.setAllowInsert(true)),
+
+			new Allow("d-del", ai -> ai.dbOps.allowDelete(false)),
+			new Allow("d-ins", ai -> ai.dbOps.allowInsert(false)),
+			new Allow("d-upd", ai -> ai.dbOps.allowUpdate(false)),
+			new Allow("d+del", ai -> ai.dbOps.allowDelete(true)),
+			new Allow("d+upd", ai -> ai.dbOps.allowUpdate(true)),
+			new Allow("d+ins", ai -> ai.dbOps.allowInsert(true))
+	);
+	private final List<Allow> allows = allow1;
+	void changeAllow() {
+		Allow allow = allows.get(allowIdx++);
+		allowIdx = allowIdx % allows.size();
+		allowButton.setText(allowText.replace("{what}", allow.name));
+		AppInfo ai = getAppInfo();
+		if(allow.doOp != null) {
+			allow.doOp.accept(ai);
+			return;
+		}
+		// everything should be enabled
+		RowsModel rm = ai.rowsModel;
+		DbOpsCustomizerAllows ops = ai.dbOps;
+		if(rm == null || ops == null)
+			return;
+		// verify everything enabled
+		if (rm.getAllowUpdate() != true) throw new IllegalStateException("n-upd");
+		if (rm.getAllowInsert() != true) throw new IllegalStateException("n-ins");
+		if (rm.getAllowDelete() != true) throw new IllegalStateException("n-del");
+		if (rm.getAllowWrite() != true) throw new IllegalStateException("n-wrt");
+		if (ops.allowUpdate() != true) throw new IllegalStateException("d-upd");
+		if (ops.allowInsert() != true) throw new IllegalStateException("d-ins");
+		if (ops.allowDelete() != true) throw new IllegalStateException("d-del");
 	}
 }

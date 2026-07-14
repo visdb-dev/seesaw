@@ -835,59 +835,59 @@ public class RowsModelTest
 	// }
 
 	// /**
-	//  * Test of setAllowDeletion method, of class RowsModel.
+	//  * Test of setAllowDelete method, of class RowsModel.
 	//  */
 	// @Test
 	// public void testSetDeletion()
 	// {
-	// 	System.out.println("setAllowDeletion");
+	// 	System.out.println("setAllowDelete");
 	// 	boolean deletion = false;
 	// 	RowsModel instance = null;
-	// 	instance.setAllowDeletion(deletion);
+	// 	instance.setAllowDelete(deletion);
 	// 	// TODO review the generated test code and remove the default call to fail.
 	// 	fail("The test case is a prototype.");
 	// }
 
 	// /**
-	//  * Test of getAllowDeletion method, of class RowsModel.
+	//  * Test of getAllowDelete method, of class RowsModel.
 	//  */
 	// @Test
 	// public void testGetDeletion()
 	// {
-	// 	System.out.println("getAllowDeletion");
+	// 	System.out.println("getAllowDelete");
 	// 	RowsModel instance = null;
 	// 	boolean expResult = false;
-	// 	boolean result = instance.getAllowDeletion();
+	// 	boolean result = instance.getAllowDelete();
 	// 	assertEquals(expResult, result);
 	// 	// TODO review the generated test code and remove the default call to fail.
 	// 	fail("The test case is a prototype.");
 	// }
 
 	// /**
-	//  * Test of getAllowInsertion method, of class RowsModel.
+	//  * Test of getAllowInsert method, of class RowsModel.
 	//  */
 	// @Test
 	// public void testGetInsertion()
 	// {
-	// 	System.out.println("getAllowInsertion");
+	// 	System.out.println("getAllowInsert");
 	// 	RowsModel instance = null;
 	// 	boolean expResult = false;
-	// 	boolean result = instance.getAllowInsertion();
+	// 	boolean result = instance.getAllowInsert();
 	// 	assertEquals(expResult, result);
 	// 	// TODO review the generated test code and remove the default call to fail.
 	// 	fail("The test case is a prototype.");
 	// }
 
 	// /**
-	//  * Test of setAllowInsertion method, of class RowsModel.
+	//  * Test of setAllowInsert method, of class RowsModel.
 	//  */
 	// @Test
 	// public void testSetInsertion()
 	// {
-	// 	System.out.println("setAllowInsertion");
+	// 	System.out.println("setAllowInsert");
 	// 	boolean insertion = false;
 	// 	RowsModel instance = null;
-	// 	instance.setAllowInsertion(insertion);
+	// 	instance.setAllowInsert(insertion);
 	// 	// TODO review the generated test code and remove the default call to fail.
 	// 	fail("The test case is a prototype.");
 	// }

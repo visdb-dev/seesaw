@@ -50,6 +50,7 @@ import java.util.Queue;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -88,6 +89,15 @@ public class Utils
 	{
 		addToEventHistory(eo);
 		getGlobalEventBus().post(eo);
+	}
+
+	/**
+	 * Post a DbOps change.
+	 * @param dbOps
+	 * @param allow 
+	 */
+	public static void postDbOpsChange(DbOpsCustomizer dbOps, DbOpsCustomizer.Allow allow) {
+		postFieldEvent(new DbOpsChangeEvent(dbOps, allow));
 	}
 
 	/**

@@ -101,8 +101,27 @@ Currently disabled. SSCommon.isRestoreOnError().  Inconsistently used:
 Use metadata for a default implementation of DbOpsCustomizer pre/post ops.
     - E.g. automatically(/assist) key generation
 
+Relationship between DbOps and NavigateState settings (like canInsert),
+when DbOps are set want to do navState.updateActionState.
+But there's some idea that DbOps should be stateless.
+
+if updateActionState shows can not update, then disable components.
+post some kind of event when updatable is set/cleared.
+Expose the navState.canInsert/Delete/Update private methods.
+
+If update disable, don't want to disable component, because hard to read.
+Maybe a badge, that says edit row disabled.
+
+If !canUpdate(), would like to beep() and not change components.
+
 Would like to have DbOpsCustomizerImpl automatically find ROOT container;
-then it would be stateless and can be shared. Maybe could
+then it would be stateless and can be shared.
+  - only used for performPreInsertOps/cleanComponents
+  - Maybe could use getfocusedcomponent?
+    Probably not.
+  - When is it used?
+    Is it used when the caller has a ui hook?
+performPreInsertOps could take a JComponent, and search up for window.
 
 For performPreInsertOps only allow JdbcRowSet, CachedRowSet (but not
 FilteredRowSet, JoinRowSet, WebRowSet).
@@ -128,6 +147,26 @@ Knowing the root container may help to automate using SimpleValidation.
 
 ================================================================================
 
+Performance note. A lot of of dbOps.perform*Ops is to re-execute the query
+after insert/delete so that that the resultSet has all the rows. Could be
+expensive. (A lot cheaper than the engineering time to try an keep things
+in sync without accessing the database). H2 does this. There's metadata for
+whether or not added rows are visible in result set.
+
+There is metadata
+    boolean ownInsertsAreVisible(int) throws SQLException
+if this is true, then it looks like the re-execute could be avoided. 
+
+After an insert, where the row shows up is database dependent and might take
+into account keys. There probably should be something in DbOpsCustomizer
+to help find the row.
+
+================================================================================
+
+Operate without needing the count of rows, show "?" in the navigator.
+
+================================================================================
+
 DbMetaDataCache
 
 Note: some information is not necessarily safe to cache.
@@ -137,7 +176,7 @@ Make this a selective cache. In particular Static/Driver info,
 capabilities/Limits. But not tables & Column details.
 Then no worry about needing to flush in some cases.
 
-Grab only what's needed for DbOpsCustomizer.
+Grab only what's needed for DbOpsCustomizer. At least for now.
 
 
 Using metadata to detect deleted rows. Could filter without re-executing query.
@@ -157,6 +196,10 @@ non-intrusive dialog with please wait (but only if somethings taking too long)
 javadoc
 -------
 Supported column types and mention DbRead/DbWriter for other cases.
+
+KeyDisplayValueSwingModel document EventList lock and general locking
+maybe also in AbstractComboBoxListSwingModel
+KeyDisplayValueSwingModel.isD2Enabled(), versus hasD2()
 
 ================================================================================
 

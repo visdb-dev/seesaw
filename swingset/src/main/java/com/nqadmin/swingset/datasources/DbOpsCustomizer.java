@@ -43,15 +43,19 @@
 package com.nqadmin.swingset.datasources;
 
 import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.navigate.DbOpsChangeEvent;
 import com.nqadmin.swingset.navigate.RowsAction;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 /**
- * Interface that provides a set of methods to perform custom operations before
- * and/or after certain database related operations;
- * for example add record, delete record.
+ * Interface that provides a set of methods to perform custom operations
+ *  before and/or after certain database related operations.
+ * Typically the "Pre" operations operate on 
+ * SSComponents associated with an app window and the "Post" operations
+ * make sure the changes are visible in the RowSet (commonly by re-executing
+ * the query).
  * There are also other methods to prevent/allow or assist
- * certain actions, for example {@code allowDeletion()} or {@code performCancelOps()}.
+ * certain actions, for example {@code allowDelete()} or {@code performCancelOps()}.
  * <p>
  * In this class' documentation there are references to {@link RowsAction}
  * enum values which have associated actions. The actions
@@ -62,20 +66,33 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * This interface has only default methods, none of which do anything; it
  * can be instantiated by doing {@code new CustomizeDbOps() {}}.
  * <p>
- * Generally the user will want to use/extend {@link DbOpsCustomizerImpl} as it has an
- * implementation of {@link DbOpsCustomizerImpl#performPreInsertOps()}
- * that will clear/reset {@link com.nqadmin.swingset.utils.SSComponent SSComponent}
- * values when a new record is added.
+ * Generally the user will want to use/extend {@link DbOpsCustomizerImpl}
+ * <ul>
+ * <li> it has an implementation of
+ * {@link DbOpsCustomizerImpl#performPreInsertOps() performPreInsertOps()}
+ * that will clear/initialize {@link com.nqadmin.swingset.utils.SSComponent SSComponent}
+ * values before editing.
+ * <li> it handles state info for
+ * allow update/insert/delete.
+ * </ul>
  */
 // TODO: rename SSDBCustomOps
 public interface DbOpsCustomizer {
+	/** For an event, to specify which field changed. */
+	/** The allow Fields. Used in event notification, see {@link DbOpsChangeEvent} */
+	public enum Allow {
+		/** update */ UPDATE,
+		/** insert */ INSERT,
+		/** delete */ DELETE,
+	}
+	
 	/**
 	 * This function is called as the first step, before inserting the row into
 	 * the database, of {@link RowsAction#ACT_COMMIT}.
 	 *
 	 * @return true if row can be inserted, false aborts the operation
 	 */
-	default boolean allowInsertion() {
+	default boolean allowInsert() {
 		return true;
 	}
 
@@ -85,7 +102,7 @@ public interface DbOpsCustomizer {
 	 *
 	 * @return true if the row can be deleted else false and the action is aborted
 	 */
-	default boolean allowDeletion() {
+	default boolean allowDelete() {
 		return true;
 	}
 

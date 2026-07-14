@@ -47,6 +47,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.navigate.NavigateState.RowPositioning;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
@@ -175,15 +176,15 @@ final class RowsActions
 			try {
 				if(!verifyEnabled(this))
 					return;
-				if (!getNavState().commitChangesToDatabase(true))
+				if (!getNavState().autoCommitUpdateRowToDatabase())
 					return;
 
 				getRowSet().first();
 
 				getNavState().freshRow();
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 
-				getNavState().dbOps.performNavigationOps(Navigation.First);
+				getNavState().getDbOps().performNavigationOps(Navigation.First);
 
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -224,7 +225,7 @@ final class RowsActions
 			try {
 				if(!verifyEnabled(this))
 					return;
-				if (!getNavState().commitChangesToDatabase(true))
+				if (!getNavState().autoCommitUpdateRowToDatabase())
 					return;
 
 				if ((getRowSet().getRow() != 0) && !getRowSet().previous()) {
@@ -232,9 +233,9 @@ final class RowsActions
 				}
 
 				getNavState().freshRow();
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 
-				getNavState().dbOps.performNavigationOps(Navigation.Previous);
+				getNavState().getDbOps().performNavigationOps(Navigation.Previous);
 
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -270,15 +271,15 @@ final class RowsActions
 			try {
 				if(!verifyEnabled(this))
 					return;
-				if (!getNavState().commitChangesToDatabase(true))
+				if (!getNavState().autoCommitUpdateRowToDatabase())
 					return;
 
 				getRowSet().next();
 
 				getNavState().freshRow();
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 
-				getNavState().dbOps.performNavigationOps(Navigation.Next);
+				getNavState().getDbOps().performNavigationOps(Navigation.Next);
 
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -314,15 +315,15 @@ final class RowsActions
 			try {
 				if(!verifyEnabled(this))
 					return;
-				if (!getNavState().commitChangesToDatabase(true))
+				if (!getNavState().autoCommitUpdateRowToDatabase())
 					return;
 				
 				getRowSet().last();
 				
 				getNavState().freshRow();
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 				
-				getNavState().dbOps.performNavigationOps(Navigation.Last);
+				getNavState().getDbOps().performNavigationOps(Navigation.Last);
 				
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -362,56 +363,54 @@ final class RowsActions
 				if(!verifyEnabled(this))
 					return;
 				if (RowSetState.isInserting(getRowSet())) {
-					// IF ON INSERT ROW ADD THE ROW.
-					// CHECK IF THE ROW CAN BE INSERTED.
-					if (!getNavState().dbOps.allowInsertion()) {
-						// WE DO NOTHING. THE ROWSET STAYS IN INSERT ROW. EITHER USER
-						// HAS TO FIX THE DATA AND SAVE THE ROW OR CANCEL THE INSERTION.
+					// IF on insert row add the row.
+
+					// Check if the row can be inserted.
+					if (!getNavState().canInsert()) {
+						// TODO: condition was "if (!getNavState().dbOps.allowInsert())"
+						//       which seems to indicate that dbOps did some validity
+						//       checking on the data. Since dbOps has the container
+						//       maybe multiple fields checked; hm, I'm guessing not
+						//       after all, you'd think the rowSet would be needed.
+
+						// Do nothing. Stay on insert row. User must
+						// fix the data and save the row or cancel the insertion.
 						return;
 					}
 					
 					RowSetOps.insertRow(getRowSet());
 					setInserting(getRowSet(), false);
-					getNavState().dbOps.performPostInsertOps();
+					getNavState().getDbOps().performPostInsertOps();
 
-					getRowSet().last();
+					// It's unspecified where the insertRow goes, but
+					// performPosInsertOps typically re-executes the query.
+					// This code is assuming the new row goes at the end. This
+					// seems to be counting on the new row having a new primary
+					// key that puts it at the end of the table. Probably should
+					// be some assist, dbOps?, for finding the new row.
+					// But, for now, assume new row is at the end.
+					// Note there's Statement.getGeneratedKeys(); but that, in
+					// itself, has assumptions.
 
-					getNavState().rowCount = getRowSet().getRow();
+					getNavState().establishRowCountCurrentRow(RowPositioning.AT_LAST);
 					
 					getNavState().freshRow();
-					getNavState().updateNavigator();
+					getNavState().updateNavigatorRowAndCount();
 				} else {
-					// ELSE UPDATE THE DATABASE BASED ON THE PRESENT ROW VALUES.
-					// IN THIS CASE WE WILL WAIT TO PERFORM POST-UPDATE OPS BELOW
-					if (!getNavState().commitChangesToDatabase(false))
+					// ELSE update the database based on the present row values.
+					if (!getNavState().commitUpdateRowToDatabase())
 						return;
+
+					// commit, resultSet.updateRow(), does not generate an event.
+					// ... getRowSet().absolute(getRowSet().getRow()) ...
+					// was used to create an event. Old comment says
+					// it was neede so "other" SSComponent bound to same column
+					// was updated correctly. Think that situation is taken
+					// care of with SSCommon's handleColumnChangeDone.
 				
 					getNavState().freshRow();
-					// TODO: why not updateNavigator?
 					getNavState().updateActionState();
-					
-					// 2020-11-24: Generally redundant, but force a refresh the screen with
-					// the values from the rowset. This will be most noticeable if you have
-					// two fields bound to the same column.
-					//
-					// getRowSet().refreshRow() did not accomplish the intended result, but
-					// navigating to the same row using absolute and the current record
-					// number did.
-					//
-					// 2020-12-24
-					// TODO: might create rid of this if broadcasting the right info,
-					//       like picking up on the "other" component broadcast
-					//
-
-					getRowSet().absolute(getRowSet().getRow());
-					
-					//
-					// TODO: if above cleaned up can remove following in favor
-					//       of simpler commitChangesToDatabase() further above
-					//
-					getNavState().dbOps.performPostUpdateOps();
 				}
-
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
@@ -451,7 +450,7 @@ final class RowsActions
 			try {
 				if(!verifyEnabled(this))
 					return;
-				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
+				// Call move to current row if on insert row.
 				boolean wasInserting = RowSetState.isInserting(getRowSet());
 				if (wasInserting) {
 					getRowSet().moveToCurrentRow();
@@ -463,12 +462,12 @@ final class RowsActions
 				// SINCE USER IS MOVED TO CURRENT ROW PRIOR TO INSERT IT IS SAFE TO
 				// CALL CANCELROWUPDATE TO GET A TRIGGER
 
-				// TODO: could cleanup/remove above comment and use issueRowChanged.
+				// TODO: could cleanup above comment and use issueRowChanged.
 
 				getRowSet().cancelRowUpdates();
 
 				setInserting(getRowSet(), false);
-				getNavState().dbOps.performCancelOps();
+				getNavState().getDbOps().performCancelOps();
 
 				// Only attempt to refresh row if we have at least one record
 				if (getRowSet().getRow() > 0) {
@@ -476,7 +475,7 @@ final class RowsActions
 				}
 				
 				getNavState().freshRow();
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 				if (wasInserting)
 					rowsModel.syncSyncManager(); // TODO does this seem right.
 			} catch (final SQLException se) {
@@ -532,11 +531,11 @@ final class RowsActions
 				}
 				
 				getNavState().freshRow();
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 
 				//}
 
-				getNavState().dbOps.performRefreshOps();
+				getNavState().getDbOps().performRefreshOps();
 				
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -574,7 +573,7 @@ final class RowsActions
 					return;
 				// Commit changes for current row to database
 				// Ignore return since doesn't matter if there's nothing to do.
-				getNavState().commitChangesToDatabase(true);
+				getNavState().autoCommitUpdateRowToDatabase();
 
 				// Move to insert row, update status, and update combo navigator (if applicable)
 				getRowSet().moveToInsertRow();
@@ -611,7 +610,7 @@ final class RowsActions
 					// related to setting up an empty undo/redo stack.
 					RowSetState.setPreInsertOps(getRowSet(), true);
 					try {
-						getNavState().dbOps.performPreInsertOps();
+						getNavState().getDbOps().performPreInsertOps();
 					} catch(Exception ex) {
 						// Catch exception to insure that preInsertOps false.
 						logger.log(ERROR, "SQL Exception in preInsertOps.", ex);
@@ -672,7 +671,7 @@ final class RowsActions
 					}
 				}
 
-				if (!getNavState().dbOps.allowDeletion()) {
+				if (!getNavState().getDbOps().allowDelete()) {
 					return;
 				}
 				
@@ -680,16 +679,16 @@ final class RowsActions
 				final int tmpPosition = getNavState().getRow();
 				
 				// SET ANTICIPATED ROW COUNT POST-DELETION
-				final int tmpSize = getNavState().rowCount-1;
+				final int tmpSize = getNavState().rowCount - 1;
 				
 				// PERFORM ANY PRE DELETION OPS
-				getNavState().dbOps.performPreDeletionOps();
+				getNavState().getDbOps().performPreDeletionOps();
 				
 				// DELETE ROW FROM ROWSET
 				RowSetOps.deleteRow(getRowSet());
 				
 				// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
-				getNavState().dbOps.performPostDeletionOps();
+				getNavState().getDbOps().performPostDeletionOps();
 				
 				// UPDATE TOTAL ROW COUNT
 				getNavState().rowCount = tmpSize;
@@ -704,7 +703,7 @@ final class RowsActions
 				
 				getNavState().freshRow();
 				// UPDATE THE STATUS OF THE NAVIGATOR
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 				
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -742,9 +741,9 @@ final class RowsActions
 			try {
 				if(!verifyEnabled(this))
 					return;
-				int row = (int) getNavState().rowNumberModel.getNumber();
+				int row = (int) getNavState().getRowNumberModel().getNumber();
 
-				// TODO: commitChangesToDatabase returns false if the getRowSet()
+				// TODO: autoCommitUpdateRowToDatabase returns false if the getRowSet()
 				//       is not modifiable. Maybe a multi-state return one
 				//       value could be OK, NOT_WRITEABLE, ERROR...
 				//       Only return if error.
@@ -765,14 +764,14 @@ final class RowsActions
 				if ((row <= getNavState().rowCount) && (row > 0)
 						&& !(getRowSet().getRow() == row && e != null
 							&& RowsAction.OK_SKIP_CURSOR_MOVE.equals(e.getActionCommand()))) {
-					if (!getNavState().commitChangesToDatabase(true))
+					if (!getNavState().autoCommitUpdateRowToDatabase())
 						return;
 					getRowSet().absolute(row);
 					getNavState().freshRow(); // only do this if row changed and commit
 				} else
 					logger.log(WARNING, "skipping commit and cursor move");
 
-				getNavState().updateNavigator();
+				getNavState().updateNavigatorRowAndCount();
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(null, //NavigateActions.this,

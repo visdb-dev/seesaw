@@ -51,7 +51,6 @@ import javax.sql.RowSet;
 import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.RowSetOps.DbUpdate;
 import com.nqadmin.swingset.utils.SSComponent;
-import com.nqadmin.swingset.utils.SSSyncManager;
 
 
 /**
@@ -113,7 +112,7 @@ public interface DbSupport {
 	 * Create a query that contains the row number of a non "order by" query.
 	 * When used in conjunction with a {@link DBComboBox2} which is acting as
 	 * a combobox navigator, the row number is used to avoid sequential searches
-	 * table searches in {@link SSSyncManager}.
+	 * table searches in {@link com.nqadmin.swingset.utils.SSSyncManager}.
 	 * For example, given {@snippet lang="java":
 	 * sup.createRownumQuery("part_id, part_name",
 	 *                       "rown",
@@ -133,7 +132,7 @@ public interface DbSupport {
 	 * windowed queries, example fragment of a more complex query: {@snippet :
 	 * ROW_NUMBER() OVER(ORDER BY (SELECT NULL))
 	 * }
-	 * refer to your database documentation, or AI assistant, when implementing
+	 * refer to your database documentation, or AI assistant, for implementing
 	 * this method.
 	 * 
 	 * @param selectColumns could be "*"

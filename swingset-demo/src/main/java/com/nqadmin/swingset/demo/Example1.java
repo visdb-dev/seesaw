@@ -66,7 +66,6 @@ import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.ComponentState;
@@ -112,6 +111,7 @@ public class Example1 extends JFrame {
 	Connection connection;
 	SSDataNavigator navigator;
 	RowsModel rowsModel;
+	DbOpsCustomizerAllows dbNav;
 
 	static int newBorderSet;
 	private void cleanup()
@@ -206,9 +206,9 @@ public class Example1 extends JFrame {
 		RowSetButtons rsButtons = new RowSetButtons()
 		{
 			@Override
-			RowSetButtons.ScreenInfo getScreenInfo()
+			RowSetButtons.AppInfo getAppInfo()
 			{
-				return new ScreenInfo(logger, rowsModel);
+				return new AppInfo(logger, rowsModel, dbNav);
 			}
 		};
 		
@@ -217,68 +217,7 @@ public class Example1 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		//rowsModel.setDBNav(new SSDBNavImpl(this)
-		DbOpsCustomizer dbNav = new DbOpsCustomizerImpl(this)
-		{
-			/**
-			 * Re-query the RowSet following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps()
-			{
-				super.performPostDeletionOps();
-				try {
-					getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps()
-			{
-				super.performPostInsertOps();
-				try {
-					getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Obtain and set the PK value for the new record & perform any other
-			 * actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps()
-			{
-				// BaseClass clears clear the component values
-				super.performPreInsertOps();
-
-				try (final ResultSet rs = connection.createStatement(
-						ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-						.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
-						) {
-					// Get the new record id.
-					rs.next();
-					final int supplierID = rs.getInt("nextVal");
-					txtSupplierID.setText(String.valueOf(supplierID));
-					
-					// // SET OTHER DEFAULTS
-					//  txtSupplierName.setText(null);
-					//  txtSupplierCity.setText(null);
-					//  txtSupplierStatus.setText("0");
-
-				} catch(final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
-				} catch(final Exception e) {
-					logger.log(Level.ERROR, "Exception occured initializing new record.", e);
-				}
-			}
-		};
+		dbNav = createDbOps();
 		
 		// Initialize database connection and components.
 		try {
@@ -299,12 +238,12 @@ public class Example1 extends JFrame {
 				rs.execute();
 				rowsModel = RowsModel.create(rs, dbNav);
 			}
-
+			
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (SQLException | ClassNotFoundException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
-
+		
 		// Bind the components to the RowsModel and the database columns.
 		rowsModel.bind(Map.of(
 				txtSupplierID, "supplier_id",
@@ -380,5 +319,82 @@ public class Example1 extends JFrame {
 		frame.pack();
 		frame.setVisible(true);
 	}
+
+	class DbOpsCustomizerAllows extends DbOpsCustomizerImpl {
+
+		DbOpsCustomizerAllows(Container container) { super(container); }
+
+		@Override
+		protected void allowUpdate(boolean allow) { super.allowUpdate(allow); }
+
+		@Override
+		protected void allowInsert(boolean allow) { super.allowInsert(allow); }
+
+		@Override
+		protected void allowDelete(boolean allow) { super.allowDelete(allow); }
+	}
 	
+	private DbOpsCustomizerAllows createDbOps() {
+		return new DbOpsCustomizerAllows(this)
+		{
+			/**
+			 * Re-query the RowSet following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps()
+			{
+				super.performPostDeletionOps();
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+			}
+			
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps()
+			{
+				super.performPostInsertOps();
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+			}
+			
+			/**
+			 * Obtain and set the PK value for the new record & perform any other
+			 * actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps()
+			{
+				// BaseClass clears clear the component values
+				super.performPreInsertOps();
+				
+				try (final ResultSet rs = connection.createStatement(
+						ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+						.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
+						) {
+					// Get the new record id.
+					rs.next();
+					final int supplierID = rs.getInt("nextVal");
+					txtSupplierID.setText(String.valueOf(supplierID));
+					
+					// // SET OTHER DEFAULTS
+					//  txtSupplierName.setText(null);
+					//  txtSupplierCity.setText(null);
+					//  txtSupplierStatus.setText("0");
+					
+				} catch(final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
+				} catch(final Exception e) {
+					logger.log(Level.ERROR, "Exception occured initializing new record.", e);
+				}
+			}
+		};
+	}
 }

@@ -46,25 +46,26 @@ package com.nqadmin.swingset.datasources;
 import java.awt.Container;
 import java.lang.System.Logger;
 
+import com.nqadmin.swingset.navigate.DbOpsChangeEvent;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.navigate.Utils.postDbOpsChange;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * Custom implementation of DbOpsCustomizer that overrides performPreInsertOps() to
- * clear/reset the various database-aware fields on a screen when the user adds
- * a new record. An instance of this class can be created for the container
- * where the fields are to be cleared and passed to the data navigator.
+ * Subclass of DbOpsCustomizer that implements performPreInsertOps() to
+ * clear/initialize the various SSComponents on a screen; before the 
+ * user edits/commits the new record.
+ * The DbOpsCustomizer is associated with a RowsModel/RowSet
+ * see {@link com.nqadmin.swingset.navigate.RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOpsCustomizer) RowsModel(RowSet, DbOpsCustomizer)}.
+ * {@link #performPreInsertOps()} searches the container provided to the
+ * constructor to find the {@link SSComponent}s to clean.
  * <p>
- * The data navigator will call the performPreInsertOps() method whenever the
- * user presses the insert button on the navigator. This functions recursively
- * clears (null, empty string, deselect) any SwingSet components or other
- * JComponents on the screen
- * <p>
- * This recursive behavior performed on all the components inside the JPanel or
- * JTabbedPane inside the specified container.
+ * When the user requests to insert a new row, typically a button push,
+ * performPreInsertOps() is invoked
+ * to clear the fields before the user starts editing.
  */
 public class DbOpsCustomizerImpl implements DbOpsCustomizer {
 
@@ -76,6 +77,7 @@ public class DbOpsCustomizerImpl implements DbOpsCustomizer {
 	/**
 	 * Screen where components to be cleared are located.
 	 */
+	// TODO: find out a way that this is not embedded in the class.
 	protected Container container = null;
 
 	/**
@@ -87,31 +89,92 @@ public class DbOpsCustomizerImpl implements DbOpsCustomizer {
 		this.container = container;
 	}
 
+	// /**
+	//  * Constructs a DbOpsCustomizerImpl with no container.
+	//  */
+	// public DbOpsCustomizerImpl() {
+	// }
+
+	private boolean allowInsert = true;
+	private boolean allowDelete = true;
+	private boolean allowUpdate = true;
+
+	/** Sub-classes should use this for proper posting of
+	 * {@link DbOpsChangeEvent}.
+	 * @param allow */
+	protected void allowInsert(boolean allow)
+	{
+		allowInsert = allow;
+		postDbOpsChange(this, Allow.INSERT);
+	}
+
+	/** Sub-classes should use this for proper posting of
+	 * {@link DbOpsChangeEvent}.
+	 * @param allow */
+	protected void allowDelete(boolean allow)
+	{
+		allowDelete = allow;
+		postDbOpsChange(this, Allow.DELETE);
+	}
+
+	/** Sub-classes should use this for proper posting of
+	 * {@link DbOpsChangeEvent}.
+	 * @param allow */
+	protected void allowUpdate(boolean allow)
+	{
+		allowUpdate = allow;
+		postDbOpsChange(this, Allow.UPDATE);
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public boolean allowInsert()
+	{
+		return allowInsert;
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public boolean allowDelete()
+	{
+		return allowDelete;
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public boolean allowUpdate()
+	{
+		return allowUpdate;
+	}
+	
+
 	/**
-	 * Performs pre-insertion operations, in particular {@link #cleanComponents(Container) }.
+	 * Performs pre-insertion operations, in particular
+	 * {@link #cleanComponents(Container) }.
 	 */
 	@Override
 	public void performPreInsertOps() {
-
-		logger.log(DEBUG, "About to call setComponents() to clear values.");
 		cleanComponents(container);
 
 	}
 
 	/**
-	 * In the specified container, clear JTextFields, reset combo boxes to empty
-	 * item and make other components of interest "clean".
+	 * In the specified container, clear/initialize SSComponents.
 	 * Typically done for a new record/row. Uses
 	 * {@link SSUtils#visitSSComponents(Container, Consumer) }
 	 * to run {@link SSComponent#cleanField() }.
 	 * <p>
-	 * This is done for all SwingSet components, text fields, and text areas,
+	 * This is done for all SwingSet components,
+	 * for example text fields, and text areas,
 	 * recursively looking in to the JTabbedPanes and JPanels inside the given
 	 * container as needed.
 	 *
 	 * @param container container in which to recursively initialize components
 	 */
 	protected void cleanComponents(final Container container) {
+		logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
+		if (container == null)
+			return;
 		SSUtils.visitSSComponents(container, comp -> comp.cleanField());
 	}
 } // end public class DbOpsCustomizerImpl

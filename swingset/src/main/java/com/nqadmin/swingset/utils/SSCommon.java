@@ -440,7 +440,12 @@ final class SSCommon
 		if (getSSComponent() instanceof JComponent jc) {
 			// if (rowsModel.getRowSet() == null)
 			if (rowsModel.getRowSet() == null
-					|| !(rowsModel.containsRows() || rowsModel.isOnInsertRow()))
+					|| !rowsModel.containsRows() && !rowsModel.isOnInsertRow()
+					// Visually, disabling component makes it harder to read
+					// not a good idea if you want to look at row data.
+					// Maybe a badge that says can not edit row.
+					// || rowsModel.containsRows() && !rowsModel.getAllowUpdate()
+					)
 				jc.setEnabled(false);
 			else {
 				// TODO: not null return protection.
@@ -767,6 +772,7 @@ final class SSCommon
 	}
 
 	Object getColumn() throws SQLException {
+		Objects.requireNonNull(getColumnReader(), "No DbReader for column");
 		return RowSetOps.getColumn(ssComponent);
 	}
 
@@ -840,15 +846,15 @@ final class SSCommon
 	}
 
 	/**
-	 * Updates the bound database column with the specified Array.
+	 * Updates the bound database column with the specified value.
 	 * <p>
-	 * Used for SSList or other component where multiple items can be selected.
 	 *
 	 * @return true if no error
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
 	boolean setColumn(Object val) {
+		Objects.requireNonNull(getColumnUpdater(), "No DbUpdater for column");
 		return setColumn(val, (value) ->
 				RowSetOps.updateColumn(getSSComponent(), value));
 	}

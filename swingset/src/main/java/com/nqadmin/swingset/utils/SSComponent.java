@@ -435,8 +435,8 @@ public interface SSComponent extends RSC
 	}
 
 	/**
-	 * Sets the value of the bound database column using the SSComponent's
-	 * {@link DbUpdater}. See {@link #getColumnUpdater() }.
+	 * Return the value of the bound database column using the SSComponent's
+	 * {@link DbReader}. See {@link #getColumnReader() }.
 	 * NPE if no columnReader. Useful for dealing with JDBCTypes not handled
 	 * internally.
 	 * 

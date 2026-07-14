@@ -67,24 +67,29 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 /**
  * Component that can be used for data navigation. It provides buttons for
- * navigating forwards and backwards through a rowSet along with inserting and
- * deleting rows in a RowSet. Previously, there were a variety of methods
- * to control allowed actions on a RowSet, e.g. setConfirmDeletes,
- * setInsertion, setModification, ...; these are now in {@link RowsModel},
- * e.g. {@link RowsModel#setAllowInsertion}, ...
- * Any changes made to the columns of a record are updated by
- * the commit button; there's row undo and re-read table (re-execute query).
+ * navigating forwards and backwards through a rowSet, displaying the current
+ * row number, commit and undo,
+ * re-fetch the rows in the rowSet from the database,
+ * insert and delete the displayed row, and display the number of records
+ * in the rowSet.
  * <p>
- * For example if you are displaying three columns using the JTextField and the
+ * <img src="doc-files/ssdatanavigator.png" alt="SSDataNavigator image"
+ * style="display: inline-block; margin-left: 40px;">
+ * <p>
+ * There are a variety of methods
+ * to control allowed actions on a RowSet, e.g. ConfirmDeletes,
+ * Insertion, Deletion, ...; see {@link RowsModel#setAllowInsert}, ...
+ * <p>
+ * For example if you are displaying three columns using the TextField and the
  * user changes the text in the text fields then the columns will be updated to
  * the new values when the user presses commit. If the user wants to
  * revert the changes he made he can press the Undo button.
  * <p>
  * The enabled/disabled state of the buttons is dependent on the edit state
- * of the SSComponents of the RowSet that the SSDataNavigator control.
+ * of the SSComponents of the RowSet that the SSDataNavigator controls.
  * Normally the navigation buttons are disabled if any field of the row is
  * modified; either commit the row or undo the changes to allow navigation.
- * If a field is in error, then only the undo button is enabled; or, of course,
+ * If any field is in error, then only the undo button is enabled; or, of course,
  * edit the field to remove the error.
  */
 // NOTE: NavigateState.setAutoCommit() is not public and never referenced.
@@ -366,22 +371,22 @@ public class SSDataNavigator extends JPanel
 	 * Returns true if deletions are allowed, else false.
 	 *
 	 * @return returns true if deletions are allowed, else false.
-	 * @deprecated use {@linkplain RowsModel#getAllowDeletion() }
+	 * @deprecated use {@linkplain RowsModel#getAllowDelete() }
 	 */
 	@Deprecated
 	public boolean getDeletion() {
-		return rowsModel.getAllowDeletion();
+		return rowsModel.getAllowDelete();
 	}
 
 	/**
 	 * Returns true if insertions are allowed, else false.
 	 *
 	 * @return returns true if insertions are allowed, else false.
-	 * @deprecated use {@linkplain RowsModel#getAllowInsertion()   }
+	 * @deprecated use {@linkplain RowsModel#getAllowInsert()   }
 	 */
 	@Deprecated
 	public boolean getInsertion() {
-		return rowsModel.getAllowInsertion();
+		return rowsModel.getAllowInsert();
 	}
 
 	/**
@@ -469,11 +474,11 @@ public class SSDataNavigator extends JPanel
 	 * row deletions are not allowed. True by default.
 	 *
 	 * @param _deletion indicates whether or not to allow deletions
-	 * @deprecated use {@linkplain RowsModel#setAllowDeletion(boolean)}
+	 * @deprecated use {@linkplain RowsModel#setAllowDelete(boolean)}
 	 */
 	@Deprecated
 	public void setDeletion(final boolean _deletion) {
-		rowsModel.setAllowDeletion(_deletion);
+		rowsModel.setAllowDelete(_deletion);
 	}
 
 	/**
@@ -481,11 +486,11 @@ public class SSDataNavigator extends JPanel
 	 * row insertions are not allowed. True by default.
 	 *
 	 * @param _insertion indicates whether or not to allow insertions
-	 * @deprecated use {@linkplain RowsModel#setAllowInsertion(boolean) }
+	 * @deprecated use {@linkplain RowsModel#setAllowInsert(boolean) }
 	 */
 	@Deprecated
 	public void setInsertion(final boolean _insertion) {
-		rowsModel.setAllowInsertion(_insertion);
+		rowsModel.setAllowInsert(_insertion);
 	}
 
 	/**
@@ -495,7 +500,7 @@ public class SSDataNavigator extends JPanel
 	 *
 	 * @param _modification indicates whether or not the modification-related
 	 *                      buttons are enabled.
-	 * @deprecated use {@linkplain RowsModel#setModification(boolean) }
+	 * @deprecated use {@linkplain RowsModel#setAllowWrite(boolean) }
 	 */
 	@Deprecated
 	public void setModification(final boolean _modification) {

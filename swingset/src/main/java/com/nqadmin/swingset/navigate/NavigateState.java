@@ -83,16 +83,16 @@ import static java.lang.System.Logger.Level.*;
  * External controls
  *     - confirmDeletes
  *     - DbOpsCustomizer
- *     - deletion (enableDeletion, deleteOK)
- *     - insertion (enableInsertion, insertOK)
+ *     - allowDelete (enableDeletion, deleteOK)
+ *     - allowInsert (enableInsertion, insertOK)
  *     - writeable (writeOK)
  *     - NavCombo
  */
 
 /** * {@link NavigateState} contains RowSet state which get reflected in RowsActions.
- * There are {@linkplain Action}s for navigation, insertion, and deletion of
- * records in a RowSet.
- * There are {@linkplain ButtonModel}s for state, such as row dirty
+ * There are {@linkplain Action}s for navigation, allowInsert, and allowDelete of
+records in a RowSet.
+There are {@linkplain ButtonModel}s for state, such as row dirty
  * that could be connected to a commit UI component. Readonly versions of the
  * state buttons are available.
  * <p>
@@ -104,24 +104,24 @@ import static java.lang.System.Logger.Level.*;
  * NOTE: FetchSize
  * 
  * They are used by {@linkplain SSDataNavigator}.
- 
- There are various navigation management parameters that may be set.
- - auto commit
- 
- 
- 
- 
- 
- 
- 
- 
- 
- Component that can be used for data navigation. It provides buttons for
- navigation, insertion, and deletion of records in a RowSet. The
- writable of a RowSet can be prevented using the setModificaton()
- method. Any changes made to the columns of a record will be updated whenever
- there is a navigation.
- <p>
+
+There are various navigation management parameters that may be set.
+- auto commit
+
+
+
+
+
+
+
+
+
+Component that can be used for data navigation. It provides buttons for
+navigation, allowInsert, and allowDelete of records in a RowSet. The
+allowWrite of a RowSet can be prevented using the setModificaton()
+method. Any changes made to the columns of a record will be updated whenever
+there is a navigation.
+<p>
  * For example if you are displaying three columns using the JTextField and the
  * user changes the text in the text fields then the columns will be updated to
  * the new values when the user navigates the RowSet. If the user wants to
@@ -270,9 +270,7 @@ final class NavigateState
 				// Update the record count. Leave positioned at first row.
 				try {
 					logger.log(DEBUG, "Updating row count.");
-					getRowSet().last();
-					rowCount = getRowSet().getRow();
-					getRowSet().first();
+					establishRowCountCurrentRow(RowPositioning.AT_FIRST) ;
 				} catch (final SQLException se) {
 					logger.log(ERROR, "SQL Exception.", se);
 				}
@@ -280,7 +278,7 @@ final class NavigateState
 			try {
 				logger.log(DEBUG, "Calling updateNavigator().");
 				freshRow();
-				updateNavigator();
+				updateNavigatorRowAndCount();
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 			}
@@ -294,9 +292,9 @@ final class NavigateState
 			// Return if not our row set.
 			if (ev.getRowsModel().getRowSet() != getRowSet())
 				return;
-
+			
 			try {
-				updateNavigator();
+				updateNavigatorRowAndCount();
 			} catch (SQLException ex) {
 				logger.log(ERROR, (String) null, ex);
 			}
@@ -342,6 +340,12 @@ final class NavigateState
 		{
 			undoRow.focusChange(ev);
 		}
+
+		@WeakSubscribe
+		public void handleDbOpsChange(DbOpsChangeEvent ev) {
+			if (Objects.equals(getDbOps(), ev.getDbOps()))
+				updateActionState();
+		}
 	}
 	
 	/** return true if number of components in error changed. */
@@ -373,16 +377,19 @@ final class NavigateState
 	final UndoRow undoRow;
 
 	
-	/** Row number for current record in RowSet. */  // TODO: is this needed? Save much?
+	/** Row number for current record in RowSet. */ // TODO:
+	// TODO: is this needed? Save much? Just use rs.getRow() always.
+	// currentRow is written by updateNavigatorRowAndCount to getRow()
 	private int currentRow = 0;
 
 	/** Container (frame or internal frame) which contains the navigator. */
-	/*private*/ DbOpsCustomizer dbOps = new DbOpsCustomizer() {};
+	private DbOpsCustomizer dbOps = new DbOpsCustomizer() {};
 
 	/**
 	 * SSDBComboBox used for navigation if applicable.
 	 * <p>
-	 * Allows Navigator to disable it when a row is inserted and enable it when that row is saved.
+	 * Allows Navigator to disable it when a row is inserted and enable it
+	 * when that row is saved.
 	 * <p>
 	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead.
 	 */
@@ -391,14 +398,14 @@ final class NavigateState
 	private SSSyncManager syncer = null;
 
 	/** Number of rows in RowSet. Set to zero if next() method returns false. */
-	/*private*/ int rowCount = 0;
+	/*RowsActions*/ int rowCount = 0;
 
 	/** RowSet from which component will create/set values. */
 	private /*final*/ RowSet rowSet;
 	
 	/** Indicates if rowset listener is added (or removed) */
 	// XXX
-	/*private*/ boolean rowsetListenerAdded = false;
+	/*RowsActions*/ boolean rowsetListenerAdded = false;
 
 	private RowSetState rowSetState;
 
@@ -452,24 +459,16 @@ final class NavigateState
 	{
 		try {
 			RowsModel.verifyExecuted(getRowSet());
-			int initial_row = getRowSet().getRow();
-
-			if (initial_row != 0) {
-				getRowSet().last();
-				rowCount = getRowSet().getRow();
-				getRowSet().absolute(initial_row);
-				currentRow = initial_row;
+			if (getRowSet().getRow() != 0) {
+				establishRowCountCurrentRow(RowPositioning.AT_CURRENT);
 			} else {
-				// See if there are any rows in the given ssrowset.
+				// At position 0, are there any rows in the given rowset.
 				if (!getRowSet().next()) {
 					rowCount = 0;
 					currentRow = 0;
 				} else {
-					// If there are rows get the row count.
-					getRowSet().last();
-					rowCount = getRowSet().getRow();
-					getRowSet().first();
-					currentRow = getRowSet().getRow();
+					// There are rows
+					establishRowCountCurrentRow(RowPositioning.AT_FIRST);
 				}
 			}
 		} catch (final SQLException se) {
@@ -481,14 +480,14 @@ final class NavigateState
 
 		try {
 			// freshRow();	// ************************** remove, setupRow only happens once.
-			updateNavigator();
+			updateNavigatorRowAndCount();
 		} catch (final SQLException se) {
 			logger.log(ERROR, "SQL Exception.", se);
 		}
 
 		// TODO: This is new since first time NavGroupState was implemented.
 		//       I think that doing setRowModified(false) a few lines up
-		//       before the updateNavigator() should take care of button state
+		//       before the updateNavigatorRowAndCount() should take care of button state
 		//       that the following is supposed to handle.
 		//
 		// // ENABLE OTHER BUTTONS IF NEED BE.
@@ -498,12 +497,12 @@ final class NavigateState
 		// // EXCEPT COMMIT & UNDO. WITH OUT COMMITING OR UNDOING THE ADD USER
 		// // CLOSES THE SCREEN. NOW IF THE SCREEN IS OPENED WITH A NEW SSROWSET.
 		// // THE REFRESH, ADD & DELETE WILL BE DISABLED.
-		// // 2019-11-11: only enabling add/delete if this.writable==true
+		// // 2019-11-11: only enabling add/delete if this.allowWrite==true
 		// refreshButton.setEnabled(true);
-		// if (insertion && writable) {
+		// if (allowInsert && allowWrite) {
 		// 	addButton.setEnabled(true);
 		// }
-		// if (deletion && writable) {
+		// if (allowDelete && allowWrite) {
 		// 	deleteButton.setEnabled(true);
 		// }
 
@@ -529,6 +528,37 @@ final class NavigateState
 		// 	SSUtils.randomSQLException(ex, logger);
 		// 	return 0;
 		// }
+	}
+
+
+	enum RowPositioning { AT_CURRENT, AT_FIRST, AT_LAST }
+	/**
+	 * Determine how many rows in row set.
+	 * 
+	 * @param pos where to leave the cursor
+	 * @throws SQLException 
+	 */
+	void establishRowCountCurrentRow(RowPositioning pos) throws SQLException {
+		switch(pos) {
+			case AT_CURRENT -> {
+				int initial_row = getRowSet().getRow();
+				getRowSet().last();
+				rowCount = getRowSet().getRow();
+				getRowSet().absolute(initial_row);
+				currentRow = initial_row;
+			}
+			case AT_FIRST -> {
+				getRowSet().last();
+				rowCount = getRowSet().getRow();
+				getRowSet().first();
+				currentRow = getRowSet().getRow(); // Should be 1.
+			}
+			case AT_LAST -> {
+				getRowSet().last();
+				rowCount = getRowSet().getRow();
+				currentRow = getRowSet().getRow();
+			}
+		}
 	}
 
 	/**
@@ -570,14 +600,25 @@ final class NavigateState
 		return change;
 	}
 
-	/*private*/ final SpinnerNumberModel rowNumberModel;
+	private final SpinnerNumberModel rowNumberModel;
+	SpinnerNumberModel getRowNumberModel() {
+		return rowNumberModel;
+	}
+
+	/*RowsActions*/ boolean autoCommitUpdateRowToDatabase()
+			throws SQLException
+	{
+		if (!undoRow.isDirty())
+			return true; // all is OK
+		return commitUpdateRowToDatabase();
+	}
 
 	/**
 	 * Common code to commit changes to the database from the rowset if
 	 * modifications are allowed; called before every action.
 	 * After committing, it performs any post-update operations.
 	 * <p>
-	 * If writable==false, then skip the update and return as
+	 * If allowWrite==false, then skip the update and return as
 	 * successful, unless we have an empty rowset.
 	 * Checks {@link DbOpsCustomizer#allowUpdate() }.
 	 * 
@@ -587,58 +628,39 @@ final class NavigateState
 	 * @return true unless there are no records OR dbOps.allowUpdate() returns false
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
-	/*private*/ boolean commitChangesToDatabase(final boolean performPostUpdateOps)
+	/*RowsActions*/ boolean commitUpdateRowToDatabase()
 			throws SQLException
 	{
-		boolean result = true;
-		
 		// check for an empty rowset 
 		if (getRowSet().getRow() == 0) {
-			result = false;
+			return false; // weird state
 		}
 
-		//boolean isDirty = undoRow.isDirty();
-		cleanupUpdateRow();	// CURRENTLY A NO-OP
+		boolean updateOK = true;
 		
-		// if we have at least one row and the user has not set modifications to false (read-only)
-		// then continue to attempt to update database based on current rowset values
-		if (result && writable) {
-			if (!dbOps.allowUpdate()) {
-				result = false;
-			} else {
-				RowSetOps.updateRow(getRowSet());
-			}
-		}
+		// There is at least one row; update whether or not it is dirty.
+		// If not read-only then continue attempt to update database
+		// based on current rowset values
+					if (Boolean.FALSE) {
+						// There is a subtle difference. But reading the comments
+						// There's special deference given to dbOps.allowUpdate().
+						// WONDER WHAT THAT'S ABOUT.
+						if (updateOK && getAllowWrite()) {
+							if (!getDbOps().allowUpdate()) {
+								updateOK = false;
+							} else {
+								RowSetOps.updateRow(getRowSet());
+							}
+						}
+					}
+
+		if (updateOK && canUpdate()) {
+			RowSetOps.updateRow(getRowSet());
+			getDbOps().performPostUpdateOps();
+		} else
+			updateOK = false; // can't update, so return false
 		
-		// if update was successful or modifications are set to false (read-only) then
-		// attempt post-update operations based on method parameter
-		//
-		// note that where modifications are set to false, we're pretending to have
-		// successfully updated the database
-
-		// TODO: If updateRow above didn't happen, when writable == false, then
-		//       seems there is no reason to do dbOps.performPostUpdateOps()
-		//       under any circumstance.
-		//       undoRow.isDirty() might also be useful...
-
-		if (result && performPostUpdateOps) {
-			dbOps.performPostUpdateOps();
-		}
-		
-		// return
-		return result;
-	}
-
-	/**
-	 * Make sure updateRow only has values that are user changes.
-	 * After making a change, undo can back off to the original (base value
-	 * of undo/redo stack); if that happened, cancelRowUpdates, and
-	 * re-update that actual changes.
-	 */
-	private void cleanupUpdateRow()
-	{
-		// TODO: is this actually needed/desirable?
-		// It seems nice to not "change" things in the database that don't change.
+		return updateOK;
 	}
 
 	// //
@@ -672,7 +694,7 @@ final class NavigateState
 	/**
 	 * Adds listener to the rowset
 	 */
-	/*private*/ void enableRowsetListeningFlag(String tag) {
+	/*RowsActions*/ void enableRowsetListeningFlag(String tag) {
 		// XXX
 		if (!rowsetListenerAdded) {
 			rowsetListenerAdded = true;
@@ -683,7 +705,7 @@ final class NavigateState
 	/**
 	 * Removes listener from the rowset
 	 */
-	/*private*/ void disableRowsetListeningFlag(String tag) {
+	/*RowsActions*/ void disableRowsetListeningFlag(String tag) {
 		// XXX
 		if (rowsetListenerAdded) {
 			rowsetListenerAdded = false;
@@ -705,13 +727,16 @@ final class NavigateState
 	private boolean confirmDeletes = true;
 
 	/** Indicator to allow/disallow deletions from the RowSet. */
-	private boolean deletion = true;
+	private boolean allowDelete = true;
 
 	/** Indicator to allow/disallow insertions to the RowSet. */
-	private boolean insertion = true;
+	private boolean allowInsert = true;
 
 	/** Indicator to allow/disallow changes to the RowSet. */
-	private boolean writable = true;
+	private boolean allowWrite = true;
+
+	/** Indicator to allow/disallow edits to a RowSets record. */
+	private boolean allowUpdate = true;
 
 	/**
 	 * Sets the confirm deletion indicator. If set to true, every time delete button
@@ -721,11 +746,8 @@ final class NavigateState
 	 * @param confirmDeletes indicates whether or not to confirm deletions
 	 */
 	// TODO: WHAT?
-	public void setConfirmDeletes(boolean confirmDeletes) {
-		//final boolean oldValue = confirmDeletes;
+	void setConfirmDeletes(boolean confirmDeletes) {
 		this.confirmDeletes = confirmDeletes;
-		// TODO: what is this about?
-		//firePropertyChange("confirmDeletes", oldValue, confirmDeletes);
 	}
 
 	/**
@@ -734,7 +756,7 @@ final class NavigateState
 	 * @return returns true if a confirmation dialog is displayed when the user
 	 *         deletes a record, else false.
 	 */
-	public boolean getConfirmDeletes() {
+	boolean getConfirmDeletes() {
 		return confirmDeletes;
 	}
 
@@ -744,12 +766,8 @@ final class NavigateState
 	 *
 	 * @param deletion indicates whether or not to allow deletions
 	 */
-	public void setDeletion(boolean deletion) {
-		//final boolean oldValue = deletion;
-		this.deletion = deletion;
-		// TODO: what is this about?
-		//firePropertyChange("deletion", oldValue, deletion);
-
+	void setAllowDelete(boolean deletion) {
+		this.allowDelete = deletion;
 		updateActionState();
 	}
 
@@ -758,8 +776,8 @@ final class NavigateState
 	 *
 	 * @return returns true if deletions are allowed, else false.
 	 */
-	public boolean getDeletion() {
-		return deletion;
+	boolean getAllowDelete() {
+		return allowDelete;
 	}
 
 	/**
@@ -768,12 +786,8 @@ final class NavigateState
 	 *
 	 * @param insertion indicates whether or not to allow insertions
 	 */
-	public void setInsertion(boolean insertion) {
-		//final boolean oldValue = insertion;
-		this.insertion = insertion;
-		// TODO: what is this about?
-		//firePropertyChange("insertion", oldValue, insertion);
-
+	void setAllowInsert(boolean insertion) {
+		this.allowInsert = insertion;
 		updateActionState();
 	}
 
@@ -782,8 +796,8 @@ final class NavigateState
 	 *
 	 * @return returns true if insertions are allowed, else false.
 	 */
-	public boolean getInsertion() {
-		return insertion;
+	boolean getAllowInsert() {
+		return allowInsert;
 	}
 
 	/**
@@ -791,15 +805,10 @@ final class NavigateState
 	 * If the user can only navigate through the records with out making any changes
 	 * set this to false. By default, the modification-related buttons are enabled.
 	 *
-	 * @param writable indicates whether or not the writable-related
-                      buttons are enabled.
+	 * @param allowWrite indicates whether or not the allowWrite-related buttons are enabled.
 	 */
-	public void setWritable(boolean writable) {
-		//final boolean oldValue = writable;
-		this.writable = writable;
-		// TODO: what is this about?
-		//firePropertyChange("writable", oldValue, writable);
-
+	void setAllowWrite(boolean allowWrite) {
+		this.allowWrite = allowWrite;
 		updateActionState();
 	}
 
@@ -809,8 +818,19 @@ final class NavigateState
 	 * @return returns true if the user modifications are written back to the
 	 *         database, else false.
 	 */
-	public boolean getWritable() {
-		return writable;
+	boolean getAllowWrite() {
+		return allowWrite;
+	}
+
+	/** Allow/disallow edits to a RowSets record. */
+	boolean getAllowUpdate() {
+		return allowUpdate;
+	}
+
+	/* Enables or disables the modification-related buttons on the SSDataNavigator. */
+	void setAllowUpdate(boolean allowUpdate) {
+		this.allowUpdate = allowUpdate;
+		updateActionState();
 	}
 
 	boolean hasError(SSComponent comp) {
@@ -827,10 +847,7 @@ final class NavigateState
 	//TODO: does this belong here
 	void setDbOps(DbOpsCustomizer dbOps) {
 		Objects.requireNonNull(dbOps);
-		//final DbOpsCustomizer oldValue = dbOps;
 		this.dbOps = dbOps;
-		// TODO: what is this about?
-		//firePropertyChange("dbOps", oldValue, dbOps);
 	}
 
 	/**
@@ -881,7 +898,7 @@ final class NavigateState
 	}
 
 	/** Going to a new row, or undo updates, or refresh row. */
-	/*private*/ void freshRow()
+	void freshRow()
 	{
 		logger.log(TRACE, "freshRow");
 		undoRow.clear();
@@ -890,7 +907,7 @@ final class NavigateState
 	}
 
 	/** Moving to insertRow. */
-	/*private*/ void freshInsertRow()
+	void freshInsertRow()
 	{
 		logger.log(TRACE, "freshInsertRow");
 		undoRow.clearInsertRow(getRowSet());
@@ -898,12 +915,27 @@ final class NavigateState
 	}
 
 	
-	private void updateEnable(RowsAction navAction, boolean flag) {
+	//
+	// TODO: These are called many times in a row;
+	//       don't wan't to recompute rowsModel every time.
+	private void updateEnable(RowsAction navAction, boolean enableFlag) {
 		List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
 		for (RowsModel rowsModel : rowsModels) {
 			Action act = rowsModel.getAction(navAction);
-			if(act.isEnabled() != flag)
-				act.setEnabled(flag);
+			if(act.isEnabled() != enableFlag)
+				act.setEnabled(enableFlag);
+		}
+	}
+	@SuppressWarnings("unused")
+	private void checkEnableLog(List<RowsAction> navActions, boolean enableFlag) {
+		List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
+		for (RowsModel rowsModel : rowsModels) {
+			for (RowsAction navAction : navActions) {
+				Action act = rowsModel.getAction(navAction);
+				if(act.isEnabled() != enableFlag)
+					logger.log(ERROR, () -> sf("Wrong enable state for %s, expect %b",
+							navAction, enableFlag), new IllegalStateException());
+			}
 		}
 	}
 
@@ -911,28 +943,29 @@ final class NavigateState
 	 * Set to true for original behavior
 	 */
 	private boolean v3Buttons;
-	
-	/**
-	 * when false, navigation disabled when row is dirty
-	 */
-	private boolean autoCommit;
 
 	/**
 	 * Return if Pre v4 button behavior.
 	 * @return true if pre v4
 	 */
-	public boolean isV3Buttons() {
+	private boolean isV3Buttons() {
 		return v3Buttons;
 	}
 
 	/**
-	 * Set whether or not the commit and cancel buttons are
-	 * always enabled, independent of whether or not there is a writable.
+	 * Set whether or not the commit and cancel buttons are always enabled,
+	 * independent of whether or not there is a allowWrite.
 	 * @param v3Buttons true for pre v4 behavior
 	 */
-	public void setV3Buttons(boolean v3Buttons) {
+	@SuppressWarnings("unused")
+	private void setV3Buttons(boolean v3Buttons) {
 		this.v3Buttons = v3Buttons;
 	}
+	
+	/**
+	 * when false, navigation disabled when row is dirty
+	 */
+	private boolean autoCommit;
 
 	/**
 	 * Return autoCommit mode. In autoCommit mode, the buttons that move
@@ -942,7 +975,7 @@ final class NavigateState
 	 * 
 	 * @return true if autoCommit mode
 	 */
-	public boolean isAutoCommit() {
+	private boolean isAutoCommit() {
 		return autoCommit;
 	}
 
@@ -956,7 +989,8 @@ final class NavigateState
 	 * @param autoCommit inidcates whether or not to enable autoCommit mode
 	 */
 	// NOTE: this method is not referenced.
-	public void setAutoCommit(boolean autoCommit) {
+	@SuppressWarnings("unused")
+	private void setAutoCommit(boolean autoCommit) {
 		this.autoCommit = autoCommit;
 	}
 
@@ -965,12 +999,31 @@ final class NavigateState
 		return lastCanNavigate;
 	}
 
+	private boolean canWrite() {
+		DbOpsCustomizer ops = getDbOps();
+		return getAllowWrite()
+				&& (getAllowUpdate()|| getAllowInsert() || getAllowDelete())
+				&& (ops.allowUpdate() || ops.allowInsert() || ops.allowDelete());
+	}
+
+	boolean canInsert() {
+		return getAllowWrite() && getAllowInsert() && getDbOps().allowInsert();
+	}
+
+	boolean canDelete() {
+		return getAllowWrite() && getAllowDelete() && getDbOps().allowDelete();
+	}
+
+	boolean canUpdate() {
+		return getAllowWrite() && getAllowUpdate() && getDbOps().allowUpdate();
+	}
+
 	/**
 	 * Set the enable/disable state of each button according to
 	 * the Navigator state variables.
 	 * @see #updateActionStateWithDatabaseCheck() 
 	 */
-	/*private*/ void updateActionState() {
+	/*RowsActions*/ void updateActionState() {
 		logger.log(TRACE, () -> sf("rowCount=%d, currentRow=%d", rowCount, getRow()));
 		List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
 		if (rowsModels.isEmpty())
@@ -1008,11 +1061,12 @@ final class NavigateState
 		lastCanNavigate = canNavigate;
 
 		// Handle commit, undo
-		boolean commitUndoOk = writable
-				&& (onInsertRow || isRowModified || commitUndoAlwaysEnabled);
-		updateEnable(ACT_COMMIT, commitUndoOk  && !hasError);
-		// TODO: Should undo/revert ever be disabled if isRowModified is true?
-		updateEnable(ACT_REVERT, commitUndoOk);
+		boolean commitOn = canWrite()
+				&& (isRowModified && canUpdate()
+					|| onInsertRow && canInsert() || commitUndoAlwaysEnabled);
+		updateEnable(ACT_COMMIT, commitOn  && !hasError);
+		boolean undoOn = isRowModified || commitOn;
+		updateEnable(ACT_REVERT, undoOn);
 
 		// TODO: Consider if row is dirty, delete button makes sense,
 		//			but, does the add button make sense?
@@ -1022,8 +1076,8 @@ final class NavigateState
 			updateEnable(ACT_DELETE, false);
 		} else {
 			// Perhaps the following should only be "!isRowModified"
-			updateEnable(ACT_ADD, insertion && !disablingAutoCommit && writable);
-			updateEnable(ACT_DELETE, deletion && writable && rowCount != 0);
+			updateEnable(ACT_ADD, canInsert() && !disablingAutoCommit);
+			updateEnable(ACT_DELETE, canDelete() && rowCount != 0);
 		}
 
 		// refresh
@@ -1037,15 +1091,23 @@ final class NavigateState
 	 * of the first, prev, next, and last buttons from the database.
 	 * @see #updateActionState() 
 	 */
-	// TODO: understand why this is needed?
+	// TODO: understand why this is needed? MOVE THIS INTO updateNavigatorRowAndCount.
 	private void updateActionStateWithDatabaseCheck() {
 		updateActionState();
+		// Not sure why these are needed, updateActionState
+		// compares getRow() to 1 and "rowCount".
+		// This code doesn't hurt, if it changes anything, then there's a bug.
+
+		// TRY TO GET RID OF THIS. SHOULDN'T BE NEEDED.
+
 		try {
 			if (getRowSet().isLast()) {
+				checkEnableLog(List.of(ACT_NEXT, ACT_LAST), false);
 				updateEnable(ACT_NEXT, false);
 				updateEnable(ACT_LAST, false);
 			}
 			if (getRowSet().isFirst()) {
+				checkEnableLog(List.of(ACT_FIRST, ACT_PREVIOUS), false);
 				updateEnable(ACT_FIRST, false);
 				updateEnable(ACT_PREVIOUS, false);
 			}
@@ -1055,20 +1117,23 @@ final class NavigateState
 	}
 
 	/**
-	 * Enables/disables navigation buttons as needed
-	 * and updates the current row and row count numbers.
+	 * Typically called after a rowSetEvent that may move the cursor
+	 * or set up a new rowSet; also called by many actions in RowsActions.
+	 * First updates currentRow and rowNumberModel's count/current.
+	 * Then updateActionStateWithDatabaseCheck().
 	 * @throws SQLException 	SQLException
 	 */
-	void updateNavigator() throws SQLException {
-
+	void updateNavigatorRowAndCount() throws SQLException {
+		// Usually currentRow is allready correct.
 		currentRow = getRowSet().getRow();
 
 		rowNumberModel.setMaximum(rowCount);
-		rowNumberModel.setValue(getRow());
+		rowNumberModel.setValue(currentRow);
 
 		logger.log(DEBUG, () -> "Current Row: " + getRow() + ". Row Count: " + rowCount);
 		//logger.debug("Stack trace:", new Throwable());
 
+		// TODO: inline updateActionStateWithDatabaseCheck code then remove it
 		updateActionStateWithDatabaseCheck();
 	}
 

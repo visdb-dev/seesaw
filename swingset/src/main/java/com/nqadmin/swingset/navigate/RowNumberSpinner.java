@@ -175,9 +175,9 @@ public class RowNumberSpinner extends JSpinner
 		actionSetModel = true;
 		try {
 			if (rowsModel.getRowSet() == null)
-				setModel( new SpinnerNumberModel());
+				setModel(new SpinnerNumberModel());
 			else
-				setModel(rowsModel.getSpinnerModel());
+				setModel(rowsModel.getRowNumberModel());
 			fireStateChanged(); // Treat a model change as a state change
 		} finally {
 			actionSetModel = false;

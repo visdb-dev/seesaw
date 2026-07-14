@@ -77,7 +77,8 @@ public class EQ
 		if (seconds == 0)
 			latch.await();
 		else
-			latch.await(seconds, TimeUnit.SECONDS);
+			if (!latch.await(seconds, TimeUnit.SECONDS))
+				throw new IllegalStateException("latch timeout");
 	}
 
 	static BusReceiver setupBusReceiver()
@@ -165,6 +166,7 @@ public class EQ
 			report(ev);
 		}
 
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		private void report(EventObjectBacktrace ev) {
 			System.out.println("EventBus: " + ev.toString());
 			if (PerTestDispatch != null)

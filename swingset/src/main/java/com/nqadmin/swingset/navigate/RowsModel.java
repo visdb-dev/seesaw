@@ -372,8 +372,6 @@ public final class RowsModel
 		RowSet oldRowSet = getRowSet();
 		rowSetListener.unregisterFrom(oldRowSet);
 		setNavState(rs, dbOps);
-		if (rs != null)
-			getNavState().updateActionState();
 
 		rowSetListener.registerTo(rs);
 		enq.postNewRowSetEvent(this, oldRowSet);
@@ -499,7 +497,7 @@ public final class RowsModel
 			rowsActions.run(ACT_FIRST);
 		return getRowSet().getRow() != 0;
 	}
-	/** Programmaticaly move the ResultSet cursor to the last row.
+	/** Programmatically move the ResultSet cursor to the last row.
 	 * @return true if on valid row
 	 * @throws java.sql.SQLException */
 	public boolean last() throws SQLException {
@@ -534,8 +532,8 @@ public final class RowsModel
 	//
 
 	// NOTE: SpinnerModel locked to RowSet
-	SpinnerNumberModel getSpinnerModel() {
-		return navState.rowNumberModel;
+	SpinnerNumberModel getRowNumberModel() {
+		return navState.getRowNumberModel();
 	}
 
 	/**
@@ -559,7 +557,7 @@ public final class RowsModel
 	}
 
 	private int getRow(boolean isSync) {
-		int spin_row = getSpinnerModel().getNumber().intValue();
+		int spin_row = getRowNumberModel().getNumber().intValue();
 		try {
 			int rs_row = getRowSet().getRow();
 			if (spin_row != rs_row) {
@@ -569,7 +567,7 @@ public final class RowsModel
 							spin_row, rs_row), new IllegalStateException("getRow sync"));
 				// RESYNC SPINNER
 				setRow(rs_row);
-				int spin_row2 = getSpinnerModel().getNumber().intValue();
+				int spin_row2 = getRowNumberModel().getNumber().intValue();
 				int rs_row2 = getRowSet().getRow();
 				if (spin_row2 != rs_row || rs_row != rs_row2)
 					throw new IllegalStateException("Spinner failed to sync");
@@ -586,7 +584,7 @@ public final class RowsModel
 	 * @param row target cursor row
 	 */
 	public void setRow(int row) {
-		SpinnerNumberModel spinnerModel = getSpinnerModel();
+		SpinnerNumberModel spinnerModel = getRowNumberModel();
 		if (spinnerModel != null) {
 			spinnerModel.setValue(row);
 		}
@@ -597,7 +595,7 @@ public final class RowsModel
 	 * @return count of rows
 	 */
 	public int getRowCount() {
-		SpinnerNumberModel spinnerModel = getSpinnerModel();
+		SpinnerNumberModel spinnerModel = getRowNumberModel();
 		if (spinnerModel != null)
 			return (Integer)spinnerModel.getMaximum();
 		return -1;
@@ -716,8 +714,8 @@ public final class RowsModel
 	 *
 	 * @return returns true if deletions are allowed, else false.
 	 */
-	public boolean getAllowDeletion() {
-		return navState.getDeletion();
+	public boolean getAllowDelete() {
+		return navState.getAllowDelete();
 	}
 
 	/**
@@ -726,8 +724,8 @@ public final class RowsModel
 	 *
 	 * @param deletion indicates whether or not to allow deletions
 	 */
-	public void setAllowDeletion(boolean deletion) {
-		navState.setDeletion(deletion);
+	public void setAllowDelete(boolean deletion) {
+		navState.setAllowDelete(deletion);
 	}
 
 	/**
@@ -735,8 +733,8 @@ public final class RowsModel
 	 *
 	 * @return returns true if insertions are allowed, else false.
 	 */
-	public boolean getAllowInsertion() {
-		return navState.getInsertion();
+	public boolean getAllowInsert() {
+		return navState.getAllowInsert();
 	}
 
 	/**
@@ -745,8 +743,8 @@ public final class RowsModel
 	 *
 	 * @param insertion indicates whether or not to allow insertions
 	 */
-	public void setAllowInsertion(boolean insertion) {
-		navState.setInsertion(insertion);
+	public void setAllowInsert(boolean insertion) {
+		navState.setAllowInsert(insertion);
 	}
 
 	/**
@@ -756,7 +754,7 @@ public final class RowsModel
 	 *         database, else false.
 	 */
 	public boolean getAllowWrite() {
-		return navState.getWritable();
+		return navState.getAllowWrite();
 	}
 
 	/**
@@ -767,7 +765,19 @@ public final class RowsModel
 	 * @param writable true to enable writable-related actions; false to disable
 	 */
 	public void setAllowWrite(boolean writable) {
-		navState.setWritable(writable);
+		navState.setAllowWrite(writable);
+	}
+
+	/** Can the rowset be updated?
+	 * @return  */
+	public boolean getAllowUpdate() {
+		return navState.getAllowUpdate();
+	}
+
+	/** Enable/disable row edit
+	 * @param allowUpdate */
+	public void setAllowUpdate(boolean allowUpdate) {
+		navState.setAllowUpdate(allowUpdate);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -1021,7 +1031,7 @@ public final class RowsModel
 	 */
 	@Deprecated
 	public void setModification(boolean modification) {
-		navState.setWritable(modification);
+		navState.setAllowWrite(modification);
 	}
 
 	/**
@@ -1033,7 +1043,7 @@ public final class RowsModel
 	 */
 	@Deprecated
 	public boolean getModification() {
-		return navState.getWritable();
+		return navState.getAllowWrite();
 	}
 
 	/**
