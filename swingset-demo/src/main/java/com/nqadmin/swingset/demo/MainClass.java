@@ -84,7 +84,7 @@ import javax.swing.SwingUtilities;
 import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.datasources.DbSupport;
-import com.nqadmin.swingset.datasources.DbSupportFactory;
+import com.nqadmin.swingset.datasources.products.DbSupportFactory;
 import com.nqadmin.swingset.datasources.DefaultDbSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
 import com.nqadmin.swingset.models.SSCollection;
@@ -407,7 +407,7 @@ public class MainClass extends JFrame
 		} catch (SQLException ex) {
 		}
 		
-		DbSupport supp = DbSupportFactory.setupLookup(dbConnection);
+		DbSupport supp = DbSupportFactory.addDbSupportToLookup(dbConnection);
 		if (supp == null) {
 			logger.log(Level.ERROR, sf("No SSDBSupport found for '%s'", databaseID));
 			CentralLookup.getDefault().replace(DbSupport.class, new DefaultDbSupport(dbConnection) { });

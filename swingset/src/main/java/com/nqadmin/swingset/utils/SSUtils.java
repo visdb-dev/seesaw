@@ -199,7 +199,8 @@ public class SSUtils {
 	}
 
 	/**
-	 * Returns the current DbSupport from the lookup.
+	 * Returns the lookup's current DbSupport.
+	 * Very fast; it listens.
 	 * @return DbSupport
 	 */
 	public static DbSupport dbSupport() {
@@ -238,7 +239,7 @@ public class SSUtils {
 			if (crs.getKeyColumns() != null)
 				return;
 			int[] keys = getPrimaryKeyColumns(
-					SSUtils.dbSupport().getSharedConnection(crs), crs);
+					SSUtils.dbSupport().getSharedConnection(), crs);
 			crs.setKeyColumns(keys);
 		} catch (SQLException ex) {
 		}
@@ -335,7 +336,7 @@ public class SSUtils {
 		String table   = rsMetaData.getTableName(colIdx);
 
 		// TODO: just call all the names keys. Buggy if join ...
-		List<KeyInfo> ki = SSUtils.dbSupport().runWithConnection(rs,
+		List<KeyInfo> ki = SSUtils.dbSupport().runWithConnection(
 				conn -> {
 					DatabaseMetaData dbMetaData = conn.getMetaData();
 					// TODO: some versions of Postgress require null catalog

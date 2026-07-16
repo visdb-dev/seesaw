@@ -33,8 +33,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import javax.sql.RowSet;
-
 import com.nqadmin.swingset.utils.SSUtils;
 
 /**
@@ -71,7 +69,7 @@ public class DbMetadataCache
 	// TODO: handle any/multiple connections, currently only caching for shared conn
 	// NOTE: If schema changes table/column info changes
 	public DatabaseMetaData getMetaData(Connection conn, boolean refresh) throws SQLException {
-		Connection shconn = getSharedConnection(null);
+		Connection shconn = getSharedConnection();
 		if (conn != shconn || !metaDataCacheEnabled)
 			return conn.getMetaData();
 		if (refresh || metaData == null) {
@@ -93,7 +91,7 @@ public class DbMetadataCache
 	{
 		Connection shconn = null;
 		try {
-			shconn = getSharedConnection(null);
+			shconn = getSharedConnection();
 		} catch (SQLException ex) { } // Can't happen with null argument.
 		if (conn != shconn)
 			return;
@@ -101,8 +99,8 @@ public class DbMetadataCache
 	}
 
 	// TODO: cache this
-	private Connection getSharedConnection(RowSet rs) throws SQLException {
-		return SSUtils.dbSupport().getSharedConnection(rs);
+	private Connection getSharedConnection() throws SQLException {
+		return SSUtils.dbSupport().getSharedConnection();
 	}
 	
 }

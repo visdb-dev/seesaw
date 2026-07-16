@@ -33,6 +33,7 @@ package com.nqadmin.swingset.datasources;
 import java.awt.EventQueue;
 import java.lang.System.Logger;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -50,9 +51,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.products.DbSupportFactory;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
-import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.navigate.RowsAction;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -77,13 +78,15 @@ public class RowSetOpsTest
 	{
 	}
 	
-	/** x */
+	/** x
+	 * @throws java.lang.ClassNotFoundException
+	 * @throws java.sql.SQLException */
 	@BeforeAll
-	public static void setUpClass()
+	public static void setUpClass() throws ClassNotFoundException, SQLException
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
-		Util.initLookup();
+		DbSupportFactory.addDbSupportToLookup(H2.getCon());
 	}
 	
 	/** x */

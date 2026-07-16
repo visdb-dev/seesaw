@@ -48,10 +48,10 @@ import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.core.TextField;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.products.DbSupportFactory;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
 import com.nqadmin.swingset.mock.TinyRS;
-import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.navigate.EQ.BusReceiver;
 import com.raelity.lib.eventbus.WeakEventBus;
 
@@ -71,13 +71,15 @@ public class RowsModelTest
 	{
 	}
 	
-	/** x */
+	/** x
+	 * @throws java.lang.ClassNotFoundException
+	 * @throws java.sql.SQLException */
 	@BeforeAll
-	public static void setUpClass()
+	public static void setUpClass() throws ClassNotFoundException, SQLException
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
-		Util.initLookup();
+		DbSupportFactory.addDbSupportToLookup(H2.getCon());
 	}
 	
 	/** x */

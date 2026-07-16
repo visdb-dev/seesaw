@@ -404,7 +404,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	private Connection getConnection() throws SQLException {
 		return connection == null
-				? SSUtils.dbSupport().getSharedConnection(null) : connection;
+				? SSUtils.dbSupport().getSharedConnection() : connection;
 	}
 
 	/**

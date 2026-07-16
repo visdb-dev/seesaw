@@ -54,59 +54,37 @@ import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
- * Database specific operations and access strategy.
+ * Database specific operations and access mechanisms.
  * An implementation manages and uses a {@code sharedConnection},
- * <p>
- * This needs work, clean up. It evolved as someplace to put stuff that
- * shouldn't be in mainline code; and it provides a way to find out where those
- * places are. 
+ * See {@link com.nqadmin.swingset.utils.SSUtils#dbSupport()} for best access method.
  */
+// This needs work, clean up. It evolved as someplace to put stuff that
+// shouldn't be in mainline code; and it provides a way to find out where those
+// places are. 
+// TODO: Get rid of the RowSet param since only one database.
+//       But then getConnection still needs way to determine DataSource or URL.
 public interface DbSupport {
 	/**
-	 * For the typical simple cases run the columnRead to set the value.
-	 * Note that the columnUpdater typically ignores the comp argument, but
-	 * there for special cases.
-	 *
-	 * @param comp
-	 * @return
+	 * Return an open connection for quick use that
+	 * connects to the database where the row set comes from.
+	 * <em>Do not close</em> the returned connection after use.
+	 * Using this to create a ResultSet/JdbcRowSet that stays open
+	 * is <em>not quick</em>.
+	 * 
+	 * @return connection, may be null
 	 * @throws java.sql.SQLException
 	 */
-	static Object runDbReader(SSComponent comp) throws SQLException {
-		return comp.getColumnReader()
-				.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
-	}
+	Connection getSharedConnection() throws SQLException;
 
 	/**
-	 * For the typical simple cases run the columnUpdater to set the value.
-	 * Note that the columnUpdater typically ignores the comp argument, but
-	 * there for special cases.
-	 * 
-	 * @param comp
-	 * @param value
-	 * @return actual item written to the database, throws if nothing written
-	 * @throws SQLException
+	 * Return a connection to the {@code RowSet}'s database using information
+	 * from the {@code RowSet} to get the connection; <em>close when finished</em>.
+	 * Tries {@code RowSet}'s DataSource then url.
+	 * @param rs row set from target database
+	 * @return connection
+	 * @throws java.sql.SQLException
 	 */
-	static DbUpdate runDbUpdater(SSComponent comp, Object value) throws SQLException {
-		return runDbUpdater(comp, value, comp.getColumnUpdater());
-	}
-
-	/**
-	 * For the typical simple cases run the columnUpdater to set the value.
-	 * Note that the columnUpdater typically ignores the comp argument, but
-	 * there for special cases.
-	 *
-	 * @param comp
-	 * @param value
-	 * @param columnUpdater
-	 * @return actual item written to the database, throws if nothing written
-	 * @throws SQLException
-	 */
-	// TODO: any reason to make this public?
-	private static DbUpdate runDbUpdater(SSComponent comp, Object value,
-			DbUpdater<RowSet, Integer, SSComponent, Object> columnUpdater)
-			throws SQLException {
-		return columnUpdater.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
-	}
+	Connection getConnection(RowSet rs) throws SQLException;
 
 	/**
 	 * Create a query that contains the row number of a non "order by" query.
@@ -151,35 +129,63 @@ public interface DbSupport {
 	 * Run the function with a connection to the database associated
 	 * with the specified {@code RowSet}, return the result.
 	 * @param <R>
-	 * @param rs if null, just use the {@code sharedConnection}
 	 * @param func
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
-	<R> R runWithConnection(RowSet rs, FunctionSQL<Connection, R> func) throws SQLException;
+	default <R> R runWithConnection(FunctionSQL<Connection, R> func) throws SQLException {
+		return func.apply(getSharedConnection());
+	}
 
 	/**
-	 * Return a connection for quick use that
-	 * connects to the database where the row set comes from.
-	 * <em>Do not close</em> the returned connection after use.
-	 * Using this to create a ResultSet/JdbcRowSet that stays open
-	 * is <em>not quick</em>.
+	 * Run the column's {@link DbReader} to get the value to return.
+	 * See {@link SSComponent#getColumnReader()}.
+	 *
+	 * @param comp
+	 * @return the value read by the DbReader
+	 * @throws java.sql.SQLException
+	 */
+	static Object runDbReader(SSComponent comp) throws SQLException {
+		// Note that the columnReader implementations typically ignores the
+		// comp argument, but there for special cases.
+		return comp.getColumnReader()
+				.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
+	}
+
+	/**
+	 * Run the column's {@link DbUpdater} to update the column with the
+	 * specified value.
+	 * See {@link SSComponent#getColumnUpdater()}.
+	 * Throws if nothing written.
 	 * 
-	 * @param rs row set from target database or null for a default connection.
-	 * @return connection or null if none found
-	 * @throws java.sql.SQLException
+	 * @param comp
+	 * @param value
+	 * @return actual item written to the database, after possible conversions.
+	 * @throws SQLException
 	 */
-	Connection getSharedConnection(RowSet rs) throws SQLException;
+	static DbUpdate runDbUpdater(SSComponent comp, Object value) throws SQLException {
+		// Note that the columnUpdater implementations typically ignores the
+		// comp argument, but there for special cases.
+		return runDbUpdater(comp, value, comp.getColumnUpdater());
+	}
 
 	/**
-	 * Return a connection that connects to the database where the row set comes from;
-	 * <em>close when finished</em>.
-	 * Tries url, dataSource.
-	 * @param rs row set from target database
-	 * @return connection
-	 * @throws java.sql.SQLException
+	 * For the typical simple cases run the columnUpdater to set the value.
+	 * Note that the columnUpdater typically ignores the comp argument, but
+	 * there for special cases.
+	 *
+	 * @param comp
+	 * @param value
+	 * @param columnUpdater
+	 * @return actual item written to the database, throws if nothing written
+	 * @throws SQLException
 	 */
-	Connection getConnection(RowSet rs) throws SQLException;
+	// TODO: any reason to make this public?
+	private static DbUpdate runDbUpdater(SSComponent comp, Object value,
+			DbUpdater<RowSet, Integer, SSComponent, Object> columnUpdater)
+			throws SQLException {
+		return columnUpdater.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
+	}
 
 	/**
 	 * Like Runnable, but throws.

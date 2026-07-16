@@ -27,58 +27,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.datasources;
+package com.nqadmin.swingset.datasources.products;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
-import com.nqadmin.swingset.utils.CentralLookup;
-import com.nqadmin.swingset.utils.JStuff;
-
-import static java.lang.System.Logger.Level.ERROR;
+import com.nqadmin.swingset.datasources.DefaultDbSupport;
 
 /**
- * Generate DbSupport instances.
- * <p>
- * TODO: handle registration based on ProductName. The handler is responsible
- *       for sorting out versions.
+ * For H2 metadata DatabaseProductName.
  */
-public class DbSupportFactory
+public class H2DbSupport extends DefaultDbSupport
 {
-	private DbSupportFactory() { }
-	private static final System.Logger logger = JStuff.getLogger();
-	// Something simple for now.
-	private static final HashMap<String, Function<Connection, DbSupport>> creators
-			= new HashMap<>(Map.of("H2", (Connection conn) -> new H2DbSupport(conn)));
-
 	/**
-	 * Create a DbSupport that works with the specified connection according
-	 * to its metadata; put it into the CentralLookup.
-	 * The connection is used as the shared connection and to fetch DatabaseMetaData.
-	 * @param conn
-	 * @return an DbSupport instance that is put into CentralLookup or null.
+	 * For H2.
+	 * @param sharedConnection
 	 */
-	public static DbSupport setupLookup(Connection conn) {
-		CentralLookup lkup = CentralLookup.getDefault();
-
-		DbSupport dbSupport = null;
-		try {
-			DatabaseMetaData dbMeta = conn.getMetaData();
-			String name = dbMeta.getDatabaseProductName();
-			Function<Connection, DbSupport> creator = creators.get(name);
-			if (creator != null)
-				dbSupport = creator.apply(conn);
-		} catch (SQLException ex) {
-			logger.log(ERROR, (String) null, ex);
-		}
-		if (dbSupport != null)
-			lkup.replace(DbSupport.class, dbSupport);
-
-		return dbSupport;
+	public H2DbSupport(Connection sharedConnection)
+	{
+		super(sharedConnection);
 	}
 
+	/** {@inheritDoc } */
+	@Override
+	public String createRownumQuery(String selectColumns, String rownumberColumn,
+			String tableName, String trailingClause)
+	{
+		String query = """
+                 SELECT {selectColumns}, ROWNUM() AS {rownumberColumn}
+                 FROM {tableName}
+                 {trailingClause};
+                 """
+				.replace("{selectColumns}", selectColumns)
+				.replace("{rownumberColumn}", rownumberColumn)
+				.replace("{tableName}", tableName)
+				.replace("{trailingClause}", trailingClause)
+				;
+		return query;
+	}
+
+	
 }

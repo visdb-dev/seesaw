@@ -722,7 +722,7 @@ public class RowSetOps {
 		
 		// Get a resultSet that is probably the same as the RowSet associated
 		// with the param comp.
-		Connection conn = SSUtils.dbSupport().getSharedConnection(comp.getRowSet());
+		Connection conn = SSUtils.dbSupport().getSharedConnection();
 		try(Statement statement = conn.createStatement(
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
 			ResultSet rs = statement.executeQuery(comp.getRowSet().getCommand());

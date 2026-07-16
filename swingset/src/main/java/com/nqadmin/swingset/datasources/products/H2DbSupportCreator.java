@@ -27,44 +27,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.datasources;
+package com.nqadmin.swingset.datasources.products;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+
+import org.openide.util.lookup.ServiceProvider;
+
+import com.nqadmin.swingset.datasources.DbSupport;
 
 /**
  * For H2.
  */
-public class H2DbSupport extends DefaultDbSupport
+@ServiceProvider(path="SS/DbSupport/H2", service=DbSupportCreator.class)
+public class H2DbSupportCreator implements DbSupportCreator
 {
 
 	/**
-	 * For H2.
+	 * Construct DbSupport for H2. MetaData doesn't matter.
 	 * @param sharedConnection
-	 */
-	public H2DbSupport(Connection sharedConnection)
-	{
-		super(sharedConnection);
-	}
-
-	/**
-	 * {@inheritDoc }
+	 * @param dbMeta
+	 * @return DbSupport
 	 */
 	@Override
-	public String createRownumQuery(String selectColumns, String rownumberColumn,
-			String tableName, String trailingClause)
+	public DbSupport create(Connection sharedConnection, DatabaseMetaData dbMeta)
 	{
-		String query = """
-                 SELECT {selectColumns}, ROWNUM() AS {rownumberColumn}
-                 FROM {tableName}
-                 {trailingClause};
-                 """
-				.replace("{selectColumns}", selectColumns)
-				.replace("{rownumberColumn}", rownumberColumn)
-				.replace("{tableName}", tableName)
-				.replace("{trailingClause}", trailingClause)
-				;
-		return query;
+		return new H2DbSupport(sharedConnection);
 	}
-
 	
 }

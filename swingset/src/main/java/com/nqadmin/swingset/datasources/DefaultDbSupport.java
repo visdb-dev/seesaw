@@ -68,8 +68,6 @@ public class DefaultDbSupport implements DbSupport
 
 	/**
 	 * Save the specified connection as the sharedConnection.
-	 * It can be retrieved with a {@code null} param to
-	 * {@link #getSharedConnection(javax.sql.RowSet)}.
 	 * 
 	 * @param sharedConnection 
 	 */
@@ -82,53 +80,16 @@ public class DefaultDbSupport implements DbSupport
 
 	/**
 	 * {@inheritDoc }
-	 * 
-	 * @param <R>
-	 * @param rs
-	 * @param func
-	 * @return 
 	 */
 	@Override
-	public <R> R runWithConnection(RowSet rs, FunctionSQL<Connection, R> func)
-			throws SQLException
+	public Connection getSharedConnection() throws SQLException
 	{
-		Connection conn01 = getSharedConnection(rs);
-		if (conn01 != null)
-			return func.apply(conn01);
-
-	    Connection conn = getConnection(rs);
-	    if (conn == null)
-	        throw new SQLException("No database connection available for RowSet. "
-	                + "dataSourceName=" + rs.getDataSourceName()
-	                + ", url=" + rs.getUrl());
-
-	    try (conn) {
-	        return func.apply(conn);
-	    }
-	}
-
-	/**
-	 * {@inheritDoc }
-	 * Typically the default connection 
-	 */
-	// TODO: Probably should handle more than one connection, like multiple databases
-	// TODO: Is there a better way to tell if connections is good for the RowSet?
-	// TODO: Seems to require that all column from same catalog; OK?
-	@Override
-	public Connection getSharedConnection(RowSet rs) throws SQLException
-	{
-		if (sharedConnection == null)
-			return null;
 		if (sharedConnection.isClosed())
 			throw new IllegalStateException("Shared connection isClosed");
-		if (rs == null)
-			return sharedConnection;
-		if (Objects.equals(sharedConnection.getCatalog(),
-				rs.getMetaData().getCatalogName(1)))
-			return sharedConnection;
-		return null;
+		return sharedConnection;
 	}
 
+	private InitialContext ctx;
 	/**
 	 * {@inheritDoc }
 	 * @param rs
@@ -138,6 +99,7 @@ public class DefaultDbSupport implements DbSupport
 	@Override
 	public Connection getConnection(RowSet rs) throws SQLException
 	{
+		Objects.requireNonNull(rs);
 		String dsName = rs.getDataSourceName();
 		if (dsName != null) {
 			try {
@@ -157,5 +119,4 @@ public class DefaultDbSupport implements DbSupport
 		
 		return null;
 	}
-	private InitialContext ctx;
 }
