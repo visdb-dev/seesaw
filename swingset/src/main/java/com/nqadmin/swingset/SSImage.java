@@ -43,6 +43,8 @@
 package com.nqadmin.swingset;
 
 import javax.sql.RowSet;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 
 import com.nqadmin.swingset.core.Image;
 import com.nqadmin.swingset.navigate.RowsModel;
@@ -73,8 +75,26 @@ public class SSImage extends Image
 	 */
 	public SSImage(RowsModel rowsModel, String columnName)
 	{
-		
 		super(rowsModel, columnName);
+	}
+
+	/**
+	 * Don't show the zoom controls.
+	 * @return the "Update" button
+	 */
+	@Override
+	protected JComponent imageControls()
+	{
+		return getButtonnUpdate();
+	}
+
+	/**
+	 * @return null - no popup menu
+	 */
+	@Override
+	protected JPopupMenu createImagePopup()
+	{
+		return null;
 	}
 
 	/**

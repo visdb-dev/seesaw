@@ -144,9 +144,9 @@ public class BorderDecorator extends FocusDecorator
 		}
 	}
 
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "unused"})
 	void debugCheck(ComponentState borderState) {
-		if (logger.isLoggable(DEBUG)) {
+		if (logger.isLoggable(TRACE)) {
 			String caller = JStuff.getCaller(3);
 			if (caller.contains("focusGained") || caller.contains("focusLost"))
 				; //System.out.println("");
@@ -163,7 +163,7 @@ public class BorderDecorator extends FocusDecorator
 				decoComp().getClass().getSimpleName(), focusComp().isFocusOwner(), valid.comp(), valid.all()));
 		Border b;
 		ComponentState borderState = ComponentState.getComponentState(getSSComponent(), valid);
-		debugCheck(borderState);
+		//debugCheck(borderState);
 		b = getBorder(borderState);
 
 		decoComp().setBorder(b);
@@ -195,7 +195,7 @@ public class BorderDecorator extends FocusDecorator
 	protected Border getBorder(ComponentState state) {
 		if (state == ComponentState.CLEAN)
 			return defaultBorder;
-		logger.log(TRACE, () -> String.format("%s %s",
+		logger.log(DEBUG, () -> String.format("%s %s",
 				state, asString(decoComp().getInsets())));
 		Border b;
 		if (decoComp().getBorder() instanceof CompoundBorder cb) {

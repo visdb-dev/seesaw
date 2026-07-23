@@ -72,7 +72,7 @@ import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 /**
- * This Interface presents a {@link RowSet} column as seen by the visual
+ * This Interface presents a {@link RowSet} column presented by the visual
  * components in the SS library. It has default methods supporting binding
  * a {@linkplain RowSet} column to this component, DBMS access with type conversion,
  * undo/redo, validation, decoration. Most of these default methods bounce
@@ -95,7 +95,10 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  * {@link #customInit() },
  * {@link #checkColumnType(JDBCType) }, {@link #metadataChange() },
  * {@link #finishBind() }, {@link #baseValidate() }, {@link #componentValidate()},
- * and {@link #createDefaultDecorator()}.
+ * and {@link #createDefaultDecorator()}. Component developers should be aware
+ * of the method {@link #isComposite()}; override it to return true if the
+ * component contains JComponents and some of these descendant components may
+ * be focused.
  * <p>
  * The methods for reading and updating database columns are
  * {@link #getColumnText() getColumn*()} and {@link #setColumnText(String) setColumn*}.
@@ -291,6 +294,17 @@ public interface SSComponent extends RSC
 	 * @throws IllegalArgumentException if can't handle JDBCType
 	 */
 	default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException { }
+
+	/**
+	 * This is overriden to return true by components that are made up of 
+	 * other components; and some of those contained components might get
+	 * the focus. Examples are
+	 * {@link com.nqadmin.swingset.core.Image} and DbDatePicker.
+	 * @return 
+	 */
+	// isComposite component usually has
+	// comp != comp.getFocusTarget() || comp != comp.getDecorateTarget()
+	default boolean isComposite() { return false; }
 
 	/**
 	 * Override this method for notification of a change in metadata.

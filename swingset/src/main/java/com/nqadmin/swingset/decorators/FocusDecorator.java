@@ -46,8 +46,19 @@ package com.nqadmin.swingset.decorators;
 import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
+import com.nqadmin.swingset.navigate.FocusChangeEvent;
+import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
+import com.raelity.lib.eventbus.WeakEventBus;
+import com.raelity.lib.eventbus.WeakSubscribe;
+
+import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.JStuff.sf;
+import static com.nqadmin.swingset.utils.SSUtils.objectID;
+import static javax.swing.SwingUtilities.isDescendingFrom;
 
 /**
  * Base class for decorators that use Focus.
@@ -69,9 +80,15 @@ public abstract class FocusDecorator extends BaseDecorator
 
 	/** {@inheritDoc} */
 	@Override
-	public void install(SSComponent component) {
-		super.install(component);
-		focusComp().addFocusListener(this);
+	public void install(SSComponent comp) {
+		super.install(comp);
+		if (!comp.isComposite())
+			focusComp().addFocusListener(this);
+		else {
+			logger().log(Level.DEBUG, sf("Composite component %s", objectID(comp)));
+			busReceiver = new BusReceiver();
+			WeakEventBus.register(busReceiver, getGlobalEventBus());
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -79,6 +96,10 @@ public abstract class FocusDecorator extends BaseDecorator
 	public void uninstall() {
 		super.uninstall();
 		focusComp().removeFocusListener(this);
+		if (busReceiver != null) {
+			WeakEventBus.unregister(busReceiver, getGlobalEventBus());
+			busReceiver = null;
+		}
 	}
 
 	/**
@@ -89,5 +110,54 @@ public abstract class FocusDecorator extends BaseDecorator
 	 */
 	protected Component focusComp() {
 		return getSSComponent().getFocusTarget();
+	}
+
+	@SuppressWarnings("NonConstantLogger")
+	private static Logger lazyLogger;
+	private Logger logger() {
+		if (lazyLogger == null)
+			lazyLogger = JStuff.getLogger(getClass().getName());
+		return lazyLogger;
+	}
+
+	private BusReceiver busReceiver; // Must have a strong reference.
+
+	class BusReceiver {
+		/** via KeyboardFocusManager.
+		 * @param ev */
+		@WeakSubscribe
+		public void handleFocusChangeEvent(FocusChangeEvent ev) {
+			checkFocusChange((Component)ev.getPce().getOldValue());
+			checkFocusChange((Component)ev.getPce().getNewValue());
+		}
+	}
+
+	
+	/** If the component is of the SSComponent, then decorate().
+	 * @param c */
+	protected void checkFocusChange(Component c) {
+		if (c instanceof SSComponent && c != getSSComponent()) {
+			logger().log(Level.TRACE, sf("Quick exit: focused '%s', ssComp '%s'",
+					objectID(c), objectID(getSSComponent())));
+			return;
+		}
+		if (logger().isLoggable(Level.DEBUG)) dumpCheckFocusInfo(c);
+
+		if (c != null && isDescendingFrom(c, (Component) getSSComponent())) {
+			decorate();
+		}
+	}
+
+	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "unused"})
+	private  void dumpCheckFocusInfo(Component c) {
+		String nam = "";
+		if (c != null) {
+			nam = c.getClass().getSimpleName();
+			if (nam.isBlank())
+				nam = c.getClass().getName();
+		}
+		logger().log(Level.TRACE, sf("focused %s, SSComp %s",
+				c == null ? "null" : nam,
+				getSSComponent().getClass().getSimpleName()));
 	}
 }

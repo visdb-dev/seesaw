@@ -30,6 +30,11 @@
 
 package com.nqadmin.swingset.decorators;
 
+import java.awt.Component;
+
+import javax.swing.SwingUtilities;
+
+import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.SSComponent;
 
 /** The state of a component, focused/dirty/modified.
@@ -81,14 +86,15 @@ public enum ComponentState
 	{
 		ComponentState borderState;
 		if (valid.all())
-			borderState = comp.isDirty() ? ComponentState.MODIFIED : ComponentState.CLEAN;
+			borderState = comp.isDirty() ? MODIFIED : CLEAN;
 		else
-			borderState = ComponentState.ERROR;
-		if (comp.getFocusTarget().isFocusOwner())
+			borderState = ERROR;
+		Component f = Utils.getKFM().getFocusOwner();
+		if (f != null && SwingUtilities.isDescendingFrom(f, (Component) comp))
 			borderState = switch (borderState) {
-			case CLEAN -> ComponentState.FOCUSED_CLEAN;
-			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
-			case ERROR -> ComponentState.FOCUSED_ERROR;
+			case CLEAN -> FOCUSED_CLEAN;
+			case MODIFIED -> FOCUSED_MODIFIED;
+			case ERROR -> FOCUSED_ERROR;
 			default -> throw new IllegalStateException("Unexpected value: " + (borderState));
 			};
 		return borderState;

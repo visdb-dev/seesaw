@@ -43,6 +43,7 @@
 package com.nqadmin.swingset.navigate;
 
 import java.awt.KeyboardFocusManager;
+import java.beans.PropertyChangeListener;
 import java.lang.System.Logger.Level;
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -51,7 +52,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
-import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -68,6 +68,16 @@ public class Utils
 	private static final System.Logger logger = JStuff.getLogger();
 
 	private Utils() { }
+	
+	// Notes on implementing a weak subscriber
+	//		https://github.com/google/guava/issues/807#issuecomment-61328188
+	// Consider the following. much like event bus, does weak listener
+	//		https://github.com/bennidi/mbassador
+	// And see NavigateActions for example; includes use of Cleaner.register.
+
+	/** Singleton EventBus */
+	private static final EventBus globalEventBus = new EventBus(new BusExceptionMonitor());
+	static { setupTrackerForKFM(); }
 
 	////////////////////////////////////////////////////////////////////////////
 	//
@@ -151,41 +161,58 @@ public class Utils
 			logger.log(DEBUG, () -> ev.toString());
 		postFieldEvent(ev);
 	}
-	
-	// Notes on implementing a weak subscriber
-	//		https://github.com/google/guava/issues/807#issuecomment-61328188
-	// Consider the following. much like event bus, does weak listener
-	//		https://github.com/bennidi/mbassador
-	// And see NavigateActions for example; includes use of Cleaner.register.
+
 
 	/**
-	 * EventBus to use Frame/Panel events
-	 */
-	private static EventBus globalEventBus = null;
-
-	/**
-	 * Get the global EventBus.
-	 * Side affect on first call is creating a broadcaster for "focusOwner" changes.
+	 * The global EventBus.
 	 * @return EventBus for this
 	 */
-	public static EventBus getGlobalEventBus()
-	{
-		// TODO: CentralLookup could be set up by app, or some general init.
-		if (globalEventBus == null) {
-			globalEventBus = CentralLookup.getDefault().lookup(EventBus.class);
-			if(globalEventBus == null) {
-				globalEventBus = new EventBus(new BusExceptionMonitor());
-				CentralLookup.getDefault().add(globalEventBus);
-			}
-
-			// TODO: Be more careful about tracking who's managing focus
-			//		 and the current focusOwner so that the events continue
-			//		 if the focus manager is changed.
-			KeyboardFocusManager.getCurrentKeyboardFocusManager()
-					.addPropertyChangeListener("focusOwner",
-							(pce) -> globalEventBus.post(new FocusChangeEvent(pce)));
-		}
+	public static EventBus getGlobalEventBus() {
 		return globalEventBus;
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// KeyboardFocusManager Tracking
+	//
+	private static PropertyChangeListener listenerFocusOwner;
+	private static PropertyChangeListener listenerManagingFocus;
+	private static KeyboardFocusManager KFM;
+
+	/** @return Current KeyboardFocusManager */
+	public static KeyboardFocusManager getKFM() { return KFM; }
+
+	private static void trackCurrentKFM() {
+		KFM = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+
+		KFM.addPropertyChangeListener("focusOwner", listenerFocusOwner);
+		KFM.addPropertyChangeListener("managingFocus", listenerManagingFocus);
+	}
+
+	/** keep track of currentKeyboardFocusManager and switch listeners as needed */
+	private static void setupTrackerForKFM() {
+		if (listenerFocusOwner != null)
+			return; // Could throw an exception
+
+		// broadcast focus changes
+		listenerFocusOwner = pce -> {
+			globalEventBus.post(new FocusChangeEvent(pce));
+		};
+		// detect change in focus manager,
+		// remove listeners from old, move them to current
+		listenerManagingFocus = pce -> {
+			if (Boolean.FALSE.equals(pce.getNewValue())) {
+				logger.log(INFO, "switching to new KeyboardFocusManager");
+				KeyboardFocusManager oldKFM = (KeyboardFocusManager) pce.getSource();
+
+				oldKFM.removePropertyChangeListener("focusOwner", listenerFocusOwner);
+				oldKFM.removePropertyChangeListener("managingFocus", listenerManagingFocus);
+
+				trackCurrentKFM();
+			}
+		};
+		// kick things off; start tracking current focus manager
+		trackCurrentKFM();
 	}
 	
 	private static class BusExceptionMonitor implements SubscriberExceptionHandler

@@ -29,6 +29,11 @@ SSCommon.checkRowOK doesn't check canModify. Rename verifyCanModifyRow.
 
 ================================================================================
 
+Could add "centerImage" popup action.
+Put more code from Image to ZoomCanvas.
+
+================================================================================
+
 setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
 Something in RowSetOps/SSComponent. Why is it needed? 2026/05
 

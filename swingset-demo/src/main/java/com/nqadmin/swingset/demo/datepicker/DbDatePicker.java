@@ -115,6 +115,15 @@ public class DbDatePicker extends DatePicker implements SSComponent
 			throw new IllegalArgumentException(sf("Date Picker column type must be DATE"));
 	}
 
+	/**
+	 * This component contains multiple components some of which can get focus.
+	 * @return true
+	 */
+	@Override
+	public boolean isComposite() {
+		return true;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public void metadataChange() {

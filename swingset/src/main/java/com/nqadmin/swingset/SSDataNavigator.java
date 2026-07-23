@@ -50,12 +50,14 @@ import java.util.Objects;
 import javax.sql.RowSet;
 import javax.swing.AbstractButton;
 import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
@@ -75,10 +77,13 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  * <p>
  * <img src="doc-files/ssdatanavigator.png" alt="SSDataNavigator image"
  * style="display: inline-block; margin-left: 40px;">
+ * <br>or<br> 
+ * <img src="doc-files/ssdatanavigator_2lines.png" alt="SSDataNavigator image"
+ * style="display: inline-block; margin-left: 40px;">
  * <p>
- * There are a variety of methods
- * to control allowed actions on a RowSet, e.g. ConfirmDeletes,
- * Insertion, Deletion, ...; see {@link RowsModel#setAllowInsert}, ...
+ * There are a variety of properties
+ * to control allowed actions on a RowSet, e.g.
+ * AllowInsert, AllowDelete, ...; see {@link RowsModel#setAllowInsert}, ...
  * <p>
  * For example if you are displaying three columns using the TextField and the
  * user changes the text in the text fields then the columns will be updated to
@@ -107,26 +112,9 @@ public class SSDataNavigator extends JPanel
 	private final ActionMap navActionMap;
 
 	/**
-	 * Constructs a SSDataNavigator for the given RowSet
-	 *
-	 * @param rowSet
-	 * @deprecated use RowsModel
+	 * The number of lines for the navigator.
 	 */
-	@Deprecated
-	public SSDataNavigator(final RowSet rowSet) {
-		this(rowSet, null);
-	}
-
-	/**
-	 * @param rowSet
-	 * @param buttonSize
-	 * @deprecated use RowsModel
-	 */
-	@Deprecated
-	public SSDataNavigator(final RowSet rowSet, final Dimension buttonSize)
-	{
-		this(findRowsModel(rowSet), buttonSize);
-	}
+	public enum Lines { /** one line */ ONE, /** two line */ TWO }
 
 	/**
 	 * Constructs the SSDataNavigator with the given RowsModel.
@@ -135,23 +123,47 @@ public class SSDataNavigator extends JPanel
 	 */
 	public SSDataNavigator(RowsModel rowsModel)
 	{
-		this(rowsModel, null);
+		this(rowsModel, Lines.ONE, null);
 	}
 
 	/**
-	 * Constructs the SSDataNavigator with the given RowsModel and sets the size of
- the buttons on the navigator to the given size
+	 * Constructs the SSDataNavigator with the given RowsModel.
+	 *
+	 * @param rowsModel   the RowsModel to which the navigator is bound to
+	 * @param nLines      number of display lines for the navigator
+	 */
+	public SSDataNavigator(RowsModel rowsModel, Lines nLines)
+	{
+		this(rowsModel, nLines, null);
+	}
+
+	/**
+	 * Constructs the SSDataNavigator with the given RowsModel
+	 * and sets the size of the buttons on the navigator to the given size
 	 *
 	 * @param rowsModel   the RowsModel to which the navigator is bound to
 	 * @param _buttonSize the size to which the button on navigator have to be set
 	 */
-	@SuppressWarnings("LeakingThisInConstructor")
-	public SSDataNavigator(RowsModel rowsModel, Dimension _buttonSize)
-	{
+	public SSDataNavigator(RowsModel rowsModel, Dimension _buttonSize) {
+		this(rowsModel, Lines.ONE, _buttonSize);
+	}
+
+	/**
+	 * Constructs the SSDataNavigator with the given RowsModel
+	 * and sets the size of the buttons on the navigator to the given size
+	 *
+	 * @param rowsModel   the RowsModel to which the navigator is bound to
+	 * @param _buttonSize the size to which the button on navigator have to be set
+	 * @param nLines      number of display lines for the navigator
+	 */
+	@SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
+	public SSDataNavigator(RowsModel rowsModel, Lines nLines, Dimension _buttonSize) {
 		Objects.requireNonNull(rowsModel);
 		rowNumberSpinner = new RowNumberSpinner(rowsModel);
 		uiComponents = uiComponents();
 		uiButtons = uiButtons();
+		uiComponentsTop = uiComponentsTop();
+		uiComponentsBottom = uiComponentsBottom();
 
 		parentActionMap = getActionMap();
 		navActionMap = new ActionMap();
@@ -160,6 +172,7 @@ public class SSDataNavigator extends JPanel
 		setActionMap(navActionMap);
 
 		rowSpinnerSize = new Dimension(65, 20);
+		rowCountSize = new Dimension(80, 20);
 		buttonSize = _buttonSize == null ? new Dimension(40, 20) : _buttonSize;
 
 		rowNumberSpinner.removeTinyArrows(rowSpinnerSize);
@@ -170,7 +183,17 @@ public class SSDataNavigator extends JPanel
 
 		setRowsModel(rowsModel);
 		hideActionText(); // suppress the Action name from appearing next to the button icon.
-		createPanel();
+		setButtonSizes();
+		// For some reason the spinner text gets stretched, so nail it down.
+		rowNumberSpinner.setMaximumSize(rowSpinnerSize);
+		// lblRowCount.setFont(new Font("Dialog", Font.BOLD, 12));
+		// lblRowCount.setEditable(false);
+		// lblRowCount.setBorder(UIManager.getBorder("TextField.border"));
+
+		if (nLines == Lines.ONE)
+			createOneLineNavigator();
+		else
+			createTwoLineNavigator();
 	}
 
 	/**
@@ -238,14 +261,36 @@ public class SSDataNavigator extends JPanel
 	/**
 	 * Adds the navigator components to the navigator panel.
 	 */
-	protected final void createPanel() {
+	protected final void createOneLineNavigator() {
+		Box box = Box.createHorizontalBox();
+		uiComponents.forEach(uiItem -> box.add(uiItem));
 
-		setButtonSizes();
-		// SET THE BOX LAYOUT
-		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		// add buttons to the navigator
+		add(box);
+	}
 
-		// ADD BUTTONS TO THE PANEL
-		uiComponents.forEach(uiItem -> add(uiItem));
+	/**
+	 * Adds the navigator components to the navigator panel.
+	 */
+	protected final void createTwoLineNavigator() {
+		// Create two horizontal boxes.
+		Box topBox = Box.createHorizontalBox();
+		uiComponentsTop.forEach(uiItem -> topBox.add(uiItem));
+
+		Box bottomBox = Box.createHorizontalBox();
+		uiComponentsBottom.forEach(uiItem -> bottomBox.add(uiItem));
+
+		Box box = Box.createVerticalBox();
+		box.add(topBox);
+		box.add(bottomBox);
+
+		box.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createEmptyBorder(2, 2, 2, 2),
+				BorderFactory.createCompoundBorder(
+						UIManager.getBorder("TitledBorder.border"),
+						BorderFactory.createEmptyBorder(2, 2, 2, 2))));
+		// add buttons to the navigator
+		add(box);
 	}
 
 	/**
@@ -322,13 +367,13 @@ public class SSDataNavigator extends JPanel
 	protected void setButtonSizes() {
 		uiButtons.forEach(uiItem -> uiItem.setPreferredSize(buttonSize));
 		rowNumberSpinner.setPreferredSize(rowSpinnerSize);
-		lblRowCount.setPreferredSize(rowSpinnerSize);
+		lblRowCount.setPreferredSize(rowCountSize);
 
 		lblRowCount.setHorizontalAlignment(SwingConstants.CENTER);
 
 		uiButtons.forEach(uiItem -> uiItem.setMinimumSize(buttonSize));
 		rowNumberSpinner.setMinimumSize(rowSpinnerSize);
-		lblRowCount.setMinimumSize(rowSpinnerSize);
+		lblRowCount.setMinimumSize(rowCountSize);
 	}
 
 	/**
@@ -570,19 +615,22 @@ public class SSDataNavigator extends JPanel
 
 	/** Label to display the total number of records in the RowSet. */
 	private final JLabel lblRowCount = new JLabel();
+	// private final JTextField lblRowCount = new JTextField();
 
 	/** Component for viewing/changing the current record number. */
 	protected final RowNumberSpinner rowNumberSpinner;
 
 	/** Current record spinner dimensions. */
 	private final Dimension rowSpinnerSize;
+	private final Dimension rowCountSize;
 
 	private final List<JComponent> uiComponents;
 	private final List<AbstractButton> uiButtons;
+	private final List<JComponent> uiComponentsTop;
+	private final List<JComponent> uiComponentsBottom;
 
 	/** These are added in order to this JPanel */
-	@SuppressWarnings("FinalPrivateMethod")
-	private final List<JComponent> uiComponents()
+	private List<JComponent> uiComponents()
 	{
 		return List.of(
 				firstButton,
@@ -598,10 +646,28 @@ public class SSDataNavigator extends JPanel
 				lblRowCount
 		);
 	}
+	private List<JComponent> uiComponentsTop() {
+		return List.of(
+				firstButton,
+				previousButton,
+				rowNumberSpinner,
+				nextButton,
+				lastButton,
+				lblRowCount
+		);
+	}
+	private List<JComponent> uiComponentsBottom() {
+		return List.of(
+				commitButton,
+				undoButton,
+				refreshButton,
+				addButton,
+				deleteButton
+		);
+	}
 
 	/** The buttons can often be handled en masse */
-	@SuppressWarnings("FinalPrivateMethod")
-	private final List<AbstractButton> uiButtons()
+	private List<AbstractButton> uiButtons()
 	{
 		return List.of(
 				firstButton,
@@ -614,6 +680,28 @@ public class SSDataNavigator extends JPanel
 				addButton,
 				deleteButton
 		);
+	}
+
+	/**
+	 * Constructs a SSDataNavigator for the given RowSet
+	 *
+	 * @param rowSet
+	 * @deprecated use RowsModel
+	 */
+	@Deprecated
+	public SSDataNavigator(final RowSet rowSet) {
+		this(rowSet, null);
+	}
+
+	/**
+	 * @param rowSet
+	 * @param buttonSize
+	 * @deprecated use RowsModel
+	 */
+	@Deprecated
+	public SSDataNavigator(final RowSet rowSet, final Dimension buttonSize)
+	{
+		this(findRowsModel(rowSet), buttonSize);
 	}
 
 

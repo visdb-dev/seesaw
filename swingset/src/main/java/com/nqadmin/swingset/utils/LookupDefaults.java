@@ -42,6 +42,7 @@ import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.DecoratorSupplier;
 import com.nqadmin.swingset.decorators.TextStyles;
+import com.nqadmin.swingset.navigate.Utils;
 
 /**
  * This class is used internally to initialize CentralLookup defaults
@@ -68,6 +69,7 @@ public class LookupDefaults
 {
 	private LookupDefaults() { }
 	private static final System.Logger logger = System.getLogger(LookupDefaults.class.getName());
+	static { Utils.getGlobalEventBus(); }
 
 	private static boolean initialized;
 	/**
