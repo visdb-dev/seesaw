@@ -54,7 +54,7 @@ import org.openide.util.WeakListeners;
 
 import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
-import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
 import com.nqadmin.swingset.datasources.DbSupport;
@@ -67,8 +67,8 @@ import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.LookupDefaults;
 import com.nqadmin.swingset.utils.SSComponent;
-import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.SyncManager;
 import com.raelity.lib.eventbus.WeakEventBus;
 
 import static com.nqadmin.swingset.navigate.RowsAction.*;
@@ -1051,17 +1051,18 @@ public final class RowsModel
 	 * @deprecated this shouldn't be public
 	 */
 	@Deprecated
-	public void setNavCombo(SSDBComboBox navCombo) {
+	public void setNavCombo(DBComboBox2<?, ?, ?> navCombo) {
 		setNavCombo(navCombo, null);
 	}
-
+	
 	/**
+	 * @param <K> comboBox and syncMangager key
 	 * @param navCombo the navCombo used with this RowsModel
 	 * @param syncer
 	 * @deprecated this shouldn't be public
 	 */
 	@Deprecated
-	public void setNavCombo(SSDBComboBox navCombo, SSSyncManager syncer) {
+	public <K> void setNavCombo(DBComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
 		navState.setNavCombo(navCombo, syncer);
 	}
 
@@ -1071,7 +1072,7 @@ public final class RowsModel
 	 */
 	// TODO: what's this about? Remove it.
 	@Deprecated
-	public SSDBComboBox getNavCombo() {
+	public DBComboBox2<?, ?, ?> getNavCombo() {
 		return navState.getNavCombo();
 	}
 }

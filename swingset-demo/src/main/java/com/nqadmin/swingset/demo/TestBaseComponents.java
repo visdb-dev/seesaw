@@ -92,6 +92,7 @@ import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbArray;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.DataNavigator;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
@@ -375,7 +376,7 @@ public class TestBaseComponents extends JFrame
 			rowset.execute();
 			rowsModel = RowsModel.create(rowset, null);
 			// navigator = new SSDataNavigator(rowsModel);
-			navigator = new SSDataNavigator(rowsModel, SSDataNavigator.Lines.TWO);
+			navigator = new SSDataNavigator(rowsModel, DataNavigator.Lines.TWO);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}

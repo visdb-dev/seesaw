@@ -241,7 +241,9 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants
 
 	/**
 	 * Easy way to set scroll bar policy for both directions. For example
-	 * <br> {@snippet lang="java" : ALWAYS.setPolicy(scrollPane); }
+	 * {@snippet lang="java":
+	 * ALWAYS.setPolicy(scrollPane);
+	 * }
 	 */
 	public enum ScrollBarPolicy {
 		/** scroll bars always. */

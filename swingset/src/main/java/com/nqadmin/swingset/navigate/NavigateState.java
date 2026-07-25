@@ -58,6 +58,7 @@ import javax.swing.SpinnerNumberModel;
 
 import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.*;
+import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
@@ -66,8 +67,8 @@ import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
-import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.SyncManager;
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
@@ -393,9 +394,9 @@ final class NavigateState
 	 * <p>
 	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead.
 	 */
-	private SSDBComboBox navCombo = null;
+	private DBComboBox2<?, ?, ?> navCombo = null;
 
-	private SSSyncManager syncer = null;
+	private SyncManager<?> syncer = null;
 
 	/** Number of rows in RowSet. Set to zero if next() method returns false. */
 	/*RowsActions*/ int rowCount = 0;
@@ -861,7 +862,7 @@ final class NavigateState
 	}
 
 	// TODO: handle multipble navCombo?
-	void setNavCombo(SSDBComboBox navCombo, SSSyncManager syncer) {
+	<K> void setNavCombo(DBComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
 		Objects.requireNonNull(navCombo);
 		// TODO: Objects.requireNonNull(syncer);
 		if (this.navCombo != null)
@@ -874,7 +875,7 @@ final class NavigateState
 	 * @return the navCombo
 	 */
 	// TODO: what's this about
-	/*public*/ SSDBComboBox getNavCombo() {
+	/*public*/ DBComboBox2<?, ?, ?> getNavCombo() {
 		return navCombo;
 	}
 
@@ -1158,5 +1159,5 @@ final class NavigateState
 		return true;
 	}
 
-} // end public class SSDataNavigator extends JPanel {
+}
 
