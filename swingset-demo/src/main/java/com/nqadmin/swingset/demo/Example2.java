@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -67,202 +67,187 @@ import com.nqadmin.swingset.utils.JStuff;
  * Record navigation is handled with a SSDataNavigator.
  */
 @SuppressWarnings("serial")
-public class Example2 extends JFrame
-{
-	/**
-	 * Log4j2 Logger
-	 */
-    private static final Logger logger = JStuff.getLogger();
-	
-	/**
-	 * screen label declarations
-	 */
-	JLabel lblSupplierID = new JLabel("Supplier ID");
-	JLabel lblSupplierName = new JLabel("Name");
-	JLabel lblSupplierCity = new JLabel("City");
-	JLabel lblSupplierStatus = new JLabel("Status");
-	
-	/**
-	 * bound component declarations
-	 */
-	SSTextField txtSupplierID = new SSTextField();
-	SSTextField txtSupplierName = new SSTextField();
-	SSTextField txtSupplierCity = new SSTextField();
-	SSComboBox cmbSupplierStatus = new SSComboBox();
-	
-	/**
-	 * database component declarations
-	 */
-	Connection connection = null;
-	SSDataNavigator navigator = null;
-	RowsModel rowsModel;
+public class Example2 extends JFrame {
+  /**
+   * Log4j2 Logger
+   */
+  private static final Logger logger = JStuff.getLogger();
 
-	RowSet getRowSet() {
-		return rowsModel.getRowSet();
-	}
+  /**
+   * screen label declarations
+   */
+  JLabel lblSupplierID = new JLabel("Supplier ID");
+  JLabel lblSupplierName = new JLabel("Name");
+  JLabel lblSupplierCity = new JLabel("City");
+  JLabel lblSupplierStatus = new JLabel("Status");
 
-	/**
-	 * Constructor for Example2
-	 * <p>
-	 * @param _dbConn - database connection
-	 */
-	@SuppressWarnings("LeakingThisInConstructor")
-	public Example2(final Connection _dbConn)
-	{
-		// SET SCREEN TITLE
-		super("Example2");
-		DemoUtil.initExampleFrame(this, null);
-		
-		// SET CONNECTION
-		connection = _dbConn;
-		
-		// SET SCREEN DIMENSIONS
-		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-		
-		// SET SCREEN POSITION
-		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-		
-		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-		try {
-			RowSet rowset = DemoUtil.getNewRowSet(connection);
-			rowset.setCommand("SELECT * FROM supplier_data");
-			rowset.execute();
-			rowsModel = RowsModel.create(rowset, createDbNav());
-			navigator = new SSDataNavigator(rowsModel);
-		} catch (final SQLException se) {
-			logger.log(Level.ERROR, "SQL Exception.", se);
-		}
+  /**
+   * bound component declarations
+   */
+  SSTextField txtSupplierID = new SSTextField();
+  SSTextField txtSupplierName = new SSTextField();
+  SSTextField txtSupplierCity = new SSTextField();
+  SSComboBox cmbSupplierStatus = new SSComboBox();
 
-		// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
-		//	 LETS ASSUME THE STATUS CODE TO TEXT MAPPINGS
-		// 		10 -> BAD
-		// 		20 -> BETTER
-		// 		30 -> GOOD
-		cmbSupplierStatus.setDisplayValues(List.of("Bad", "Better", "Good"),
-									 List.of(10, 20, 30));
-		
-		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-		rowsModel.bind(txtSupplierID, "supplier_id");
-		rowsModel.bind(txtSupplierName, "supplier_name");
-		rowsModel.bind(txtSupplierCity, "city");
-		rowsModel.bind(cmbSupplierStatus, "status");
-		//this.cmbSupplierStatus.setSelectedIndex(1);
-		
-		// SET LABEL DIMENSIONS
-		lblSupplierID.setPreferredSize(MainClass.labelDim);
-		lblSupplierName.setPreferredSize(MainClass.labelDim);
-		lblSupplierCity.setPreferredSize(MainClass.labelDim);
-		lblSupplierStatus.setPreferredSize(MainClass.labelDim);
-		
-		// SET BOUND COMPONENT DIMENSIONS
-		txtSupplierID.setPreferredSize(MainClass.ssDim);
-		txtSupplierName.setPreferredSize(MainClass.ssDim);
-		txtSupplierCity.setPreferredSize(MainClass.ssDim);
-		cmbSupplierStatus.setPreferredSize(MainClass.ssDim);
-		
-		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-		final Container contentPane = getContentPane();
-		contentPane.setLayout(new GridBagLayout());
-		final GridBagConstraints constraints = new GridBagConstraints();
-		
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		contentPane.add(lblSupplierID, constraints);
-		constraints.gridy = 1;
-		contentPane.add(lblSupplierName, constraints);
-		constraints.gridy = 2;
-		contentPane.add(lblSupplierCity, constraints);
-		constraints.gridy = 3;
-		contentPane.add(lblSupplierStatus, constraints);
-		
-		constraints.gridx = 1;
-		constraints.gridy = 0;
-		contentPane.add(txtSupplierID, constraints);
-		constraints.gridy = 1;
-		contentPane.add(txtSupplierName, constraints);
-		constraints.gridy = 2;
-		contentPane.add(txtSupplierCity, constraints);
-		constraints.gridy = 3;
-		contentPane.add(cmbSupplierStatus, constraints);
-		
-		constraints.gridx = 0;
-		constraints.gridy = 4;
-		constraints.gridwidth = 2;
-		contentPane.add(navigator, constraints);
-		
-		// DISABLE THE PRIMARY KEY
-		txtSupplierID.setEnabled(false);
-		
-		// MAKE THE JFRAME VISIBLE
-		setVisible(true);
-		pack();
-	}
+  /**
+   * database component declarations
+   */
+  Connection connection = null;
+  SSDataNavigator navigator = null;
+  RowsModel rowsModel;
 
-	private DbOpsCustomizer createDbNav() {
-		/**
-		 * Various navigator overrides needed to support H2
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		return new DbOpsCustomizerImpl(this)
-		{
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps()
-			{
-				super.performPostDeletionOps();
-				try {
-					getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
+  RowSet getRowSet() { return rowsModel.getRowSet(); }
 
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps()
-			{
-				super.performPostInsertOps();
-				try {
-					getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
+  /**
+   * Constructor for Example2
+   * <p>
+   * @param _dbConn - database connection
+   */
+  @SuppressWarnings("LeakingThisInConstructor")
+  public Example2(final Connection _dbConn) {
+    // SET SCREEN TITLE
+    super("Example2");
+    DemoUtil.initExampleFrame(this, null);
 
-			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps()
-			{
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-				
-				try (final ResultSet rs = connection.createStatement(
-							ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-						.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
-				) {
-					// GET THE NEW RECORD ID.
-					rs.next();
-					final int supplierID = rs.getInt("nextVal");
-					txtSupplierID.setText(String.valueOf(supplierID));
-					
-					// // SET OTHER DEFAULTS
-					// 	 txtSupplierName.setText(null);
-					// 	 txtSupplierCity.setText(null);
-					// 	 cmbSupplierStatus.setSelectedValue(0);
-					
-				} catch(final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
-				} catch(final Exception e) {
-					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
-				}
-			}
-		};
-	}
+    // SET CONNECTION
+    connection = _dbConn;
+
+    // SET SCREEN DIMENSIONS
+    setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+
+    // SET SCREEN POSITION
+    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
+    // INITIALIZE DATABASE CONNECTION AND COMPONENTS
+    try {
+      RowSet rowset = DemoUtil.getNewRowSet(connection);
+      rowset.setCommand("SELECT * FROM supplier_data");
+      rowset.execute();
+      rowsModel = RowsModel.create(rowset, createDbNav());
+      navigator = new SSDataNavigator(rowsModel);
+    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+
+    // SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
+    //	 LETS ASSUME THE STATUS CODE TO TEXT MAPPINGS
+    // 		10 -> BAD
+    // 		20 -> BETTER
+    // 		30 -> GOOD
+    cmbSupplierStatus.setDisplayValues(List.of("Bad", "Better", "Good"), List.of(10, 20, 30));
+
+    // BIND THE COMPONENTS TO THE DATABASE COLUMNS
+    rowsModel.bind(txtSupplierID, "supplier_id");
+    rowsModel.bind(txtSupplierName, "supplier_name");
+    rowsModel.bind(txtSupplierCity, "city");
+    rowsModel.bind(cmbSupplierStatus, "status");
+    //this.cmbSupplierStatus.setSelectedIndex(1);
+
+    // SET LABEL DIMENSIONS
+    lblSupplierID.setPreferredSize(MainClass.labelDim);
+    lblSupplierName.setPreferredSize(MainClass.labelDim);
+    lblSupplierCity.setPreferredSize(MainClass.labelDim);
+    lblSupplierStatus.setPreferredSize(MainClass.labelDim);
+
+    // SET BOUND COMPONENT DIMENSIONS
+    txtSupplierID.setPreferredSize(MainClass.ssDim);
+    txtSupplierName.setPreferredSize(MainClass.ssDim);
+    txtSupplierCity.setPreferredSize(MainClass.ssDim);
+    cmbSupplierStatus.setPreferredSize(MainClass.ssDim);
+
+    // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
+    final Container contentPane = getContentPane();
+    contentPane.setLayout(new GridBagLayout());
+    final GridBagConstraints constraints = new GridBagConstraints();
+
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    contentPane.add(lblSupplierID, constraints);
+    constraints.gridy = 1;
+    contentPane.add(lblSupplierName, constraints);
+    constraints.gridy = 2;
+    contentPane.add(lblSupplierCity, constraints);
+    constraints.gridy = 3;
+    contentPane.add(lblSupplierStatus, constraints);
+
+    constraints.gridx = 1;
+    constraints.gridy = 0;
+    contentPane.add(txtSupplierID, constraints);
+    constraints.gridy = 1;
+    contentPane.add(txtSupplierName, constraints);
+    constraints.gridy = 2;
+    contentPane.add(txtSupplierCity, constraints);
+    constraints.gridy = 3;
+    contentPane.add(cmbSupplierStatus, constraints);
+
+    constraints.gridx = 0;
+    constraints.gridy = 4;
+    constraints.gridwidth = 2;
+    contentPane.add(navigator, constraints);
+
+    // DISABLE THE PRIMARY KEY
+    txtSupplierID.setEnabled(false);
+
+    // MAKE THE JFRAME VISIBLE
+    setVisible(true);
+    pack();
+  }
+
+  private DbOpsCustomizer createDbNav() {
+    /**
+     * Various navigator overrides needed to support H2
+     * H2 does not fully support updatable rowset so it must be
+     * re-queried following insert and delete with rowset.execute()
+     */
+    return new DbOpsCustomizerImpl(this) {
+      /**
+       * Requery the rowset following a deletion. This is needed for H2.
+       */
+      @Override
+      public void performPostDeletionOps() {
+        super.performPostDeletionOps();
+        try {
+          getRowSet().execute();
+        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+      }
+
+      /**
+       * Requery the rowset following an insertion. This is needed for H2.
+       */
+      @Override
+      public void performPostInsertOps() {
+        super.performPostInsertOps();
+        try {
+          getRowSet().execute();
+        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+      }
+
+      /**
+       * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+       */
+      @Override
+      public void performPreInsertOps() {
+        // SSDBNavImpl will clear the component values
+        super.performPreInsertOps();
+
+        try (final ResultSet rs
+             = connection
+                   .createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+                   .executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");) {
+          // GET THE NEW RECORD ID.
+          rs.next();
+          final int supplierID = rs.getInt("nextVal");
+          txtSupplierID.setText(String.valueOf(supplierID));
+
+          // // SET OTHER DEFAULTS
+          // 	 txtSupplierName.setText(null);
+          // 	 txtSupplierCity.setText(null);
+          // 	 cmbSupplierStatus.setSelectedValue(0);
+
+        } catch (final SQLException se) {
+          logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
+        } catch (final Exception e) {
+          logger.log(Level.ERROR, "Exception occured initializing new record.", e);
+        }
+      }
+    };
+  }
 }

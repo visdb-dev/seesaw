@@ -34,7 +34,4 @@ import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 /**
  * Compatibility.
  */
-public interface SSDBNav extends DbOpsCustomizer
-{
-	
-}
+public interface SSDBNav extends DbOpsCustomizer {}

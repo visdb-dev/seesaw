@@ -36,17 +36,14 @@ import com.nqadmin.swingset.utils.CentralLookup;
 /**
  * x
  */
-public class Util
-{
-	/**
-	 * x
-	 */
-	public static void initLookup() {
-		CentralLookup lkup = CentralLookup.getDefault();
-		lkup.replace(DbSupport.class, new DefaultDbSupport(null));
-	}
+public class Util {
+  /**
+   * x
+   */
+  public static void initLookup() {
+    CentralLookup lkup = CentralLookup.getDefault();
+    lkup.replace(DbSupport.class, new DefaultDbSupport(null));
+  }
 
-	private Util()
-	{
-	}
+  private Util() {}
 }

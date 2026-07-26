@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -74,282 +74,273 @@ import static java.lang.System.Logger.Level.*;
  * coding.
  */
 public class Example4UsingHelper extends SSFormViewScreenHelper {
-	
-	// Unique serial ID
-	private static final long serialVersionUID = -5528806265008339747L;
+  // Unique serial ID
+  private static final long serialVersionUID = -5528806265008339747L;
 
-	// Log4j2 Logger
-    private static final Logger logger = JStuff.getLogger();
-    
-    // String Constants
-	private static final String rowsetQuery = "SELECT * FROM part_data ORDER BY part_id;";
-	private static final String comboNavQuery = "SELECT part_id, part_name FROM part_data ORDER BY part_id;";
-	private static final String pkColumn = "part_id";
-	private static final String cmbNavDisplayColumn = "part_name";
-	
-	// Screen Labels
-	JLabel lblSelectPart = new JLabel("Parts");
-	JLabel lblPartID = new JLabel("Part ID");
-	JLabel lblPartName = new JLabel("Part Name");
-	JLabel lblPartColor = new JLabel("Color");
-	JLabel lblPartWeight = new JLabel("Weight");
-	JLabel lblPartCity = new JLabel("City");
-	
-	// SwingSet Components
-	//SSTextField txtPartID = new SSTextField();
-	SSTextField txtPartName = new SSTextField();
-	SSComboBox cmbPartColor = new SSComboBox();
-	SSTextField txtPartWeight = new SSTextField();
-	SSTextField txtPartCity = new SSTextField();
+  // Log4j2 Logger
+  private static final Logger logger = JStuff.getLogger();
 
-	/**
-	 * Constructor for Example4
-	 * <p>
-	 * @param _dbConn - database connection
-	 * @param _container parent window/container
-	 */
-	public Example4UsingHelper(final Connection _dbConn, final Container _container) {
+  // String Constants
+  private static final String rowsetQuery = "SELECT * FROM part_data ORDER BY part_id;";
+  private static final String comboNavQuery
+      = "SELECT part_id, part_name FROM part_data ORDER BY part_id;";
+  private static final String pkColumn = "part_id";
+  private static final String cmbNavDisplayColumn = "part_name";
 
-		// Parent Constructor
-		super("Example 4 Using Helper", _container, _dbConn, pkColumn, null, cmbNavDisplayColumn);
-		
-		// For H2, the rowset has to be re-queried following a record insertion or deletion
-		// TODO: Investigate how MySQL handles insert/delete and implement addNewRecordToCmbNavigator if needed.
-		setRequeryAfterInsertOrDelete(true);
-		
-		// Hide the frame since we're putting the JInternalFrame in its own JFrame for the demo
-		setBorder(null);
-		
-		// Finish Initialization
-		initScreen();
-		// updateScreen(); // Force a setRowSet() for testing.
-	}
+  // Screen Labels
+  JLabel lblSelectPart = new JLabel("Parts");
+  JLabel lblPartID = new JLabel("Part ID");
+  JLabel lblPartName = new JLabel("Part Name");
+  JLabel lblPartColor = new JLabel("Color");
+  JLabel lblPartWeight = new JLabel("Weight");
+  JLabel lblPartCity = new JLabel("City");
 
-	/** {@inheritDoc}
-	 * The parameter is cast to a Connection.
-	 */
-	@Override
-	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException
-	{
-		return DemoUtil.getNewRowSet((Connection)connectionOrDataSource);
-	}
-	
+  // SwingSet Components
+  //SSTextField txtPartID = new SSTextField();
+  SSTextField txtPartName = new SSTextField();
+  SSComboBox cmbPartColor = new SSComboBox();
+  SSTextField txtPartWeight = new SSTextField();
+  SSTextField txtPartCity = new SSTextField();
 
-	@Override
-	protected void activateDeactivateComponents() throws Exception {
-		// nothing to do...
-	}
+  /**
+   * Constructor for Example4
+   * <p>
+   * @param _dbConn - database connection
+   * @param _container parent window/container
+   */
+  public Example4UsingHelper(final Connection _dbConn, final Container _container) {
+    // Parent Constructor
+    super("Example 4 Using Helper", _container, _dbConn, pkColumn, null, cmbNavDisplayColumn);
 
-	@Override
-	protected void addComponents() throws Exception {
-	// SET LABEL DIMENSIONS
-		lblSelectPart.setPreferredSize(MainClass.labelDim);
-		lblPartID.setPreferredSize(MainClass.labelDim);
-		lblPartName.setPreferredSize(MainClass.labelDim);
-		lblPartColor.setPreferredSize(MainClass.labelDim);
-		lblPartWeight.setPreferredSize(MainClass.labelDim);
-		lblPartCity.setPreferredSize(MainClass.labelDim);
+    // For H2, the rowset has to be re-queried following a record insertion or deletion
+    // TODO: Investigate how MySQL handles insert/delete and implement addNewRecordToCmbNavigator if needed.
+    setRequeryAfterInsertOrDelete(true);
 
-	// SET BOUND COMPONENT DIMENSIONS
-		getComboNav().setPreferredSize(MainClass.ssDim);
-		getTxtPrimaryKey().setPreferredSize(MainClass.ssDim);
-		txtPartName.setPreferredSize(MainClass.ssDim);
-		cmbPartColor.setPreferredSize(MainClass.ssDim);
-		txtPartWeight.setPreferredSize(MainClass.ssDim);
-		txtPartCity.setPreferredSize(MainClass.ssDim);
-		
-	// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-		final Container contentPane = getContentPane();
-		contentPane.setLayout(new GridBagLayout());
-		final GridBagConstraints constraints = new GridBagConstraints();
+    // Hide the frame since we're putting the JInternalFrame in its own JFrame for the demo
+    setBorder(null);
 
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		contentPane.add(lblSelectPart, constraints);
-		constraints.gridy = 1;
-		contentPane.add(lblPartID, constraints);
-		constraints.gridy = 2;
-		contentPane.add(lblPartName, constraints);
-		constraints.gridy = 3;
-		contentPane.add(lblPartColor, constraints);
-		constraints.gridy = 4;
-		contentPane.add(lblPartWeight, constraints);
-		constraints.gridy = 5;
-		contentPane.add(lblPartCity, constraints);
+    // Finish Initialization
+    initScreen();
+    // updateScreen(); // Force a setRowSet() for testing.
+  }
 
-		constraints.gridx = 1;
-		constraints.gridy = 0;
-		contentPane.add(getComboNav(), constraints);
-		constraints.gridy = 1;
-		contentPane.add(getTxtPrimaryKey(), constraints);
-		constraints.gridy = 2;
-		contentPane.add(txtPartName, constraints);
-		constraints.gridy = 3;
-		contentPane.add(cmbPartColor, constraints);
-		constraints.gridy = 4;
-		contentPane.add(txtPartWeight, constraints);
-		constraints.gridy = 5;
-		contentPane.add(txtPartCity, constraints);
+  /**
+   * {@inheritDoc}
+   * The parameter is cast to a Connection.
+   */
+  @Override
+  protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException {
+    return DemoUtil.getNewRowSet((Connection) connectionOrDataSource);
+  }
 
-		constraints.gridx = 0;
-		constraints.gridy = 6;
-		constraints.gridwidth = 2;
-		contentPane.add(getDataNavigator(), constraints);
-	}
+  @Override
+  protected void activateDeactivateComponents() throws Exception {
+    // nothing to do...
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void addCustomListeners() {
+  @Override
+  protected void addComponents() throws Exception {
+    // SET LABEL DIMENSIONS
+    lblSelectPart.setPreferredSize(MainClass.labelDim);
+    lblPartID.setPreferredSize(MainClass.labelDim);
+    lblPartName.setPreferredSize(MainClass.labelDim);
+    lblPartColor.setPreferredSize(MainClass.labelDim);
+    lblPartWeight.setPreferredSize(MainClass.labelDim);
+    lblPartCity.setPreferredSize(MainClass.labelDim);
 
-		txtPartName.addFocusListener(new FocusAdapter() {
-			String oldValue = new String("");
+    // SET BOUND COMPONENT DIMENSIONS
+    getComboNav().setPreferredSize(MainClass.ssDim);
+    getTxtPrimaryKey().setPreferredSize(MainClass.ssDim);
+    txtPartName.setPreferredSize(MainClass.ssDim);
+    cmbPartColor.setPreferredSize(MainClass.ssDim);
+    txtPartWeight.setPreferredSize(MainClass.ssDim);
+    txtPartCity.setPreferredSize(MainClass.ssDim);
 
-			@Override
-			public void focusGained(FocusEvent fe) {
-				oldValue = txtPartName.getText();
-			}
+    // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
+    final Container contentPane = getContentPane();
+    contentPane.setLayout(new GridBagLayout());
+    final GridBagConstraints constraints = new GridBagConstraints();
 
-			@Override
-			public void focusLost(FocusEvent fe) {
-				if (!txtPartName.getText().equals(oldValue)) {
-					logger.log(DEBUG, "txtPartName triggering update to combo navigator.");
-					SwingUtilities.invokeLater(() -> updateNavigatorText());
-				}
-			}
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    contentPane.add(lblSelectPart, constraints);
+    constraints.gridy = 1;
+    contentPane.add(lblPartID, constraints);
+    constraints.gridy = 2;
+    contentPane.add(lblPartName, constraints);
+    constraints.gridy = 3;
+    contentPane.add(lblPartColor, constraints);
+    constraints.gridy = 4;
+    contentPane.add(lblPartWeight, constraints);
+    constraints.gridy = 5;
+    contentPane.add(lblPartCity, constraints);
 
-		});
-	}
-	
-	@Override
-	protected void addNewRecordToComboNav() {
-		// nothing to do because H2 requires that the rowset be 
-		// requeried following a record insertion or deletion
-	}
+    constraints.gridx = 1;
+    constraints.gridy = 0;
+    contentPane.add(getComboNav(), constraints);
+    constraints.gridy = 1;
+    contentPane.add(getTxtPrimaryKey(), constraints);
+    constraints.gridy = 2;
+    contentPane.add(txtPartName, constraints);
+    constraints.gridy = 3;
+    contentPane.add(cmbPartColor, constraints);
+    constraints.gridy = 4;
+    contentPane.add(txtPartWeight, constraints);
+    constraints.gridy = 5;
+    contentPane.add(txtPartCity, constraints);
 
-	@Override
-	protected void bindComponents() throws Exception {
-		//txtPartID.bind(getRowset(), "part_id");
-		txtPartName.bind(getRowset(), "part_name");
-		cmbPartColor.bind(getRowset(), "color_code");
-		txtPartWeight.bind(getRowset(), "weight");
-		txtPartCity.bind(getRowset(), "city");
-	}
+    constraints.gridx = 0;
+    constraints.gridy = 6;
+    constraints.gridwidth = 2;
+    contentPane.add(getDataNavigator(), constraints);
+  }
 
-	@Override
-	public void closeChildScreens() {
-		// nothing to do...
-	}
+  /** {@inheritDoc} */
+  @Override
+  protected void addCustomListeners() {
+    txtPartName.addFocusListener(new FocusAdapter() {
+      String oldValue = new String("");
 
-	@Override
-	protected void configureToolBars() {
-		// nothing to do...
-	}
-	
+      @Override
+      public void focusGained(FocusEvent fe) {
+        oldValue = txtPartName.getText();
+      }
 
-	@Override
-	protected String getComboNavQuery() {
-		return comboNavQuery;
-	}
+      @Override
+      public void focusLost(FocusEvent fe) {
+        if (!txtPartName.getText().equals(oldValue)) {
+          logger.log(DEBUG, "txtPartName triggering update to combo navigator.");
+          SwingUtilities.invokeLater(() -> updateNavigatorText());
+        }
+      }
+    });
+  }
 
-	@Override
-	protected JMenuBar getCustomMenu() {
-		// nothing to do...
-		return null;
-	}
-	
-	@Override
-	protected String getRowsetQuery() {
-		return rowsetQuery;
-	}
-	
-	@Override
-	protected void populateSSComboBoxes() {
-		// SET COMBO OPTIONS
-		cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"));
-	}
+  @Override
+  protected void addNewRecordToComboNav() {
+    // nothing to do because H2 requires that the rowset be
+    // requeried following a record insertion or deletion
+  }
 
-	/**
-	 * Obtain and return the primary key value for the new record.
-	 */
-	@Override
-	protected String retrieveNewPrimaryKey() {
-		
-		String newPrimaryKey = null;
+  @Override
+  protected void bindComponents() throws Exception {
+    //txtPartID.bind(getRowset(), "part_id");
+    txtPartName.bind(getRowset(), "part_name");
+    cmbPartColor.bind(getRowset(), "color_code");
+    txtPartWeight.bind(getRowset(), "weight");
+    txtPartCity.bind(getRowset(), "city");
+  }
 
-		try {
+  @Override
+  public void closeChildScreens() {
+    // nothing to do...
+  }
 
-		// GET THE NEW RECORD ID.
-			final ResultSet rs = getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-					.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
-			rs.next();
-			final int partID = rs.getInt("nextVal");
-			newPrimaryKey = String.valueOf(partID);
-			rs.close();
-			
-		} catch(final SQLException se) {
-			logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
-		} catch(final Exception e) {
-			logger.log(Level.ERROR, "Exception occured initializing new record.",e);
-		}
-		
-		return newPrimaryKey;
+  @Override
+  protected void configureToolBars() {
+    // nothing to do...
+  }
 
-	}
+  @Override
+  protected String getComboNavQuery() {
+    return comboNavQuery;
+  }
 
-	@Override
-	protected void setDefaultValues() throws Exception {
-		// ALL SET TO NULL/EMPTY STRING BY DEFAULT
-		//txtPartName.setText(null);
-		//cmbPartColor.setSelectedValue(0);
-		//txtPartWeight.setText("0");
-		//txtPartCity.setText(null);
-	}
-	
-	// THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
-	// https://stackoverflow.com/a/51254020
-	@Override
-	public void setUI(InternalFrameUI _ui) {
-		super.setUI(_ui); // this gets called internally when updating the ui and makes the northPane reappear
-		BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
-		if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
-	}
+  @Override
+  protected JMenuBar getCustomMenu() {
+    // nothing to do...
+    return null;
+  }
 
-	@Override
-	protected void updateSSDBComboBoxes() {
-		// nothing to do...
-	}
-	
-	/**
-	 * Updates the Combo Navigator based on the current screen values - used after
-	 * editing a component field
-	 */
-	private void updateNavigatorText() {
+  @Override
+  protected String getRowsetQuery() {
+    return rowsetQuery;
+  }
 
-		try {
-			if (getRowset().getRow() > 0) {
+  @Override
+  protected void populateSSComboBoxes() {
+    // SET COMBO OPTIONS
+    cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"));
+  }
 
-				long partID = getRowset().getLong("part_id");
+  /**
+   * Obtain and return the primary key value for the new record.
+   */
+  @Override
+  protected String retrieveNewPrimaryKey() {
+    String newPrimaryKey = null;
 
-				getSyncManager().async();
+    try {
+      // GET THE NEW RECORD ID.
+      final ResultSet rs
+          = getConnection()
+                .createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+                .executeQuery("SELECT nextval('part_data_seq') as nextVal;");
+      rs.next();
+      final int partID = rs.getInt("nextVal");
+      newPrimaryKey = String.valueOf(partID);
+      rs.close();
 
-				final String update = txtPartName.getText();
-				
-//				logger.debug("Running on EDT? " + SwingUtilities.isEventDispatchThread());
-//				logger.debug("Attempting to update combo navigator Option to: " + update);
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, "Exception occured initializing new record.", e);
+    }
 
-				getComboNav().updateDisplayValue(partID, update);
-				
-//				logger.debug("Combo navigator Option after call to getComboNav().updateDisplayValue(): " + getComboNav().getChosenDisplayValue());
-				
-				getSyncManager().sync();
+    return newPrimaryKey;
+  }
 
-			}
+  @Override
+  protected void setDefaultValues() throws Exception {
+    // ALL SET TO NULL/EMPTY STRING BY DEFAULT
+    //txtPartName.setText(null);
+    //cmbPartColor.setSelectedValue(0);
+    //txtPartWeight.setText("0");
+    //txtPartCity.setText(null);
+  }
 
-		} catch (SQLException _se) {
-			logger.log(Level.ERROR, "Error occured updating Combo Navigator text.",_se);
-			JOptionPane.showMessageDialog(getRootFrame(),
-					"Error occured updating Combo Navigator text.\n" + _se.getMessage());
-		}
+  // THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
+  // https://stackoverflow.com/a/51254020
+  @Override
+  public void setUI(InternalFrameUI _ui) {
+    super.setUI(
+        _ui); // this gets called internally when updating the ui and makes the northPane reappear
+    BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
+    if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
+  }
 
-	}
+  @Override
+  protected void updateSSDBComboBoxes() {
+    // nothing to do...
+  }
+
+  /**
+   * Updates the Combo Navigator based on the current screen values - used after
+   * editing a component field
+   */
+  private void updateNavigatorText() {
+    try {
+      if (getRowset().getRow() > 0) {
+        long partID = getRowset().getLong("part_id");
+
+        getSyncManager().async();
+
+        final String update = txtPartName.getText();
+
+        //				logger.debug("Running on EDT? " + SwingUtilities.isEventDispatchThread());
+        //				logger.debug("Attempting to update combo navigator Option to: " + update);
+
+        getComboNav().updateDisplayValue(partID, update);
+
+        //				logger.debug("Combo navigator Option after call to getComboNav().updateDisplayValue(): " + getComboNav().getChosenDisplayValue());
+
+        getSyncManager().sync();
+      }
+
+    } catch (SQLException _se) {
+      logger.log(Level.ERROR, "Error occured updating Combo Navigator text.", _se);
+      JOptionPane.showMessageDialog(
+          getRootFrame(), "Error occured updating Combo Navigator text.\n" + _se.getMessage());
+    }
+  }
 }

@@ -43,92 +43,91 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** xxx */
 public class SSVersionTest {
-	
-	/**
-	 * Test stuff.
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testMain() {
-		System.err.println("" + SSVersion.get("1.2.3-SNAPSOT"));
-		SSVersion vNull = SSVersion.get("");
-		SSVersion v1 = SSVersion.get("1.2.3");
-		SSVersion v2 = SSVersion.get("1.2.3-SNAPSHOT");
+  /**
+   * Test stuff.
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testMain() {
+    System.err.println("" + SSVersion.get("1.2.3-SNAPSOT"));
+    SSVersion vNull = SSVersion.get("");
+    SSVersion v1 = SSVersion.get("1.2.3");
+    SSVersion v2 = SSVersion.get("1.2.3-SNAPSHOT");
 
-		assertTrue(v1.compareTo(v2) > 0);
-		assertTrue(v2.compareTo(v1) < 0);
-		assertTrue(v1.compareTo(v1) == 0);
-		assertTrue(v2.compareTo(v2) == 0);
+    assertTrue(v1.compareTo(v2) > 0);
+    assertTrue(v2.compareTo(v1) < 0);
+    assertTrue(v1.compareTo(v1) == 0);
+    assertTrue(v2.compareTo(v2) == 0);
 
-		assertTrue(!v1.equals(v2));
-		assertTrue(!v2.equals(v1));
-		assertTrue(v1.equals(v1));
-		assertTrue(v2.equals(v2));
+    assertTrue(!v1.equals(v2));
+    assertTrue(!v2.equals(v1));
+    assertTrue(v1.equals(v1));
+    assertTrue(v2.equals(v2));
 
-		v2 = SSVersion.get("1.2.3");
-		assertTrue(v1.equals(v2));
-		assertTrue(v2.equals(v1));
-		v2 = SSVersion.get("1.2.4");
-		assertTrue(!v1.equals(v2));
-		assertTrue(!v2.equals(v1));
+    v2 = SSVersion.get("1.2.3");
+    assertTrue(v1.equals(v2));
+    assertTrue(v2.equals(v1));
+    v2 = SSVersion.get("1.2.4");
+    assertTrue(!v1.equals(v2));
+    assertTrue(!v2.equals(v1));
 
-		assertEquals("1.2.3", SSVersion.get("1.2.3").toString());
-		assertEquals("1.2.0", SSVersion.get("1.2").toString());
-		assertEquals("1.0.0", SSVersion.get("1").toString());
-		assertEquals(vNull, SSVersion.get("1.2.3."));
-		assertEquals(vNull, SSVersion.get("1.2."));
-		assertEquals(vNull, SSVersion.get("1."));
-		assertEquals("123.234.345", SSVersion.get("123.234.345").toString());
-		assertEquals(vNull, SSVersion.get("123.234.345.456"));
-		assertEquals("123.234.345-SNAPSHOT", SSVersion.get("123.234.345-SNAPSHOT").toString());
+    assertEquals("1.2.3", SSVersion.get("1.2.3").toString());
+    assertEquals("1.2.0", SSVersion.get("1.2").toString());
+    assertEquals("1.0.0", SSVersion.get("1").toString());
+    assertEquals(vNull, SSVersion.get("1.2.3."));
+    assertEquals(vNull, SSVersion.get("1.2."));
+    assertEquals(vNull, SSVersion.get("1."));
+    assertEquals("123.234.345", SSVersion.get("123.234.345").toString());
+    assertEquals(vNull, SSVersion.get("123.234.345.456"));
+    assertEquals("123.234.345-SNAPSHOT", SSVersion.get("123.234.345-SNAPSHOT").toString());
 
-		assertTrue(v1.compareTo(SSVersion.get("1.2.3")) == 0);
-		assertTrue(v1.compareTo(SSVersion.get("1.10.1")) < 0);
-		assertTrue(v1.compareTo(SSVersion.get("1.1.3")) > 0);
-		assertTrue(v1.compareTo(SSVersion.get("2.2.3")) < 0);
-		assertTrue(v1.compareTo(SSVersion.get("1.2.4")) < 0);
-		assertTrue(v1.compareTo(SSVersion.get("1.2.2")) > 0);
+    assertTrue(v1.compareTo(SSVersion.get("1.2.3")) == 0);
+    assertTrue(v1.compareTo(SSVersion.get("1.10.1")) < 0);
+    assertTrue(v1.compareTo(SSVersion.get("1.1.3")) > 0);
+    assertTrue(v1.compareTo(SSVersion.get("2.2.3")) < 0);
+    assertTrue(v1.compareTo(SSVersion.get("1.2.4")) < 0);
+    assertTrue(v1.compareTo(SSVersion.get("1.2.2")) > 0);
 
-		assertEquals(vNull, SSVersion.get("1.2.3-"));
-		assertEquals(vNull, SSVersion.get("1.2.3-RC1-SNAPSHOT"));
+    assertEquals(vNull, SSVersion.get("1.2.3-"));
+    assertEquals(vNull, SSVersion.get("1.2.3-RC1-SNAPSHOT"));
 
-		SSVersion vrc1 = SSVersion.get("1.2.3-RC1");
-		SSVersion vrc2 = SSVersion.get("1.2.3-RC2");
-		SSVersion vreg = SSVersion.get("1.2.3");
-		SSVersion vsnap = SSVersion.get("1.2.3-SNAPSHOT");
+    SSVersion vrc1 = SSVersion.get("1.2.3-RC1");
+    SSVersion vrc2 = SSVersion.get("1.2.3-RC2");
+    SSVersion vreg = SSVersion.get("1.2.3");
+    SSVersion vsnap = SSVersion.get("1.2.3-SNAPSHOT");
 
-		assertTrue(vrc1.preRelease().equals("rc1"));
-		assertTrue(vrc2.preRelease().equals("rc2"));
+    assertTrue(vrc1.preRelease().equals("rc1"));
+    assertTrue(vrc2.preRelease().equals("rc2"));
 
-		assertFalse(vreg.isPreRelease());
-		assertFalse(vreg.isSnapshot());
-		assertTrue(vreg.preRelease().isEmpty());
+    assertFalse(vreg.isPreRelease());
+    assertFalse(vreg.isSnapshot());
+    assertTrue(vreg.preRelease().isEmpty());
 
-		assertTrue(vrc1.isPreRelease());
-		assertFalse(vrc1.isSnapshot());
-		assertFalse(vrc1.preRelease().isEmpty());
+    assertTrue(vrc1.isPreRelease());
+    assertFalse(vrc1.isSnapshot());
+    assertFalse(vrc1.preRelease().isEmpty());
 
-		assertFalse(vsnap.isPreRelease());
-		assertTrue(vsnap.isSnapshot());
-		assertTrue(vsnap.preRelease().isEmpty());
+    assertFalse(vsnap.isPreRelease());
+    assertTrue(vsnap.isSnapshot());
+    assertTrue(vsnap.preRelease().isEmpty());
 
-		SSVersion vrc2B = SSVersion.get("1.2.3-RC2");
-		SSVersion vregB = SSVersion.get("1.2.3");
-		SSVersion vsnapB = SSVersion.get("1.2.3-SNAPSHOT");
+    SSVersion vrc2B = SSVersion.get("1.2.3-RC2");
+    SSVersion vregB = SSVersion.get("1.2.3");
+    SSVersion vsnapB = SSVersion.get("1.2.3-SNAPSHOT");
 
-		assertTrue(vrc2.compareTo(vrc2B)   == 0);
-		assertTrue(vreg.compareTo(vregB)   == 0);
-		assertTrue(vsnap.compareTo(vsnapB) == 0);
+    assertTrue(vrc2.compareTo(vrc2B) == 0);
+    assertTrue(vreg.compareTo(vregB) == 0);
+    assertTrue(vsnap.compareTo(vsnapB) == 0);
 
-		assertTrue(vrc2.compareTo(vrc1) > 0);
-		assertTrue(vrc1.compareTo(vrc2) < 0);
+    assertTrue(vrc2.compareTo(vrc1) > 0);
+    assertTrue(vrc1.compareTo(vrc2) < 0);
 
-		assertTrue(vreg.compareTo(vrc1)  > 0);
-		assertTrue(vreg.compareTo(vsnap) > 0);
-		assertTrue(vrc1.compareTo(vreg)  < 0);
-		assertTrue(vsnap.compareTo(vreg) < 0);
+    assertTrue(vreg.compareTo(vrc1) > 0);
+    assertTrue(vreg.compareTo(vsnap) > 0);
+    assertTrue(vrc1.compareTo(vreg) < 0);
+    assertTrue(vsnap.compareTo(vreg) < 0);
 
-		assertTrue(vrc1.compareTo(vsnap) > 0);
-		assertTrue(vsnap.compareTo(vrc1) < 0);
-	}
+    assertTrue(vrc1.compareTo(vsnap) > 0);
+    assertTrue(vsnap.compareTo(vrc1) < 0);
+  }
 }

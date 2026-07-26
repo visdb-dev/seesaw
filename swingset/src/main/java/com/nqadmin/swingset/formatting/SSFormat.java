@@ -58,75 +58,69 @@ package com.nqadmin.swingset.formatting;
 //		 "class Format<E extends Enum<E>>" that can be extended?
 //
 public enum SSFormat {
-	/** special circumstances or if format not needed (testing) */
-	CUSTOM,
-	/** default date format */
-	DATE,
-	/** Date MMDDYYYY */
-	DATE_MMDDYYYY_SLASH  (DATE),
-	/** Date DDMMYYYY */
-	DATE_DDMMYYYY_SLASH (DATE),
-	/** Date YYYYMMDD */
-	DATE_YYYYMMDD_STROKE (DATE),
+  /** special circumstances or if format not needed (testing) */
+  CUSTOM,
+  /** default date format */
+  DATE,
+  /** Date MMDDYYYY */
+  DATE_MMDDYYYY_SLASH(DATE),
+  /** Date DDMMYYYY */
+  DATE_DDMMYYYY_SLASH(DATE),
+  /** Date YYYYMMDD */
+  DATE_YYYYMMDD_STROKE(DATE),
 
-	/** default time format */
-	TIME,
-	/** Time HHMMSS */
-	TIME_HHMMSS (TIME),
+  /** default time format */
+  TIME,
+  /** Time HHMMSS */
+  TIME_HHMMSS(TIME),
 
-	/** default timestamp format */
-	TIMESTAMP,
-	/** Timestamp big */
-	TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ (TIMESTAMP),
-	/** Timestamp date-time, no milliseconds timezone */
-	TIMESTAMP_YYYYMMDD_STROKE_HHMMSS (TIMESTAMP),
-	/** Timestamp date, no date, milliseconds, timezone */
-	TIMESTAMP_YYYYMMDD_STROKE (TIMESTAMP),
-	;
+  /** default timestamp format */
+  TIMESTAMP,
+  /** Timestamp big */
+  TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ(TIMESTAMP),
+  /** Timestamp date-time, no milliseconds timezone */
+  TIMESTAMP_YYYYMMDD_STROKE_HHMMSS(TIMESTAMP),
+  /** Timestamp date, no date, milliseconds, timezone */
+  TIMESTAMP_YYYYMMDD_STROKE(TIMESTAMP),
+  ;
 
-	// could add a field to contructor that says "I'm default".
-	private static SSFormat getDefaultFormat(SSFormat format) {
-		return switch(format.getType()) {
-		case DATE -> DATE_MMDDYYYY_SLASH;
-		case TIME -> TIME_HHMMSS;
-		//case TIMESTAMP -> TIMESTAMP_YYYYMMDD_HHMMSS;
-		case TIMESTAMP -> TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ;
-		default -> format;	// XXX
-		};
-	}
+  // could add a field to contructor that says "I'm default".
+  private static SSFormat getDefaultFormat(SSFormat format) {
+    return switch (format.getType()) {
+      case DATE -> DATE_MMDDYYYY_SLASH;
+      case TIME -> TIME_HHMMSS;
+      //case TIMESTAMP -> TIMESTAMP_YYYYMMDD_HHMMSS;
+      case TIMESTAMP -> TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ;
+      default -> format; // XXX
+    };
+  }
 
-	/**
-	 * The param format may resolve to another format.
-	 * Find the actual format to use.
-	 * @param format format
-	 * @return a format that can b
-	 */
-	public static SSFormat getActualFormat(SSFormat format) {
-		return format.isBase() ? getDefaultFormat(format) : format;
-	}
+  /**
+   * The param format may resolve to another format.
+   * Find the actual format to use.
+   * @param format format
+   * @return a format that can b
+   */
+  public static SSFormat getActualFormat(SSFormat format) {
+    return format.isBase() ? getDefaultFormat(format) : format;
+  }
 
-	final private SSFormat type;
+  final private SSFormat type;
 
-	/** the default has no args */
-	SSFormat() {
-		type = this;
-	}
+  /** the default has no args */
+  SSFormat() { type = this; }
 
-	SSFormat(SSFormat _base) {
-		type = _base;
-	}
+  SSFormat(SSFormat _base) { type = _base; }
 
-	/** Is this enum value the default for the given type
-	 * @return true if this enum is the default.
-	 */
-	boolean isBase() {
-		return type == this;
-	}
+  /**
+   * Is this enum value the default for the given type
+   * @return true if this enum is the default.
+   */
+  boolean isBase() { return type == this; }
 
-	/** The type of this format, e.g. DATE. 
-	 * @return type
-	 */
-	public SSFormat getType() {
-		return type;
-	}
+  /**
+   * The type of this format, e.g. DATE.
+   * @return type
+   */
+  public SSFormat getType() { return type; }
 }

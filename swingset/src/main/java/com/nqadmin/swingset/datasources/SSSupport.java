@@ -41,21 +41,20 @@ import javax.sql.rowset.WebRowSet;
  * <p>
  * Experimental, this class may go away.
  */
-public interface SSSupport
-{
-	/**
-	 * Does SS handle the specified type of RowSet.
-	 * @param rs
-	 * @return 
-	 */
-	default boolean isWritableRowSetType(RowSet rs) {
-		return switch (rs) {
-		case FilteredRowSet _ -> false;
-		case JoinRowSet _ -> false;
-		case WebRowSet _ -> false;
-		case JdbcRowSet _ -> true;
-		case CachedRowSet _ -> true;
-		default -> false;
-		};
-	}
+public interface SSSupport {
+  /**
+   * Does SS handle the specified type of RowSet.
+   * @param rs
+   * @return
+   */
+  default boolean isWritableRowSetType(RowSet rs) {
+    return switch (rs) {
+      case FilteredRowSet _ -> false;
+      case JoinRowSet _ -> false;
+      case WebRowSet _ -> false;
+      case JdbcRowSet _ -> true;
+      case CachedRowSet _ -> true;
+      default -> false;
+    };
+  }
 }

@@ -56,191 +56,166 @@ import static java.lang.System.Logger.Level.*;
  * Use the RowsModel to get the RowSet.
  */
 @SuppressWarnings("serial")
-public class RowsEvent extends EventObjectBacktrace implements RowsModelEvent
-{
-	private static final Logger logger = JStuff.getLogger();
+public class RowsEvent extends EventObjectBacktrace implements RowsModelEvent {
+  private static final Logger logger = JStuff.getLogger();
 
-	/** The type of NaviagionRowSetEvent events */
-	public enum RowSetEventType {
-		/** See {@link javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent) } */
-		CURSOR_MOVED,
-		/** See {@link javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)} */
-		ROW_CHANGED,
-		/** See {@link javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)} */
-		ROW_SET_CHANGED,
-	}
+  /** The type of NaviagionRowSetEvent events */
+  public enum RowSetEventType {
+    /** See {@link javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent) } */
+    CURSOR_MOVED,
+    /** See {@link javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)} */
+    ROW_CHANGED,
+    /** See {@link javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)} */
+    ROW_SET_CHANGED,
+  }
 
-	/** The type of RowSet operation which caused this event. */
-	// TODO: originatingComponentType
-	// TODO: KindOperator ???
-	public enum OperatorKind {
-		/** A {@link RowsAction}, typically a button push, generated this event */
-		ACTION,
-		/** An SSComponent's action generated this event, like user input. */
-		COMPONENT,
-		/** Other bracketed event, like SSSyncManger. */
-		OTHER,
-		/** Direct RowSet operation; not bracketed.
-		 * Alternate SSSyncManager handling or outside of SS. */
-		ANON,
-		/** Initialization that should never show up in use. */
-		UNKNOWN,
-	}
+  /** The type of RowSet operation which caused this event. */
+  // TODO: originatingComponentType
+  // TODO: KindOperator ???
+  public enum OperatorKind {
+    /** A {@link RowsAction}, typically a button push, generated this event */
+    ACTION,
+    /** An SSComponent's action generated this event, like user input. */
+    COMPONENT,
+    /** Other bracketed event, like SSSyncManger. */
+    OTHER,
+    /**
+     * Direct RowSet operation; not bracketed.
+     * Alternate SSSyncManager handling or outside of SS.
+     */
+    ANON,
+    /** Initialization that should never show up in use. */
+    UNKNOWN,
+  }
 
-	private static int generation;
+  private static int generation;
 
-	/** NOTE: rowSetEventTypes may "grow" before dispatch */
-	private final Set<RowSetEventType> rowSetEventTypes;
-	private final int gen;
+  /** NOTE: rowSetEventTypes may "grow" before dispatch */
+  private final Set<RowSetEventType> rowSetEventTypes;
+  private final int gen;
 
-	/**
-	 * An Event object generated for a RowsAction on a RowSet.
-	 * @param source
-	 * @param rs
-	 * @param operatorKind
-	 * @param operator Either a RowsAction or RSC/component; may be null
-	 * @param rowSetEventTypes
-	 */
-	RowsEvent(RowsEventSource source, Set<RowSetEventType> rowSetEventTypes)
-	{
-		super(source);
-		this.rowSetEventTypes = EnumSet.copyOf(rowSetEventTypes);
-		this.gen = ++generation;
+  /**
+   * An Event object generated for a RowsAction on a RowSet.
+   * @param source
+   * @param rs
+   * @param operatorKind
+   * @param operator Either a RowsAction or RSC/component; may be null
+   * @param rowSetEventTypes
+   */
+  RowsEvent(RowsEventSource source, Set<RowSetEventType> rowSetEventTypes) {
+    super(source);
+    this.rowSetEventTypes = EnumSet.copyOf(rowSetEventTypes);
+    this.gen = ++generation;
 
-		switch (source.operatorKind()) {
-		case COMPONENT -> {
-			if (!(source.operator() instanceof RSC))
-				throw new IllegalArgumentException(sf("%s must have a component"));
-		}
-		case ACTION -> {
-			if (!(source.operator() instanceof RowsAction))
-				throw new IllegalArgumentException(sf("%s must have an action"));
-		}
-		case null,default -> {}
-		}
-	}
-	RowsEvent(RowsEventSource source, RowSetEventType rowSetEventType)
-	{
-		this(source, EnumSet.of(rowSetEventType));
-	}
+    switch (source.operatorKind()) {
+      case COMPONENT -> {
+        if (!(source.operator() instanceof RSC))
+          throw new IllegalArgumentException(sf("%s must have a component"));
+      }
+      case ACTION -> {
+        if (!(source.operator() instanceof RowsAction))
+          throw new IllegalArgumentException(sf("%s must have an action"));
+      }
+      case null, default -> {
+      }
+    }
+  }
+  RowsEvent(RowsEventSource source, RowSetEventType rowSetEventType) {
+    this(source, EnumSet.of(rowSetEventType));
+  }
 
-	boolean absorb(RowsEvent rev)
-	{
-		// UNKNOWN never matches
-		if (getSource().operatorKind() == OperatorKind.UNKNOWN
-				|| !getSource().equals(rev.getSource())) {
-			return false;
-		}
+  boolean absorb(RowsEvent rev) {
+    // UNKNOWN never matches
+    if (getSource().operatorKind() == OperatorKind.UNKNOWN
+        || !getSource().equals(rev.getSource())) {
+      return false;
+    }
 
-		if (isJunit())
-			System.out.println("absorb: " + rev.rowSetEventTypes);
-		else
-			logger.log(TRACE, () -> sf("absorb: %s", rev.rowSetEventTypes));
-		rowSetEventTypes.addAll(rev.rowSetEventTypes);
-		return true;
-	}
+    if (isJunit()) System.out.println("absorb: " + rev.rowSetEventTypes);
+    else logger.log(TRACE, () -> sf("absorb: %s", rev.rowSetEventTypes));
+    rowSetEventTypes.addAll(rev.rowSetEventTypes);
+    return true;
+  }
 
-	// TODO: Other versions of absorb? Or maybe can absorb?
+  // TODO: Other versions of absorb? Or maybe can absorb?
 
-	/** {@inheritDoc } */
-	@Override
-	@SuppressWarnings("NonPublicExported")
-	public final RowsEventSource getSource() {
-		return (RowsEventSource) source;
-	}
+  /** {@inheritDoc } */
+  @Override
+  @SuppressWarnings("NonPublicExported")
+  public final RowsEventSource getSource() {
+    return (RowsEventSource) source;
+  }
 
-	/**
-	 * Test if this event is for the specified rowSet.
-	 * @param rowSet check against this rowSet
-	 * @return true if the event is for the specified rowSet
-	 */
-	public boolean matches(RowSet rowSet) {
-		return getSource().rowSet() == rowSet;
-	}
+  /**
+   * Test if this event is for the specified rowSet.
+   * @param rowSet check against this rowSet
+   * @return true if the event is for the specified rowSet
+   */
+  public boolean matches(RowSet rowSet) { return getSource().rowSet() == rowSet; }
 
-	/**
-	 * A RowsModel.
-	 * @return RowsModel that issued the event
-	 */
-	@Override
-	public RowsModel getRowsModel() {
-		return getSource().rowsModel();
-	}
+  /**
+   * A RowsModel.
+   * @return RowsModel that issued the event
+   */
+  @Override
+  public RowsModel getRowsModel() {
+    return getSource().rowsModel();
+  }
 
-	/**
-	 * Return the RowSet associated with these events.
-	 * @return
-	 */
-	public RowSet getRowSet()
-	{
-		return getSource().rowSet();
-	}
+  /**
+   * Return the RowSet associated with these events.
+   * @return
+   */
+  public RowSet getRowSet() { return getSource().rowSet(); }
 
-	/**
-	 * The events generated by the navigation action.
-	 * @return the events generated by the navigation action.
-	 */
-	public Set<RowSetEventType> getEventTypes()
-	{
-		return rowSetEventTypes;
-	}
+  /**
+   * The events generated by the navigation action.
+   * @return the events generated by the navigation action.
+   */
+  public Set<RowSetEventType> getEventTypes() { return rowSetEventTypes; }
 
-	/**
-	 * The actions on the rowset that generated the events.
-	 * Null if the OperatorKind is not a NavAction.
-	 * 
-	 * @return the RowsAction that generated the events.
-	 */
-	public RowsAction getOperAct()
-	{
-		if (getSource().operatorKind() != OperatorKind.ACTION)
-			return null;
-		return (RowsAction) getSource().operator();
-	}
+  /**
+   * The actions on the rowset that generated the events.
+   * Null if the OperatorKind is not a NavAction.
+   *
+   * @return the RowsAction that generated the events.
+   */
+  public RowsAction getOperAct() {
+    if (getSource().operatorKind() != OperatorKind.ACTION) return null;
+    return (RowsAction) getSource().operator();
+  }
 
-	/**
-	 * The {@link RSC} that originated the event.
-	 * Null if the OperatorKind is not an SSComponent.
-	 * @return the component that originated the events
-	 */
-	public RSC getOperComponent()
-	{
-		if (getSource().operatorKind() != OperatorKind.COMPONENT)
-			return null;
-		return (RSC) getSource().operator();
-	}
+  /**
+   * The {@link RSC} that originated the event.
+   * Null if the OperatorKind is not an SSComponent.
+   * @return the component that originated the events
+   */
+  public RSC getOperComponent() {
+    if (getSource().operatorKind() != OperatorKind.COMPONENT) return null;
+    return (RSC) getSource().operator();
+  }
 
-	/**
-	 * The operator that originated the event;
-	 * use {@link #getKindOperator() } to determine the kind.
-	 * This is the operator no matter the OperatorKind.
-	 * @return the object that originated the events
-	 */
-	public Object getOperAny()
-	{
-		return getSource().operator();
-	}
+  /**
+   * The operator that originated the event;
+   * use {@link #getKindOperator() } to determine the kind.
+   * This is the operator no matter the OperatorKind.
+   * @return the object that originated the events
+   */
+  public Object getOperAny() { return getSource().operator(); }
 
-	/**
-	 * The source of the rowset operatorKind that generated the events.
-	 * @return 
-	 */
-	public OperatorKind getKindOperator()
-	{
-		return getSource().operatorKind();
-	}
+  /**
+   * The source of the rowset operatorKind that generated the events.
+   * @return
+   */
+  public OperatorKind getKindOperator() { return getSource().operatorKind(); }
 
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("RowsEvent{%d, %s, %s, %s, %s, %s}",
-				gen,
-				objectID(getSource().rowsModel()),
-				objectID(getSource().rowSet()),
-				getSource().operatorKind(),
-				getSource().operator() instanceof RowsAction
-						? getSource().operator() : objectID(getSource().operator()),
-				rowSetEventTypes);
-	}
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return sf("RowsEvent{%d, %s, %s, %s, %s, %s}", gen, objectID(getSource().rowsModel()),
+              objectID(getSource().rowSet()), getSource().operatorKind(),
+              getSource().operator() instanceof RowsAction ? getSource().operator()
+                                                           : objectID(getSource().operator()),
+              rowSetEventTypes);
+  }
 }

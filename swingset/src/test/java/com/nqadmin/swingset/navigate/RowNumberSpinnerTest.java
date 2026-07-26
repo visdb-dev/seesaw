@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
@@ -57,233 +56,209 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * x
  */
-public class RowNumberSpinnerTest
-{
-	private static final Logger LOG = Logger.getLogger(getLoggerName());
-	
-	/** x */
-	public RowNumberSpinnerTest()
-	{
-	}
+public class RowNumberSpinnerTest {
+  private static final Logger LOG = Logger.getLogger(getLoggerName());
 
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
-		TestLogging.load();
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-		if (busReceiver != null)
-			WeakEventBus.unregister(busReceiver, getGlobalEventBus());
-		busReceiver = null;
-	}
+  /** x */
+  public RowNumberSpinnerTest() {}
 
-	BusReceiver busReceiver; // Strong Reference
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {
+    isJunit(); // Make sure it's set; when using invokeLater, can be missed.
+    TestLogging.load();
+  }
 
-	/**
-	 * Test of setAction method, of class RowNumberSpinner.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "CallToPrintStackTrace", "UseSpecificCatch"})
-	public void testSetAction() throws Exception
-	{
-		LOG.log(INFO, "setAction");
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-		busReceiver = EQ.setupBusReceiver();
-		EQ.GetRowsModelEvent events = busReceiver.events();
+  /** x */
+  @BeforeEach
+  public void setUp() {}
 
-		H2.clean();
-		RowSet rs1 = TinyRS.getRS1_4();
-		RowsModel model1 = RowsModel.create(rs1, null);
-		RowSet rs2 = TinyRS.getRS2_5();
-		
-		RowNumberSpinner spinner = new RowNumberSpinner(model1);
+  /** x */
+  @AfterEach
+  public void tearDown() {
+    if (busReceiver != null) WeakEventBus.unregister(busReceiver, getGlobalEventBus());
+    busReceiver = null;
+  }
 
-		// Verify that there is only one actionPerformed per setValue.
-		// Verify that the correct rowSet cursor is modified,
-		// and that the "other" rowSet cursor is not modified.
+  BusReceiver busReceiver; // Strong Reference
 
-		checkGoto(); // initialize state
-		int row = ((Number)spinner.getValue()).intValue();
-		assertEquals(1, row);
-		assertEquals(1, rs1.getRow());
+  /**
+   * Test of setAction method, of class RowNumberSpinner.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "CallToPrintStackTrace",
+                     "UseSpecificCatch"})
+  public void testSetAction() throws Exception {
+    LOG.log(INFO, "setAction");
 
-		assertTrue(EQ.invokeLatchWait("tick1", s -> LOG.log(INFO, s), null,
-				() -> spinner.setValue(3)));
-		assertEquals(1, events.size());
-		assertEquals(3, rs1.getRow());
-		assertEquals(1, checkGoto());
+    busReceiver = EQ.setupBusReceiver();
+    EQ.GetRowsModelEvent events = busReceiver.events();
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick2", s -> LOG.log(INFO, s), null,
-				() -> spinner.setValue(2)));
-		assertEquals(1, events.size());
-		assertEquals(2, rs1.getRow());
-		assertEquals(1, checkGoto());
-		// rs1 has 4 rows
-		assertEquals(4, spinner.getModel().getMaximum());
+    H2.clean();
+    RowSet rs1 = TinyRS.getRS1_4();
+    RowsModel model1 = RowsModel.create(rs1, null);
+    RowSet rs2 = TinyRS.getRS2_5();
 
+    RowNumberSpinner spinner = new RowNumberSpinner(model1);
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick3", s -> LOG.log(INFO, s), null,
-				() -> model1.setRowSet(rs2)));
-		assertEquals(2, events.size());
-		checkGoto(); // initialize state
-		// rs2 has 5 rows
-		assertEquals(5, spinner.getModel().getMaximum());
-		assertEquals(1, rs2.getRow());
+    // Verify that there is only one actionPerformed per setValue.
+    // Verify that the correct rowSet cursor is modified,
+    // and that the "other" rowSet cursor is not modified.
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick4", s -> LOG.log(INFO, s), null,
-				() -> spinner.setValue(3)));
-		assertEquals(1, events.size());
-		assertEquals(3, rs2.getRow());
-		assertEquals(2, rs1.getRow());
-		assertEquals(1, checkGoto());
+    checkGoto(); // initialize state
+    int row = ((Number) spinner.getValue()).intValue();
+    assertEquals(1, row);
+    assertEquals(1, rs1.getRow());
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick5", s -> LOG.log(INFO, s), null,
-				() -> spinner.setValue(2)));
-		assertEquals(1, events.size());
-		assertEquals(2, rs2.getRow());
-		assertEquals(2, rs1.getRow());
-		assertEquals(1, checkGoto());
+    assertTrue(EQ.invokeLatchWait("tick1", s -> LOG.log(INFO, s), null, () -> spinner.setValue(3)));
+    assertEquals(1, events.size());
+    assertEquals(3, rs1.getRow());
+    assertEquals(1, checkGoto());
 
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick2", s -> LOG.log(INFO, s), null, () -> spinner.setValue(2)));
+    assertEquals(1, events.size());
+    assertEquals(2, rs1.getRow());
+    assertEquals(1, checkGoto());
+    // rs1 has 4 rows
+    assertEquals(4, spinner.getModel().getMaximum());
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick6", s -> LOG.log(INFO, s), null,
-				() -> model1.setRowSet(rs1)));
-		assertEquals(2, events.size());
-		checkGoto(); // initialize state
+    events.clear();
+    assertTrue(
+        EQ.invokeLatchWait("tick3", s -> LOG.log(INFO, s), null, () -> model1.setRowSet(rs2)));
+    assertEquals(2, events.size());
+    checkGoto(); // initialize state
+    // rs2 has 5 rows
+    assertEquals(5, spinner.getModel().getMaximum());
+    assertEquals(1, rs2.getRow());
 
-		// rs1 has 4 rows
-		assertEquals(4, spinner.getModel().getMaximum());
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick4", s -> LOG.log(INFO, s), null, () -> spinner.setValue(3)));
+    assertEquals(1, events.size());
+    assertEquals(3, rs2.getRow());
+    assertEquals(2, rs1.getRow());
+    assertEquals(1, checkGoto());
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick7", s -> LOG.log(INFO, s), null,
-				() -> spinner.setValue(3)));
-		assertEquals(1, events.size());
-		assertEquals(3, rs1.getRow());
-		assertEquals(2, rs2.getRow());
-		assertEquals(1, checkGoto());
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick5", s -> LOG.log(INFO, s), null, () -> spinner.setValue(2)));
+    assertEquals(1, events.size());
+    assertEquals(2, rs2.getRow());
+    assertEquals(2, rs1.getRow());
+    assertEquals(1, checkGoto());
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick8", s -> LOG.log(INFO, s), null,
-				() -> spinner.setValue(2)));
-		assertEquals(1, events.size());
-		assertEquals(2, rs1.getRow());
-		assertEquals(2, rs2.getRow());
-		assertEquals(1, checkGoto());
-	}
-	
-	private int nGoto;
-	/** return number of goto actions */
-	private int checkGoto() {
-		int prevGoto = nGoto;
-		nGoto = RowsActions.getCount(RowsAction.ACT_GOTOROW);
-		int n = nGoto - prevGoto;
-		//System.out.printf("N_GOTO: %d\n", n);
-		return n;
-	}
+    events.clear();
+    assertTrue(
+        EQ.invokeLatchWait("tick6", s -> LOG.log(INFO, s), null, () -> model1.setRowSet(rs1)));
+    assertEquals(2, events.size());
+    checkGoto(); // initialize state
 
-	@SuppressWarnings("unused")
-	private void checkRowSetPos(int r1, RowSet rs1, int r2, RowSet rs2) throws SQLException {
-		// int prevGoto = nGoto;
-		// nGoto = NavigateActions.getCount(RowsAction.ACT_GOTOROW);
-		// int n = nGoto - prevGoto;
-		LOG.log(INFO, sf("POS: rs1%s %d, rs2%s %d\n",
-				rs1.getRow() != r1 ? " ERROR" : "", r1,
-				rs2.getRow() != r2 ? " ERROR" : "", r2
-		));
-	}
+    // rs1 has 4 rows
+    assertEquals(4, spinner.getModel().getMaximum());
 
-	// /**
-	//  * Test of setModel method, of class RowNumberSpinner.
-	//  * @throws java.sql.SQLException
-	//  * @throws java.lang.ClassNotFoundException
-	//  */
-	// @Test
-	// @SuppressWarnings({"ThrowableResultIgnored", "deprecation"})
-	// public void testSetModel() throws SQLException, ClassNotFoundException
-	// {
-	// 	System.out.println("setModel");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick7", s -> LOG.log(INFO, s), null, () -> spinner.setValue(3)));
+    assertEquals(1, events.size());
+    assertEquals(3, rs1.getRow());
+    assertEquals(2, rs2.getRow());
+    assertEquals(1, checkGoto());
 
-	// 	H2.clean();
-	// 	RowSet rs1 = getRS1_4();
-	// 	RowsModel rowsModel = RowsModel.create(rs1);
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick8", s -> LOG.log(INFO, s), null, () -> spinner.setValue(2)));
+    assertEquals(1, events.size());
+    assertEquals(2, rs1.getRow());
+    assertEquals(2, rs2.getRow());
+    assertEquals(1, checkGoto());
+  }
 
-	// 	RowNumberSpinner spinner = new RowNumberSpinner(rowsModel);
-	// 	SpinnerNumberModel defaultSpinnerModel = spinner.getModel();
+  private int nGoto;
+  /** return number of goto actions */
+  private int checkGoto() {
+    int prevGoto = nGoto;
+    nGoto = RowsActions.getCount(RowsAction.ACT_GOTOROW);
+    int n = nGoto - prevGoto;
+    //System.out.printf("N_GOTO: %d\n", n);
+    return n;
+  }
 
-	// 	assertThrows(IllegalCallerException.class,
-	// 				 () -> spinner.setModel(new SpinnerNumberModel()));
-	// 	assertTrue(defaultSpinnerModel == spinner.getModel());
+  @SuppressWarnings("unused")
+  private void checkRowSetPos(int r1, RowSet rs1, int r2, RowSet rs2) throws SQLException {
+    // int prevGoto = nGoto;
+    // nGoto = NavigateActions.getCount(RowsAction.ACT_GOTOROW);
+    // int n = nGoto - prevGoto;
+    LOG.log(INFO, sf("POS: rs1%s %d, rs2%s %d\n", rs1.getRow() != r1 ? " ERROR" : "", r1,
+                     rs2.getRow() != r2 ? " ERROR" : "", r2));
+  }
 
-	// 	spinner.setModel(rowsModel);
-	// 	assertFalse(defaultSpinnerModel == spinner.getModel());
-	// }
+  // /**
+  //  * Test of setModel method, of class RowNumberSpinner.
+  //  * @throws java.sql.SQLException
+  //  * @throws java.lang.ClassNotFoundException
+  //  */
+  // @Test
+  // @SuppressWarnings({"ThrowableResultIgnored", "deprecation"})
+  // public void testSetModel() throws SQLException, ClassNotFoundException
+  // {
+  // 	System.out.println("setModel");
 
+  // 	H2.clean();
+  // 	RowSet rs1 = getRS1_4();
+  // 	RowsModel rowsModel = RowsModel.create(rs1);
 
+  // 	RowNumberSpinner spinner = new RowNumberSpinner(rowsModel);
+  // 	SpinnerNumberModel defaultSpinnerModel = spinner.getModel();
 
+  // 	assertThrows(IllegalCallerException.class,
+  // 				 () -> spinner.setModel(new SpinnerNumberModel()));
+  // 	assertTrue(defaultSpinnerModel == spinner.getModel());
 
-	// /**
-	//  * Test of removeTinyArrows method, of class RowNumberSpinner.
-	//  */
-	// @Test
-	// public void testRemoveTinyArrows()
-	// {
-	// 	System.out.println("removeTinyArrows");
-	// 	Dimension targetSpinnerSize = null;
-	// 	RowNumberSpinner instance = new RowNumberSpinner();
-	// 	instance.removeTinyArrows(targetSpinnerSize);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+  // 	spinner.setModel(rowsModel);
+  // 	assertFalse(defaultSpinnerModel == spinner.getModel());
+  // }
 
-	// /**
-	//  * Test of setWindowUpDownKeysEnable method, of class RowNumberSpinner.
-	//  */
-	// @Test
-	// public void testSetWindowUpDownKeysEnable()
-	// {
-	// 	System.out.println("setWindowUpDownKeysEnable");
-	// 	boolean enable = false;
-	// 	RowNumberSpinner instance = new RowNumberSpinner();
-	// 	instance.setWindowUpDownKeysEnable(enable);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+  // /**
+  //  * Test of removeTinyArrows method, of class RowNumberSpinner.
+  //  */
+  // @Test
+  // public void testRemoveTinyArrows()
+  // {
+  // 	System.out.println("removeTinyArrows");
+  // 	Dimension targetSpinnerSize = null;
+  // 	RowNumberSpinner instance = new RowNumberSpinner();
+  // 	instance.removeTinyArrows(targetSpinnerSize);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
 
-	// /**
-	//  * Test of setUpDownKeysEnable method, of class RowNumberSpinner.
-	//  */
-	// @Test
-	// public void testSetUpDownKeysEnable()
-	// {
-	// 	System.out.println("setUpDownKeysEnable");
-	// 	boolean enable = false;
-	// 	RowNumberSpinner instance = new RowNumberSpinner();
-	// 	instance.setUpDownKeysEnable(enable);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-	
+  // /**
+  //  * Test of setWindowUpDownKeysEnable method, of class RowNumberSpinner.
+  //  */
+  // @Test
+  // public void testSetWindowUpDownKeysEnable()
+  // {
+  // 	System.out.println("setWindowUpDownKeysEnable");
+  // 	boolean enable = false;
+  // 	RowNumberSpinner instance = new RowNumberSpinner();
+  // 	instance.setWindowUpDownKeysEnable(enable);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of setUpDownKeysEnable method, of class RowNumberSpinner.
+  //  */
+  // @Test
+  // public void testSetUpDownKeysEnable()
+  // {
+  // 	System.out.println("setUpDownKeysEnable");
+  // 	boolean enable = false;
+  // 	RowNumberSpinner instance = new RowNumberSpinner();
+  // 	instance.setUpDownKeysEnable(enable);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
 }

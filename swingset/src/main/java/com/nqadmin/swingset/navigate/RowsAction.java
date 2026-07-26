@@ -50,82 +50,69 @@ import javax.sql.RowSetEvent;
  * {@link com.nqadmin.swingset.navigate.RowsActions}.
  */
 // TODO: RowsAction not RowsAction???
-public enum RowsAction
-{
-	/** Go to first record. */
-	ACT_FIRST,
-	/** Go to last record. */
-	ACT_LAST,
-	/** Go to next record. */
-	ACT_NEXT,
-	/** Go to previous record. */
-	ACT_PREVIOUS,
-	/** Commit current record to data base. */
-	ACT_COMMIT,
-	/** Undo changes to current record. */
-	ACT_REVERT,
-	/** Refresh record. */
-	ACT_REFRESH,
-	/** Add record. */
-	ACT_ADD(true), // This action has no associated RowSet event.
-	/** Delete record. */
-	ACT_DELETE,
-	/** A specialized action for "goto row number".
-	 * This action has a Property, see {@link javax.swing.Action#getValue(java.lang.String)},
-	 * NavigateActions.KEY_SPINNER_MODEL, whose value is a
-	 * {@link javax.swing.SpinnerNumberModel} which models the ResultSet's current row.
-	 */
-	ACT_GOTOROW,
-	/** Need with CachedRowSet since no RowSet events */
-	ACT_REVERT_FORCE(true, true),
-	/** Send a row changed rowSet event */
-	ACT_ROW_CHANGED(true, true),
-	;
+public enum RowsAction {
+  /** Go to first record. */
+  ACT_FIRST,
+  /** Go to last record. */
+  ACT_LAST,
+  /** Go to next record. */
+  ACT_NEXT,
+  /** Go to previous record. */
+  ACT_PREVIOUS,
+  /** Commit current record to data base. */
+  ACT_COMMIT,
+  /** Undo changes to current record. */
+  ACT_REVERT,
+  /** Refresh record. */
+  ACT_REFRESH,
+  /** Add record. */
+  ACT_ADD(true), // This action has no associated RowSet event.
+  /** Delete record. */
+  ACT_DELETE,
+  /**
+   * A specialized action for "goto row number".
+   * This action has a Property, see {@link javax.swing.Action#getValue(java.lang.String)},
+   * NavigateActions.KEY_SPINNER_MODEL, whose value is a
+   * {@link javax.swing.SpinnerNumberModel} which models the ResultSet's current row.
+   */
+  ACT_GOTOROW,
+  /** Need with CachedRowSet since no RowSet events */
+  ACT_REVERT_FORCE(true, true),
+  /** Send a row changed rowSet event */
+  ACT_ROW_CHANGED(true, true),
+  ;
 
-	private final boolean force;
-	private final boolean virtual;
+  private final boolean force;
+  private final boolean virtual;
 
-	private RowsAction()
-	{
-		this(false, false);
-	}
+  private RowsAction() { this(false, false); }
 
-	private RowsAction(boolean force)
-	{
-		this(force, false);
-	}
+  private RowsAction(boolean force) { this(force, false); }
 
-	private RowsAction(boolean force, boolean virtual)
-	{
-		this.force = force;
-		this.virtual = virtual;
-	}
+  private RowsAction(boolean force, boolean virtual) {
+    this.force = force;
+    this.virtual = virtual;
+  }
 
-	/**
-	 * Flag means to create a {@link RowsEvent} for this {@code RowsAction}
-	 * even if there is no associated {@link RowSetEvent}.
-	 * 
-	 * @return true means unconditionally create event
-	 */
-	public boolean isForce()
-	{
-		return force;
-	}
+  /**
+   * Flag means to create a {@link RowsEvent} for this {@code RowsAction}
+   * even if there is no associated {@link RowSetEvent}.
+   *
+   * @return true means unconditionally create event
+   */
+  public boolean isForce() { return force; }
 
-	/**
-	 * Not a real event.
-	 * @return true means don't try to instantiate it
-	 */
-	public boolean isVirtual()
-	{
-		return virtual;
-	}
+  /**
+   * Not a real event.
+   * @return true means don't try to instantiate it
+   */
+  public boolean isVirtual() { return virtual; }
 
-	/**
-	 * Following could be used by spinner as event's command to indicate that if
-	 * already on the row don't need to do "rs.absolute()".
-	 * But that might be the default behavior anyway, in which case this would
-	 * be a no-op.
-	*/
-	public static final String OK_SKIP_CURSOR_MOVE = "MAY_SKIP_GOTOROW";
+  /**
+   * Following could be used by spinner as event's command to indicate that if
+   * already on the row don't need to do "rs.absolute()".
+   * But that might be the default behavior anyway, in which case this would
+   * be a no-op.
+   */
+  public static final String OK_SKIP_CURSOR_MOVE = "MAY_SKIP_GOTOROW";
 }

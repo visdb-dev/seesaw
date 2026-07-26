@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -66,7 +66,7 @@ import static java.sql.JDBCType.*;
 
 /**
  * Used to display values stored in the database as a boolean.
- * The CheckBox can be bound to a numeric or boolean database column. 
+ * The CheckBox can be bound to a numeric or boolean database column.
  * The boolean value is converted to the data base type by the
  * {@link #setColumnObject(java.lang.Object)} infrastructure.
  * Currently, Dec 2024, if bound to a numeric database column, a checked
@@ -76,132 +76,117 @@ import static java.sql.JDBCType.*;
  * values returned for the checked and unchecked CheckBox states.
  */
 @SuppressWarnings("serial")
-public class CheckBox extends JCheckBox implements SSComponent
-{
-	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column
-	 */
-	protected class CheckBoxListener implements ItemListener
-	{
-		/** {@inheritDoc} */
-		@Override
-		public void itemStateChanged(final ItemEvent ie)
-		{
-			try {
-				dbChange(() -> setColumnObject(isSelected()));
-			} catch (SQLException ex) {
-				logger.log(Level.ERROR, (String) null, ex);
-			}
-		}
-	}
+public class CheckBox extends JCheckBox implements SSComponent {
+  /**
+   * Listener(s) for the component's value used to propagate changes back to bound
+   * database column
+   */
+  protected class CheckBoxListener implements ItemListener {
+    /** {@inheritDoc} */
+    @Override
+    public void itemStateChanged(final ItemEvent ie) {
+      try {
+        dbChange(() -> setColumnObject(isSelected()));
+      } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
+    }
+  }
 
-	/** System Logger for component. */
-	private static final Logger logger = JStuff.getLogger();
+  /** System Logger for component. */
+  private static final Logger logger = JStuff.getLogger();
 
-	/**
-	 * Creates an object of CheckBox.
-	 */
-	public CheckBox() {
-		this(null);
-	}
-	
-	/**
-	 * Creates an object of CheckBox binding it to the specified column in the
-	 * given RowSet.
-	 *
-	 * @param rowsModel        model for a rowSet
-	 * @param columnName name of the column to which this check box should be
-	 *                         bound
-	 */
-	public CheckBox(RowsModel rowsModel, final String columnName) {
-		this(null);
-		rowsModel.bind(this, columnName);
-	}
+  /**
+   * Creates an object of CheckBox.
+   */
+  public CheckBox() { this(null); }
 
-	/**
-	 * Creates an object of CheckBox.
-	 *
-	 * @param text Checkbox label
-	 */
-	public CheckBox(final String text) {
-		super(text);
-		logger.log(Level.DEBUG, () -> sf("original border: %s",
-				BorderDecorator.asString(getBorder(), this)));
-		// JCheckBox disables painting the borders.
-		// Replace the JCheckBox border with an empty border.
-		Border b = BorderDecorator.createEmptyBorder(this);
-		setBorder(b);
-		setBorderPainted(true);
-		finishSSCommon();
-	}
+  /**
+   * Creates an object of CheckBox binding it to the specified column in the
+   * given RowSet.
+   *
+   * @param rowsModel        model for a rowSet
+   * @param columnName name of the column to which this check box should be
+   *                         bound
+   */
+  public CheckBox(RowsModel rowsModel, final String columnName) {
+    this(null);
+    rowsModel.bind(this, columnName);
+  }
 
-	/** {@inheritDoc } */
-	@Override
-	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
-	{
-		assertConvertFromJdbcType(jdbcType, Boolean.class,
-				EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
-	}
+  /**
+   * Creates an object of CheckBox.
+   *
+   * @param text Checkbox label
+   */
+  public CheckBox(final String text) {
+    super(text);
+    logger.log(Level.DEBUG,
+               () -> sf("original border: %s", BorderDecorator.asString(getBorder(), this)));
+    // JCheckBox disables painting the borders.
+    // Replace the JCheckBox border with an empty border.
+    Border b = BorderDecorator.createEmptyBorder(this);
+    setBorder(b);
+    setBorderPainted(true);
+    finishSSCommon();
+  }
 
-	/** {@inheritDoc } */
-	@Override
-	public void cleanField()
-	{
-		setSelected(false);
-	}
+  /** {@inheritDoc } */
+  @Override
+  public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException {
+    assertConvertFromJdbcType(jdbcType, Boolean.class,
+                              EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
+  }
 
-	private Hook hook;
+  /** {@inheritDoc } */
+  @Override
+  public void cleanField() {
+    setSelected(false);
+  }
 
-	/** {@inheritDoc } */
-	@Override
-	public final Hook getSSComponentHook()
-	{
-		if (hook == null)
-			hook = new Hook(this) {
-				/**
-				 * Updates the value stored and displayed in the SwingSet component
-				 * based on getColumnText()
-				 */
-				@Override
-				protected void updateSSComponent()
-				{
-					logger.log(Level.DEBUG, () -> sf("%s: getColumnText() - %s",getColumnForLog(), getColumnText()));
-					
-					Boolean value = getColumnObject(Boolean.class);
-					setSelected(value == null ? false : value);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected CheckBoxListener getSSComponentListener() {
-					return new CheckBoxListener();
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void addSSComponentListener(EventListener eventListener)
-				{
-					addItemListener((ItemListener) eventListener);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void removeSSComponentListener(EventListener eventListener)
-				{
-					removeItemListener((ItemListener) eventListener);
-				}
-				
-			};
-		return hook;
-	}
+  private Hook hook;
 
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("CheckBox{selected=%s, %s}",
-				isSelected(), SSUtils.ssComponentToString(this));
-	}
+  /** {@inheritDoc } */
+  @Override
+  public final Hook getSSComponentHook() {
+    if (hook == null)
+      hook = new Hook(this) {
+        /**
+         * Updates the value stored and displayed in the SwingSet component
+         * based on getColumnText()
+         */
+        @Override
+        protected void updateSSComponent() {
+          logger.log(Level.DEBUG,
+                     () -> sf("%s: getColumnText() - %s", getColumnForLog(), getColumnText()));
+
+          Boolean value = getColumnObject(Boolean.class);
+          setSelected(value == null ? false : value);
+        }
+
+        /** {@inheritDoc } */
+        @Override
+        protected CheckBoxListener getSSComponentListener() {
+          return new CheckBoxListener();
+        }
+
+        /** {@inheritDoc } */
+        @Override
+        protected void addSSComponentListener(EventListener eventListener) {
+          addItemListener((ItemListener) eventListener);
+        }
+
+        /** {@inheritDoc } */
+        @Override
+        protected void removeSSComponentListener(EventListener eventListener) {
+          removeItemListener((ItemListener) eventListener);
+        }
+      };
+    return hook;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return sf("CheckBox{selected=%s, %s}", isSelected(), SSUtils.ssComponentToString(this));
+  }
 
 } // end public class CheckBox

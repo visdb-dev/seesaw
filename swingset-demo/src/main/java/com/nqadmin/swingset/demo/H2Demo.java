@@ -52,67 +52,59 @@ import org.h2.tools.RunScript;
  * An in memory DB for unit testsing. One connection, recreates the database
  * when getting a rowset.
  */
-public class H2Demo
-{
-	private H2Demo() { }
-	public static final String DB_NAME = "db";
-	private static Connection conn;
+public class H2Demo {
+  private H2Demo() {}
+  public static final String DB_NAME = "db";
+  private static Connection conn;
 
-	public static RowSet getRowSet(String sql)
-			throws SQLException, ClassNotFoundException {
-		Objects.requireNonNull(sql);
-		execute(sql);
-		JdbcRowSet rs = RowSetProvider.newFactory().createJdbcRowSet();
-		rs.setUrl(dbUrl());
-		return rs;
-	}
+  public static RowSet getRowSet(String sql) throws SQLException, ClassNotFoundException {
+    Objects.requireNonNull(sql);
+    execute(sql);
+    JdbcRowSet rs = RowSetProvider.newFactory().createJdbcRowSet();
+    rs.setUrl(dbUrl());
+    return rs;
+  }
 
-	/**
-	 * Starting with an empty data base, run some sql commands.
-	 * SQL_INIT is the default sql script if sql is null.
-	 * @param sql initialization command
-	 * @return
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
-	 */
-	public static RowSet getRowSetCleanDB(String sql)
-			throws SQLException, ClassNotFoundException {
-		clean();
-		execute(sql != null ? sql : SQL_INIT);
-		JdbcRowSet rs = RowSetProvider.newFactory().createJdbcRowSet();
-		rs.setUrl(dbUrl());
-		return rs;
-	}
+  /**
+   * Starting with an empty data base, run some sql commands.
+   * SQL_INIT is the default sql script if sql is null.
+   * @param sql initialization command
+   * @return
+   * @throws SQLException
+   * @throws ClassNotFoundException
+   */
+  public static RowSet getRowSetCleanDB(String sql) throws SQLException, ClassNotFoundException {
+    clean();
+    execute(sql != null ? sql : SQL_INIT);
+    JdbcRowSet rs = RowSetProvider.newFactory().createJdbcRowSet();
+    rs.setUrl(dbUrl());
+    return rs;
+  }
 
-	public static void clean() throws SQLException, ClassNotFoundException {
-		execute("DROP ALL OBJECTS");
-	}
+  public static void clean() throws SQLException, ClassNotFoundException {
+    execute("DROP ALL OBJECTS");
+  }
 
-	public static Connection getCon() throws ClassNotFoundException, SQLException {
-		if (conn == null)
-			conn = create();
-		return conn;
-	}
+  public static Connection getCon() throws ClassNotFoundException, SQLException {
+    if (conn == null) conn = create();
+    return conn;
+  }
 
-	public static String dbUrl() {
-		return "jdbc:h2:mem:" + DB_NAME;
-	}
+  public static String dbUrl() { return "jdbc:h2:mem:" + DB_NAME; }
 
-	private static void execute(String sql) throws SQLException, ClassNotFoundException
-	{
-		RunScript.execute(getCon(), new StringReader(sql));
-	}
+  private static void execute(String sql) throws SQLException, ClassNotFoundException {
+    RunScript.execute(getCon(), new StringReader(sql));
+  }
 
-	// TODO: args sqlInit and urltag
-	private static Connection create() throws ClassNotFoundException, SQLException {
-		Class.forName("org.h2.Driver");
-		Connection c = DriverManager.getConnection(dbUrl());
-		return c;
-	}
-	
-	/** The default sql script to initialize the database */
-	public static final String SQL_INIT =
-		"""
+  // TODO: args sqlInit and urltag
+  private static Connection create() throws ClassNotFoundException, SQLException {
+    Class.forName("org.h2.Driver");
+    Connection c = DriverManager.getConnection(dbUrl());
+    return c;
+  }
+
+  /** The default sql script to initialize the database */
+  public static final String SQL_INIT = """
 		DROP TABLE IF EXISTS tbl;
 		DROP SEQUENCE IF EXISTS tbl_seq;
 

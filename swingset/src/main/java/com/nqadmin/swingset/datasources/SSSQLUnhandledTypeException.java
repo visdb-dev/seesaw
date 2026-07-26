@@ -46,41 +46,28 @@ package com.nqadmin.swingset.datasources;
  * Specified type not handled.
  */
 @SuppressWarnings("serial")
-public class SSSQLUnhandledTypeException extends SSSQLException
-{
-	/**
-	 * Unhandled type.
-	 * @param reason reason
-	 */
-	public SSSQLUnhandledTypeException(String reason)
-	{
-		super(reason);
-	}
+public class SSSQLUnhandledTypeException extends SSSQLException {
+  /**
+   * Unhandled type.
+   * @param reason reason
+   */
+  public SSSQLUnhandledTypeException(String reason) { super(reason); }
 
-	/**
-	 * Unhandled type.
-	 */
-	public SSSQLUnhandledTypeException()
-	{
-	}
+  /**
+   * Unhandled type.
+   */
+  public SSSQLUnhandledTypeException() {}
 
-	/**
-	 * Unhandled type.
-	 * @param cause cause
-	 */
-	public SSSQLUnhandledTypeException(Throwable cause)
-	{
-		super(cause);
-	}
+  /**
+   * Unhandled type.
+   * @param cause cause
+   */
+  public SSSQLUnhandledTypeException(Throwable cause) { super(cause); }
 
-	/**
-	 * Unhandled type.
-	 * @param reason reason
-	 * @param cause cause
-	 */
-	public SSSQLUnhandledTypeException(String reason, Throwable cause)
-	{
-		super(reason, cause);
-	}
-
+  /**
+   * Unhandled type.
+   * @param reason reason
+   * @param cause cause
+   */
+  public SSSQLUnhandledTypeException(String reason, Throwable cause) { super(reason, cause); }
 }

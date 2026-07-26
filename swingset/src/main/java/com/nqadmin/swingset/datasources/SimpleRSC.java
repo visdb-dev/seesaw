@@ -63,168 +63,145 @@ import static java.lang.System.Logger.Level.*;
 //
 // TODO: SimpleRSC exceptions
 // During contruction both name/index are verified.
-// Any SQL exceptions beyond that are probably due to 
+// Any SQL exceptions beyond that are probably due to
 // a dropped connectsion, AFAICT.
 // Compare/consider what SSComponent does.
 //
-public class SimpleRSC implements RSC
-{
-	private final RowsModel rowsModel;
-	private final int index;
-	private final String name;
-	private static final Logger logger = JStuff.getLogger();
+public class SimpleRSC implements RSC {
+  private final RowsModel rowsModel;
+  private final int index;
+  private final String name;
+  private static final Logger logger = JStuff.getLogger();
 
-	private SimpleRSC(RowsModel rowsModel, Integer index, String name) throws SQLException
-	{
-		this.rowsModel = rowsModel;
-		RowSet rs = rowsModel.getRowSet();
-		this.index = index != null ? index : RowSetOps.getColumnIndex(rs, name);
-		this.name = name != null ? name : RowSetOps.getColumnName(rs, index);
-	}
+  private SimpleRSC(RowsModel rowsModel, Integer index, String name) throws SQLException {
+    this.rowsModel = rowsModel;
+    RowSet rs = rowsModel.getRowSet();
+    this.index = index != null ? index : RowSetOps.getColumnIndex(rs, name);
+    this.name = name != null ? name : RowSetOps.getColumnName(rs, index);
+  }
 
-	SimpleRSC(RowsModel rowsModel, int index) throws SQLException
-	{
-		this(rowsModel, index, null);
-	}
+  SimpleRSC(RowsModel rowsModel, int index) throws SQLException { this(rowsModel, index, null); }
 
-	SimpleRSC(RowsModel rowsModel, String name) throws SQLException
-	{
-		this(rowsModel, null, name);
-	}
-	
-	/** {@inheritDoc} */
-	@Override
-	public final RowSet getRowSet()
-	{
-		return rowsModel.getRowSet();
-	}
+  SimpleRSC(RowsModel rowsModel, String name) throws SQLException { this(rowsModel, null, name); }
 
-	/** {@inheritDoc} */
-	@Override
-	public final RowsModel getRowsModel()
-	{
-		return rowsModel;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final RowSet getRowSet() {
+    return rowsModel.getRowSet();
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public int getColumnIndex()
-	{
-		return index;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final RowsModel getRowsModel() {
+    return rowsModel;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public String getColumnName()
-	{
-		return name;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public int getColumnIndex() {
+    return index;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public JDBCType getColumnJDBCType()
-	{
-		try {
-			return RowSetOps.getJDBCColumnType(getRowSet(), index);
-		} catch (SQLException ex) {
-			throw new SSSQLRuntimeException(ex);
-		}
-	}
+  /** {@inheritDoc} */
+  @Override
+  public String getColumnName() {
+    return name;
+  }
 
-	/** {@inheritDoc} */
-	// TODO: SQLException better?
-	@Override
-	public String getColumnText()
-	{
-		String value = "";
+  /** {@inheritDoc} */
+  @Override
+  public JDBCType getColumnJDBCType() {
+    try {
+      return RowSetOps.getJDBCColumnType(getRowSet(), index);
+    } catch (SQLException ex) { throw new SSSQLRuntimeException(ex); }
+  }
 
-		try {
-			if (getRowSet().getRow() != 0) {
-				value = RowSetOps.getColumnObjectText(this);
-				if (!getAllowNull() && (value == null)) {
-					value = "";
-				}
-			}
-		} catch (final SQLException ex) {
-			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
-			throw new SSSQLRuntimeException(ex);
-		}
+  /** {@inheritDoc} */
+  // TODO: SQLException better?
+  @Override
+  public String getColumnText() {
+    String value = "";
 
-		return value;
-	}
+    try {
+      if (getRowSet().getRow() != 0) {
+        value = RowSetOps.getColumnObjectText(this);
+        if (!getAllowNull() && (value == null)) { value = ""; }
+      }
+    } catch (final SQLException ex) {
+      logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
+      throw new SSSQLRuntimeException(ex);
+    }
 
-	/** {@inheritDoc} */
-	// TODO: SQLException better?
-	@Override
-	public <T> T getColumnObject(Class<T> clazz)
-	{
-		T value = null;
-		
-		try {
-			if (getRowSet().getRow() != 0) {
-				value = clazz.cast(RowSetOps.getColumnObject(this, findJavaTypeClass(getColumnJDBCType())));
-			}
-		} catch (final SQLException ex) {
-			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
-			throw new SSSQLRuntimeException(ex);
-		}
-		
-		return value;
-	}
+    return value;
+  }
 
-	// @Override
-	// public Object getColumnObject() throws SQLException
-	// {
-	// 	if (getColumnCount() == 0)
-	// 		return null;
-	// 	
-	// 	Object objectValue = fetchCurrentValue(this);
-	// 	return convertObjectType(objectValue, getColumnJDBCType());
-	// }
+  /** {@inheritDoc} */
+  // TODO: SQLException better?
+  @Override
+  public <T> T getColumnObject(Class<T> clazz) {
+    T value = null;
 
+    try {
+      if (getRowSet().getRow() != 0) {
+        value = clazz.cast(RowSetOps.getColumnObject(this, findJavaTypeClass(getColumnJDBCType())));
+      }
+    } catch (final SQLException ex) {
+      logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
+      throw new SSSQLRuntimeException(ex);
+    }
 
-	// // TODO: getTypedObject
-	// @Override
-	// public <T> T getTypedObject() throws SQLException
-	// {
-	// 	throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-	// }
+    return value;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean getAllowNull()
-	{
-		return RowSetOps.isNullable(getRowSet(), index).orElse(true);
-	}
+  // @Override
+  // public Object getColumnObject() throws SQLException
+  // {
+  // 	if (getColumnCount() == 0)
+  // 		return null;
+  //
+  // 	Object objectValue = fetchCurrentValue(this);
+  // 	return convertObjectType(objectValue, getColumnJDBCType());
+  // }
 
-	/** {@inheritDoc} */
-	@Override
-	public String getColumnForLog()
-	{
-		return "["+name+"]";
-	}
+  // // TODO: getTypedObject
+  // @Override
+  // public <T> T getTypedObject() throws SQLException
+  // {
+  // 	throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+  // }
 
-	// Following to avoid not used error
-	static {
-		if(Boolean.FALSE)
-			try {new SimpleRSC(null, 0).getColumnCount();}
-			catch(SQLException ex) {}
-	}
+  /** {@inheritDoc} */
+  @Override
+  public boolean getAllowNull() {
+    return RowSetOps.isNullable(getRowSet(), index).orElse(true);
+  }
 
-	private int getColumnCount() {
-		try {
-			return getRowSet().getMetaData().getColumnCount();
-		} catch (final SQLException ex) {
-			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
-			throw new SSSQLRuntimeException(ex);
-		}
-	}
+  /** {@inheritDoc} */
+  @Override
+  public String getColumnForLog() {
+    return "[" + name + "]";
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return String.format("SimpleRSC{%s %s, [%s], %d}",
-				objectID(getRowsModel()), objectID(getRowSet()), name, index);
-	}
+  // Following to avoid not used error
+  static {
+    if (Boolean.FALSE) try {
+        new SimpleRSC(null, 0).getColumnCount();
+      } catch (SQLException ex) {}
+  }
+
+  private int getColumnCount() {
+    try {
+      return getRowSet().getMetaData().getColumnCount();
+    } catch (final SQLException ex) {
+      logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
+      throw new SSSQLRuntimeException(ex);
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return String.format("SimpleRSC{%s %s, [%s], %d}", objectID(getRowsModel()),
+                         objectID(getRowSet()), name, index);
+  }
 }

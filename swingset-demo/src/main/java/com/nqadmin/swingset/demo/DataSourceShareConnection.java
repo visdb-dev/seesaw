@@ -63,94 +63,92 @@ import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
  * To use with the demo's naming service.
  */
 public class DataSourceShareConnection {
-	/** Name of the DataSource. */
-	public static final String DATA_SOURCE_NAME = "ShareConnection";
+  /** Name of the DataSource. */
+  public static final String DATA_SOURCE_NAME = "ShareConnection";
 
-	private DataSourceShareConnection() { }
+  private DataSourceShareConnection() {}
 
-	/**
-	 * Provide a DataSource that always returns a specified connection.
-	 * @param conn hook up the DataSource to this connection
-	 * @return DataSource
-	 */
-	public static DataSource getDataSource(Connection conn) {
-		JdbcDataSource ds01 = new JdbcDataSource();
-		ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME
-				+ defLookup(H2Trace.class).getTraceUrlFlags());
-		return new MyDataSource(ds01, conn);
-	}
+  /**
+   * Provide a DataSource that always returns a specified connection.
+   * @param conn hook up the DataSource to this connection
+   * @return DataSource
+   */
+  public static DataSource getDataSource(Connection conn) {
+    JdbcDataSource ds01 = new JdbcDataSource();
+    ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME
+                + defLookup(H2Trace.class).getTraceUrlFlags());
+    return new MyDataSource(ds01, conn);
+  }
 
-	private static class MyDataSource implements DataSource
-	{
-		private final DataSource delegate;
-		private final Connection sharedConnection;
-		
-		private MyDataSource(DataSource _delegate, Connection conn) {
-			this.delegate = _delegate;
-			this.sharedConnection = conn;
-		}
+  private static class MyDataSource implements DataSource {
+    private final DataSource delegate;
+    private final Connection sharedConnection;
 
-		@Override
-		public Connection getConnection() throws SQLException {
-			return sharedConnection;
-		}
+    private MyDataSource(DataSource _delegate, Connection conn) {
+      this.delegate = _delegate;
+      this.sharedConnection = conn;
+    }
 
-		@Override
-		public Connection getConnection(String username, String password) throws SQLException {
-			return sharedConnection;
-		}
+    @Override
+    public Connection getConnection() throws SQLException {
+      return sharedConnection;
+    }
 
-		////////////////////////////////////////////////////////////////////////
-		//
-		// unmodified delegation
-		//
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+      return sharedConnection;
+    }
 
-		@Override
-		public <T> T unwrap(Class<T> iface) throws SQLException {
-			return delegate.unwrap(iface);
-		}
+    ////////////////////////////////////////////////////////////////////////
+    //
+    // unmodified delegation
+    //
 
-		@Override
-		public boolean isWrapperFor(Class<?> iface) throws SQLException {
-			return delegate.isWrapperFor(iface);
-		}
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+      return delegate.unwrap(iface);
+    }
 
-		@Override
-		public PrintWriter getLogWriter() throws SQLException {
-			return delegate.getLogWriter();
-		}
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+      return delegate.isWrapperFor(iface);
+    }
 
-		@Override
-		public void setLogWriter(PrintWriter out) throws SQLException {
-			delegate.setLogWriter(out);
-		}
+    @Override
+    public PrintWriter getLogWriter() throws SQLException {
+      return delegate.getLogWriter();
+    }
 
-		@Override
-		public void setLoginTimeout(int seconds) throws SQLException {
-			delegate.setLoginTimeout(seconds);
-		}
+    @Override
+    public void setLogWriter(PrintWriter out) throws SQLException {
+      delegate.setLogWriter(out);
+    }
 
-		@Override
-		public int getLoginTimeout() throws SQLException {
-			return delegate.getLoginTimeout();
-		}
+    @Override
+    public void setLoginTimeout(int seconds) throws SQLException {
+      delegate.setLoginTimeout(seconds);
+    }
 
-		// JDK-9
-		@Override
-		public ConnectionBuilder createConnectionBuilder() throws SQLException {
-			return delegate.createConnectionBuilder();
-		}
+    @Override
+    public int getLoginTimeout() throws SQLException {
+      return delegate.getLoginTimeout();
+    }
 
-		@Override
-		public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
-			return delegate.getParentLogger();
-		}
+    // JDK-9
+    @Override
+    public ConnectionBuilder createConnectionBuilder() throws SQLException {
+      return delegate.createConnectionBuilder();
+    }
 
-		// JDK-9
-		@Override
-		public ShardingKeyBuilder createShardingKeyBuilder() throws SQLException {
-			return delegate.createShardingKeyBuilder();
-		}
-	}
+    @Override
+    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+      return delegate.getParentLogger();
+    }
 
+    // JDK-9
+    @Override
+    public ShardingKeyBuilder createShardingKeyBuilder() throws SQLException {
+      return delegate.createShardingKeyBuilder();
+    }
+  }
 }

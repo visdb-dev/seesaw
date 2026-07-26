@@ -24,32 +24,27 @@ import com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter;
 /**
  *
  */
-public class SSMaskFormatterFactorySnippets
-{
-	// @start region=init1
-	static class CustomBuilder extends SSMaskFormatterFactory.Builder<CustomBuilder> {
-		CustomBuilder(String mask) {
-			super(mask);
-		}
+public class SSMaskFormatterFactorySnippets {
+  // @start region=init1
+  static class CustomBuilder extends SSMaskFormatterFactory.Builder<CustomBuilder> {
+    CustomBuilder(String mask) { super(mask); }
 
-		@Override
-		protected SSMaskFormatter getSSMaskFormatter() throws ParseException {
-			return new CustomSSMaskFormatter();
-		}
-	}
-	
-	@SuppressWarnings("serial")
-	static class CustomSSMaskFormatter extends SSMaskFormatter {
-		CustomSSMaskFormatter() throws ParseException {
-			super(null);
-		}
-		// ...
-	}
+    @Override
+    protected SSMaskFormatter getSSMaskFormatter() throws ParseException {
+      return new CustomSSMaskFormatter();
+    }
+  }
 
-	void createCustomFormatterFactory() {
-		SSMaskFormatterFactory ssmff = new CustomBuilder("...")
-				// ...ssFormat(SSFormat.CUSTOM)
-				.build();
-	}
-	// @end region=init1
+  @SuppressWarnings("serial")
+  static class CustomSSMaskFormatter extends SSMaskFormatter {
+    CustomSSMaskFormatter() throws ParseException { super(null); }
+    // ...
+  }
+
+  void createCustomFormatterFactory() {
+    SSMaskFormatterFactory ssmff = new CustomBuilder("...")
+                                       // ...ssFormat(SSFormat.CUSTOM)
+                                       .build();
+  }
+  // @end region=init1
 }

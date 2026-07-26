@@ -45,136 +45,122 @@ import static java.sql.JDBCType.DATE;
  * part of the SS library.
  */
 @SuppressWarnings("serial")
-public class DbDatePicker extends DatePicker implements SSComponent
-{
-	private class DbDatePickerListener implements EventListener,DateChangeListener {
-		/** {@inheritDoc} */
-		@Override
-		public void dateChanged(final DateChangeEvent dce)
-		{
-			try {
-				dbChange(() -> setColumnObject(dce.getNewDate()));
-			} catch (SQLException ex) {
-				logger.log(Logger.Level.ERROR, (String) null, ex);
-			}
-		}
-	}
-	/** System Logger for component. */
-	private static final Logger logger = JStuff.getLogger();
+public class DbDatePicker extends DatePicker implements SSComponent {
+  private class DbDatePickerListener implements EventListener, DateChangeListener {
+    /** {@inheritDoc} */
+    @Override
+    public void dateChanged(final DateChangeEvent dce) {
+      try {
+        dbChange(() -> setColumnObject(dce.getNewDate()));
+      } catch (SQLException ex) { logger.log(Logger.Level.ERROR, (String) null, ex); }
+    }
+  }
+  /** System Logger for component. */
+  private static final Logger logger = JStuff.getLogger();
 
-	/**
-	 * Create date picker and bind it to the specified column in the
-	 * given RowSet.
-	 *
-	 * @param rowsModel       datasource to be used.
-	 * @param boundColumnName name of the column to which this check box should
-	 *                        be bound
-	 */
-	@SuppressWarnings("LeakingThisInConstructor")
-	public DbDatePicker(RowsModel rowsModel, String boundColumnName)
-	{
-		this();
-		rowsModel.bind(this, boundColumnName);
-	}
+  /**
+   * Create date picker and bind it to the specified column in the
+   * given RowSet.
+   *
+   * @param rowsModel       datasource to be used.
+   * @param boundColumnName name of the column to which this check box should
+   *                        be bound
+   */
+  @SuppressWarnings("LeakingThisInConstructor")
+  public DbDatePicker(RowsModel rowsModel, String boundColumnName) {
+    this();
+    rowsModel.bind(this, boundColumnName);
+  }
 
-	/**
-	 * Create date picker.
-	 */
-	public DbDatePicker()
-	{
-		super(initialSettings());
+  /**
+   * Create date picker.
+   */
+  public DbDatePicker() {
+    super(initialSettings());
 
-		finishSSCommon();
-	}
-	
-	private static DatePickerSettings initialSettings()
-	{
-		DatePickerSettings dps = new DatePickerSettings();
-		return dps;
-	}
+    finishSSCommon();
+  }
 
-	/**
-	 * Set custom Decorate/FocusTarget.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public void customInit()
-	{
-		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
+  private static DatePickerSettings initialSettings() {
+    DatePickerSettings dps = new DatePickerSettings();
+    return dps;
+  }
 
-		// Highlight the date text field when this component gets focus.
-		setDecorateTarget(getComponentDateTextField());
-		setFocusTarget(getComponentDateTextField());
-	}
+  /**
+   * Set custom Decorate/FocusTarget.
+   * {@inheritDoc }
+   */
+  @Override
+  public void customInit() {
+    // Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
 
-	/** {@inheritDoc } */
-	@Override
-	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
-	{
-		if (jdbcType != DATE)
-			throw new IllegalArgumentException(sf("Date Picker column type must be DATE"));
-	}
+    // Highlight the date text field when this component gets focus.
+    setDecorateTarget(getComponentDateTextField());
+    setFocusTarget(getComponentDateTextField());
+  }
 
-	/**
-	 * This component contains multiple components some of which can get focus.
-	 * @return true
-	 */
-	@Override
-	public boolean isComposite() {
-		return true;
-	}
+  /** {@inheritDoc } */
+  @Override
+  public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException {
+    if (jdbcType != DATE)
+      throw new IllegalArgumentException(sf("Date Picker column type must be DATE"));
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public void metadataChange() {
-		getSettings().setAllowEmptyDates(getAllowNull());
-	}
-	
-	/** {@inheritDoc } */
-	@Override
-	public void cleanField()
-	{
-		if (getAllowNull()) {
-			clear();
-		} else {
-			setDateToToday();
-		}
-	}
+  /**
+   * This component contains multiple components some of which can get focus.
+   * @return true
+   */
+  @Override
+  public boolean isComposite() {
+    return true;
+  }
 
-	private Hook hook;
+  /** {@inheritDoc} */
+  @Override
+  public void metadataChange() {
+    getSettings().setAllowEmptyDates(getAllowNull());
+  }
 
-	/** {@inheritDoc } */
-	@Override
-	public final Hook getSSComponentHook()
-	{
-		if (hook == null)
-			hook = new Hook(this) {
-				@Override
-				protected void updateSSComponent()
-				{
-					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getColumnText()));
-					LocalDate value = getColumnObject(LocalDate.class);
-					setDate(value);
-				}
-				
-				@Override
-				protected EventListener getSSComponentListener()
-				{
-					return new DbDatePickerListener();
-				}
-				
-				@Override
-				protected void addSSComponentListener(EventListener eventListener)
-				{
-					addDateChangeListener((DateChangeListener) eventListener);
-				}
-				
-				@Override
-				protected void removeSSComponentListener(EventListener eventListener)
-				{
-					removeDateChangeListener((DateChangeListener) eventListener);
-				}
-			};
-		return hook;
-	}
+  /** {@inheritDoc } */
+  @Override
+  public void cleanField() {
+    if (getAllowNull()) {
+      clear();
+    } else {
+      setDateToToday();
+    }
+  }
+
+  private Hook hook;
+
+  /** {@inheritDoc } */
+  @Override
+  public final Hook getSSComponentHook() {
+    if (hook == null)
+      hook = new Hook(this) {
+        @Override
+        protected void updateSSComponent() {
+          logger.log(DEBUG,
+                     () -> sf("%s: getBoundColumnText() - %s", getColumnForLog(), getColumnText()));
+          LocalDate value = getColumnObject(LocalDate.class);
+          setDate(value);
+        }
+
+        @Override
+        protected EventListener getSSComponentListener() {
+          return new DbDatePickerListener();
+        }
+
+        @Override
+        protected void addSSComponentListener(EventListener eventListener) {
+          addDateChangeListener((DateChangeListener) eventListener);
+        }
+
+        @Override
+        protected void removeSSComponentListener(EventListener eventListener) {
+          removeDateChangeListener((DateChangeListener) eventListener);
+        }
+      };
+    return hook;
+  }
 }

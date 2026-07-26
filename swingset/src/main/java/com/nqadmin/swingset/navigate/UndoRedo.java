@@ -48,159 +48,140 @@ import static java.lang.System.Logger.Level.*;
 /**
  * UndoRedo static commands.
  */
-public enum UndoRedo
-{
-	/** Undo command */
-	UNDO,
-	/** Redo command */
-	REDO,
-	/** Cancel edit, clear stack */
-	ESC,
-	;
+public enum UndoRedo {
+  /** Undo command */
+  UNDO,
+  /** Redo command */
+  REDO,
+  /** Cancel edit, clear stack */
+  ESC,
+  ;
 
-	/**
-	 * Value and error status of item on the undo/redo stack.
-	 * "codedValue" because a null is represented by JDBCType.NULL
-	 * when rs.updateNull was used.
-	 */
-	public record Change(Object codedValue, boolean isError) {
-		public Object value() {
-			return codedValue == JDBCType.NULL ? null : codedValue;
-		}
-	};
+  /**
+   * Value and error status of item on the undo/redo stack.
+   * "codedValue" because a null is represented by JDBCType.NULL
+   * when rs.updateNull was used.
+   */
+  public record Change(Object codedValue, boolean isError) {
+    public Object value() { return codedValue == JDBCType.NULL ? null : codedValue; }
+  }
+  ;
 
-	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
+  static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
 
-	/** Logger for component */
-	private static final Logger logger = JStuff.getLogger();
+  /** Logger for component */
+  private static final Logger logger = JStuff.getLogger();
 
-	// UNDO/REDO NOTES
-	//
-	// Currently undo/redo can NOT be changed while running.
-	// If/when changing is supported, it should only be changed
-	// when going to a new row or insertRow. Any user interface to
-	// enable/disable undo/redo should queue the change request
-	// and then apply it during the transition to a new row.
-	//
-	// Part of undo/redo for insertRow is capturing the values set
-	// by preInsertOps; the values are captured by the undo/redo
-	// logic. So if going from disabled to enabled, the enable must
-	// come before preInsertOps.
+  // UNDO/REDO NOTES
+  //
+  // Currently undo/redo can NOT be changed while running.
+  // If/when changing is supported, it should only be changed
+  // when going to a new row or insertRow. Any user interface to
+  // enable/disable undo/redo should queue the change request
+  // and then apply it during the transition to a new row.
+  //
+  // Part of undo/redo for insertRow is capturing the values set
+  // by preInsertOps; the values are captured by the undo/redo
+  // logic. So if going from disabled to enabled, the enable must
+  // come before preInsertOps.
 
-	/**
-	 * Check if the specified {@linkplain RowSet} is currently enabled
-	 * for undo/redo. The enable state may only change when the RowSet's
-	 * current row changes.
-	 * @param rs RowSet of interest
-	 * @return true if undo/redo is OK
-	 */
-	public static boolean isUndoRedoEnabled(RowSet rs)
-	{
-		return true;
-		//return !get(rs).isOnInsertRow();
-	}
+  /**
+   * Check if the specified {@linkplain RowSet} is currently enabled
+   * for undo/redo. The enable state may only change when the RowSet's
+   * current row changes.
+   * @param rs RowSet of interest
+   * @return true if undo/redo is OK
+   */
+  public static boolean isUndoRedoEnabled(RowSet rs) {
+    return true;
+    //return !get(rs).isOnInsertRow();
+  }
 
-	/**
-	 * Check if the specified {@linkplain RSC} is currently enabled
-	 * for undo/redo. The enable state may only change when the RowSet's
-	 * current row changes.
-	 * <p>
-	 * This method currently delegates to check the rowset. In the future
-	 * it's possible that per column enable may be implemented.
-	 * @param comp RSC of interest
-	 * @return true if undo/redo is OK
-	 */
-	public static boolean isUndoRedoEnabled(RSC comp)
-	{
-		return isUndoRedoEnabled(comp.getRowSet());
-	}
+  /**
+   * Check if the specified {@linkplain RSC} is currently enabled
+   * for undo/redo. The enable state may only change when the RowSet's
+   * current row changes.
+   * <p>
+   * This method currently delegates to check the rowset. In the future
+   * it's possible that per column enable may be implemented.
+   * @param comp RSC of interest
+   * @return true if undo/redo is OK
+   */
+  public static boolean isUndoRedoEnabled(RSC comp) { return isUndoRedoEnabled(comp.getRowSet()); }
 
-	/**
-	 * Make sure the column's undo/redo stack is initialized; the
-	 * database value (an object) is the base.
-	 * This must be used before any updates are done to the rowset.
-	 * Does nothing if base already captured.
-	 * @param comp rowset/column
-	 * @throws SQLException
-	 */
-	public static void captureInitialValue(RSC comp)
-			throws SQLException
-	{
-		if (!isUndoRedoEnabled(comp))
-			return;
-		comp.getRowsModel().getUndoRow().captureInitialValue(comp);
-	}
+  /**
+   * Make sure the column's undo/redo stack is initialized; the
+   * database value (an object) is the base.
+   * This must be used before any updates are done to the rowset.
+   * Does nothing if base already captured.
+   * @param comp rowset/column
+   * @throws SQLException
+   */
+  public static void captureInitialValue(RSC comp) throws SQLException {
+    if (!isUndoRedoEnabled(comp)) return;
+    comp.getRowsModel().getUndoRow().captureInitialValue(comp);
+  }
 
-	/**
-	 * Return the current undo/redo value for the specified component.
-	 * @param comp rowset/column
-	 * @return current value
-	 * @throws SQLException
-	 */
-	public static Change fetchCurrentChange(RSC comp)
-			throws SQLException
-	{
-		if (!isUndoRedoEnabled(comp))
-			throw new IllegalStateException("UNDO/REDO disabled");
-		return comp.getRowsModel().getUndoRow().fetchCurrentChange(comp);
-	}
+  /**
+   * Return the current undo/redo value for the specified component.
+   * @param comp rowset/column
+   * @return current value
+   * @throws SQLException
+   */
+  public static Change fetchCurrentChange(RSC comp) throws SQLException {
+    if (!isUndoRedoEnabled(comp)) throw new IllegalStateException("UNDO/REDO disabled");
+    return comp.getRowsModel().getUndoRow().fetchCurrentChange(comp);
+  }
 
-	/**
-	 * Perform the specified undo/redo cmd on the specified component.
-	 * @param comp ssComponent
-	 * @param cmd undo or redo
-	 */
-	// TODO: SSComponent vs RSC
-	public static void undoRedo(SSComponent comp, UndoRedo cmd)
-	{
-		if (!isUndoRedoEnabled(comp))
-			return;
-		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
-				comp.getClass().getSimpleName(), comp.getColumnName()));
-		try {
-			RowsModel rm;
-			if (comp.getColumnName() == null || (rm = comp.getRowsModel()) == null) {
-				SSUtils.beep();
-				return;
-			}
+  /**
+   * Perform the specified undo/redo cmd on the specified component.
+   * @param comp ssComponent
+   * @param cmd undo or redo
+   */
+  // TODO: SSComponent vs RSC
+  public static void undoRedo(SSComponent comp, UndoRedo cmd) {
+    if (!isUndoRedoEnabled(comp)) return;
+    logger.log(
+        DEBUG,
+        () -> sf("%s: %s for %s", cmd, comp.getClass().getSimpleName(), comp.getColumnName()));
+    try {
+      RowsModel rm;
+      if (comp.getColumnName() == null || (rm = comp.getRowsModel()) == null) {
+        SSUtils.beep();
+        return;
+      }
 
-			NavigateState navState = rm.getNavState();
-			Change change = navState.doUndoRedo(comp, cmd);
-			// Wait until value propogates to the component.
-			if (change != NO_CHANGE)
-				SwingUtilities.invokeLater(() -> {
-					postColumnUndoRedo(comp, change.value(),
-							change.isError /*|| !comp.allValidate().all()*/);
-				});
-		} catch (SQLException ex) {
-			logger.log(ERROR, sf("%s:", cmd), ex);
-			// TODO: error dialog?
-			//postRowSetUndoRedo(comp, UndoCol.none, true); // show error?
-		}
-	}
+      NavigateState navState = rm.getNavState();
+      Change change = navState.doUndoRedo(comp, cmd);
+      // Wait until value propogates to the component.
+      if (change != NO_CHANGE)
+        SwingUtilities.invokeLater(() -> {
+          postColumnUndoRedo(comp, change.value(), change.isError /*|| !comp.allValidate().all()*/);
+        });
+    } catch (SQLException ex) {
+      logger.log(ERROR, sf("%s:", cmd), ex);
+      // TODO: error dialog?
+      //postRowSetUndoRedo(comp, UndoCol.none, true); // show error?
+    }
+  }
 
-	/**
-	 * Make the next undo/redo change goes into a new slot.
-	 * @param comp rowset/col
-	 */
-	public static void newSlot(RSC comp)
-	{
-		if (!isUndoRedoEnabled(comp))
-			return;
-		comp.getRowsModel().getUndoRow().focusChange(null);
-	}
+  /**
+   * Make the next undo/redo change goes into a new slot.
+   * @param comp rowset/col
+   */
+  public static void newSlot(RSC comp) {
+    if (!isUndoRedoEnabled(comp)) return;
+    comp.getRowsModel().getUndoRow().focusChange(null);
+  }
 
-	/**
-	 * Add a modification to the undo/redo stack.
-	 * @param ev
-	 * @throws SQLException
-	 */
-	// TODO: make this package visibility, go through rowsModel?
-	public static void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException
-	{
-		if (!isUndoRedoEnabled(ev.getSource()))
-			return;
-		ev.getSource().getRowsModel().getUndoRow().addChange(ev);
-	}
-
+  /**
+   * Add a modification to the undo/redo stack.
+   * @param ev
+   * @throws SQLException
+   */
+  // TODO: make this package visibility, go through rowsModel?
+  public static void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException {
+    if (!isUndoRedoEnabled(ev.getSource())) return;
+    ev.getSource().getRowsModel().getUndoRow().addChange(ev);
+  }
 }

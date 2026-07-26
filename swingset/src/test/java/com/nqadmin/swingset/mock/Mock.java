@@ -39,24 +39,23 @@ import org.mockito.Mockito;
 /**
  * Some well known mocks for SS.
  */
-public class Mock
-{
-	private Mock() { }
+public class Mock {
+  private Mock() {}
 
-	/**
-	 *	name		age
-	 *	VARCHAR		INTEGER
-	 * { "John"		30 }
-	 * @return rowset
-	 * @throws java.sql.SQLException
-	 */
-	public static RowSet getRowSet() throws SQLException {
-        JdbcRowSet mockRowSet = Mockito.mock(JdbcRowSet.class);
-        Mockito.when(mockRowSet.next()).thenReturn(true).thenReturn(false);
-        Mockito.when(mockRowSet.getString("name")).thenReturn("John");
-        Mockito.when(mockRowSet.getInt("age")).thenReturn(30);
-		return mockRowSet;
-	}
+  /**
+   *	name		age
+   *	VARCHAR		INTEGER
+   * { "John"		30 }
+   * @return rowset
+   * @throws java.sql.SQLException
+   */
+  public static RowSet getRowSet() throws SQLException {
+    JdbcRowSet mockRowSet = Mockito.mock(JdbcRowSet.class);
+    Mockito.when(mockRowSet.next()).thenReturn(true).thenReturn(false);
+    Mockito.when(mockRowSet.getString("name")).thenReturn("John");
+    Mockito.when(mockRowSet.getInt("age")).thenReturn(30);
+    return mockRowSet;
+  }
 }
 /* https://www.baeldung.com/spring-jdbctemplate-testing
    Shows using H2 or Mock

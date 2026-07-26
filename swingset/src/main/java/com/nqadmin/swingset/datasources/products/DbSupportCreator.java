@@ -52,16 +52,15 @@ import com.nqadmin.swingset.datasources.DbSupport;
  * <a href="https://bits.netbeans.org/dev/javadoc/org-openide-util-lookup/org/openide/util/lookup/ServiceProvider.html">
  * See @ServiceProvider javadoc</a>.
  */
-public interface DbSupportCreator
-{
-	/**
-	 * Create a DbSupport for the connection. The DatabaseMetaData belongs
-	 * to the connection; use to refer to dbMeta productVersion or ...
-	 * If this creator can't construct a DbSupport for the meta data return null;
-	 * 
-	 * @param sharedConnection
-	 * @param dbMeta
-	 * @return may be null
-	 */
-	DbSupport create(Connection sharedConnection, DatabaseMetaData dbMeta);
+public interface DbSupportCreator {
+  /**
+   * Create a DbSupport for the connection. The DatabaseMetaData belongs
+   * to the connection; use to refer to dbMeta productVersion or ...
+   * If this creator can't construct a DbSupport for the meta data return null;
+   *
+   * @param sharedConnection
+   * @param dbMeta
+   * @return may be null
+   */
+  DbSupport create(Connection sharedConnection, DatabaseMetaData dbMeta);
 }

@@ -31,37 +31,53 @@ import com.nqadmin.swingset.utils.SSComponent;
 @SuppressWarnings("serial")
 // @start region=hook_example
 public class MyCheckBox extends JCheckBox implements SSComponent {
-    class MyCheckBoxListener implements ItemListener {
-        @Override public void itemStateChanged(final ItemEvent ie) {
-            // update the database with the new value
-            try { dbChange(() -> setColumnObject(isSelected())); // @link substring="setColumnObject" target="SSComponent#setColumnObject" @link substring="dbChange" target="SSComponent#dbChange"
-            } catch (SQLException ex) { log(xxx); } // @replace regex='xxx' replacement="..."
+  class MyCheckBoxListener implements ItemListener {
+    @Override
+    public void itemStateChanged(final ItemEvent ie) {
+      // update the database with the new value
+      try {
+        dbChange(
+            ()
+                -> setColumnObject(
+                    isSelected())); // @link substring="setColumnObject" target="SSComponent#setColumnObject" @link substring="dbChange" target="SSComponent#dbChange"
+      } catch (SQLException ex) { log(xxx); } // @replace regex='xxx' replacement="..."
+    }
+  }
+  MyCheckBox() {
+    finishSSCommon();
+  } // @link substring="finishSSCommon" target="SSComponent#finishSSCommon"
+  @Override
+  public void cleanField() {
+    setSelected(false);
+  }
+  // ...
+  private Hook hook;
+  @Override
+  public final Hook getSSComponentHook() {
+    if (hook == null)
+      hook = new Hook(this) {
+        @Override
+        protected void updateSSComponent() {
+          Boolean value = getColumnObject(Boolean.class);
+          setSelected(value == null ? false : value);
         }
-    }
-    MyCheckBox() { finishSSCommon(); } // @link substring="finishSSCommon" target="SSComponent#finishSSCommon"
-    @Override public void cleanField() { setSelected(false); }
-    // ...
-    private Hook hook;
-    @Override public final Hook getSSComponentHook() {
-        if (hook == null)
-            hook = new Hook(this) {
-                 @Override protected void updateSSComponent() {
-                     Boolean value = getColumnObject(Boolean.class);
-                     setSelected(value == null ? false : value);
-                 }
-                 @Override protected MyCheckBoxListener getSSComponentListener()
-                     { return new MyCheckBoxListener(); }
-                 @Override protected void addSSComponentListener(EventListener eventListener)
-                     { addItemListener((ItemListener) eventListener); }
-                 @Override protected void removeSSComponentListener(EventListener eventListener)
-                     { removeItemListener((ItemListener) eventListener); }
-            };
-        return hook;
-    }
-// @end region=hook_example
+        @Override
+        protected MyCheckBoxListener getSSComponentListener() {
+          return new MyCheckBoxListener();
+        }
+        @Override
+        protected void addSSComponentListener(EventListener eventListener) {
+          addItemListener((ItemListener) eventListener);
+        }
+        @Override
+        protected void removeSSComponentListener(EventListener eventListener) {
+          removeItemListener((ItemListener) eventListener);
+        }
+      };
+    return hook;
+  }
+  // @end region=hook_example
 
-	int xxx;
-	void log(int x) {
-
-	}
+  int xxx;
+  void log(int x) {}
 }

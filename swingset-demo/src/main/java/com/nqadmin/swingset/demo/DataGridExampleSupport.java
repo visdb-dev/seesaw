@@ -74,250 +74,221 @@ import static java.lang.System.Logger.Level.*;
  * There's code to handle insert/delete with H2.
  */
 class DataGridExampleSupport {
-	private final Container uiContainer;
-	private final RowSet rowset;
-	private final SSDataGrid dataGrid;
-	private final Logger logger;
+  private final Container uiContainer;
+  private final RowSet rowset;
+  private final SSDataGrid dataGrid;
+  private final Logger logger;
 
-	/** assumes rowset has been set */
-	static void setup(Logger logger, Container uiContainer,
-			RowSet rowset, SSDataGrid dataGrid,
-			int primaryColumn, SSDataValue dataValue, String[] columnNames, Object[] defaultValues)
-			throws SQLException {
-		DataGridExampleSupport dges = new DataGridExampleSupport(
-				logger, uiContainer, rowset, dataGrid);
-		dges.init(primaryColumn, dataValue, columnNames, defaultValues);
-	}
+  /** assumes rowset has been set */
+  static void setup(Logger logger, Container uiContainer, RowSet rowset, SSDataGrid dataGrid,
+                    int primaryColumn, SSDataValue dataValue, String[] columnNames,
+                    Object[] defaultValues) throws SQLException {
+    DataGridExampleSupport dges = new DataGridExampleSupport(logger, uiContainer, rowset, dataGrid);
+    dges.init(primaryColumn, dataValue, columnNames, defaultValues);
+  }
 
+  private DataGridExampleSupport(Logger _logger, Container _uiContainer, RowSet _rowset,
+                                 SSDataGrid _dataGrid) {
+    if (!(_uiContainer.getLayout() instanceof BorderLayout)) {
+      throw new IllegalArgumentException("uiContainer without BorderLayout");
+    }
 
-	private DataGridExampleSupport(Logger _logger, Container _uiContainer,
-			RowSet _rowset, SSDataGrid _dataGrid) {
+    this.uiContainer = _uiContainer;
+    this.rowset = _rowset;
+    this.dataGrid = _dataGrid;
+    this.logger = _logger;
+  }
 
-		if(!(_uiContainer.getLayout() instanceof BorderLayout)) {
-			throw new IllegalArgumentException("uiContainer without BorderLayout");
-		}
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private void init(int primaryColumn, SSDataValue dataValue, String[] columnNames,
+                    Object[] defaultValues) throws SQLException {
+    // stuff needed if there's going to be an insertion
+    dataGrid.getModel().setSSDataGridHandler(new DataGridHandler());
+    dataGrid.setPrimaryColumn(primaryColumn);
+    dataGrid.setSSDataValue(dataValue);
+    dataGrid.setDefaultValues(columnNames, defaultValues);
 
-		this.uiContainer = _uiContainer;
-		this.rowset = _rowset;
-		this.dataGrid = _dataGrid;
-		this.logger = _logger;
+    TableColumnModel cm = dataGrid.getColumnModel();
+    for (int i = 1; i <= cm.getColumnCount(); i++) {
+      TableColumn c = cm.getColumn(i - 1);
+      c.setIdentifier(RowSetOps.getColumnName(rowset, i));
+      System.err.println("id: " + c.getIdentifier());
+    }
 
-	}
-	
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	private void init(int primaryColumn, SSDataValue dataValue,
-			String[] columnNames, Object[] defaultValues)
-			throws SQLException {
-		// stuff needed if there's going to be an insertion
-		dataGrid.getModel().setSSDataGridHandler(new DataGridHandler());
-		dataGrid.setPrimaryColumn(primaryColumn);
-		dataGrid.setSSDataValue(dataValue);
-		dataGrid.setDefaultValues(columnNames, defaultValues);
+    setupDebugButtons();
+  }
 
-		TableColumnModel cm = dataGrid.getColumnModel();
-		for (int i = 1; i <= cm.getColumnCount(); i++) {
-			TableColumn c = cm.getColumn(i-1);
-			c.setIdentifier(RowSetOps.getColumnName(rowset, i));
-			System.err.println("id: " + c.getIdentifier());
-		}
+  /**
+   * Based on example4's SSDBNavImpl
+   */
+  private class DataGridHandler implements SSDataGridHandler {
+    @Override
+    public boolean allowDeletion(int _row) {
+      return true;
+    }
 
-		setupDebugButtons();
-	}
+    @Override
+    public void performPreInsertOps(int _row) {}
 
+    @Override
+    public void performPostInsertOps(int _row) {
+      try {
+        rowset.execute();
+      } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+    }
 
-	/**
-	 * Based on example4's SSDBNavImpl
-	 */
-	private class DataGridHandler implements SSDataGridHandler {
-		
-		@Override
-		public boolean allowDeletion(int _row) {
-			return true;
-		}
+    @Override
+    public void performPreDeletionOps(int _row) {}
 
-		@Override
-		public void performPreInsertOps(int _row) {
-		}
+    @Override
+    public void performPostDeletionOps(int _row) {
+      try {
+        rowset.execute();
+      } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+    }
+  }
 
-		@Override
-		public void performPostInsertOps(int _row) {
-			try {
-				rowset.execute();
-			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
-			}
-		}
+  private void setShowHideSorting(AbstractButton b) {
+    dataGrid.setSorting(b.isSelected());
+    b.setText("<html><center>"
+              + "sorting"
+              + "<br>"
+              + "[" + (b.isSelected() ? "disable" : "enable") + "]"
+              + "</center></html>");
+  }
 
-		@Override
-		public void performPreDeletionOps(int _row) {
-		}
+  private void setShowHideInsertion(AbstractButton b) {
+    dataGrid.setInsertion(b.isSelected());
+    b.setText("<html><center>"
+              + "insert row"
+              + "<br>"
+              + "[" + (b.isSelected() ? "hide" : "show") + "]"
+              + "</center></html>");
+  }
 
-		@Override
-		public void performPostDeletionOps(int _row) {
-			try {
-				rowset.execute();
-			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
-			}
-		}
-	}
+  private void setAllowDelete(AbstractButton b) {
+    dataGrid.setAllowDeletion(b.isSelected());
+    b.setText("<html><center>"
+              + "deletion"
+              + "<br>"
+              + "[" + (b.isSelected() ? "disable" : "enable") + "]"
+              + "</center></html>");
+  }
 
-	private void setShowHideSorting(AbstractButton b) {
-		dataGrid.setSorting(b.isSelected());
-		b.setText("<html><center>"
-				+ "sorting"
-				+ "<br>"
-				+ "[" + (b.isSelected() ? "disable" : "enable") + "]"
-				+ "</center></html>"
-		);
-	}
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private void setupDebugButtons() {
+    JPanel buttons = new JPanel();
+    buttons.setLayout(new GridLayout(2, 3));
+    uiContainer.add(buttons, BorderLayout.SOUTH);
+    AbstractButton button;
 
-	private void setShowHideInsertion(AbstractButton b) {
-		dataGrid.setInsertion(b.isSelected());
-		b.setText("<html><center>"
-				+ "insert row"
-				+ "<br>"
-				+ "[" + (b.isSelected() ? "hide" : "show") + "]"
-				+ "</center></html>");
-	}
+    // Toggle sorting
+    button = new JToggleButton();
+    button.setSelected(dataGrid.getSorting());
+    setShowHideSorting(button);
+    buttons.add(button);
+    button.addActionListener((e) -> { setShowHideSorting((AbstractButton) e.getSource()); });
 
-	private void setAllowDelete(AbstractButton b) {
-		dataGrid.setAllowDeletion(b.isSelected());
-		b.setText("<html><center>"
-				+ "deletion"
-				+ "<br>"
-				+ "[" + (b.isSelected() ? "disable" : "enable") + "]"
-				+ "</center></html>");
-	}
+    // Toggle insert row
+    button = new JToggleButton();
+    button.setSelected(dataGrid.getInsertion());
+    setShowHideInsertion(button);
+    buttons.add(button);
+    button.addActionListener((e) -> { setShowHideInsertion((AbstractButton) e.getSource()); });
 
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	private void setupDebugButtons() {
-		JPanel buttons = new JPanel();
-		buttons.setLayout(new GridLayout(2, 3));
-		uiContainer.add(buttons, BorderLayout.SOUTH);
-		AbstractButton button;
+    // Toggle allow deletion
+    button = new JToggleButton();
+    button.setSelected(dataGrid.isAllowDeletion());
+    setAllowDelete(button);
+    buttons.add(button);
+    button.addActionListener((e) -> { setAllowDelete((AbstractButton) e.getSource()); });
 
-		// Toggle sorting
-		button = new JToggleButton();
-		button.setSelected(dataGrid.getSorting());
-		setShowHideSorting(button);
-		buttons.add(button);
-		button.addActionListener((e) -> {
-			setShowHideSorting((AbstractButton) e.getSource());
-		});
+    if (Boolean.FALSE) {
+      // trigger for random debug stuff
+      button = new JButton("trigger");
+      buttons.add(button);
+      button.addActionListener((ActionEvent e) -> {
+        System.err.println("BANG");
+        List<Integer> cols = new ArrayList<>();
+        for (int col : dataGrid.getSelectedColumns()) cols.add(col);
 
-		// Toggle insert row
-		button = new JToggleButton();
-		button.setSelected(dataGrid.getInsertion());
-		setShowHideInsertion(button);
-		buttons.add(button);
-		button.addActionListener((e) -> {
-			setShowHideInsertion((AbstractButton) e.getSource());
-		});
+        System.err.println("selCols: " + cols);
+        //outputColInfo();
+      });
+    }
 
-		// Toggle allow deletion
-		button = new JToggleButton();
-		button.setSelected(dataGrid.isAllowDeletion());
-		setAllowDelete(button);
-		buttons.add(button);
-		button.addActionListener((e) -> {
-			setAllowDelete((AbstractButton) e.getSource());
-		});
+    // delete selected row
+    button = new JButton("delete");
+    buttons.add(button);
+    button.addActionListener((e) -> {
+      int rowSel = dataGrid.getSelectedRow();
+      int row = rowSel != -1 ? dataGrid.convertRowIndexToModel(rowSel) : -1;
+      if (row == -1 || !dataGrid.isAllowDeletion()) {
+        String msg = row == -1 ? "No row is selected."
+                               : sf("Deletion (%d --> %d) no allowed", rowSel, row);
+        JOptionPane.showMessageDialog((Component) e.getSource(), msg, "Can not delete",
+                                      JOptionPane.ERROR_MESSAGE);
+      } else {
+        SSTableModel model = dataGrid.getModel();
+        model.deleteRow(row);
+      }
+    });
 
-		if(Boolean.FALSE) {
-			// trigger for random debug stuff
-			button = new JButton("trigger");
-			buttons.add(button);
-			button.addActionListener((ActionEvent e) -> {
-				System.err.println("BANG");
-				List<Integer> cols = new ArrayList<>();
-				for(int col : dataGrid.getSelectedColumns())
-					cols.add(col);
-				
-				System.err.println("selCols: " + cols);
-				//outputColInfo();
-			});
-		}
+    // Toggle hide columns
+    button = new JButton("<html><center>hide<br>cols</center></html>");
+    buttons.add(button);
+    button.addActionListener((e) -> {
+      System.err.println("Changing hidden column info");
+      //System.err.println("BEFORE:");
+      //outputColInfo();
+      // Alternate between column index and column name
+      List<Integer> i_hide_cols = Collections.emptyList(); // don't hide anything
+      List<String> s_hide_cols = Collections.emptyList();
+      if (!hidden[0]) {
+        indexOrName = (indexOrName + 1) % 4;
+        i_hide_cols = Arrays.asList(1, 3);
+        s_hide_cols = new ArrayList<>();
+        // convert int column to name column
+        for (int colIdx : i_hide_cols) {
+          try {
+            s_hide_cols.add(RowSetOps.getColumnName(rowset, colIdx + 1));
+          } catch (SQLException ex) { throw new IllegalStateException("SQL: " + ex.getMessage()); }
+        }
+      }
+      // TODO: since not using arrays, don't need cases 2/3
+      switch (indexOrName) {
+        case 0:
+        case 2:
+          if (indexOrName == 2 && i_hide_cols.isEmpty()) i_hide_cols = Collections.emptyList();
+          System.err.println("setHiddenColumns(int)" + (i_hide_cols == null ? " null" : ""));
+          dataGrid.setHiddenColumns(i_hide_cols);
+          break;
+        default:
+        case 1:
+        case 3:
+          System.err.println("setHiddenColumnsByName(string)"
+                             + (s_hide_cols == null ? " null" : ""));
+          try {
+            dataGrid.setHiddenColumnsByName(s_hide_cols);
+          } catch (SQLException ex) { throw new IllegalStateException("SQL: " + ex.getMessage()); }
+          break;
+      }
+      hidden[0] = !hidden[0];
+      //System.err.println("AFTER:");
+      //outputColInfo();
+      System.err.println("Hidden: " + hidden[0]);
+    });
+    if (Boolean.FALSE) outputColInfo();
+  }
+  boolean[] hidden = new boolean[1];
+  int indexOrName = 0;
 
-		// delete selected row
-		button = new JButton("delete");
-		buttons.add(button);
-		button.addActionListener((e) -> {
-			int rowSel = dataGrid.getSelectedRow();
-			int row = rowSel != -1 ? dataGrid.convertRowIndexToModel(rowSel) : -1;
-			if(row == -1 || !dataGrid.isAllowDeletion()) {
-				String msg = row == -1
-						? "No row is selected."
-						: sf("Deletion (%d --> %d) no allowed", rowSel, row);
-				JOptionPane.showMessageDialog((Component) e.getSource(),
-						msg, "Can not delete", JOptionPane.ERROR_MESSAGE);
-			} else {
-				SSTableModel model = dataGrid.getModel();
-				model.deleteRow(row);
-			}
-		});
-
-		// Toggle hide columns
-		button = new JButton("<html><center>hide<br>cols</center></html>");
-		buttons.add(button);
-		button.addActionListener((e) -> {
-			System.err.println("Changing hidden column info");
-			//System.err.println("BEFORE:");
-			//outputColInfo();
-			// Alternate between column index and column name
-			List<Integer> i_hide_cols = Collections.emptyList(); // don't hide anything
-			List<String> s_hide_cols = Collections.emptyList();
-			if(!hidden[0]) {
-				indexOrName = (indexOrName + 1) % 4;
-				i_hide_cols = Arrays.asList(1, 3);
-				s_hide_cols = new ArrayList<>();
-				// convert int column to name column
-				for(int colIdx : i_hide_cols) {
-					try {
-						s_hide_cols.add(RowSetOps.getColumnName(rowset, colIdx+1));
-					} catch (SQLException ex) {
-						throw new IllegalStateException("SQL: " + ex.getMessage());
-					}
-				}
-			}
-			// TODO: since not using arrays, don't need cases 2/3
-			switch(indexOrName) {
-				case 0:
-				case 2:
-					if(indexOrName == 2 && i_hide_cols.isEmpty())
-						i_hide_cols = Collections.emptyList();
-					System.err.println("setHiddenColumns(int)"
-						+ (i_hide_cols == null ? " null" : ""));
-					dataGrid.setHiddenColumns(i_hide_cols);
-					break;
-				default:
-				case 1:
-				case 3:
-					System.err.println("setHiddenColumnsByName(string)"
-						+ (s_hide_cols == null ? " null" : ""));
-					try {
-						dataGrid.setHiddenColumnsByName(s_hide_cols);
-					} catch (SQLException ex) {
-						throw new IllegalStateException("SQL: " + ex.getMessage());
-					}
-					break;
-			}
-			hidden[0] = ! hidden[0];
-			//System.err.println("AFTER:");
-			//outputColInfo();
-			System.err.println("Hidden: " + hidden[0]);
-		});
-		if(Boolean.FALSE) outputColInfo();
-	}
-	boolean[] hidden = new boolean[1];
-	int indexOrName = 0;
-
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	void outputColInfo() {
-		for (TableColumn col : dataGrid.getColumnsList()) {
-			System.err.printf("id: %s, widths: max %d, min %d, pref %d, set %d,\n",
-					col.getIdentifier(), col.getMaxWidth(), col.getMinWidth(),
-					col.getPreferredWidth(), col.getWidth());
-		}
-	}
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  void outputColInfo() {
+    for (TableColumn col : dataGrid.getColumnsList()) {
+      System.err.printf("id: %s, widths: max %d, min %d, pref %d, set %d,\n", col.getIdentifier(),
+                        col.getMaxWidth(), col.getMinWidth(), col.getPreferredWidth(),
+                        col.getWidth());
+    }
+  }
 }

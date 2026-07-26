@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.datasources.RSC;
@@ -39,68 +38,61 @@ import com.nqadmin.swingset.datasources.RSC;
  * The contents of the undo/redo stack is unchanged; note the error.
  */
 @SuppressWarnings("serial")
-public class ColumnUndoRedoEvent extends EventObjectBacktrace implements ChangeEventData
-{
-	final private Object value;
-	final private boolean error;
+public class ColumnUndoRedoEvent extends EventObjectBacktrace implements ChangeEventData {
+  final private Object value;
+  final private boolean error;
 
+  /**
+   * Create a undo/redo stack event.
+   * Signals change in components current value and if newValue is an error.
+   * @param source the component making the modification
+   * @param value the value written to the rowSet
+   * @param error true if the component value is in error
+   */
+  public ColumnUndoRedoEvent(RSC source, Object value, boolean error) {
+    super(source);
+    this.value = value;
+    this.error = error;
+  }
 
-	/**
-	 * Create a undo/redo stack event.
-	 * Signals change in components current value and if newValue is an error.
-	 * @param source the component making the modification
-	 * @param value the value written to the rowSet
-	 * @param error true if the component value is in error
-	 */
-	public ColumnUndoRedoEvent(RSC source, Object value,
-							   boolean error)
-	{
-		super(source);
-		this.value = value;
-		this.error = error;
-	}
+  /**
+   * Test if this event is for the specified rowSet.
+   * @param rowSet check against this rowSet
+   * @return true if the event is for the specified rowSet
+   */
+  public boolean matches(RowSet rowSet) { return getSource().getRowSet() == rowSet; }
 
-	/**
-	 * Test if this event is for the specified rowSet.
-	 * @param rowSet check against this rowSet
-	 * @return true if the event is for the specified rowSet
-	 */
-	public boolean matches(RowSet rowSet) {
-		return getSource().getRowSet() == rowSet;
-	}
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public RSC getSource() {
+    return (RSC) super.getSource();
+  }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public RSC getSource() {
-		return (RSC) super.getSource();
-	}
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public RSC getRSC() {
+    return getSource();
+  }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public RSC getRSC() {
-		return getSource();
-	}
+  /**
+   * Value written to rowSet.
+   * @return value
+   */
+  @Override
+  public Object getValue() {
+    return value;
+  }
 
-	/**
-	 * Value written to rowSet.
-	 * @return value
-	 */
-	@Override
-	public Object getValue()
-	{
-		return value;
-	}
-
-	/**
-	 * Test if this event's component's value is in error.
-	 * @return true if in error.
-	 */
-	@Override
-	public boolean isError() {
-		return error;
-	}
+  /**
+   * Test if this event's component's value is in error.
+   * @return true if in error.
+   */
+  @Override
+  public boolean isError() {
+    return error;
+  }
 }

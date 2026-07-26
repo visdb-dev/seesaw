@@ -34,24 +34,22 @@ import com.nqadmin.swingset.datasources.RSC;
 /**
  * Implemented by several events.
  */
-public interface ChangeEventData
-{
+public interface ChangeEventData {
+  /**
+   * The SSComponent for the event.
+   * @return
+   */
+  RSC getRSC();
 
-	/**
-	 * The SSComponent for the event.
-	 * @return
-	 */
-	RSC getRSC();
+  /**
+   * The new value of the event.
+   * @return
+   */
+  Object getValue();
 
-	/**
-	 * The new value of the event.
-	 * @return
-	 */
-	Object getValue();
-
-	/**
-	 * Is the data in error.
-	 * @return
-	 */
-	boolean isError();
+  /**
+   * Is the data in error.
+   * @return
+   */
+  boolean isError();
 }

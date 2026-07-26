@@ -33,28 +33,21 @@ import com.nqadmin.swingset.models.SSListItem;
 
 /**
  * An item that acts kind of like a standalone SSListItem.
- * 
+ *
  * @param <K>
- * @param <D> 
+ * @param <D>
  */
-public class Item1<K,D> extends Item2<K,D,Object>
-{
-	/**
-	 * Create immutable item.
-	 * @param key
-	 * @param displayValue
-	 */
-	public Item1(K key, D displayValue)
-	{
-		super(key, displayValue);
-	}
-	
-	/**
-	 * Create immutable item based on SSListItem.
-	 * @param listItem
-	 */
-	public Item1(SSListItem listItem)
-	{
-		super(listItem, false);
-	}
+public class Item1<K, D> extends Item2<K, D, Object> {
+  /**
+   * Create immutable item.
+   * @param key
+   * @param displayValue
+   */
+  public Item1(K key, D displayValue) { super(key, displayValue); }
+
+  /**
+   * Create immutable item based on SSListItem.
+   * @param listItem
+   */
+  public Item1(SSListItem listItem) { super(listItem, false); }
 }

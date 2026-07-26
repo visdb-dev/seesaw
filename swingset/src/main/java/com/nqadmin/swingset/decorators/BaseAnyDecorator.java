@@ -38,53 +38,50 @@ import static com.nqadmin.swingset.utils.JStuff.sf;
 /**
  * Used for both Decorator and TextDecorator.
  */
-public abstract class BaseAnyDecorator implements AnyDecorator
-{
-	private SSComponent ssComponent;
+public abstract class BaseAnyDecorator implements AnyDecorator {
+  private SSComponent ssComponent;
 
-	/** Install this decorator into the component. Installs listeners
-	 * @param component the component
-	 */
-	@Override
-	public void install(SSComponent component) {
-		if (this.ssComponent != null)
-			throw new IllegalStateException(sf("'%s' allready installed in '%s'",
-					this.getClass().getSimpleName(), ssComponent.getClass().getSimpleName()));
-		this.ssComponent = component;
-	}
+  /**
+   * Install this decorator into the component. Installs listeners
+   * @param component the component
+   */
+  @Override
+  public void install(SSComponent component) {
+    if (this.ssComponent != null)
+      throw new IllegalStateException(sf("'%s' allready installed in '%s'",
+                                         this.getClass().getSimpleName(),
+                                         ssComponent.getClass().getSimpleName()));
+    this.ssComponent = component;
+  }
 
-	/** Remove decorator/listeners from component. */
-	@Override
-	public void uninstall() {
-		this.ssComponent = null;
-	}
-	
-	/**
-	 * Return the SSComponent associated with this decorator.
-	 * 
-	 * @return the component
-	 */
-	@Override
-	public final SSComponent getSSComponent() {
-		return ssComponent;
-	}
+  /** Remove decorator/listeners from component. */
+  @Override
+  public void uninstall() {
+    this.ssComponent = null;
+  }
 
-	/**
-	 * Convenience method to get the SSComponent cast as a JComponent.
-	 * 
-	 * @return the SSComponent as a JComponent
-	 */
-	protected final JComponent jComp() {
-		return (JComponent) getSSComponent();
-	}
+  /**
+   * Return the SSComponent associated with this decorator.
+   *
+   * @return the component
+   */
+  @Override
+  public final SSComponent getSSComponent() {
+    return ssComponent;
+  }
 
-	/**
-	 * Return the JComponent that gets decorated and TextDecorated.
-	 * It may not be the same as whats returned by {@link #getSSComponent() }.
-	 * 
-	 * @return the JComponent
-	 */
-	protected final JComponent decoComp() {
-		return getSSComponent().getDecorateTarget();
-	}
+  /**
+   * Convenience method to get the SSComponent cast as a JComponent.
+   *
+   * @return the SSComponent as a JComponent
+   */
+  protected final JComponent jComp() { return (JComponent) getSSComponent(); }
+
+  /**
+   * Return the JComponent that gets decorated and TextDecorated.
+   * It may not be the same as whats returned by {@link #getSSComponent() }.
+   *
+   * @return the JComponent
+   */
+  protected final JComponent decoComp() { return getSSComponent().getDecorateTarget(); }
 }

@@ -35,41 +35,28 @@ import java.sql.SQLException;
  * Base of all SS specific exceptions
  */
 @SuppressWarnings("serial")
-public class SSSQLException extends SQLException
-{
-	/**
-	 * SSException
-	 * @param reason reason
-	 */
-	public SSSQLException(String reason)
-	{
-		super(reason);
-	}
+public class SSSQLException extends SQLException {
+  /**
+   * SSException
+   * @param reason reason
+   */
+  public SSSQLException(String reason) { super(reason); }
 
-	/**
-	 * SSException
-	 */
-	public SSSQLException()
-	{
-	}
+  /**
+   * SSException
+   */
+  public SSSQLException() {}
 
-	/**
-	 * SSException
-	 * @param cause cause
-	 */
-	public SSSQLException(Throwable cause)
-	{
-		super(cause);
-	}
+  /**
+   * SSException
+   * @param cause cause
+   */
+  public SSSQLException(Throwable cause) { super(cause); }
 
-	/**
-	 * SSException
-	 * @param reason reason
-	 * @param cause cause
-	 */
-	public SSSQLException(String reason, Throwable cause)
-	{
-		super(reason, cause);
-	}
-	
+  /**
+   * SSException
+   * @param reason reason
+   * @param cause cause
+   */
+  public SSSQLException(String reason, Throwable cause) { super(reason, cause); }
 }

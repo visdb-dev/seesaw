@@ -48,160 +48,145 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * List1.
  */
-public class List1Test
-{
-	
-	/** x */
-	public List1Test()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-		Util.initLookup();
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-	}
+public class List1Test {
+  /** x */
+  public List1Test() {}
 
-	/**
-	 * MyList
-	 */
-	@SuppressWarnings("serial")
-	class MyList extends List1<Object,String> implements SSComponent
-	{
-		/** x */
-		public MyList()
-		{
-			// 2022-05-04: Changing from JDBCType.NULL to INTEGER as that will
-			// be the most likely key type and NULL is known to generate errors.
-			super(JDBCType.INTEGER);
-		}
-	}
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {
+    Util.initLookup();
+  }
 
-	/**
-	 * Test of getChosenKeys method, of class List1;
- Also getChosenDisplayValues.
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testGetChosenMappingsAndOptions()
-	{
-		System.out.println("getChosenKeys");
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-		MyList list = new MyList();
-		List<Object> resultKeys;
-		List<String> resultDisplayValues;
+  /** x */
+  @BeforeEach
+  public void setUp() {}
 
-		resultKeys = list.getChosenKeys();
-		assertEquals(Collections.emptyList(), resultKeys);
-		resultDisplayValues = list.getChosenDisplayValues();
-		assertEquals(Collections.emptyList(), resultDisplayValues);
+  /** x */
+  @AfterEach
+  public void tearDown() {}
 
-		List<String> options = List.of("zero", "one", "two", "three");
-		list.setDisplayValues(options);
+  /**
+   * MyList
+   */
+  @SuppressWarnings("serial")
+  class MyList extends List1<Object, String> implements SSComponent {
+    /** x */
+    public MyList() {
+      // 2022-05-04: Changing from JDBCType.NULL to INTEGER as that will
+      // be the most likely key type and NULL is known to generate errors.
+      super(JDBCType.INTEGER);
+    }
+  }
 
-		resultKeys = list.getChosenKeys();
-		assertEquals(Collections.emptyList(), resultKeys);
-		resultDisplayValues = list.getChosenDisplayValues();
-		assertEquals(Collections.emptyList(), resultDisplayValues);
+  /**
+   * Test of getChosenKeys method, of class List1;
+Also getChosenDisplayValues.
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testGetChosenMappingsAndOptions() {
+    System.out.println("getChosenKeys");
 
-		list.setChosenKeys(new Integer[] {1, 2});
+    MyList list = new MyList();
+    List<Object> resultKeys;
+    List<String> resultDisplayValues;
 
-		resultKeys = list.getChosenKeys();
-		assertEquals(List.of(1, 2), resultKeys);
-		resultDisplayValues = list.getChosenDisplayValues();
-		assertEquals(List.of("one", "two"), resultDisplayValues);
-	}
+    resultKeys = list.getChosenKeys();
+    assertEquals(Collections.emptyList(), resultKeys);
+    resultDisplayValues = list.getChosenDisplayValues();
+    assertEquals(Collections.emptyList(), resultDisplayValues);
 
-	/**
-	 * Test of list shadows.
-	 */
-	@Test
-	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ConvertToTryWithResources", "ThrowableResultIgnored"})
-	public void testShadows()
-	{
-		System.out.println("Shadows");
+    List<String> options = List.of("zero", "one", "two", "three");
+    list.setDisplayValues(options);
 
-		MyList myList = new MyList();
-		KeyDisplayValueSwingModel<Object, String, Object> optionModel = myList.getSwingModel();
-		List<String> listItems = List.of("LI 1","LI 2", "LI 3", "LI 4", "LI 5", "LI 6", "LI 7");
-		List<Object> listCodes = List.of(1,2,3,4,5,6,7);
-		List<String> otherOptions = List.of("one", "two", "three", "four");
-		List<Object> otherMappings = List.of("oneM", "twoM", "threeM", "fourM");
-		KeyDisplayValueSwingModel<Object, String, Object>.Remodel remodel
-				= optionModel.getRemodel();
+    resultKeys = list.getChosenKeys();
+    assertEquals(Collections.emptyList(), resultKeys);
+    resultDisplayValues = list.getChosenDisplayValues();
+    assertEquals(Collections.emptyList(), resultDisplayValues);
 
-		// Set up a map with "LI N" --> N, for example: "LI 1" --> 1
-		myList.setDisplayValues(listItems, listCodes);
+    list.setChosenKeys(new Integer[] {1, 2});
 
-		List<Object> mappings = optionModel.getKeys();
-		boolean isShadow = optionModel.hasShadow(mappings);
-		assertEquals(true, isShadow);
-		isShadow = optionModel.hasShadow(listCodes);
-		assertEquals(false, isShadow);
+    resultKeys = list.getChosenKeys();
+    assertEquals(List.of(1, 2), resultKeys);
+    resultDisplayValues = list.getChosenDisplayValues();
+    assertEquals(List.of("one", "two"), resultDisplayValues);
+  }
 
-		String expect1 = "{LI 1,1}{LI 2,2}{LI 3,3}{LI 4,4}{LI 5,5}{LI 6,6}{LI 7,7}";
-		String expect0 = "{LI 1,0}{LI 2,1}{LI 3,2}{LI 4,3}{LI 5,4}{LI 6,5}{LI 7,6}";
+  /**
+   * Test of list shadows.
+   */
+  @Test
+  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "ConvertToTryWithResources",
+                     "ThrowableResultIgnored"})
+  public void testShadows() {
+    System.out.println("Shadows");
 
-		assertEquals(expect1, optionModel.dump());
-		// auto generated, [0,N)
-		myList.setDisplayValues(listItems);
-		assertEquals(expect0, optionModel.dump());
+    MyList myList = new MyList();
+    KeyDisplayValueSwingModel<Object, String, Object> optionModel = myList.getSwingModel();
+    List<String> listItems = List.of("LI 1", "LI 2", "LI 3", "LI 4", "LI 5", "LI 6", "LI 7");
+    List<Object> listCodes = List.of(1, 2, 3, 4, 5, 6, 7);
+    List<String> otherOptions = List.of("one", "two", "three", "four");
+    List<Object> otherMappings = List.of("oneM", "twoM", "threeM", "fourM");
+    KeyDisplayValueSwingModel<Object, String, Object>.Remodel remodel = optionModel.getRemodel();
 
-		// back to original
-		myList.setDisplayValues(listItems, listCodes);
-		assertEquals(expect1, optionModel.dump());
-		
-		myList.setDisplayValues(otherOptions); // WARN old discarded
-		assertEquals("{one,0}{two,1}{three,2}{four,3}", optionModel.dump());
+    // Set up a map with "LI N" --> N, for example: "LI 1" --> 1
+    myList.setDisplayValues(listItems, listCodes);
 
-		// back to original
-		myList.setDisplayValues(listItems, listCodes);
-		assertEquals(expect1, optionModel.dump());
+    List<Object> mappings = optionModel.getKeys();
+    boolean isShadow = optionModel.hasShadow(mappings);
+    assertEquals(true, isShadow);
+    isShadow = optionModel.hasShadow(listCodes);
+    assertEquals(false, isShadow);
 
-		remodel.clear();
-		assertEquals("", optionModel.dump());
+    String expect1 = "{LI 1,1}{LI 2,2}{LI 3,3}{LI 4,4}{LI 5,5}{LI 6,6}{LI 7,7}";
+    String expect0 = "{LI 1,0}{LI 2,1}{LI 3,2}{LI 4,3}{LI 5,4}{LI 6,5}{LI 7,6}";
 
-		// different sizes
-		assertThrows(IllegalArgumentException.class,
-					 () -> myList.setDisplayValues(otherOptions, listCodes));
-		assertEquals("", optionModel.dump());
+    assertEquals(expect1, optionModel.dump());
+    // auto generated, [0,N)
+    myList.setDisplayValues(listItems);
+    assertEquals(expect0, optionModel.dump());
 
-		// check shadows
-		// If shadows are used, there are exceptions and empty lists; but
-		// shadows should be copied when populating List1, see getDisconnectedList()
+    // back to original
+    myList.setDisplayValues(listItems, listCodes);
+    assertEquals(expect1, optionModel.dump());
 
-		String expect = "{one,oneM}{two,twoM}{three,threeM}{four,fourM}";
-		myList.setDisplayValues(otherOptions , otherMappings);
-		assertEquals(expect, optionModel.dump());
+    myList.setDisplayValues(otherOptions); // WARN old discarded
+    assertEquals("{one,0}{two,1}{three,2}{four,3}", optionModel.dump());
 
-		myList.setDisplayValues(optionModel.getDisplayValues(), otherMappings);
-		assertEquals(expect, optionModel.dump());
+    // back to original
+    myList.setDisplayValues(listItems, listCodes);
+    assertEquals(expect1, optionModel.dump());
 
-		myList.setDisplayValues(otherOptions, optionModel.getKeys());
-		assertEquals(expect, optionModel.dump());
+    remodel.clear();
+    assertEquals("", optionModel.dump());
 
-		myList.setDisplayValues(optionModel.getDisplayValues(), optionModel.getKeys());
-		assertEquals(expect, optionModel.dump());
+    // different sizes
+    assertThrows(IllegalArgumentException.class,
+                 () -> myList.setDisplayValues(otherOptions, listCodes));
+    assertEquals("", optionModel.dump());
 
-		remodel.close();
-	}
+    // check shadows
+    // If shadows are used, there are exceptions and empty lists; but
+    // shadows should be copied when populating List1, see getDisconnectedList()
+
+    String expect = "{one,oneM}{two,twoM}{three,threeM}{four,fourM}";
+    myList.setDisplayValues(otherOptions, otherMappings);
+    assertEquals(expect, optionModel.dump());
+
+    myList.setDisplayValues(optionModel.getDisplayValues(), otherMappings);
+    assertEquals(expect, optionModel.dump());
+
+    myList.setDisplayValues(otherOptions, optionModel.getKeys());
+    assertEquals(expect, optionModel.dump());
+
+    myList.setDisplayValues(optionModel.getDisplayValues(), optionModel.getKeys());
+    assertEquals(expect, optionModel.dump());
+
+    remodel.close();
+  }
 }

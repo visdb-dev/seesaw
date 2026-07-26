@@ -49,42 +49,39 @@ import com.nqadmin.swingset.decorators.Validator;
 /**
  * A combined validator/decorator using the Simple Validation framework.
  */
-public class SimpleValValidatorDecorator extends BaseDecorator
-{
-	private final TextComponentValidationItem valItem;
-	/** decorator name */
-	public static final Decorator.DecoratorStyle SIMPLE_VALIDATOR = new Decorator.DecoratorStyle("SIMPLE_VALIDATOR");
+public class SimpleValValidatorDecorator extends BaseDecorator {
+  private final TextComponentValidationItem valItem;
+  /** decorator name */
+  public static final Decorator.DecoratorStyle SIMPLE_VALIDATOR
+      = new Decorator.DecoratorStyle("SIMPLE_VALIDATOR");
 
-	public SimpleValValidatorDecorator(TextComponentValidationItem valItem) {
-		this.valItem = valItem;
-		this.validator = () -> valItem.validate();
-	}
+  public SimpleValValidatorDecorator(TextComponentValidationItem valItem) {
+    this.valItem = valItem;
+    this.validator = () -> valItem.validate();
+  }
 
-	@Override
-	public boolean decorate() {
-		valItem.performValidation();
-		return !valItem.hasFatalProblem();
-	}
+  @Override
+  public boolean decorate() {
+    valItem.performValidation();
+    return !valItem.hasFatalProblem();
+  }
 
-	// TODO: this does decoration as well. Does SwingSet need a split architecture?
-	private final Validator validator;
+  // TODO: this does decoration as well. Does SwingSet need a split architecture?
+  private final Validator validator;
 
-	/**
-	 * Get the SwingSet validator.
-	 * TODO: Note that this does decoration as well.
-	 * @return 
-	 */
-	public Validator getValidator() {
-		return validator;
-	}
+  /**
+   * Get the SwingSet validator.
+   * TODO: Note that this does decoration as well.
+   * @return
+   */
+  public Validator getValidator() { return validator; }
 
-	/**
-	 * SimpleValidatorDecorator style
-	 * @return
-	 */
-	@Override
-	public Decorator.DecoratorStyle getDecoratorStyle()
-	{
-		return SIMPLE_VALIDATOR;
-	}
+  /**
+   * SimpleValidatorDecorator style
+   * @return
+   */
+  @Override
+  public Decorator.DecoratorStyle getDecoratorStyle() {
+    return SIMPLE_VALIDATOR;
+  }
 }

@@ -39,30 +39,28 @@ package com.nqadmin.swingset.enums;
 
 /**
  * Predefined yes/no options.
- * 
+ *
  * @see com.nqadmin.swingset.SSComboBox#setDisplayValues(java.lang.Class)
  * @see com.nqadmin.swingset.SSList#setDisplayValues(java.lang.Class)
  * @since 4.0
  */
 public enum YesNo {
-	/** Predefined "no" option. */
-	NO("No"),
-	/** Predefined "yes" option. */
-	YES("Yes");
+  /** Predefined "no" option. */
+  NO("No"),
+  /** Predefined "yes" option. */
+  YES("Yes");
 
-	private final String displayValue;
+  private final String displayValue;
 
-	private YesNo(String _displayValue) {
-		displayValue = _displayValue;
-	}
-	
-	/**
-	 * Generate user visible display string.
-	 * @return string to display
-	 */
-	@Override
-	public String toString() {
-		// TODO: lookup internationalization
-		return displayValue;
-	}
+  private YesNo(String _displayValue) { displayValue = _displayValue; }
+
+  /**
+   * Generate user visible display string.
+   * @return string to display
+   */
+  @Override
+  public String toString() {
+    // TODO: lookup internationalization
+    return displayValue;
+  }
 }

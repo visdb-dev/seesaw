@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -54,80 +54,76 @@ import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
  * Used to link a SSFormattedTextField to a currency column in a database.
  */
 @SuppressWarnings("serial")
-public class SSCurrencyField extends NumberField
-{
-	/**
-	 * Creates a new instance of SSCurrencyField
-	 */
-	public SSCurrencyField() {
-		this(createFormatterFactory(CUSTOM, null, null, null, null));
-	}
+public class SSCurrencyField extends NumberField {
+  /**
+   * Creates a new instance of SSCurrencyField
+   */
+  public SSCurrencyField() { this(createFormatterFactory(CUSTOM, null, null, null, null)); }
 
-	/**
-	 * Creates an instance of SSCurrenyField with the specified number of integer and
-	 * fraction digits
-	 *
-	 * @param precision - number of digits needed for integer part of the number
-	 * @param decimals  - number of digits needed for the fraction part of the number
-	 */
-	public SSCurrencyField(int precision, int decimals) {
-		this(createFormatterFactory(CUSTOM, precision, decimals, null, null));
-	}
+  /**
+   * Creates an instance of SSCurrenyField with the specified number of integer and
+   * fraction digits
+   *
+   * @param precision - number of digits needed for integer part of the number
+   * @param decimals  - number of digits needed for the fraction part of the number
+   */
+  public SSCurrencyField(int precision, int decimals) {
+    this(createFormatterFactory(CUSTOM, precision, decimals, null, null));
+  }
 
-	/**
-	 * Creates an instance of SSCurrenyField with the specified number of integer and
-	 * fraction digits using the given locale
-	 *
-	 * @param precision     - number of digits needed for integer part of the number
-	 * @param decimals      - number of digits needed for the fraction part of the number
-	 * @param editLocale  - locale to be used while in editing mode
-	 * @param displayLocale - locate to be used for displaying the number
-	 */
-	public SSCurrencyField(int precision, int decimals, Locale editLocale, Locale displayLocale) {
-		this(createFormatterFactory(CUSTOM, precision, decimals, editLocale, displayLocale));
-	}
+  /**
+   * Creates an instance of SSCurrenyField with the specified number of integer and
+   * fraction digits using the given locale
+   *
+   * @param precision     - number of digits needed for integer part of the number
+   * @param decimals      - number of digits needed for the fraction part of the number
+   * @param editLocale  - locale to be used while in editing mode
+   * @param displayLocale - locate to be used for displaying the number
+   */
+  public SSCurrencyField(int precision, int decimals, Locale editLocale, Locale displayLocale) {
+    this(createFormatterFactory(CUSTOM, precision, decimals, editLocale, displayLocale));
+  }
 
-	/**
-	 * Creates an SSCurrencyField with the specified formatter factory
-	 *
-	 * @param factory - formatter factory to be used
-	 */
-	public SSCurrencyField(AbstractFormatterFactory factory) {
-		super(factory);
-	}
+  /**
+   * Creates an SSCurrencyField with the specified formatter factory
+   *
+   * @param factory - formatter factory to be used
+   */
+  public SSCurrencyField(AbstractFormatterFactory factory) { super(factory); }
 
-	/**
-	 * Create a FormatterFactory.
-	 * @param ssFormat
-	 * @param precision - number of digits needed for integer part of the number
-	 * @param decimals - number of digits needed for fraction part of the number
-	 * @param editLocale - locale while editing
-	 * @param displayLocale - locale while not editing
-	 * @return FormatterFactory.
-	 */
-	public static DefaultFormatterFactory createFormatterFactory(
-			SSFormat ssFormat, Integer precision, Integer decimals,
-			Locale editLocale, Locale displayLocale)
-	{
-		Objects.requireNonNull(ssFormat);
+  /**
+   * Create a FormatterFactory.
+   * @param ssFormat
+   * @param precision - number of digits needed for integer part of the number
+   * @param decimals - number of digits needed for fraction part of the number
+   * @param editLocale - locale while editing
+   * @param displayLocale - locale while not editing
+   * @return FormatterFactory.
+   */
+  public static DefaultFormatterFactory createFormatterFactory(SSFormat ssFormat, Integer precision,
+                                                               Integer decimals, Locale editLocale,
+                                                               Locale displayLocale) {
+    Objects.requireNonNull(ssFormat);
 
-		Locale defaultLocale = Locale.getDefault(Locale.Category.FORMAT);
-		// For display use currency, e.g. might see '$'. TODO: use the same for both?
-		NumberFormat displayFormat = createNumberFormat(()->NumberFormat.getCurrencyInstance(
-				displayLocale != null ? displayLocale : defaultLocale));
-		// For editing use a plain number
-		NumberFormat editFormat = createNumberFormat(()->NumberFormat.getInstance(
-				displayLocale != null ? displayLocale : defaultLocale));
+    Locale defaultLocale = Locale.getDefault(Locale.Category.FORMAT);
+    // For display use currency, e.g. might see '$'. TODO: use the same for both?
+    NumberFormat displayFormat
+        = createNumberFormat(()
+                                 -> NumberFormat.getCurrencyInstance(
+                                     displayLocale != null ? displayLocale : defaultLocale));
+    // For editing use a plain number
+    NumberFormat editFormat = createNumberFormat(
+        () -> NumberFormat.getInstance(displayLocale != null ? displayLocale : defaultLocale));
 
-		initPrecision(precision, editFormat, displayFormat);
-		initDecimals(decimals, editFormat, displayFormat);
-		
-		// Note that the editFormatter does not specify precision/decimals.
-		
-		return new SSFormatterFactory.Builder<>()
-				.ssFormat(ssFormat)
-				.editFormatter(new SSNumberFormatter(editFormat))
-				.displayFormatter(new SSNumberFormatter(displayFormat))
-				.build();
-	}
+    initPrecision(precision, editFormat, displayFormat);
+    initDecimals(decimals, editFormat, displayFormat);
+
+    // Note that the editFormatter does not specify precision/decimals.
+
+    return new SSFormatterFactory.Builder<>()
+        .ssFormat(ssFormat)
+        .editFormatter(new SSNumberFormatter(editFormat))
+        .displayFormatter(new SSNumberFormatter(displayFormat))
+        .build();
+  }
 }

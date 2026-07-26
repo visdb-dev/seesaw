@@ -33,25 +33,20 @@ package com.nqadmin.swingset.formatting;
  * Base class for formatted fields.
  */
 @SuppressWarnings("serial")
-public abstract class Field extends SSFormattedTextField
-{
-	/**
-	 * Constructor.
-	 * @param factory formatter factory
-	 */
-	public Field(AbstractFormatterFactory factory)
-	{
-		super(factory);
-	}
+public abstract class Field extends SSFormattedTextField {
+  /**
+   * Constructor.
+   * @param factory formatter factory
+   */
+  public Field(AbstractFormatterFactory factory) { super(factory); }
 
-	/**
-	 * {@inheritDoc }
-	 * If a null value, make sure it's OK to have it.
-	 */
+  /**
+   * {@inheritDoc }
+   * If a null value, make sure it's OK to have it.
+   */
 
-	@Override
-	public boolean componentValidate() {
-		return getValue() != null || getAllowNull();
-	}
-	
+  @Override
+  public boolean componentValidate() {
+    return getValue() != null || getAllowNull();
+  }
 }

@@ -36,16 +36,14 @@ import com.nqadmin.swingset.navigate.RowsModel;
 /**
  * Stash one of these into lookup...
  */
-public interface DbOpsCustomizerCreator
-{
-
-	/**
-	 * Return a {@link DbOpsCustomizer} that works with the specified RowSet.
-	 * Typically called when a RowSet is assigned to a RowsModel.
-	 * 
-	 * @param rs needing a DbOpsCustomizer
-	 * @param rowsModel before the RowSet is assigned, null if not yet created.
-	 * @return DbOpsCustomizer may be null and caller should keep looking.
-	 */
-	DbOpsCustomizer create(RowSet rs, RowsModel rowsModel);
+public interface DbOpsCustomizerCreator {
+  /**
+   * Return a {@link DbOpsCustomizer} that works with the specified RowSet.
+   * Typically called when a RowSet is assigned to a RowsModel.
+   *
+   * @param rs needing a DbOpsCustomizer
+   * @param rowsModel before the RowSet is assigned, null if not yet created.
+   * @return DbOpsCustomizer may be null and caller should keep looking.
+   */
+  DbOpsCustomizer create(RowSet rs, RowsModel rowsModel);
 }

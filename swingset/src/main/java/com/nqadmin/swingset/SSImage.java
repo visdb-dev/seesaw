@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -56,60 +56,50 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  */
 // TODO: SSImage make all the load/store buttons/capabilities optional.
 @SuppressWarnings("serial")
-public class SSImage extends Image
-{
-	/**
-	 * Construct a default SSImage Object.
-	 */
-	public SSImage() {
-		super();
-	}
+public class SSImage extends Image {
+  /**
+   * Construct a default SSImage Object.
+   */
+  public SSImage() { super(); }
 
-	/**
-	 * Constructs a SSImage Object bound to the specified column in the specified
-	 * rowSet.
-	 *
-	 * @param rowsModel          - RowSet from/to which data has to be read/written
-	 * @param columnName - column in the rowSet to which the component should
-	 *                         be bound.
-	 */
-	public SSImage(RowsModel rowsModel, String columnName)
-	{
-		super(rowsModel, columnName);
-	}
+  /**
+   * Constructs a SSImage Object bound to the specified column in the specified
+   * rowSet.
+   *
+   * @param rowsModel          - RowSet from/to which data has to be read/written
+   * @param columnName - column in the rowSet to which the component should
+   *                         be bound.
+   */
+  public SSImage(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
 
-	/**
-	 * Don't show the zoom controls.
-	 * @return the "Update" button
-	 */
-	@Override
-	protected JComponent imageControls()
-	{
-		return getButtonnUpdate();
-	}
+  /**
+   * Don't show the zoom controls.
+   * @return the "Update" button
+   */
+  @Override
+  protected JComponent imageControls() {
+    return getButtonnUpdate();
+  }
 
-	/**
-	 * @return null - no popup menu
-	 */
-	@Override
-	protected JPopupMenu createImagePopup()
-	{
-		return null;
-	}
+  /**
+   * @return null - no popup menu
+   */
+  @Override
+  protected JPopupMenu createImagePopup() {
+    return null;
+  }
 
-	/**
-	 * Constructs a SSImage Object bound to the specified column in the specified
-	 * rowSet.
-	 *
-	 * @param rowSet          - RowSet from/to which data has to be read/written
-	 * @param columnName - column in the rowSet to which the component should
-	 *                         be bound.
-	 * @deprecated use RowsModel insted of RowSet
-	 */
-	@Deprecated
-	public SSImage(RowSet rowSet, String columnName)
-	{
-		super(findRowsModel(rowSet), columnName);
-	}
-
+  /**
+   * Constructs a SSImage Object bound to the specified column in the specified
+   * rowSet.
+   *
+   * @param rowSet          - RowSet from/to which data has to be read/written
+   * @param columnName - column in the rowSet to which the component should
+   *                         be bound.
+   * @deprecated use RowsModel insted of RowSet
+   */
+  @Deprecated
+  public SSImage(RowSet rowSet, String columnName) {
+    super(findRowsModel(rowSet), columnName);
+  }
 }

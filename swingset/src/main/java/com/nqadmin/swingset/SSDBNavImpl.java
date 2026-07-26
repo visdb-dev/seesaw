@@ -36,14 +36,11 @@ import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 /**
  * Compatibility.
  */
-public class SSDBNavImpl extends DbOpsCustomizerImpl implements SSDBNav
-{
-	/**
-	 * Constructs a SSDBNavImpl with the specified container.
-	 *
-	 * @param _container	GUI Container to scan for Swing components to clear/reset
-	 */
-	public SSDBNavImpl(final Container _container) {
-		super(_container);
-	}
+public class SSDBNavImpl extends DbOpsCustomizerImpl implements SSDBNav {
+  /**
+   * Constructs a SSDBNavImpl with the specified container.
+   *
+   * @param _container	GUI Container to scan for Swing components to clear/reset
+   */
+  public SSDBNavImpl(final Container _container) { super(_container); }
 }

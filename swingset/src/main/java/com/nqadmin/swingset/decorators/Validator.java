@@ -48,33 +48,34 @@ import com.nqadmin.swingset.utils.SSComponent;
  * A validator allows a specialized validation condition on a per component
  * basis. If {@linkplain validate()} is false there is no attempt to write
  * to the data base. This is typically checked by a {@link Decorator}.
- * 
+ *
  * .
  * <p>
  * TODO: eventually define a factory to create these, a base
  *		 class might contain methods like getText.
  */
 public interface Validator {
-	// Severity enum?
-	/**
-	 * Run the component's validators; return the result.
-	 * @return true if component is valid, false if there is an error.
-	 */
-	boolean validate();
+  // Severity enum?
+  /**
+   * Run the component's validators; return the result.
+   * @return true if component is valid, false if there is an error.
+   */
+  boolean validate();
 
-	// TODO: It is not clear that a Validator needs install/uninstall.
-	//		 For now, just have a couple of defaults that do nothing.
+  // TODO: It is not clear that a Validator needs install/uninstall.
+  //		 For now, just have a couple of defaults that do nothing.
 
-	/** Install this validator into the component. Installs listeners
-	 * @param component the componenet
-	 */
-	default void install(SSComponent component) {};
+  /**
+   * Install this validator into the component. Installs listeners
+   * @param component the componenet
+   */
+  default void install(SSComponent component){};
 
-	/** Remove validator/listeners from component. */
-	default void uninstall() {};
+  /** Remove validator/listeners from component. */
+  default void uninstall(){};
 
-	/**
-	 * A validator that always indicates valid.
-	 */
-	public static Validator nullValidator = () -> true;
+  /**
+   * A validator that always indicates valid.
+   */
+  public static Validator nullValidator = () -> true;
 }

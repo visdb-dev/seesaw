@@ -16,7 +16,6 @@
  */
 package snippet_files;
 
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -30,50 +29,47 @@ import com.nqadmin.swingset.navigate.RowsModel;
  *
  */
 @SuppressWarnings("serial")
-public class DataGridSnippets extends JFrame
-{
-	SSDataGrid dataGrid;
-	RowSet rowSet;
-	RowsModel rowsModel;
+public class DataGridSnippets extends JFrame {
+  SSDataGrid dataGrid;
+  RowSet rowSet;
+  RowsModel rowsModel;
 
-	// @start region=init1
-	/**
-	 * Set up a data grid with customizations for some known table.
-	 * @param dataGrid initialize this data grid
-	 * @throws SQLException 
-	 */
-	void init(SSDataGrid dataGrid) throws SQLException {
-		// Set the header before setting the RowsModel.
-		dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-		dataGrid.setRowsModel(rowsModel);
-		
-		// HIDE THE PART ID COLUMN
-		dataGrid.setHiddenColumnsByName(List.of("part_id"));
-		
-		dataGrid.setMessageWindow(this);
-		dataGrid.setUneditableColumns(new String[]{"part_id"});
-		
-		dataGrid.setComboRenderer("color_code",
-								  new String[]{"Red","Green","Blue"},
-								  new Integer[]{0, 1, 2});
-		dataGrid.setDefaultValues(new int[]{1, 2, 3},
-								  new Object[]{0, 20, "New Orleans"});
-		
-		dataGrid.setPrimaryColumn("part_id");
+  // @start region=init1
+  /**
+   * Set up a data grid with customizations for some known table.
+   * @param dataGrid initialize this data grid
+   * @throws SQLException
+   */
+  void init(SSDataGrid dataGrid) throws SQLException {
+    // Set the header before setting the RowsModel.
+    dataGrid.setHeaders(new String[] {"Part Name", "Color Code", " Weight", "City"});
+    dataGrid.setRowsModel(rowsModel);
 
-		// Setup the primary key generation as needed.
-		dataGrid.setSSDataValue(() -> {
-			Integer key = null;
-			
-			// your primary key value generation goes here.
-			// If it's something the user enters then no problem.
-			// If it's an auto increment field then it depends on
-			// the database driver you are using.
-			// If the updaterow can retrieve the values for the row
-			// without knowing the primary key value its fine.
-			
-			return key;
-		});
-	}
-	// @end region=init1
+    // HIDE THE PART ID COLUMN
+    dataGrid.setHiddenColumnsByName(List.of("part_id"));
+
+    dataGrid.setMessageWindow(this);
+    dataGrid.setUneditableColumns(new String[] {"part_id"});
+
+    dataGrid.setComboRenderer("color_code", new String[] {"Red", "Green", "Blue"},
+                              new Integer[] {0, 1, 2});
+    dataGrid.setDefaultValues(new int[] {1, 2, 3}, new Object[] {0, 20, "New Orleans"});
+
+    dataGrid.setPrimaryColumn("part_id");
+
+    // Setup the primary key generation as needed.
+    dataGrid.setSSDataValue(() -> {
+      Integer key = null;
+
+      // your primary key value generation goes here.
+      // If it's something the user enters then no problem.
+      // If it's an auto increment field then it depends on
+      // the database driver you are using.
+      // If the updaterow can retrieve the values for the row
+      // without knowing the primary key value its fine.
+
+      return key;
+    });
+  }
+  // @end region=init1
 }

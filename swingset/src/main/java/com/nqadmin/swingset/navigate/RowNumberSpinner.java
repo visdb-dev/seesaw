@@ -88,206 +88,185 @@ import static javax.swing.KeyStroke.getKeyStroke;
  * as part of a navigator and {@code RowsModel.setRowSet()}.
  */
 @SuppressWarnings("serial")
-public class RowNumberSpinner extends JSpinner
-{
-	private static final Logger logger = JStuff.getLogger();
-	//private NavGotoRowAction gotoRowAction;
-	private RowsModel rowsModel;
+public class RowNumberSpinner extends JSpinner {
+  private static final Logger logger = JStuff.getLogger();
+  //private NavGotoRowAction gotoRowAction;
+  private RowsModel rowsModel;
 
-	/**
-	 * Construct spinner for row number in a data navigator.
-	 * @param rowsModel
-	 */
-	public RowNumberSpinner(RowsModel rowsModel)
-	{
-		this.rowsModel = rowsModel;
-		busReceiver = new BusReceiver();
-		WeakEventBus.register(busReceiver, getGlobalEventBus());
+  /**
+   * Construct spinner for row number in a data navigator.
+   * @param rowsModel
+   */
+  public RowNumberSpinner(RowsModel rowsModel) {
+    this.rowsModel = rowsModel;
+    busReceiver = new BusReceiver();
+    WeakEventBus.register(busReceiver, getGlobalEventBus());
 
-		setAction();
-	}
+    setAction();
+  }
 
-	BusReceiver busReceiver; // Must have a strong reference.
-	class BusReceiver
-	{
-		// Each RowSet has it's own SpinnerModel.
-		// Need to note model change to update spinner, no gain in wrapping spinner model.
-		@WeakSubscribe
-		@SuppressWarnings("UseOfSystemOutOrSystemErr")
-		public void handleNewRowSetEvent(RowsModelNewRowSetEvent ev)
-		{
-			if (ev.getRowsModel() != rowsModel)
-				return;
-			if (isJunitPrint())
-				System.err.printf("RowNumberSpinner: %s\n", ev.toString());
-			else
-				logger.log(DEBUG, () -> sf("Change spinner rowSet/model %s", ev.toString()));
-			internalChangeSpinnerModel();
-		}
-	}
+  BusReceiver busReceiver; // Must have a strong reference.
+  class BusReceiver {
+    // Each RowSet has it's own SpinnerModel.
+    // Need to note model change to update spinner, no gain in wrapping spinner model.
+    @WeakSubscribe
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
+    public void handleNewRowSetEvent(RowsModelNewRowSetEvent ev) {
+      if (ev.getRowsModel() != rowsModel) return;
+      if (isJunitPrint()) System.err.printf("RowNumberSpinner: %s\n", ev.toString());
+      else logger.log(DEBUG, () -> sf("Change spinner rowSet/model %s", ev.toString()));
+      internalChangeSpinnerModel();
+    }
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public SpinnerNumberModel getModel()
-	{
-		return (SpinnerNumberModel) super.getModel();
-	}
+  /** {@inheritDoc} */
+  @Override
+  public SpinnerNumberModel getModel() {
+    return (SpinnerNumberModel) super.getModel();
+  }
 
-	private boolean actionSetModel;
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * <b>An exception is thrown if invoked unexpectedly.</b>
-	 */
-	@Override
-	public void setModel(SpinnerModel model)
-	{
-		if(!actionSetModel)
-			throw new IllegalCallerException("Can not change the model");
-		super.setModel(model);
-	}
+  private boolean actionSetModel;
+  /**
+   * {@inheritDoc}
+   *
+   * <b>An exception is thrown if invoked unexpectedly.</b>
+   */
+  @Override
+  public void setModel(SpinnerModel model) {
+    if (!actionSetModel) throw new IllegalCallerException("Can not change the model");
+    super.setModel(model);
+  }
 
-	/** Use this to track enabled. */
-	private final PropertyChangeListener pclEnableDisableAction = (evt) -> {
-		if ("enabled".equals(evt.getPropertyName()))
-			setEnabled((boolean) evt.getNewValue());
-	};
+  /** Use this to track enabled. */
+  private final PropertyChangeListener pclEnableDisableAction = (evt) -> {
+    if ("enabled".equals(evt.getPropertyName())) setEnabled((boolean) evt.getNewValue());
+  };
 
-	/** forward spinner events to goto row action */
-	private final ChangeListener changeListener = (evt) -> {
-		if (rowsModel.getRowSet() == null)
-			return;
-		// This has problems with Example 4, nav combo not updating fields.
-		// rowsModel.getAction(RowsAction.ACT_GOTOROW)
-		// 		.actionPerformed(new ActionEvent(RowNumberSpinner.this,
-		// 		AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
-		Action act = rowsModel.getAction(RowsAction.ACT_GOTOROW);
-		// if (!act.isEnabled()) {
-		// 	return;
-		// }
-		act.actionPerformed(null);
-	};
+  /** forward spinner events to goto row action */
+  private final ChangeListener changeListener = (evt) -> {
+    if (rowsModel.getRowSet() == null) return;
+    // This has problems with Example 4, nav combo not updating fields.
+    // rowsModel.getAction(RowsAction.ACT_GOTOROW)
+    // 		.actionPerformed(new ActionEvent(RowNumberSpinner.this,
+    // 		AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
+    Action act = rowsModel.getAction(RowsAction.ACT_GOTOROW);
+    // if (!act.isEnabled()) {
+    // 	return;
+    // }
+    act.actionPerformed(null);
+  };
 
-	private void internalChangeSpinnerModel()
-	{
-		// If JSpinner setModel doesn't come from right here,
-		// an exception is thrown.
-		actionSetModel = true;
-		try {
-			if (rowsModel.getRowSet() == null)
-				setModel(new SpinnerNumberModel());
-			else
-				setModel(rowsModel.getRowNumberModel());
-			fireStateChanged(); // Treat a model change as a state change
-		} finally {
-			actionSetModel = false;
-		}
-	}
+  private void internalChangeSpinnerModel() {
+    // If JSpinner setModel doesn't come from right here,
+    // an exception is thrown.
+    actionSetModel = true;
+    try {
+      if (rowsModel.getRowSet() == null) setModel(new SpinnerNumberModel());
+      else setModel(rowsModel.getRowNumberModel());
+      fireStateChanged(); // Treat a model change as a state change
+    } finally { actionSetModel = false; }
+  }
 
-	/** 
-	 * Listen to the specified action for Spinner enabled; send events to it.
-	 * The action contains the model for the JSpinner.
-	 * @param action provides enabled
-	 */
-	private void setAction() {
-		Action action = rowsModel.getAction(RowsAction.ACT_GOTOROW);
+  /**
+   * Listen to the specified action for Spinner enabled; send events to it.
+   * The action contains the model for the JSpinner.
+   * @param action provides enabled
+   */
+  private void setAction() {
+    Action action = rowsModel.getAction(RowsAction.ACT_GOTOROW);
 
-		if(!(action instanceof NavGotoRowAction gotoRowAction))
-			throw new IllegalArgumentException("Must be NavGotoRowAction");
+    if (!(action instanceof NavGotoRowAction gotoRowAction))
+      throw new IllegalArgumentException("Must be NavGotoRowAction");
 
-		removeChangeListener(changeListener);
+    removeChangeListener(changeListener);
 
-		internalChangeSpinnerModel();
+    internalChangeSpinnerModel();
 
-		// Copy the enable/disable state.
-		setEnabled(gotoRowAction.isEnabled());
+    // Copy the enable/disable state.
+    setEnabled(gotoRowAction.isEnabled());
 
-		// Listen to the gotoAction for enable/disable Spinner.
-		gotoRowAction.addPropertyChangeListener(pclEnableDisableAction);
+    // Listen to the gotoAction for enable/disable Spinner.
+    gotoRowAction.addPropertyChangeListener(pclEnableDisableAction);
 
-		// Forward JSpinner events through the action.
-		addChangeListener(changeListener);
-	}
+    // Forward JSpinner events through the action.
+    addChangeListener(changeListener);
+  }
 
-	/**
-	 * Customize the spinner to get rid of the tiny spinner up/down arrows. There's also example code to disable/enable the keyboard up/down arrows.
-	 * @param targetSpinnerSize used to set the width after removing the arrows
-	 */
-	//https://stackoverflow.com/questions/16284594/disable-up-and-down-arrow-buttons-on-jspinner
-	public void removeTinyArrows(Dimension targetSpinnerSize)
-	{
-		Dimension d = getPreferredSize();
-		d.width = targetSpinnerSize.width;
-		setUI(new BasicSpinnerUI() {
-			@Override
-			protected Component createNextButton() {
-				return null;
-			}
-			
-			@Override
-			protected Component createPreviousButton() {
-				return null;
-			}
-		});
-		setPreferredSize(d);
-	}
+  /**
+   * Customize the spinner to get rid of the tiny spinner up/down arrows. There's also example code to disable/enable the keyboard up/down arrows.
+   * @param targetSpinnerSize used to set the width after removing the arrows
+   */
+  //https://stackoverflow.com/questions/16284594/disable-up-and-down-arrow-buttons-on-jspinner
+  public void removeTinyArrows(Dimension targetSpinnerSize) {
+    Dimension d = getPreferredSize();
+    d.width = targetSpinnerSize.width;
+    setUI(new BasicSpinnerUI() {
+      @Override
+      protected Component createNextButton() {
+        return null;
+      }
 
-	/**
-	 * Get one of this component's local input maps. If it doesn't exist
-	 * then create it and hook it in to the component.
-	 * @return the specified input map
-	 */
-	private InputMap getMyInputMap(int whichMap)
-	{
-		return switch (whichMap) {
-		case WHEN_IN_FOCUSED_WINDOW -> {
-			if (inFocusedWindowInputMap == null) {
-				InputMap im = new ComponentInputMap(this);
-				im.setParent(getInputMap(WHEN_IN_FOCUSED_WINDOW));
-				setInputMap(WHEN_IN_FOCUSED_WINDOW, im);
-				inFocusedWindowInputMap = im;
-			}
-			yield inFocusedWindowInputMap;
-		}
-		case WHEN_ANCESTOR_OF_FOCUSED_COMPONENT -> {
-			if (ancestorOfFocusedComponentInputMap == null) {
-				InputMap im = new InputMap();
-				im.setParent(getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT));
-				setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, im);
-				ancestorOfFocusedComponentInputMap = im;
-			}
-			yield ancestorOfFocusedComponentInputMap;
-		}
-		default -> null;
-		};
-	}
+      @Override
+      protected Component createPreviousButton() {
+        return null;
+      }
+    });
+    setPreferredSize(d);
+  }
 
-	private InputMap inFocusedWindowInputMap;
-	private InputMap ancestorOfFocusedComponentInputMap;
+  /**
+   * Get one of this component's local input maps. If it doesn't exist
+   * then create it and hook it in to the component.
+   * @return the specified input map
+   */
+  private InputMap getMyInputMap(int whichMap) {
+    return switch (whichMap) {
+      case WHEN_IN_FOCUSED_WINDOW -> {
+        if (inFocusedWindowInputMap == null) {
+          InputMap im = new ComponentInputMap(this);
+          im.setParent(getInputMap(WHEN_IN_FOCUSED_WINDOW));
+          setInputMap(WHEN_IN_FOCUSED_WINDOW, im);
+          inFocusedWindowInputMap = im;
+        }
+        yield inFocusedWindowInputMap;
+      }
+      case WHEN_ANCESTOR_OF_FOCUSED_COMPONENT -> {
+        if (ancestorOfFocusedComponentInputMap == null) {
+          InputMap im = new InputMap();
+          im.setParent(getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT));
+          setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, im);
+          ancestorOfFocusedComponentInputMap = im;
+        }
+        yield ancestorOfFocusedComponentInputMap;
+      }
+      default -> null;
+    };
+  }
 
-	/**
-	 * Use the up/down arrow keys while this spinner's window is focused
-	 * to adjust row number.
-	 * @param enable true enables up/down keys when window has focus
-	 */
-	public void setWindowUpDownKeysEnable(boolean enable)
-	{
-		InputMap im = getMyInputMap(WHEN_IN_FOCUSED_WINDOW);
-		im.put(getKeyStroke(VK_UP, 0), enable ? "increment" : null);
-		im.put(getKeyStroke(VK_DOWN, 0), enable ? "decrement" : null);
-	}
+  private InputMap inFocusedWindowInputMap;
+  private InputMap ancestorOfFocusedComponentInputMap;
 
-	/**
-	 * Disable the up/down arrow keys for this spinner component.
-	 * When disabling, window up/down keys are disabled
-	 * using {@link #setWindowUpDownKeysEnable(boolean)}.
-	 * 
-	 * @param enable true enables default
-	 */
-	public void setUpDownKeysEnable(boolean enable)
-	{
-		InputMap im = getMyInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		im.put(getKeyStroke(VK_UP, 0), enable ? null : "none");
-		im.put(getKeyStroke(VK_DOWN, 0), enable ? null : "none");
-	}
+  /**
+   * Use the up/down arrow keys while this spinner's window is focused
+   * to adjust row number.
+   * @param enable true enables up/down keys when window has focus
+   */
+  public void setWindowUpDownKeysEnable(boolean enable) {
+    InputMap im = getMyInputMap(WHEN_IN_FOCUSED_WINDOW);
+    im.put(getKeyStroke(VK_UP, 0), enable ? "increment" : null);
+    im.put(getKeyStroke(VK_DOWN, 0), enable ? "decrement" : null);
+  }
+
+  /**
+   * Disable the up/down arrow keys for this spinner component.
+   * When disabling, window up/down keys are disabled
+   * using {@link #setWindowUpDownKeysEnable(boolean)}.
+   *
+   * @param enable true enables default
+   */
+  public void setUpDownKeysEnable(boolean enable) {
+    InputMap im = getMyInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    im.put(getKeyStroke(VK_UP, 0), enable ? null : "none");
+    im.put(getKeyStroke(VK_DOWN, 0), enable ? null : "none");
+  }
 }

@@ -48,24 +48,17 @@ package com.nqadmin.swingset.datasources;
  * there is a rowset should never happen.
  */
 @SuppressWarnings("serial")
-public class SSSQLRuntimeException extends RuntimeException
-{
-	/**
-	 * Create exception.
-	 * @param message
-	 * @param cause
-	 */
-	public SSSQLRuntimeException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
+public class SSSQLRuntimeException extends RuntimeException {
+  /**
+   * Create exception.
+   * @param message
+   * @param cause
+   */
+  public SSSQLRuntimeException(String message, Throwable cause) { super(message, cause); }
 
-	/**
-	 * Create exception.
-	 * @param cause
-	 */
-	public SSSQLRuntimeException(Throwable cause)
-	{
-		super(cause);
-	}
+  /**
+   * Create exception.
+   * @param cause
+   */
+  public SSSQLRuntimeException(Throwable cause) { super(cause); }
 }

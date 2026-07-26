@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -41,30 +41,26 @@ package com.nqadmin.swingset.utils;
  * Various Enumerations for SwingSet
  */
 public class SSEnums {
-	/**
-	 * Enumeration for navigation buttons.
-	 */
-	public enum Navigation {
-		/** Go to the first record in the RowSet */
-		First(3),
-		/** Go to the last record in the RowSet */
-		Last(4),
-		/** Go to the next record in the RowSet */
-		Next(1),
-		/** Go to the previous record in the RowSet */
-		Previous(2);
+  /**
+   * Enumeration for navigation buttons.
+   */
+  public enum Navigation {
+    /** Go to the first record in the RowSet */
+    First(3),
+    /** Go to the last record in the RowSet */
+    Last(4),
+    /** Go to the next record in the RowSet */
+    Next(1),
+    /** Go to the previous record in the RowSet */
+    Previous(2);
 
-		private final int value;
+    private final int value;
 
-		Navigation(final int newValue) {
-			value = newValue;
-		}
+    Navigation(final int newValue) { value = newValue; }
 
-		/**
-		 * @return integer corresponding to enumerated value
-		 */
-		public int getValue() {
-			return value;
-		}
-	}
+    /**
+     * @return integer corresponding to enumerated value
+     */
+    public int getValue() { return value; }
+  }
 }

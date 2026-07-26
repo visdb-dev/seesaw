@@ -64,110 +64,107 @@ import com.nqadmin.swingset.navigate.RowsModel;
 // TODO: some of these must carefully be specified to only use a subset of the
 //		 methods. The getColumn[Text/Object] could be problematic.
 //		They should have a way to check for recursion.
-public interface RSC
-{
-	/**
-	 * Construct and return an object representing a RowsModel column.
-	 * <p>
-	 * TODO: SO FAR ONLY USED WITH/FROM GRID. Issue with getColumnObject undo/redo.
-	 * @param rowsModel
-	 * @param columnIndex
-	 * @return
-	 * @throws SSSQLRuntimeException
-	 */
-	static RSC get(RowsModel rowsModel, int columnIndex) {
-		//
-		// TODO: accept format, implement in SimpleRSC
-		//
-		try {
-			return new SimpleRSC(rowsModel, columnIndex);
-		} catch (SQLException ex) {
-			throw new SSSQLRuntimeException(ex);
-		}
-	}
+public interface RSC {
+  /**
+   * Construct and return an object representing a RowsModel column.
+   * <p>
+   * TODO: SO FAR ONLY USED WITH/FROM GRID. Issue with getColumnObject undo/redo.
+   * @param rowsModel
+   * @param columnIndex
+   * @return
+   * @throws SSSQLRuntimeException
+   */
+  static RSC get(RowsModel rowsModel, int columnIndex) {
+    //
+    // TODO: accept format, implement in SimpleRSC
+    //
+    try {
+      return new SimpleRSC(rowsModel, columnIndex);
+    } catch (SQLException ex) { throw new SSSQLRuntimeException(ex); }
+  }
 
-	/**
-	 * Construct and return an object representing a RowSet column.
-	 * <p>
-	 * TODO: NOT USED
-	 * @param rowsModel
-	 * @param columnIndex
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	static RSC getEx(RowsModel rowsModel, int columnIndex) throws SQLException {
-		return new SimpleRSC(rowsModel, columnIndex);
-	}
+  /**
+   * Construct and return an object representing a RowSet column.
+   * <p>
+   * TODO: NOT USED
+   * @param rowsModel
+   * @param columnIndex
+   * @return
+   * @throws java.sql.SQLException
+   */
+  static RSC getEx(RowsModel rowsModel, int columnIndex) throws SQLException {
+    return new SimpleRSC(rowsModel, columnIndex);
+  }
 
-	/**
-	 * Construct and return an object representing a RowSet column.
-	 * <p>
-	 * TODO: NOT USED
-	 * @param rowsModel
-	 * @param columnName 
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	static RSC getEx(RowsModel rowsModel, String columnName) throws SQLException {
-		return new SimpleRSC(rowsModel, columnName);
-	}
+  /**
+   * Construct and return an object representing a RowSet column.
+   * <p>
+   * TODO: NOT USED
+   * @param rowsModel
+   * @param columnName
+   * @return
+   * @throws java.sql.SQLException
+   */
+  static RSC getEx(RowsModel rowsModel, String columnName) throws SQLException {
+    return new SimpleRSC(rowsModel, columnName);
+  }
 
-	/**
-	 * @return the RowsModel
-	 */
-	RowsModel getRowsModel();
+  /**
+   * @return the RowsModel
+   */
+  RowsModel getRowsModel();
 
-	/**
-	 * @return the row set
-	 */
-	RowSet getRowSet();
+  /**
+   * @return the row set
+   */
+  RowSet getRowSet();
 
-	/**
-	 * @return the column index in the rowset
-	 */
-	int getColumnIndex();
+  /**
+   * @return the column index in the rowset
+   */
+  int getColumnIndex();
 
-	/**
-	 * @return the column name in the rowset
-	 */
-	String getColumnName();
+  /**
+   * @return the column name in the rowset
+   */
+  String getColumnName();
 
-	/**
-	 * @return The JDBCType of the column in the rowset
-	 */
-	JDBCType getColumnJDBCType();
+  /**
+   * @return The JDBCType of the column in the rowset
+   */
+  JDBCType getColumnJDBCType();
 
-	/**
-	 * @return column value as a String
-	 */
-	String getColumnText();
-	//Object getColumnObject() throws SQLException;
+  /**
+   * @return column value as a String
+   */
+  String getColumnText();
+  //Object getColumnObject() throws SQLException;
 
-	/**
-	 * Returns an Object of the specified type
-	 * representing the value in the bound database column.
-	 *
-	 * Note a null is never converted into ""; use getColumnText for that.
-	 * @param <T> type to return
-	 * @param clazz Class of returned type
-	 * @return column object
-	 */
-	<T> T getColumnObject(Class<T> clazz);
-	//<T> T getTypedObject() throws SQLException;
+  /**
+   * Returns an Object of the specified type
+   * representing the value in the bound database column.
+   *
+   * Note a null is never converted into ""; use getColumnText for that.
+   * @param <T> type to return
+   * @param clazz Class of returned type
+   * @return column object
+   */
+  <T> T getColumnObject(Class<T> clazz);
+  //<T> T getTypedObject() throws SQLException;
 
-	/**
-	 * A component may have a display/parse format.
-	 * @return The format for this component
-	 */
-	default SSFormat getSSFormat() { return null; }
+  /**
+   * A component may have a display/parse format.
+   * @return The format for this component
+   */
+  default SSFormat getSSFormat() { return null; }
 
-	/**
-	 * @return Does the column allow null?
-	 */
-	boolean getAllowNull();
+  /**
+   * @return Does the column allow null?
+   */
+  boolean getAllowNull();
 
-	/**
-	 * @return typically column name wrapped in "[]"
-	 */
-	String getColumnForLog();
+  /**
+   * @return typically column name wrapped in "[]"
+   */
+  String getColumnForLog();
 }

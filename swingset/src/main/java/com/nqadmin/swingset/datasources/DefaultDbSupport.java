@@ -62,61 +62,51 @@ import com.nqadmin.swingset.utils.SSUtils;
  *       could be from different database.
  */
 // TODO: clarify semantics of how many connections are supported
-public class DefaultDbSupport implements DbSupport
-{
-	private final Connection sharedConnection;
+public class DefaultDbSupport implements DbSupport {
+  private final Connection sharedConnection;
 
-	/**
-	 * Save the specified connection as the sharedConnection.
-	 * 
-	 * @param sharedConnection 
-	 */
-	public DefaultDbSupport(Connection sharedConnection)
-	{
-		if (!SSUtils.isJunit())
-			Objects.requireNonNull(sharedConnection);
-		this.sharedConnection = sharedConnection;
-	}
+  /**
+   * Save the specified connection as the sharedConnection.
+   *
+   * @param sharedConnection
+   */
+  public DefaultDbSupport(Connection sharedConnection) {
+    if (!SSUtils.isJunit()) Objects.requireNonNull(sharedConnection);
+    this.sharedConnection = sharedConnection;
+  }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public Connection getSharedConnection() throws SQLException
-	{
-		if (sharedConnection.isClosed())
-			throw new IllegalStateException("Shared connection isClosed");
-		return sharedConnection;
-	}
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public Connection getSharedConnection() throws SQLException {
+    if (sharedConnection.isClosed()) throw new IllegalStateException("Shared connection isClosed");
+    return sharedConnection;
+  }
 
-	private InitialContext ctx;
-	/**
-	 * {@inheritDoc }
-	 * @param rs
-	 * @return
-	 * @throws SQLException 
-	 */
-	@Override
-	public Connection getConnection(RowSet rs) throws SQLException
-	{
-		Objects.requireNonNull(rs);
-		String dsName = rs.getDataSourceName();
-		if (dsName != null) {
-			try {
-				if (ctx == null)
-					ctx = new InitialContext();
-				// TODO: keep a local map of dsName to DataSource ???
-				DataSource ds = (DataSource)ctx.lookup(dsName);
-				return ds.getConnection();
-			} catch (NamingException ex) {
-			}
-		}
+  private InitialContext ctx;
+  /**
+   * {@inheritDoc }
+   * @param rs
+   * @return
+   * @throws SQLException
+   */
+  @Override
+  public Connection getConnection(RowSet rs) throws SQLException {
+    Objects.requireNonNull(rs);
+    String dsName = rs.getDataSourceName();
+    if (dsName != null) {
+      try {
+        if (ctx == null) ctx = new InitialContext();
+        // TODO: keep a local map of dsName to DataSource ???
+        DataSource ds = (DataSource) ctx.lookup(dsName);
+        return ds.getConnection();
+      } catch (NamingException ex) {}
+    }
 
-		String url = rs.getUrl();
-		if (url != null) {
-			return DriverManager.getConnection(url);
-		}
-		
-		return null;
-	}
+    String url = rs.getUrl();
+    if (url != null) { return DriverManager.getConnection(url); }
+
+    return null;
+  }
 }

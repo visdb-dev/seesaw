@@ -44,155 +44,134 @@ import java.util.logging.StreamHandler;
 
 import com.nqadmin.swingset.utils.SSUtils.TestFormatterBase;
 
-
 /**
  * Logging for use during tests.
  * <br>in setUpClass: isJunit(); TestLogging.load(...);
  * <br>in tearDownClass: TestLogging.flush();
  * x
  */
-public class TestLogging
-{
-	private TestLogging() { }
-	
-	/** Not for logging per se, but to configure the handler for test logging. */
-	private static final Logger logger = Logger.getLogger("com.nqadmin.swingset");
+public class TestLogging {
+  private TestLogging() {}
 
-	/** set up logger with default level INFO.
-	 */
-	public static void load() {
-		load(null);
-	}
+  /** Not for logging per se, but to configure the handler for test logging. */
+  private static final Logger logger = Logger.getLogger("com.nqadmin.swingset");
 
-	/** x
-	 * @param _level use "null" for default
-	 */
-	public static void load(Level _level) {
-		Level level = _level == null ? Level.INFO : _level;
-		testLogging(level);
-	}
+  /**
+   * set up logger with default level INFO.
+   */
+  public static void load() { load(null); }
 
-	/** Flush our stuff, but probably not needed since our TestStreamHandler
-	 * flushes each record.
-	 */
-	public static void flush() {
-		for (Handler handler : logger.getHandlers()) {
-			handler.flush();
-		}
-	}
+  /**
+   * x
+   * @param _level use "null" for default
+   */
+  public static void load(Level _level) {
+    Level level = _level == null ? Level.INFO : _level;
+    testLogging(level);
+  }
 
-	/**
-	 * x
-	 */
-	private static void testLogging(Level level) {
-		testLoggingInternal(level);
-		logger.log(Level.INFO, () -> "LOGGER ON, LEVEL " + level);
-	}
-	
-	/**
-	 * x
-	 * @param _level
-	 */
-	private static void testLoggingInternal(Level level) {
-		//Level logger_level = Level.ALL;
-		Level logger_level = level;
-		Level handler_level = level;
+  /**
+   * Flush our stuff, but probably not needed since our TestStreamHandler
+   * flushes each record.
+   */
+  public static void flush() {
+    for (Handler handler : logger.getHandlers()) { handler.flush(); }
+  }
 
-		logger.setUseParentHandlers(false);
+  /**
+   * x
+   */
+  private static void testLogging(Level level) {
+    testLoggingInternal(level);
+    logger.log(Level.INFO, () -> "LOGGER ON, LEVEL " + level);
+  }
 
-		logger.setLevel(logger_level);
-		Handler[] handlers = logger.getHandlers();
-		if (handlers.length != 0) {
-			handlers[0].setLevel(handler_level);
-			return;
-		}
+  /**
+   * x
+   * @param _level
+   */
+  private static void testLoggingInternal(Level level) {
+    //Level logger_level = Level.ALL;
+    Level logger_level = level;
+    Level handler_level = level;
 
-		//String fmt = "%4$s: %5$s [%1$tc]%n";
-		String fmt = "%4$s: %5$s [%2$s]%6$s%n";
-		//System.setProperty("java.util.logging.SimpleFormatter.format", fmt);
-		SimpleFormatter formatter = new TestFormatter(fmt);
-		StreamHandler handler = new TestStreamHandler(System.out, formatter);
+    logger.setUseParentHandlers(false);
 
-		logger.addHandler(handler);
-		handler.setLevel(handler_level);
-	}
+    logger.setLevel(logger_level);
+    Handler[] handlers = logger.getHandlers();
+    if (handlers.length != 0) {
+      handlers[0].setLevel(handler_level);
+      return;
+    }
 
-	/** During testing don't buffer. */
-	private static class TestStreamHandler extends StreamHandler
-	{
+    //String fmt = "%4$s: %5$s [%1$tc]%n";
+    String fmt = "%4$s: %5$s [%2$s]%6$s%n";
+    //System.setProperty("java.util.logging.SimpleFormatter.format", fmt);
+    SimpleFormatter formatter = new TestFormatter(fmt);
+    StreamHandler handler = new TestStreamHandler(System.out, formatter);
 
-		public TestStreamHandler(OutputStream out, Formatter formatter)
-		{
-			super(out, formatter);
-		}
+    logger.addHandler(handler);
+    handler.setLevel(handler_level);
+  }
 
-		@Override
-		public void publish(LogRecord record)
-		{
-			super.publish(record);
-			flush();
-		}
+  /** During testing don't buffer. */
+  private static class TestStreamHandler extends StreamHandler {
+    public TestStreamHandler(OutputStream out, Formatter formatter) { super(out, formatter); }
 
-	}
+    @Override
+    public void publish(LogRecord record) {
+      super.publish(record);
+      flush();
+    }
+  }
 
-	/** To distinguish formatter used in JUnit tests */
-	private static class TestFormatter extends TestFormatterBase
-	{
-		private final String format;
-		// SurrogateLogger.getSimpleFormat(SimpleFormatter::getLoggingProperty);
-		
-		/**
-		 * Create a {@code SimpleFormatter}.
-		 * @param format
-		 */
-		public TestFormatter(String format) {
-			this.format = format;
-		}
-		
-		private static final String PREFIX = "com.nqadmin.swingset";
-		
-		/**
-		 * Format the given LogRecord. TRIM THE SOURCE NAME.
-		 * See SimpleFormatter for general documentation.
-		 */
-		@Override
-		public String format(LogRecord record) {
-			//return super.format(record);
-			return xformat(record);
-		}
-		
-		private String xformat(LogRecord record) {
-			ZonedDateTime zdt = ZonedDateTime.ofInstant(
-					record.getInstant(), ZoneId.systemDefault());
-			String source;
-			if (record.getSourceClassName() != null) {
-				source = record.getSourceClassName();
-				if (source.startsWith(PREFIX))
-					source = "SS" + source.substring(PREFIX.length());
-				if (record.getSourceMethodName() != null) {
-					source += " " + record.getSourceMethodName();
-				}
-			} else {
-				source = record.getLoggerName();
-			}
-			String message = formatMessage(record);
-			String throwable = "";
-			if (record.getThrown() != null) {
-				StringWriter sw = new StringWriter();
-				try (PrintWriter pw = new PrintWriter(sw)) {
-					pw.println();
-					record.getThrown().printStackTrace(pw);
-				}
-				throwable = sw.toString();
-			}
-			return String.format(format,
-					zdt,
-					source,
-					record.getLoggerName(),
-					record.getLevel(), //record.getLevel().getLocalizedLevelName(),
-					message,
-					throwable);
-		}
-		
-	}
+  /** To distinguish formatter used in JUnit tests */
+  private static class TestFormatter extends TestFormatterBase {
+    private final String format;
+    // SurrogateLogger.getSimpleFormat(SimpleFormatter::getLoggingProperty);
+
+    /**
+     * Create a {@code SimpleFormatter}.
+     * @param format
+     */
+    public TestFormatter(String format) { this.format = format; }
+
+    private static final String PREFIX = "com.nqadmin.swingset";
+
+    /**
+     * Format the given LogRecord. TRIM THE SOURCE NAME.
+     * See SimpleFormatter for general documentation.
+     */
+    @Override
+    public String format(LogRecord record) {
+      //return super.format(record);
+      return xformat(record);
+    }
+
+    private String xformat(LogRecord record) {
+      ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+      String source;
+      if (record.getSourceClassName() != null) {
+        source = record.getSourceClassName();
+        if (source.startsWith(PREFIX)) source = "SS" + source.substring(PREFIX.length());
+        if (record.getSourceMethodName() != null) { source += " " + record.getSourceMethodName(); }
+      } else {
+        source = record.getLoggerName();
+      }
+      String message = formatMessage(record);
+      String throwable = "";
+      if (record.getThrown() != null) {
+        StringWriter sw = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(sw)) {
+          pw.println();
+          record.getThrown().printStackTrace(pw)
+          ;
+        }
+        throwable = sw.toString();
+      }
+      return String.format(format, zdt, source, record.getLoggerName(),
+                           record.getLevel(), //record.getLevel().getLocalizedLevelName(),
+                           message, throwable);
+    }
+  }
 }

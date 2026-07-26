@@ -44,68 +44,51 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * x
  */
-public class TwoSSCommon
-{
-	
-	/** x */
-	public TwoSSCommon()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-	}
+public class TwoSSCommon {
+  /** x */
+  public TwoSSCommon() {}
 
-	@SuppressWarnings("serial")
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
 
-	class TestImage extends Image {
-		@SuppressWarnings("unused")
-		Object xxx;
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-		public TestImage()
-		{
-			finishSSCommon();
-		}
+  /** x */
+  @BeforeEach
+  public void setUp() {}
 
-		@Override
-		public void customInit()
-		{
-			super.customInit();
-			xxx = getSSCommon();
-		}
-	}
+  /** x */
+  @AfterEach
+  public void tearDown() {}
 
-	/**
-	 * Test of getStyleNames method, of class TextStyles.
-	 * @throws java.io.IOException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testOneSSCommon() throws IOException
-	{
-		System.out.println("FocusTarget");
+  @SuppressWarnings("serial")
 
-		TestImage testImage = new TestImage();
-		assertTrue(testImage.xxx == testImage.getSSCommon());
-	}
+  class TestImage extends Image {
+    @SuppressWarnings("unused")
+    Object xxx;
+
+    public TestImage() { finishSSCommon(); }
+
+    @Override
+    public void customInit() {
+      super.customInit();
+      xxx = getSSCommon();
+    }
+  }
+
+  /**
+   * Test of getStyleNames method, of class TextStyles.
+   * @throws java.io.IOException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testOneSSCommon() throws IOException {
+    System.out.println("FocusTarget");
+
+    TestImage testImage = new TestImage();
+    assertTrue(testImage.xxx == testImage.getSSCommon());
+  }
 }

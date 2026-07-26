@@ -46,67 +46,63 @@ import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Generate DbSupport instances;
- * Searches for classes that can create them. 
+ * Searches for classes that can create them.
  * See {@link DbSupportCreator}.
  */
 // Would be nice to have this run automatically. Might need a "using" method
 // somewhere that initializes database related stuff.
-public class DbSupportFactory
-{
-	private DbSupportFactory() { }
-	private static final System.Logger logger = JStuff.getLogger();
+public class DbSupportFactory {
+  private DbSupportFactory() {}
+  private static final System.Logger logger = JStuff.getLogger();
 
-	/**
-	 * Create a DbSupport that works with the specified connection according
-	 * to its metadata; put it into the CentralLookup.
-	 * It replaces any
-	 * {@code DbSupport} that might already be in there.
-	 * See {@link SSUtils#dbSupport()} for best access method.
-	 * The connection is used as the shared connection and to
-	 * examine DatabaseMetaData.
-	 * @param sharedConnection
-	 * @return an DbSupport instance that is put into CentralLookup or null.
-	 */
-	public static DbSupport addDbSupportToLookup(Connection sharedConnection) {
-		DbSupport dbSupport = createDbSupport(sharedConnection);
-		if (dbSupport != null)
-			CentralLookup.getDefault().replace(DbSupport.class, dbSupport);
-		return dbSupport;
-	}
+  /**
+   * Create a DbSupport that works with the specified connection according
+   * to its metadata; put it into the CentralLookup.
+   * It replaces any
+   * {@code DbSupport} that might already be in there.
+   * See {@link SSUtils#dbSupport()} for best access method.
+   * The connection is used as the shared connection and to
+   * examine DatabaseMetaData.
+   * @param sharedConnection
+   * @return an DbSupport instance that is put into CentralLookup or null.
+   */
+  public static DbSupport addDbSupportToLookup(Connection sharedConnection) {
+    DbSupport dbSupport = createDbSupport(sharedConnection);
+    if (dbSupport != null) CentralLookup.getDefault().replace(DbSupport.class, dbSupport);
+    return dbSupport;
+  }
 
-	/**
-	 * Create a DbSupport that works with the specified connection according
-	 * to its metadata.
-	 * The connection is used as the shared connection and to
-	 * examine DatabaseMetaData.
-	 * @param sharedConnection
-	 * @return an DbSupport instance that is put into CentralLookup or null.
-	 */
-	public static DbSupport createDbSupport(Connection sharedConnection) {
-		DatabaseMetaData dbMeta;
-		String productName;
-		try {
-			dbMeta = sharedConnection.getMetaData();
-			productName = dbMeta.getDatabaseProductName();
-		} catch (SQLException ex) {
-			logger.log(ERROR, (String) null, ex);
-			return null;
-		}
-		logger.log(Level.INFO, () -> "Creating DbSupport for " + productName);
-		Collection<? extends DbSupportCreator> creators = Lookups.forPath(
-				"SS/DbSupport/" + productName).lookupAll(DbSupportCreator.class);
-		if (creators.isEmpty()) 
-			logger.log(ERROR, () -> "No DbSupportCreator for " + productName);
+  /**
+   * Create a DbSupport that works with the specified connection according
+   * to its metadata.
+   * The connection is used as the shared connection and to
+   * examine DatabaseMetaData.
+   * @param sharedConnection
+   * @return an DbSupport instance that is put into CentralLookup or null.
+   */
+  public static DbSupport createDbSupport(Connection sharedConnection) {
+    DatabaseMetaData dbMeta;
+    String productName;
+    try {
+      dbMeta = sharedConnection.getMetaData();
+      productName = dbMeta.getDatabaseProductName();
+    } catch (SQLException ex) {
+      logger.log(ERROR, (String) null, ex);
+      return null;
+    }
+    logger.log(Level.INFO, () -> "Creating DbSupport for " + productName);
+    Collection<? extends DbSupportCreator> creators
+        = Lookups.forPath("SS/DbSupport/" + productName).lookupAll(DbSupportCreator.class);
+    if (creators.isEmpty()) logger.log(ERROR, () -> "No DbSupportCreator for " + productName);
 
-		DbSupport dbSupport = null;
-		for (DbSupportCreator creator : creators) {
-			if((dbSupport = creator.create(sharedConnection, dbMeta)) != null)
-				break;
-		}
-		if (dbSupport == null) {
-			logger.log(ERROR, () -> "Failed to create DbSupport for " + productName);
-			return null;
-		}
-		return dbSupport;
-	}
+    DbSupport dbSupport = null;
+    for (DbSupportCreator creator : creators) {
+      if ((dbSupport = creator.create(sharedConnection, dbMeta)) != null) break;
+    }
+    if (dbSupport == null) {
+      logger.log(ERROR, () -> "Failed to create DbSupport for " + productName);
+      return null;
+    }
+    return dbSupport;
+  }
 }

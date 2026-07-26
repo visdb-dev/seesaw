@@ -32,6 +32,4 @@ package com.nqadmin.swingset.decorators;
 /**
  * The only thing missing is decorateText.
  */
-public abstract class BaseTextDecorator extends BaseAnyDecorator implements TextDecorator
-{
-}
+public abstract class BaseTextDecorator extends BaseAnyDecorator implements TextDecorator {}

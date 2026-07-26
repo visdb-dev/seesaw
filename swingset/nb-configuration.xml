@@ -18,11 +18,11 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enable-indent>
         <org-netbeans-modules-editor-indent.text.html.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.html.CodeStyle.project.enable-indent>
         <org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>words</org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>4</org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>4</org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>4</org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>2</org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>2</org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>8</org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>
         <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>false</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
         <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>java;javax;org;com;*;static *</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_AssignmentIssues_2e_assignmentToMethodParam.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_AssignmentIssues_2e_assignmentToMethodParam.enabled>
@@ -86,5 +86,7 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-rethrow-runtime>false</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-rethrow-runtime>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-org-openide-util-Exceptions>false</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-org-openide-util-Exceptions>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-printStackTrace>false</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-printStackTrace>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineMethodParams>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineMethodParams>
     </properties>
 </project-shared-configuration>

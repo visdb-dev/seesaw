@@ -54,430 +54,403 @@ import static org.junit.jupiter.api.Assertions.*;
 // Google AI : junit 5 eventqueue
 //
 // In JUnit 5, the TestExecutionListener class is used to register an instance with
-// a Launcher to receive notifications about events that occur during test execution. [1]  
-// Explanation [2]  
-// 
+// a Launcher to receive notifications about events that occur during test execution. [1]
+// Explanation [2]
+//
 // • The java.awt.EventQueue class is a platform-independent class that queues events
-//   from trusted application classes and the underlying peer classes. [2]  
+//   from trusted application classes and the underlying peer classes. [2]
 // • The TestExecutionListener class is used to register an instance with a Launcher
-//   to receive notifications about events that occur during test execution. [1]  
+//   to receive notifications about events that occur during test execution. [1]
 // • To be notified of events that occur during test execution, register an instance
-//   of the TestExecutionListener class with a Launcher. [1]  
-// 
-// Some annotations used in JUnit 5 include: [3]  
-// 
-// • @ExtendWith: Used to annotate test classes in JUnit 5 [3]  
-// • @BeforeEach: Used to execute a piece of code before each test [4]  
-// • @AfterEach: Used to execute a piece of code after each test [4]  
-// • @BeforeAll: Used to execute code once for all tests in the test instance [4]  
-// • @AfterAll: Used to execute code once for all tests in the test instance [4]  
-// 
-// 
+//   of the TestExecutionListener class with a Launcher. [1]
+//
+// Some annotations used in JUnit 5 include: [3]
+//
+// • @ExtendWith: Used to annotate test classes in JUnit 5 [3]
+// • @BeforeEach: Used to execute a piece of code before each test [4]
+// • @AfterEach: Used to execute a piece of code after each test [4]
+// • @BeforeAll: Used to execute code once for all tests in the test instance [4]
+// • @AfterAll: Used to execute code once for all tests in the test instance [4]
+//
+//
 // Generative AI is experimental.
-// 
+//
 // [1] https://junit.org/junit5/docs/5.0.3/api/org/junit/platform/launcher/TestExecutionListener.html[2] https://docs.oracle.com/cd/E17802_01/j2se/j2se/1.5.0/jcp/rc/apidiffs/java/awt/EventQueue.html[3] https://devonblog.com/continuous-delivery/migration-from-junit-4-to-junit-5/[4] https://www.arhohuttunen.com/junit-5-test-lifecycle/
 
 /** x */
-public class RowsModelEventHandlingTest
-{
-	
-	/** x */
-	public RowsModelEventHandlingTest()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-		// Force the check, to set the isJunit flag to true.
-		// This is needed because of the use of 'invokeLater'
-		// where junit is not on the stack.
-		isJunit();
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-		if (oneTestBusReceiver != null)
-			WeakEventBus.unregister(oneTestBusReceiver, getGlobalEventBus());
-		oneTestBusReceiver = null;
-	}
+public class RowsModelEventHandlingTest {
+  /** x */
+  public RowsModelEventHandlingTest() {}
 
-	BusReceiver oneTestBusReceiver; // Strong Reference
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
 
-	/**
-	 * Test of Basics for of class RowsModelEventHandling.
-	 * @throws java.sql.SQLException
-	 * @throws java.lang.ClassNotFoundException
-	 * @throws java.lang.InterruptedException
-	 * @throws java.lang.reflect.InvocationTargetException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testBasicHandling()
-	throws SQLException, ClassNotFoundException,
-			InterruptedException, InvocationTargetException
-	{
-		System.out.println("Basics");
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-		H2.clean();
+  /** x */
+  @BeforeEach
+  public void setUp() {
+    // Force the check, to set the isJunit flag to true.
+    // This is needed because of the use of 'invokeLater'
+    // where junit is not on the stack.
+    isJunit();
+  }
 
-		RowSet rs1 = TinyRS.getRS1();
-		RowsModel model1 = RowsModel.create(rs1, null);
+  /** x */
+  @AfterEach
+  public void tearDown() {
+    if (oneTestBusReceiver != null)
+      WeakEventBus.unregister(oneTestBusReceiver, getGlobalEventBus());
+    oneTestBusReceiver = null;
+  }
 
-		RowSet rs2 = TinyRS.getRS2();
-		RowsModel model2 = RowsModel.create(rs2, null);
+  BusReceiver oneTestBusReceiver; // Strong Reference
 
-		oneTestBusReceiver = EQ.setupBusReceiver();
-		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
+  /**
+   * Test of Basics for of class RowsModelEventHandling.
+   * @throws java.sql.SQLException
+   * @throws java.lang.ClassNotFoundException
+   * @throws java.lang.InterruptedException
+   * @throws java.lang.reflect.InvocationTargetException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testBasicHandling()
+      throws SQLException, ClassNotFoundException, InterruptedException, InvocationTargetException {
+    System.out.println("Basics");
 
-		System.out.println("=== next");
-		events.clear();
-		// all the "next" collapsed into a single event
-		assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s),
-				() -> {
-					model1.next();
-					model1.next();	// merged
-					model1.next();	// merged
-				}));
-		assertEquals(1, events.size());
-		assertEquals(ACTION, events.get(0).getKindOperator());
-		assertEquals(ACT_NEXT, events.get(0).getOperAct());
+    H2.clean();
 
-		System.out.println("=== rsOp next");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick2", s -> System.out.println(s),
-				() -> {
-					model2.rsOp(this, () -> {
-						rs2.next();
-						rs2.next();
-						rs2.next();
-					});
-				}));
-		assertEquals(1, events.size());
-		assertEquals(OTHER, events.get(0).getKindOperator());
-		assertTrue(this == events.get(0).getOperAny());
+    RowSet rs1 = TinyRS.getRS1();
+    RowsModel model1 = RowsModel.create(rs1, null);
 
-		// Anonymous RowSet
-		System.out.println("=== anon next");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick3", s -> System.out.println(s),
-				() -> {
-					rs2.next();
-					rs2.next();
-					rs2.next();
-				}));
-		assertEquals(1, events.size());
-		assertEquals(ANON, events.get(0).getKindOperator());
-		assertTrue(null == events.get(0).getOperAny());
+    RowSet rs2 = TinyRS.getRS2();
+    RowsModel model2 = RowsModel.create(rs2, null);
 
-		// Opening insert row
-		System.out.println("=== insert");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick4", s -> System.out.println(s),
-				() -> { model2.getAction(RowsAction.ACT_ADD).actionPerformed(null); }));
-		assertEquals(1, events.size());
-		assertTrue(RowSetState.isInserting(model2.getRowSet()));
+    oneTestBusReceiver = EQ.setupBusReceiver();
+    EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick5", s -> System.out.println(s),
-				() -> { model2.getAction(RowsAction.ACT_REVERT).actionPerformed(null); }));
-		assertFalse(RowSetState.isInserting(model2.getRowSet()));
+    System.out.println("=== next");
+    events.clear();
+    // all the "next" collapsed into a single event
+    assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s), () -> {
+      model1.next();
+      model1.next(); // merged
+      model1.next(); // merged
+    }));
+    assertEquals(1, events.size());
+    assertEquals(ACTION, events.get(0).getKindOperator());
+    assertEquals(ACT_NEXT, events.get(0).getOperAct());
 
-		// Opening insert row on *empty* rowSet
-		RowsModel model3 = RowsModel.create(TinyRS.getRSEmpty(), null);
-		System.out.println("=== empty insert");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick6", s -> System.out.println(s),
-				() -> { model3.getAction(RowsAction.ACT_ADD).actionPerformed(null); }));
-		assertEquals(1, events.size());
-		assertTrue(RowSetState.isInserting(model3.getRowSet()));
+    System.out.println("=== rsOp next");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick2", s -> System.out.println(s), () -> {
+      model2.rsOp(this, () -> {
+        rs2.next();
+        rs2.next();
+        rs2.next();
+      });
+    }));
+    assertEquals(1, events.size());
+    assertEquals(OTHER, events.get(0).getKindOperator());
+    assertTrue(this == events.get(0).getOperAny());
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick7", s -> System.out.println(s),
-				() -> { model3.getAction(RowsAction.ACT_REVERT).actionPerformed(null); }));
-		assertFalse(RowSetState.isInserting(model3.getRowSet()));
-	}
+    // Anonymous RowSet
+    System.out.println("=== anon next");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick3", s -> System.out.println(s), () -> {
+      rs2.next();
+      rs2.next();
+      rs2.next();
+    }));
+    assertEquals(1, events.size());
+    assertEquals(ANON, events.get(0).getKindOperator());
+    assertTrue(null == events.get(0).getOperAny());
 
-	/**
-	 * Test of Basics for of class RowsModelEventHandling.
-	 * @throws java.sql.SQLException
-	 * @throws java.lang.ClassNotFoundException
-	 * @throws java.lang.InterruptedException
-	 * @throws java.lang.reflect.InvocationTargetException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testAbsorbHandling()
-			throws SQLException, ClassNotFoundException,
-			InterruptedException, InvocationTargetException
-	{
-		System.out.println("Absorb");
+    // Opening insert row
+    System.out.println("=== insert");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick4", s -> System.out.println(s), () -> {
+      model2.getAction(RowsAction.ACT_ADD).actionPerformed(null);
+    }));
+    assertEquals(1, events.size());
+    assertTrue(RowSetState.isInserting(model2.getRowSet()));
 
-		H2.clean();
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick5", s -> System.out.println(s), () -> {
+      model2.getAction(RowsAction.ACT_REVERT).actionPerformed(null);
+    }));
+    assertFalse(RowSetState.isInserting(model2.getRowSet()));
 
-		RowSet rs1 = TinyRS.getRS1();
-		RowsModel model1 = RowsModel.create(rs1, null);
+    // Opening insert row on *empty* rowSet
+    RowsModel model3 = RowsModel.create(TinyRS.getRSEmpty(), null);
+    System.out.println("=== empty insert");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick6", s -> System.out.println(s), () -> {
+      model3.getAction(RowsAction.ACT_ADD).actionPerformed(null);
+    }));
+    assertEquals(1, events.size());
+    assertTrue(RowSetState.isInserting(model3.getRowSet()));
 
-		RowSet rs2 = TinyRS.getRS2();
-		RowsModel model2 = RowsModel.create(rs2, null);
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick7", s -> System.out.println(s), () -> {
+      model3.getAction(RowsAction.ACT_REVERT).actionPerformed(null);
+    }));
+    assertFalse(RowSetState.isInserting(model3.getRowSet()));
+  }
 
-		oneTestBusReceiver = EQ.setupBusReceiver();
-		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
+  /**
+   * Test of Basics for of class RowsModelEventHandling.
+   * @throws java.sql.SQLException
+   * @throws java.lang.ClassNotFoundException
+   * @throws java.lang.InterruptedException
+   * @throws java.lang.reflect.InvocationTargetException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testAbsorbHandling()
+      throws SQLException, ClassNotFoundException, InterruptedException, InvocationTargetException {
+    System.out.println("Absorb");
 
+    H2.clean();
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s),
-				() -> {
-					model1.next();
-					model1.next();
-					model1.first();
-					model1.next();
-					model1.next();	// merged
-					model1.first();
-					model1.next();
-					model1.next();	// merged
-				}));
-		assertEquals(5, events.size());
-		assertEquals(ACT_NEXT,  events.get(0).getOperAct());
-		assertEquals(ACT_FIRST, events.get(1).getOperAct());
-		assertEquals(ACT_NEXT,  events.get(2).getOperAct());
-		assertEquals(ACT_FIRST, events.get(3).getOperAct());
-		assertEquals(ACT_NEXT,  events.get(4).getOperAct());
-		
+    RowSet rs1 = TinyRS.getRS1();
+    RowsModel model1 = RowsModel.create(rs1, null);
 
-		System.out.println("===");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick2", s -> System.out.println(s),
-				() -> {
-					// The events by model2 prevent merging
-					model1.first();
-					model1.next();
-					model2.next();
-					model1.next();
-					model1.next();	// merged
-					model1.next();	// merged
-					model2.next();
-				}));
-		assertEquals(5, events.size());
-		assertEquals(model1, events.get(0).getRowsModel());
-		assertEquals(ACT_FIRST, events.get(0).getOperAct());
-		assertEquals(model1, events.get(1).getRowsModel());
-		assertEquals(ACT_NEXT, events.get(1).getOperAct());
+    RowSet rs2 = TinyRS.getRS2();
+    RowsModel model2 = RowsModel.create(rs2, null);
 
-		assertEquals(model2, events.get(2).getRowsModel());
-		assertEquals(ACT_NEXT, events.get(2).getOperAct());
+    oneTestBusReceiver = EQ.setupBusReceiver();
+    EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
 
-		assertEquals(model1, events.get(3).getRowsModel());
-		assertEquals(ACT_NEXT, events.get(3).getOperAct());
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s), () -> {
+      model1.next();
+      model1.next();
+      model1.first();
+      model1.next();
+      model1.next(); // merged
+      model1.first();
+      model1.next();
+      model1.next(); // merged
+    }));
+    assertEquals(5, events.size());
+    assertEquals(ACT_NEXT, events.get(0).getOperAct());
+    assertEquals(ACT_FIRST, events.get(1).getOperAct());
+    assertEquals(ACT_NEXT, events.get(2).getOperAct());
+    assertEquals(ACT_FIRST, events.get(3).getOperAct());
+    assertEquals(ACT_NEXT, events.get(4).getOperAct());
 
-		assertEquals(model2, events.get(4).getRowsModel());
-		assertEquals(ACT_NEXT, events.get(4).getOperAct());
+    System.out.println("===");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick2", s -> System.out.println(s), () -> {
+      // The events by model2 prevent merging
+      model1.first();
+      model1.next();
+      model2.next();
+      model1.next();
+      model1.next(); // merged
+      model1.next(); // merged
+      model2.next();
+    }));
+    assertEquals(5, events.size());
+    assertEquals(model1, events.get(0).getRowsModel());
+    assertEquals(ACT_FIRST, events.get(0).getOperAct());
+    assertEquals(model1, events.get(1).getRowsModel());
+    assertEquals(ACT_NEXT, events.get(1).getOperAct());
 
-		System.out.println("===");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick3", s -> System.out.println(s),
-				() -> {
-					model1.rsOp(this, () -> {
-						rs1.first();
-						rs1.first();
-						rs1.first();
-						rs1.first();
-						rs1.first();
-						rs1.first();
-					});
-				}));
-		assertEquals(1, events.size());
-		assertEquals(model1, events.get(0).getRowsModel());
-		assertEquals(null, events.get(0).getOperAct());
-		assertEquals(OTHER, events.get(0).getKindOperator());
-	}
+    assertEquals(model2, events.get(2).getRowsModel());
+    assertEquals(ACT_NEXT, events.get(2).getOperAct());
 
-	/**
-	 * Test of Nested for of class RowsModelEventHandling.
-	 * @throws java.sql.SQLException
-	 * @throws java.lang.ClassNotFoundException
-	 * @throws java.lang.InterruptedException
-	 * @throws java.lang.reflect.InvocationTargetException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testNestedHandling()
-	throws SQLException, ClassNotFoundException,
-			InterruptedException, InvocationTargetException
-	{
-		System.out.println("Nested");
+    assertEquals(model1, events.get(3).getRowsModel());
+    assertEquals(ACT_NEXT, events.get(3).getOperAct());
 
-		H2.clean();
+    assertEquals(model2, events.get(4).getRowsModel());
+    assertEquals(ACT_NEXT, events.get(4).getOperAct());
 
-		RowSet rs1 = TinyRS.getRS1();
-		RowsModel model1 = RowsModel.create(rs1, null);
+    System.out.println("===");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick3", s -> System.out.println(s), () -> {
+      model1.rsOp(this, () -> {
+        rs1.first();
+        rs1.first();
+        rs1.first();
+        rs1.first();
+        rs1.first();
+        rs1.first();
+      });
+    }));
+    assertEquals(1, events.size());
+    assertEquals(model1, events.get(0).getRowsModel());
+    assertEquals(null, events.get(0).getOperAct());
+    assertEquals(OTHER, events.get(0).getKindOperator());
+  }
 
-		RowSet rs2 = TinyRS.getRS2();
-		RowsModel model2 = RowsModel.create(rs2, null);
+  /**
+   * Test of Nested for of class RowsModelEventHandling.
+   * @throws java.sql.SQLException
+   * @throws java.lang.ClassNotFoundException
+   * @throws java.lang.InterruptedException
+   * @throws java.lang.reflect.InvocationTargetException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testNestedHandling()
+      throws SQLException, ClassNotFoundException, InterruptedException, InvocationTargetException {
+    System.out.println("Nested");
 
-		oneTestBusReceiver = EQ.setupBusReceiver();
-		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
+    H2.clean();
 
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s),
-				() -> {
-					model1.rsOp(this, () -> {
-						rs1.first();
-						rs1.first();
-					});
-				}));
-		assertEquals(1, events.size());
-		assertEquals(OTHER, events.get(0).getKindOperator());
+    RowSet rs1 = TinyRS.getRS1();
+    RowsModel model1 = RowsModel.create(rs1, null);
 
-		System.out.println("===");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s),
-				() -> {
-					model1.rsOp(this, () -> {
-						rs1.first();
-						rs2.first();
-						rs1.first();
-					});
-				}));
-		assertEquals(3, events.size());
-		assertEquals(OTHER, events.get(0).getKindOperator());
-		assertEquals(rs1,   events.get(0).getRowSet());
-		assertEquals(ANON,  events.get(1).getKindOperator());
-		assertEquals(rs2,   events.get(1).getRowSet());
-		assertEquals(OTHER, events.get(2).getKindOperator());
-		assertEquals(rs1,   events.get(2).getRowSet());
+    RowSet rs2 = TinyRS.getRS2();
+    RowsModel model2 = RowsModel.create(rs2, null);
 
-		System.out.println("===");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s),
-				() -> {
-					model1.rsOp(this, () -> {
-						rs1.first();
-						model2.rsOp(this, () -> {
-							rs2.first();
-						});
-						rs1.first();
-					});
-				}));
-		assertEquals(3, events.size());
-		assertEquals(OTHER, events.get(0).getKindOperator());
-		assertEquals(model1, events.get(0).getRowsModel());
-		assertEquals(rs1, events.get(0).getRowSet());
+    oneTestBusReceiver = EQ.setupBusReceiver();
+    EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
 
-		assertEquals(OTHER, events.get(1).getKindOperator());
-		assertEquals(model2, events.get(1).getRowsModel());
-		assertEquals(rs2, events.get(1).getRowSet());
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s), () -> {
+      model1.rsOp(this, () -> {
+        rs1.first();
+        rs1.first();
+      });
+    }));
+    assertEquals(1, events.size());
+    assertEquals(OTHER, events.get(0).getKindOperator());
 
-		assertEquals(OTHER, events.get(2).getKindOperator());
-		assertEquals(model1, events.get(2).getRowsModel());
-		assertEquals(rs1, events.get(2).getRowSet());
+    System.out.println("===");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s), () -> {
+      model1.rsOp(this, () -> {
+        rs1.first();
+        rs2.first();
+        rs1.first();
+      });
+    }));
+    assertEquals(3, events.size());
+    assertEquals(OTHER, events.get(0).getKindOperator());
+    assertEquals(rs1, events.get(0).getRowSet());
+    assertEquals(ANON, events.get(1).getKindOperator());
+    assertEquals(rs2, events.get(1).getRowSet());
+    assertEquals(OTHER, events.get(2).getKindOperator());
+    assertEquals(rs1, events.get(2).getRowSet());
 
-		System.out.println("===");
-		events.clear();
-		assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s),
-				() -> {
-					model1.rsOp(this, () -> {
-						rs1.first();
-						model2.next();
-						rs1.first();
-					});
-				}));
-		assertEquals(3, events.size());
-		assertEquals(OTHER, events.get(0).getKindOperator());
-		assertEquals(model1, events.get(0).getRowsModel());
-		assertEquals(rs1, events.get(0).getRowSet());
+    System.out.println("===");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s), () -> {
+      model1.rsOp(this, () -> {
+        rs1.first();
+        model2.rsOp(this, () -> { rs2.first(); });
+        rs1.first();
+      });
+    }));
+    assertEquals(3, events.size());
+    assertEquals(OTHER, events.get(0).getKindOperator());
+    assertEquals(model1, events.get(0).getRowsModel());
+    assertEquals(rs1, events.get(0).getRowSet());
 
-		assertEquals(ACTION, events.get(1).getKindOperator());
-		assertEquals(model2, events.get(1).getRowsModel());
-		assertEquals(rs2, events.get(1).getRowSet());
+    assertEquals(OTHER, events.get(1).getKindOperator());
+    assertEquals(model2, events.get(1).getRowsModel());
+    assertEquals(rs2, events.get(1).getRowSet());
 
-		assertEquals(OTHER, events.get(2).getKindOperator());
-		assertEquals(model1, events.get(2).getRowsModel());
-		assertEquals(rs1, events.get(2).getRowSet());
-	}
+    assertEquals(OTHER, events.get(2).getKindOperator());
+    assertEquals(model1, events.get(2).getRowsModel());
+    assertEquals(rs1, events.get(2).getRowSet());
 
-	// /**
-	//  * Test of postAsync method, of class RowsModelEventHandling.
-	//  */
-	// // @Test
-	// public void testPostAsync()
-	// {
-	// 	System.out.println("postAsync");
-	// 	RowsModelEvent event = null;
-	// 	RowsModelEventHandling.postAsync(event);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+    System.out.println("===");
+    events.clear();
+    assertTrue(EQ.invokeLatchWait("tick1", s -> System.out.println(s), () -> {
+      model1.rsOp(this, () -> {
+        rs1.first();
+        model2.next();
+        rs1.first();
+      });
+    }));
+    assertEquals(3, events.size());
+    assertEquals(OTHER, events.get(0).getKindOperator());
+    assertEquals(model1, events.get(0).getRowsModel());
+    assertEquals(rs1, events.get(0).getRowSet());
 
-	// /**
-	//  * Test of dumpQueuedEvents method, of class RowsModelEventHandling.
-	//  */
-	// @Test
-	// public void testDumpQueuedEvents()
-	// {
-	// 	System.out.println("dumpQueuedEvents");
-	// 	String tag = "";
-	// 	Deque<RowsModelEvent> evs = null;
-	// 	StringBuilder _sb = null;
-	// 	String tag2 = "";
-	// 	StringBuilder expResult = null;
-	// 	StringBuilder result = RowsModelEventHandling.dumpQueuedEvents(tag, evs, _sb, tag2);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+    assertEquals(ACTION, events.get(1).getKindOperator());
+    assertEquals(model2, events.get(1).getRowsModel());
+    assertEquals(rs2, events.get(1).getRowSet());
 
-	// /**
-	//  * Test of addToAllEvents method, of class RowsModelEventHandling.
-	//  */
-	// @Test
-	// public void testAddToAllEvents()
-	// {
-	// 	System.out.println("addToAllEvents");
-	// 	RowsModelEvent event = null;
-	// 	RowsModelEventHandling.addToAllEvents(event);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+    assertEquals(OTHER, events.get(2).getKindOperator());
+    assertEquals(model1, events.get(2).getRowsModel());
+    assertEquals(rs1, events.get(2).getRowSet());
+  }
 
-	// /**
-	//  * Test of latestEvents method, of class RowsModelEventHandling.
-	//  */
-	// @Test
-	// public void testDumpAllEvents()
-	// {
-	// 	System.out.println("latestEvents");
-	// 	String tag = "";
-	// 	RowsModelEventHandling.latestEvents(tag);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+  // /**
+  //  * Test of postAsync method, of class RowsModelEventHandling.
+  //  */
+  // // @Test
+  // public void testPostAsync()
+  // {
+  // 	System.out.println("postAsync");
+  // 	RowsModelEvent event = null;
+  // 	RowsModelEventHandling.postAsync(event);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
 
-	// /**
-	//  * Test of verifyEDT method, of class RowsModelEventHandling.
-	//  */
-	// @Test
-	// public void testVerifyEDT()
-	// {
-	// 	System.out.println("verifyEDT");
-	// 	RowsModelEventHandling.verifyEDT();
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-	
+  // /**
+  //  * Test of dumpQueuedEvents method, of class RowsModelEventHandling.
+  //  */
+  // @Test
+  // public void testDumpQueuedEvents()
+  // {
+  // 	System.out.println("dumpQueuedEvents");
+  // 	String tag = "";
+  // 	Deque<RowsModelEvent> evs = null;
+  // 	StringBuilder _sb = null;
+  // 	String tag2 = "";
+  // 	StringBuilder expResult = null;
+  // 	StringBuilder result = RowsModelEventHandling.dumpQueuedEvents(tag, evs, _sb, tag2);
+  // 	assertEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of addToAllEvents method, of class RowsModelEventHandling.
+  //  */
+  // @Test
+  // public void testAddToAllEvents()
+  // {
+  // 	System.out.println("addToAllEvents");
+  // 	RowsModelEvent event = null;
+  // 	RowsModelEventHandling.addToAllEvents(event);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of latestEvents method, of class RowsModelEventHandling.
+  //  */
+  // @Test
+  // public void testDumpAllEvents()
+  // {
+  // 	System.out.println("latestEvents");
+  // 	String tag = "";
+  // 	RowsModelEventHandling.latestEvents(tag);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of verifyEDT method, of class RowsModelEventHandling.
+  //  */
+  // @Test
+  // public void testVerifyEDT()
+  // {
+  // 	System.out.println("verifyEDT");
+  // 	RowsModelEventHandling.verifyEDT();
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
 }

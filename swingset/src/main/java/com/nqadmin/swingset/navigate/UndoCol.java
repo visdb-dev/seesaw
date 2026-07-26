@@ -65,199 +65,171 @@ import static java.lang.System.Logger.Level.*;
  * The database is read for the initial value when this is created,
  * except for the insertRow.
  */
-final class UndoCol
-{
-	/** One item per change, changes.get(0) is the current value in the database;
-	 * or the value from preInsertOps. */
-	private final List<Change> changes;
-	/** The index of the previous Value. */
-	private int curIdx;
-	/**
-	 * When set, the next change starts a new item on the undo stack.
-	 * Set to true when column gets focus, or column value changed by undo/redo.
-	 */
-	private boolean needNewSlot;
+final class UndoCol {
+  /**
+   * One item per change, changes.get(0) is the current value in the database;
+   * or the value from preInsertOps.
+   */
+  private final List<Change> changes;
+  /** The index of the previous Value. */
+  private int curIdx;
+  /**
+   * When set, the next change starts a new item on the undo stack.
+   * Set to true when column gets focus, or column value changed by undo/redo.
+   */
+  private boolean needNewSlot;
 
-	/**
-	 * Create an empty UndoCol.
-	 */
-	private UndoCol()
-	{
-		changes = new ArrayList<>(3);
-		curIdx = 0;
-		needNewSlot = true;
-	}
+  /**
+   * Create an empty UndoCol.
+   */
+  private UndoCol() {
+    changes = new ArrayList<>(3);
+    curIdx = 0;
+    needNewSlot = true;
+  }
 
-	/**
-	 * Create UndoCol; initialize undo/redo stack from the value.
-	 * @param change
-	 */
-	UndoCol(Change change)
-	{
-		this();
-		changes.add(change);
-	}
+  /**
+   * Create UndoCol; initialize undo/redo stack from the value.
+   * @param change
+   */
+  UndoCol(Change change) {
+    this();
+    changes.add(change);
+  }
 
-	/**
-	 * Create UndoCol; initialize undo/redo stack from comp's database value;
-	 * @param comp RowSet Column
-	 */
-	UndoCol(RSC comp) throws SQLException
-	{
-		this(new Change(initialValue(comp), false));
-	}
+  /**
+   * Create UndoCol; initialize undo/redo stack from comp's database value;
+   * @param comp RowSet Column
+   */
+  UndoCol(RSC comp) throws SQLException { this(new Change(initialValue(comp), false)); }
 
-	private static Object initialValue(RSC comp) throws SQLException
-	{
-		//return isPreInsertOps(comp.getRowSet())
-		//		? null : comp.getRowSet().getObject(comp.getColumnIndex());
+  private static Object initialValue(RSC comp) throws SQLException {
+    //return isPreInsertOps(comp.getRowSet())
+    //		? null : comp.getRowSet().getObject(comp.getColumnIndex());
 
-		// If doing preInsertOps, just use a null for the initial value
-		// (special case text field); the real value is on the way.
-		if (isPreInsertOps(comp.getRowSet())) {
-			if (comp instanceof JTextComponent)
-				return comp.getAllowNull() ? null : "";
-			else
-				return null;
-		} else
-			return RowSetOps.getColumnDirect(comp);
-	}
+    // If doing preInsertOps, just use a null for the initial value
+    // (special case text field); the real value is on the way.
+    if (isPreInsertOps(comp.getRowSet())) {
+      if (comp instanceof JTextComponent) return comp.getAllowNull() ? null : "";
+      else return null;
+    } else return RowSetOps.getColumnDirect(comp);
+  }
 
-	/** Check if there is an undo (previous) value. */
-	boolean hasPrev()
-	{
-		return curIdx > 0;
-	}
+  /** Check if there is an undo (previous) value. */
+  boolean hasPrev() { return curIdx > 0; }
 
-	/** Return the undo (prevValue). MUST check hasPrev() first. */
-	private Change prevValue()
-	{
-		needNewSlot = true;
-		--curIdx;
-		return changes.get(curIdx);
-	}
+  /** Return the undo (prevValue). MUST check hasPrev() first. */
+  private Change prevValue() {
+    needNewSlot = true;
+    --curIdx;
+    return changes.get(curIdx);
+  }
 
-	/** Check if there a redo (next) value. */
-	boolean hasNext()
-	{
-		return curIdx < changes.size() - 1;
-	}
+  /** Check if there a redo (next) value. */
+  boolean hasNext() { return curIdx < changes.size() - 1; }
 
-	/** Return the redo (nextValue. MUST check hasNext() first. */
-	private Change nextValue()
-	{
-		needNewSlot = true;
-		++curIdx;
-		return changes.get(curIdx);
-	}
+  /** Return the redo (nextValue. MUST check hasNext() first. */
+  private Change nextValue() {
+    needNewSlot = true;
+    ++curIdx;
+    return changes.get(curIdx);
+  }
 
-	/**
-	 * This is always called if ESC, even if there is only 1 item on stack.
-	 * Some components have intermediate values that aren't on the undo/redo
-	 * stack, so always return the value from the database to set the component.
-	 */
-	private Change cancelEdits() {
-		// If don't clear stack, it's like a super undo, keeping redo stack.
-		// changes.subList(1, changes.size()).clear();
-		needNewSlot = true;
-		curIdx = 0;
-		return changes.get(0);
-	}
+  /**
+   * This is always called if ESC, even if there is only 1 item on stack.
+   * Some components have intermediate values that aren't on the undo/redo
+   * stack, so always return the value from the database to set the component.
+   */
+  private Change cancelEdits() {
+    // If don't clear stack, it's like a super undo, keeping redo stack.
+    // changes.subList(1, changes.size()).clear();
+    needNewSlot = true;
+    curIdx = 0;
+    return changes.get(0);
+  }
 
-	/**
-	 * Update the undo history with a change.
-	 * A bunch of changes in a row, go to the same slot.
-	 * On the first change for the column grab the database value as an object.
-	 * @param me modification data
-	 */
-	void addChange(ColumnChangeStartEvent me) throws SQLException
-	{
-		// TODO: only do this if null?
-		// Don't push something on the top if it equals what's on the top.
-		Change newChange = new Change(me.getValue(), me.isError());
-		if (fetchCurrentChange().equals(newChange))
-			return;
+  /**
+   * Update the undo history with a change.
+   * A bunch of changes in a row, go to the same slot.
+   * On the first change for the column grab the database value as an object.
+   * @param me modification data
+   */
+  void addChange(ColumnChangeStartEvent me) throws SQLException {
+    // TODO: only do this if null?
+    // Don't push something on the top if it equals what's on the top.
+    Change newChange = new Change(me.getValue(), me.isError());
+    if (fetchCurrentChange().equals(newChange)) return;
 
-		if (needNewSlot) {
-			// First modification after a focus change or change that needs new slot.
-			// Put change in a new spot.
-			++curIdx;
-			if (curIdx >= changes.size())
-				changes.add(null); // need a new slot
-			needNewSlot = false;
-		}
-		assert curIdx > 0 : "can not be on the original value";
+    if (needNewSlot) {
+      // First modification after a focus change or change that needs new slot.
+      // Put change in a new spot.
+      ++curIdx;
+      if (curIdx >= changes.size()) changes.add(null); // need a new slot
+      needNewSlot = false;
+    }
+    assert curIdx > 0 : "can not be on the original value";
 
-		// Remove entries after where the next entry goes.
-		changes.subList(curIdx+1, changes.size()).clear();
-		assert curIdx == changes.size() - 1 : "curIdx must be last item";
+    // Remove entries after where the next entry goes.
+    changes.subList(curIdx + 1, changes.size()).clear();
+    assert curIdx == changes.size() - 1 : "curIdx must be last item";
 
-		changes.set(curIdx, newChange);
-		NavigateState.getLogger().log(DEBUG, () -> sf("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
-		removeDuplicateChange(curIdx);
-	}
+    changes.set(curIdx, newChange);
+    NavigateState.getLogger().log(
+        DEBUG, () -> sf("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
+    removeDuplicateChange(curIdx);
+  }
 
-	/**
-	 * If the change at {@code idx} is equal to previous change then
-	 * remove it; adjust curIdx as needed.
-	 * 
-	 * @return true if a change was removed.
-	 */
-	boolean removeDuplicateChange(int idx) {
-		if (idx == 0 || idx >= changes.size())
-			return false;
+  /**
+   * If the change at {@code idx} is equal to previous change then
+   * remove it; adjust curIdx as needed.
+   *
+   * @return true if a change was removed.
+   */
+  boolean removeDuplicateChange(int idx) {
+    if (idx == 0 || idx >= changes.size()) return false;
 
-		// Can probably assert curIdx == changes.size() - 1
-		//if (curIdx != changes.size() - 1) throw new IllegalStateException();
-		if (changes.get(idx).equals(changes.get(idx - 1))) {
-			NavigateState.getLogger().log(DEBUG,
-					() -> sf("UNDO/REDO removeDuplicateChange: %d - %s", idx, changes));
-			changes.remove(idx);
-			if (idx <= curIdx) { curIdx--; }
-			needNewSlot = true;
-			return true;
-		}
-		return false;
-	}
+    // Can probably assert curIdx == changes.size() - 1
+    //if (curIdx != changes.size() - 1) throw new IllegalStateException();
+    if (changes.get(idx).equals(changes.get(idx - 1))) {
+      NavigateState.getLogger().log(
+          DEBUG, () -> sf("UNDO/REDO removeDuplicateChange: %d - %s", idx, changes));
+      changes.remove(idx);
+      if (idx <= curIdx) { curIdx--; }
+      needNewSlot = true;
+      return true;
+    }
+    return false;
+  }
 
-	boolean isDirty()
-	{
-		return curIdx != 0;
-	}
+  boolean isDirty() { return curIdx != 0; }
 
-	Change findUndoRedoChange(UndoRedo cmd)
-	{
-		return switch(cmd) {
-		case UNDO -> hasPrev() ? prevValue() : UndoRedo.NO_CHANGE;
-		case REDO -> hasNext() ? nextValue() : UndoRedo.NO_CHANGE;
-		case ESC -> cancelEdits();
-		};
-	}
+  Change findUndoRedoChange(UndoRedo cmd) {
+    return switch (cmd) {
+      case UNDO -> hasPrev() ? prevValue() : UndoRedo.NO_CHANGE;
+      case REDO -> hasNext() ? nextValue() : UndoRedo.NO_CHANGE;
+      case ESC -> cancelEdits();
+    };
+  }
 
-	/**
-	 * The current value may be what's in the data base, if curIdx is 0;
-	 * or it may be the value from a modification event.
-	 * @return value
-	 */
-	Change fetchCurrentChange()
-	{
-		return changes.get(curIdx);
-	}
+  /**
+   * The current value may be what's in the data base, if curIdx is 0;
+   * or it may be the value from a modification event.
+   * @return value
+   */
+  Change fetchCurrentChange() { return changes.get(curIdx); }
 
-	/**
-	 * Handle focus change.
-	 * @param ev event may be null
-	 */
-	void focusChange(FocusChangeEvent ev)
-	{
-		removeDuplicateChange(curIdx);
-		needNewSlot = true;
-	}
+  /**
+   * Handle focus change.
+   * @param ev event may be null
+   */
+  void focusChange(FocusChangeEvent ev) {
+    removeDuplicateChange(curIdx);
+    needNewSlot = true;
+  }
 
-	@Override
-	public String toString()
-	{
-		return sf("UndoCol{curIdx=%s, needNewSlot=%s, nChanges %d, changes=%s}",
-				curIdx, needNewSlot, changes.size(), changes);
-	}
+  @Override
+  public String toString() {
+    return sf("UndoCol{curIdx=%s, needNewSlot=%s, nChanges %d, changes=%s}", curIdx, needNewSlot,
+              changes.size(), changes);
+  }
 }

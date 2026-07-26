@@ -32,8 +32,6 @@ package com.nqadmin.swingset.navigate;
 /**
  * Tag for events broadcast from {@link RowsModel}.
  */
-interface RowsModelEvent
-{
-	RowsModel getRowsModel();
+interface RowsModelEvent {
+  RowsModel getRowsModel();
 }
-

@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -53,62 +53,52 @@ import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
  * Typically used to bind a SSFormattedTextField to an integer column in a database.
  */
 @SuppressWarnings("serial")
-public class SSIntegerField extends NumberField
-{
-	/**
-	 * Creates a new instance of SSIntegerField
-	 */
-	public SSIntegerField()
-	{
-		this(createFormatterFactory(CUSTOM, null));
-	}
+public class SSIntegerField extends NumberField {
+  /**
+   * Creates a new instance of SSIntegerField
+   */
+  public SSIntegerField() { this(createFormatterFactory(CUSTOM, null)); }
 
-	/**
-	 * Creates an object of SSIntegerField with the specified number of digits.
-	 *
-	 * @param precision - number of digits needed
-	 */
-	public SSIntegerField(int precision) {
-		this(createFormatterFactory(CUSTOM, precision));
-	}
+  /**
+   * Creates an object of SSIntegerField with the specified number of digits.
+   *
+   * @param precision - number of digits needed
+   */
+  public SSIntegerField(int precision) { this(createFormatterFactory(CUSTOM, precision)); }
 
-	/**
-	 * Creates an object of SSIntegerField with the specified formatter factory
-	 *
-	 * @param factory - formatter factory to be used
-	 */
-	public SSIntegerField(AbstractFormatterFactory factory) {
-		super(factory);
-	}
+  /**
+   * Creates an object of SSIntegerField with the specified formatter factory
+   *
+   * @param factory - formatter factory to be used
+   */
+  public SSIntegerField(AbstractFormatterFactory factory) { super(factory); }
 
-	/**
-	 * This class should throw a run-time exception if this method is used;
-	 * but it is silently ignored.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public void setDecimals(final int decimals) {
-	}
+  /**
+   * This class should throw a run-time exception if this method is used;
+   * but it is silently ignored.
+   * {@inheritDoc }
+   */
+  @Override
+  public void setDecimals(final int decimals) {}
 
-	/**
-	 * Create a FormatterFactory.
-	 * @param ssFormat
-	 * @param precision
-	 * @return FormatterFactory.
-	 */
-	public static DefaultFormatterFactory createFormatterFactory(
-			SSFormat ssFormat, Integer precision)
-	{
-		Objects.requireNonNull(ssFormat);
+  /**
+   * Create a FormatterFactory.
+   * @param ssFormat
+   * @param precision
+   * @return FormatterFactory.
+   */
+  public static DefaultFormatterFactory createFormatterFactory(SSFormat ssFormat,
+                                                               Integer precision) {
+    Objects.requireNonNull(ssFormat);
 
-		NumberFormat integerFormat = createNumberFormat(()->NumberFormat.getIntegerInstance());
+    NumberFormat integerFormat = createNumberFormat(() -> NumberFormat.getIntegerInstance());
 
-		initPrecision(precision, integerFormat);
-		
-		return new SSFormatterFactory.Builder<>()
-				.ssFormat(ssFormat)
-				.displayFormatter(new SSNumberFormatter(integerFormat))
-				.editFormatter(new SSNumberFormatter(integerFormat))
-				.build();
-	}
+    initPrecision(precision, integerFormat);
+
+    return new SSFormatterFactory.Builder<>()
+        .ssFormat(ssFormat)
+        .displayFormatter(new SSNumberFormatter(integerFormat))
+        .editFormatter(new SSNumberFormatter(integerFormat))
+        .build();
+  }
 }

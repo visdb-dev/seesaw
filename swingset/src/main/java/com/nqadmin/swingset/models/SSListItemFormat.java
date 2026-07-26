@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -90,7 +90,7 @@ import static java.lang.System.Logger.Level.*;
  * empty String is produced.
  * <p>
  * This is compatible with GlazedLists AutoCompleteSupport.
- * 
+ *
  * @since 4.0.0
  */
 // TODO: Change to use java.time formatters.
@@ -98,224 +98,208 @@ import static java.lang.System.Logger.Level.*;
 // TODO: interoperability with SSFormat
 @SuppressWarnings("serial")
 public class SSListItemFormat extends Format {
-	//TODO: Put default formats into a common location (not in SSListItemFormat).
-	/** default date format */
-	public static final String DATE_DEFAULT = "yyyy-MM-dd";
-	/** default time format */
-	public static final String TIME_DEFAULT = "HH:mm:ss";
-	/** default timestamp format */
-	public static final String TIMESTAMP_DEFAULT = "yyyy-MM-dd'T'HH:mm:ss";
-	/** default elem separator */
-	public static final String DEFAULT_SEPARATOR = " | ";
-	private static final FieldPosition FP0 = new FieldPosition(0);
+  //TODO: Put default formats into a common location (not in SSListItemFormat).
+  /** default date format */
+  public static final String DATE_DEFAULT = "yyyy-MM-dd";
+  /** default time format */
+  public static final String TIME_DEFAULT = "HH:mm:ss";
+  /** default timestamp format */
+  public static final String TIMESTAMP_DEFAULT = "yyyy-MM-dd'T'HH:mm:ss";
+  /** default elem separator */
+  public static final String DEFAULT_SEPARATOR = " | ";
+  private static final FieldPosition FP0 = new FieldPosition(0);
 
-	private String separator = DEFAULT_SEPARATOR;
-	/** elemInfos.get(elemIndex) == elemInfo. */
-	protected List<ElemInfo> elemInfos = new ArrayList<>(4);
-	/** format these elem in order of List. */
-	protected List<Integer> itemElemIndexes = new ArrayList<>(4);
+  private String separator = DEFAULT_SEPARATOR;
+  /** elemInfos.get(elemIndex) == elemInfo. */
+  protected List<ElemInfo> elemInfos = new ArrayList<>(4);
+  /** format these elem in order of List. */
+  protected List<Integer> itemElemIndexes = new ArrayList<>(4);
 
-	// allow customization of date/time formats
-	private final EnumMap<JDBCType, Format> formats = new EnumMap<>(JDBCType.class);
+  // allow customization of date/time formats
+  private final EnumMap<JDBCType, Format> formats = new EnumMap<>(JDBCType.class);
 
-	private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = JStuff.getLogger();
 
-	/**
-	 * Encapsulate info about element in SSListInfo.
-	 */
-	protected static class ElemInfo {
-		/** type of the elem */
-		final JDBCType type;
-		/** Format to use with this elem, may be null */
-		final Format format;
+  /**
+   * Encapsulate info about element in SSListInfo.
+   */
+  protected static class ElemInfo {
+    /** type of the elem */
+    final JDBCType type;
+    /** Format to use with this elem, may be null */
+    final Format format;
 
-		/**
-		 * Type and format for an SSListItem.
-		 * @param type type
-		 * @param format format
-		 */
-		protected ElemInfo(JDBCType type, Format format) {
-			this.type = type;
-			this.format = format;
-		}
-	}
+    /**
+     * Type and format for an SSListItem.
+     * @param type type
+     * @param format format
+     */
+    protected ElemInfo(JDBCType type, Format format) {
+      this.type = type;
+      this.format = format;
+    }
+  }
 
-	
-	/**
-	 * Create a Format. Use {@code addElemType} to specify
-	 * elements, in order, that are formatted.
-	 * By default, element 0 is formatted with toString()
-	 */
-	@SuppressWarnings("OverridableMethodCallInConstructor")
-	public SSListItemFormat() {
-		// format elment 0 with toString()
-		addElemType(0, JDBCType.NULL);
+  /**
+   * Create a Format. Use {@code addElemType} to specify
+   * elements, in order, that are formatted.
+   * By default, element 0 is formatted with toString()
+   */
+  @SuppressWarnings("OverridableMethodCallInConstructor")
+  public SSListItemFormat() {
+    // format elment 0 with toString()
+    addElemType(0, JDBCType.NULL);
 
-		// initialize default format patterns
-		formats.put(JDBCType.DATE,      new SimpleDateFormat(DATE_DEFAULT));
-		formats.put(JDBCType.TIME,      new SimpleDateFormat(TIME_DEFAULT));
-		formats.put(JDBCType.TIMESTAMP, new SimpleDateFormat(TIMESTAMP_DEFAULT));
-	}
+    // initialize default format patterns
+    formats.put(JDBCType.DATE, new SimpleDateFormat(DATE_DEFAULT));
+    formats.put(JDBCType.TIME, new SimpleDateFormat(TIME_DEFAULT));
+    formats.put(JDBCType.TIMESTAMP, new SimpleDateFormat(TIMESTAMP_DEFAULT));
+  }
 
-	/**
-	 * Clear list item element information in preparation
-	 * to establish elements to format.
-	 * Note that default formatting patterns are not restored.
-	 */
-	public void clear() {
-		elemInfos.clear();
-		itemElemIndexes.clear();
-	}
+  /**
+   * Clear list item element information in preparation
+   * to establish elements to format.
+   * Note that default formatting patterns are not restored.
+   */
+  public void clear() {
+    elemInfos.clear();
+    itemElemIndexes.clear();
+  }
 
-	/**
-	 * Add element for formatting.Elements are formatted in
-	 * the same order as they are added. If the same elemIndex
- 	 * is added, the previous information is discarded.
-	 * 
-	 * @param elemIndex ListItem elemIndex for formatting
-	 * @param jdbcType type of element
-	 * @param format format to use for the element, may be null
-	 */
-	public void addElemType(int elemIndex, JDBCType jdbcType, Format format) {
-		Objects.requireNonNull(jdbcType);
-		// first make sure there's room
-		while (elemIndex >= elemInfos.size()) {
-			elemInfos.add(null);
-		}
-		elemInfos.set(elemIndex, new ElemInfo(jdbcType, format));
+  /**
+   * Add element for formatting.Elements are formatted in
+   * the same order as they are added. If the same elemIndex
+   * is added, the previous information is discarded.
+   *
+   * @param elemIndex ListItem elemIndex for formatting
+   * @param jdbcType type of element
+   * @param format format to use for the element, may be null
+   */
+  public void addElemType(int elemIndex, JDBCType jdbcType, Format format) {
+    Objects.requireNonNull(jdbcType);
+    // first make sure there's room
+    while (elemIndex >= elemInfos.size()) { elemInfos.add(null); }
+    elemInfos.set(elemIndex, new ElemInfo(jdbcType, format));
 
-		// SSListItem is formatted in the order the items are added
-		Integer indexAsObject = elemIndex;
-		itemElemIndexes.remove(indexAsObject);
-		itemElemIndexes.add(indexAsObject);
-	}
+    // SSListItem is formatted in the order the items are added
+    Integer indexAsObject = elemIndex;
+    itemElemIndexes.remove(indexAsObject);
+    itemElemIndexes.add(indexAsObject);
+  }
 
-	/**
-	 * Add element for formatting.Elements are formatted in
-	 * the same order as they are added. If the same elemIndex
- 	 * is added, the previous information is discarded.
-	 * The default Format for this type is used.
-	 * 
-	 * @param elemIndex ListItem elemIndex for formatting
-	 * @param jdbcType type of element
-	 */
-	public void addElemType(int elemIndex, JDBCType jdbcType) {
-		addElemType(elemIndex, jdbcType, null);
-	}
+  /**
+   * Add element for formatting.Elements are formatted in
+   * the same order as they are added. If the same elemIndex
+   * is added, the previous information is discarded.
+   * The default Format for this type is used.
+   *
+   * @param elemIndex ListItem elemIndex for formatting
+   * @param jdbcType type of element
+   */
+  public void addElemType(int elemIndex, JDBCType jdbcType) {
+    addElemType(elemIndex, jdbcType, null);
+  }
 
-	/**
-	 * Set the default Format for the specified jdbc type.
-	 * Only the {@link Format#format(Object, StringBuffer, java.text.FieldPosition)}
-	 * method is used with the argument Format.
-	 * @param jdbcType all elements of this type use the specified format
-	 * @param format the format
-	 * @return the previous format
-	 */
-	public Format setFormat(JDBCType jdbcType, Format format) {
-		return formats.put(jdbcType, format);
-	}
+  /**
+   * Set the default Format for the specified jdbc type.
+   * Only the {@link Format#format(Object, StringBuffer, java.text.FieldPosition)}
+   * method is used with the argument Format.
+   * @param jdbcType all elements of this type use the specified format
+   * @param format the format
+   * @return the previous format
+   */
+  public Format setFormat(JDBCType jdbcType, Format format) {
+    return formats.put(jdbcType, format);
+  }
 
-	/**
-	 * Get the default Format for the specified JDBCType.
-	 * @param jdbcType format for this
-	 * @return format or null if no format has been set
-	 */
-	public Format getFormat(JDBCType jdbcType) {
-		return formats.get(jdbcType);
-	}
+  /**
+   * Get the default Format for the specified JDBCType.
+   * @param jdbcType format for this
+   * @return format or null if no format has been set
+   */
+  public Format getFormat(JDBCType jdbcType) { return formats.get(jdbcType); }
 
-	/**
-	 * The separator is goes between elements in a formatted string.
-	 * @param separator the separator
-	 */
-	public void setSeparator(String separator) {
-		this.separator = separator;
-	}
+  /**
+   * The separator is goes between elements in a formatted string.
+   * @param separator the separator
+   */
+  public void setSeparator(String separator) { this.separator = separator; }
 
-	/**
-	 * @return the separator
-	 */
-	public String getSeparator() {
-		return separator;
-	}
-	
-	/**
-	 * This implementation does not create Object from String.
-	 * @param source text
-	 * @param pos pos
-	 * @return the original string
-	 */
-	@Override
-	public Object parseObject(String source, ParsePosition pos) {
-		// Do not create objects from here
-		return source;
-	}
-	
-	/**
-	 * Note that pos is ignored.
-	 * @param _listItem item being formatted
-	 * @param toAppendTo StringBuffer being worked on
-	 * @param pos pos
-	 * @return StringBuffer being worked on
-	 */
-	@Override
-	public StringBuffer format(Object _listItem, StringBuffer toAppendTo, FieldPosition pos) {
-		if (_listItem != null && _listItem instanceof ListItem0) {
-			// GlazedLists guarantees only format(Object), so ignore pos.
-			ListItem0 listItem = (ListItem0)_listItem;
-			for (int i = 0; i < itemElemIndexes.size(); i++) {
-				// if this isn't the first element, add the separator
-				if (i != 0) {
-					toAppendTo.append(separator);
-				}
-				int elemIndex = itemElemIndexes.get(i);
-				appendValue(toAppendTo, elemIndex, listItem);
-			}
-		}
-		return toAppendTo;
-	}
+  /**
+   * @return the separator
+   */
+  public String getSeparator() { return separator; }
 
-	/**
-	 * This method allows overriding classes to access the list item
-	 * elements directly without going through remodel.
-	 *
-	 * @param elemIndex index of element
-	 * @param listItem container holding the element
-	 * @return the element
-	 */
-	protected Object getElem(int elemIndex, SSListItem listItem) {
-		return ((ListItem0) listItem).getElem(elemIndex);
-	}
+  /**
+   * This implementation does not create Object from String.
+   * @param source text
+   * @param pos pos
+   * @return the original string
+   */
+  @Override
+  public Object parseObject(String source, ParsePosition pos) {
+    // Do not create objects from here
+    return source;
+  }
 
-	/**
-	 * Format the indicated element, by default use toString().
-	 * @param sb append string value to this
-	 * @param elemIndex index of element
-	 * @param listItem container holding the element
-	 */
-	protected void appendValue(StringBuffer sb, int elemIndex, SSListItem listItem) {
-		Object elem = getElem(elemIndex, listItem);
-		if (elem == null) {
-			return;
-		}
-		
-		ElemInfo elemInfo = elemInfos.get(elemIndex);
-		JDBCType jdbcType = elemInfo.type;
-		Format format = elemInfo.format;
-		if (format == null) {
-			format = formats.get(jdbcType);
-		}
-		if (format != null) {
-			try {
-				format.format(elem, sb, FP0);
-				return;
-			} catch (Exception ex) {
-				logger.log(ERROR, sf("can't format %s with %s. Exception: %s",
-						elem.toString(), format.toString(), ex.getMessage()));
-			}
-		}
-		// No formatter, or formatter got an exception
-		sb.append(elem.toString());
-	}
-	
+  /**
+   * Note that pos is ignored.
+   * @param _listItem item being formatted
+   * @param toAppendTo StringBuffer being worked on
+   * @param pos pos
+   * @return StringBuffer being worked on
+   */
+  @Override
+  public StringBuffer format(Object _listItem, StringBuffer toAppendTo, FieldPosition pos) {
+    if (_listItem != null && _listItem instanceof ListItem0) {
+      // GlazedLists guarantees only format(Object), so ignore pos.
+      ListItem0 listItem = (ListItem0) _listItem;
+      for (int i = 0; i < itemElemIndexes.size(); i++) {
+        // if this isn't the first element, add the separator
+        if (i != 0) { toAppendTo.append(separator); }
+        int elemIndex = itemElemIndexes.get(i);
+        appendValue(toAppendTo, elemIndex, listItem);
+      }
+    }
+    return toAppendTo;
+  }
+
+  /**
+   * This method allows overriding classes to access the list item
+   * elements directly without going through remodel.
+   *
+   * @param elemIndex index of element
+   * @param listItem container holding the element
+   * @return the element
+   */
+  protected Object getElem(int elemIndex, SSListItem listItem) {
+    return ((ListItem0) listItem).getElem(elemIndex);
+  }
+
+  /**
+   * Format the indicated element, by default use toString().
+   * @param sb append string value to this
+   * @param elemIndex index of element
+   * @param listItem container holding the element
+   */
+  protected void appendValue(StringBuffer sb, int elemIndex, SSListItem listItem) {
+    Object elem = getElem(elemIndex, listItem);
+    if (elem == null) { return; }
+
+    ElemInfo elemInfo = elemInfos.get(elemIndex);
+    JDBCType jdbcType = elemInfo.type;
+    Format format = elemInfo.format;
+    if (format == null) { format = formats.get(jdbcType); }
+    if (format != null) {
+      try {
+        format.format(elem, sb, FP0);
+        return;
+      } catch (Exception ex) {
+        logger.log(ERROR, sf("can't format %s with %s. Exception: %s", elem.toString(),
+                             format.toString(), ex.getMessage()));
+      }
+    }
+    // No formatter, or formatter got an exception
+    sb.append(elem.toString());
+  }
 }

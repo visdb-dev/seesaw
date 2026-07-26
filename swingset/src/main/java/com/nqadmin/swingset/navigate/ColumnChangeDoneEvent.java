@@ -33,14 +33,11 @@ package com.nqadmin.swingset.navigate;
  * The modification has propagated, in particular to the undo/redo stack.
  */
 @SuppressWarnings("serial")
-public class ColumnChangeDoneEvent extends ColumnChangeEvent
-{
-	/**
-	 * Create a modification done event.
-	 * 
-	 * @param ev the event that started the modification
-	 */
-	public ColumnChangeDoneEvent(ChangeEventData ev) {
-		super(ev);
-	}
+public class ColumnChangeDoneEvent extends ColumnChangeEvent {
+  /**
+   * Create a modification done event.
+   *
+   * @param ev the event that started the modification
+   */
+  public ColumnChangeDoneEvent(ChangeEventData ev) { super(ev); }
 }

@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
@@ -54,111 +53,100 @@ import static com.nqadmin.swingset.utils.JStuff.sf;
  * This is not SS directly; examine how DB does automatic conversions.
  */
 @SuppressWarnings("StaticNonFinalUsedInInitialization")
-public class MetaDataTest
-{
-	
-	/** x */
-	public MetaDataTest()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-	}
+public class MetaDataTest {
+  /** x */
+  public MetaDataTest() {}
 
-	RowSet g_rs;
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
 
-	/** x
-	 * @throws java.lang.Exception */
-	//
-	// TODO: Try conversions, check overflow.
-	//		 Notice with H2 "supportsConvert" is unconditionally true.
-	//
-	// @Test
-	@SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
-	public void testSupportsConvert() throws Exception
-	{
-		System.out.println("SupportsConvert");
-		Connection con = H2.getCon();
-		DatabaseMetaData md = con.getMetaData();
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-		if(!md.supportsConvert()) {
-			System.out.println("    DOES NOT SUPPORT CONVERT");
-			return;
-		}
-		for (JDBCType t1 : JDBCType.values()) {
-			System.out.printf("    %s conversion from to\n", t1);
-			boolean has_no_convert = false;
-			for (JDBCType t2 : JDBCType.values()) {
-				boolean supportsConvert = md.supportsConvert(
-						t1.getVendorTypeNumber(), t2.getVendorTypeNumber());
-				//System.out.printf("\t%s\t%s\n", supportsConvert ? "YES" : "No", t2);
-				if (supportsConvert)
-					;
-				else {
-					System.out.printf("\t%s\t%s\n", "No", t2);
-					has_no_convert = true;
-				}
-			}
-			if (!has_no_convert)
-				System.out.printf("\tconverts ANYTHING\n");
-		}
-	}
+  /** x */
+  @BeforeEach
+  public void setUp() {}
 
-	List<Object[]> rsType = List.of(
-			new Object[] {"TYPE_FORWARD_ONLY",       ResultSet.TYPE_FORWARD_ONLY},
-			new Object[] {"TYPE_SCROLL_INSENSITIVE", ResultSet.TYPE_SCROLL_INSENSITIVE},
-			new Object[] {"TYPE_SCROLL_SENSITIVE",   ResultSet.TYPE_SCROLL_SENSITIVE});
-	interface DbFunction<T, R> {
-		R apply(T t) throws SQLException;
-	}
+  /** x */
+  @AfterEach
+  public void tearDown() {}
 
-	static final Map<String, DbFunction<Integer,Object>> dbCap = new TreeMap<>();
-	static DatabaseMetaData g_md;
+  RowSet g_rs;
 
-	//g_md - @SuppressWarnings("StaticNonFinalUsedInInitialization")
-	static {
-		dbCap.put("detected - deletes", typ -> g_md.deletesAreDetected(typ));
-		dbCap.put("detected - inserts", typ -> g_md.insertsAreDetected(typ));
-		dbCap.put("detected - updates", typ -> g_md.updatesAreDetected(typ));
-		dbCap.put("own_vsbl - deletes", typ -> g_md.ownDeletesAreVisible(typ));
-		dbCap.put("own_vsbl - inserts", typ -> g_md.ownInsertsAreVisible(typ));
-		dbCap.put("own_vsbl - updates", typ -> g_md.ownUpdatesAreVisible(typ));
-	}
+  /**
+   * x
+   * @throws java.lang.Exception
+   */
+  //
+  // TODO: Try conversions, check overflow.
+  //		 Notice with H2 "supportsConvert" is unconditionally true.
+  //
+  // @Test
+  @SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
+  public void testSupportsConvert() throws Exception {
+    System.out.println("SupportsConvert");
+    Connection con = H2.getCon();
+    DatabaseMetaData md = con.getMetaData();
 
-	/** x
-	 * @throws java.lang.Exception */
-	//
-	// TODO: Try conversions, check overflow.
-	//		 Notice with H2 "supportsConvert" is unconditionally true.
-	//
-	// @Test
-	@SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
-	public void testMetadata() throws Exception
-	{
-		System.out.println("Metadata");
+    if (!md.supportsConvert()) {
+      System.out.println("    DOES NOT SUPPORT CONVERT");
+      return;
+    }
+    for (JDBCType t1 : JDBCType.values()) {
+      System.out.printf("    %s conversion from to\n", t1);
+      boolean has_no_convert = false;
+      for (JDBCType t2 : JDBCType.values()) {
+        boolean supportsConvert
+            = md.supportsConvert(t1.getVendorTypeNumber(), t2.getVendorTypeNumber());
+        //System.out.printf("\t%s\t%s\n", supportsConvert ? "YES" : "No", t2);
+        if (supportsConvert)
+          ;
+        else {
+          System.out.printf("\t%s\t%s\n", "No", t2);
+          has_no_convert = true;
+        }
+      }
+      if (!has_no_convert) System.out.printf("\tconverts ANYTHING\n");
+    }
+  }
 
-		g_rs = H2.getRowSetCleanDB("""
+  List<Object[]> rsType
+      = List.of(new Object[] {"TYPE_FORWARD_ONLY", ResultSet.TYPE_FORWARD_ONLY},
+                new Object[] {"TYPE_SCROLL_INSENSITIVE", ResultSet.TYPE_SCROLL_INSENSITIVE},
+                new Object[] {"TYPE_SCROLL_SENSITIVE", ResultSet.TYPE_SCROLL_SENSITIVE});
+  interface DbFunction<T, R> {
+    R apply(T t) throws SQLException;
+  }
+
+  static final Map<String, DbFunction<Integer, Object>> dbCap = new TreeMap<>();
+  static DatabaseMetaData g_md;
+
+  //g_md - @SuppressWarnings("StaticNonFinalUsedInInitialization")
+  static {
+    dbCap.put("detected - deletes", typ -> g_md.deletesAreDetected(typ));
+    dbCap.put("detected - inserts", typ -> g_md.insertsAreDetected(typ));
+    dbCap.put("detected - updates", typ -> g_md.updatesAreDetected(typ));
+    dbCap.put("own_vsbl - deletes", typ -> g_md.ownDeletesAreVisible(typ));
+    dbCap.put("own_vsbl - inserts", typ -> g_md.ownInsertsAreVisible(typ));
+    dbCap.put("own_vsbl - updates", typ -> g_md.ownUpdatesAreVisible(typ));
+  }
+
+  /**
+   * x
+   * @throws java.lang.Exception
+   */
+  //
+  // TODO: Try conversions, check overflow.
+  //		 Notice with H2 "supportsConvert" is unconditionally true.
+  //
+  // @Test
+  @SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
+  public void testMetadata() throws Exception {
+    System.out.println("Metadata");
+
+    g_rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -173,42 +161,40 @@ public class MetaDataTest
 				(3, 3, 3)
 			;
             """);
-		g_rs.setCommand("SELECT * FROM tbl");
-		g_rs.execute();
-		g_rs.next();
+    g_rs.setCommand("SELECT * FROM tbl");
+    g_rs.execute();
+    g_rs.next();
 
-		DatabaseMetaData md = H2.getCon().getMetaData();
-		g_md = md;
+    DatabaseMetaData md = H2.getCon().getMetaData();
+    g_md = md;
 
-		System.out.println("Capabilities");
-		for (Map.Entry<String, DbFunction<Integer, Object>> entry : dbCap.entrySet()) {
-			for (Object[] objects : rsType) {
-				String s = sf("    %s %-25s  %s", entry.getKey(), objects[0],
-				   entry.getValue().apply((Integer) objects[1]));
-				System.out.println(s);
-			}
-		}
+    System.out.println("Capabilities");
+    for (Map.Entry<String, DbFunction<Integer, Object>> entry : dbCap.entrySet()) {
+      for (Object[] objects : rsType) {
+        String s = sf("    %s %-25s  %s", entry.getKey(), objects[0],
+                      entry.getValue().apply((Integer) objects[1]));
+        System.out.println(s);
+      }
+    }
 
-		// System.out.println("ownUpdatesAreVisible: " + md.ownUpdatesAreVisible(
-		// 		ResultSet.TYPE_SCROLL_INSENSITIVE
-		// ));
-		// // ownUpdatesAreVisible: true
+    // System.out.println("ownUpdatesAreVisible: " + md.ownUpdatesAreVisible(
+    // 		ResultSet.TYPE_SCROLL_INSENSITIVE
+    // ));
+    // // ownUpdatesAreVisible: true
 
-		g_rs.absolute(2);
-		g_rs.deleteRow();
-		g_rs.last();
-		System.out.println("After deleting 2nd row from 3 rows: nrows " + g_rs.getRow());
-		g_rs.execute();
-		g_rs.last();
-		System.out.println("    After re-query: nrows " + g_rs.getRow());
+    g_rs.absolute(2);
+    g_rs.deleteRow();
+    g_rs.last();
+    System.out.println("After deleting 2nd row from 3 rows: nrows " + g_rs.getRow());
+    g_rs.execute();
+    g_rs.last();
+    System.out.println("    After re-query: nrows " + g_rs.getRow());
 
-
-		g_rs.updateObject("c_tinyint", 7);
-		Object o = g_rs.getObject("c_tinyint"); // returns 1
-		System.out.println("" + o);
-		g_rs.updateRow();
-		o = g_rs.getObject("c_tinyint"); // returns 7
-		System.out.println("" + o);
-	}
-
+    g_rs.updateObject("c_tinyint", 7);
+    Object o = g_rs.getObject("c_tinyint"); // returns 1
+    System.out.println("" + o);
+    g_rs.updateRow();
+    o = g_rs.getObject("c_tinyint"); // returns 7
+    System.out.println("" + o);
+  }
 }

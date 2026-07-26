@@ -39,30 +39,28 @@ package com.nqadmin.swingset.enums;
 
 /**
  * Predefined include/exclude options.
- * 
+ *
  * @see com.nqadmin.swingset.SSComboBox#setDisplayValues(java.lang.Class)
  * @see com.nqadmin.swingset.SSList#setDisplayValues(java.lang.Class)
  * @since 4.0
  */
 public enum IncludeExclude {
-	/** Predefined "include" option. */
-	INCLUDE("Include"),
-	/** Predefined "exclude" option. */
-	EXCLUDE("Exclude");
+  /** Predefined "include" option. */
+  INCLUDE("Include"),
+  /** Predefined "exclude" option. */
+  EXCLUDE("Exclude");
 
-	private final String displayValue;
+  private final String displayValue;
 
-	private IncludeExclude(String _displayValue) {
-		displayValue = _displayValue;
-	}
-	
-	/**
-	 * Generate user visible display string.
-	 * @return string to display
-	 */
-	@Override
-	public String toString() {
-		// TODO: lookup internationalization
-		return displayValue;
-	}
+  private IncludeExclude(String _displayValue) { displayValue = _displayValue; }
+
+  /**
+   * Generate user visible display string.
+   * @return string to display
+   */
+  @Override
+  public String toString() {
+    // TODO: lookup internationalization
+    return displayValue;
+  }
 }

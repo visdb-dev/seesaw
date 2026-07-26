@@ -26,21 +26,21 @@ import com.nqadmin.swingset.navigate.RowsModel;
  * xxx
  */
 public class ListSnippets {
-	SSList list;
-	RowsModel rowsModel;
+  SSList list;
+  RowsModel rowsModel;
 
-	// @start region=init1
-	/**
-	 * Create an SSList, initialize its contents,
-	 * bind the list selection to a column in the RowsModel.
-	 */
-	@SuppressWarnings("unused")
-	void init() {
-		list = new SSList(JDBCType.DOUBLE);
-		List<String> options = List.of("VLarge", "large", "medium", "small", "VSmall");
-		List<Object> mappings = List.of(100.0, 10.0, 5.0, 1.0, 0.1);
-		list.setDisplayValues(options, mappings);
-		rowsModel.bind(list, "my_column");
-	}
-	// @end region=init1
+  // @start region=init1
+  /**
+   * Create an SSList, initialize its contents,
+   * bind the list selection to a column in the RowsModel.
+   */
+  @SuppressWarnings("unused")
+  void init() {
+    list = new SSList(JDBCType.DOUBLE);
+    List<String> options = List.of("VLarge", "large", "medium", "small", "VSmall");
+    List<Object> mappings = List.of(100.0, 10.0, 5.0, 1.0, 0.1);
+    list.setDisplayValues(options, mappings);
+    rowsModel.bind(list, "my_column");
+  }
+  // @end region=init1
 }

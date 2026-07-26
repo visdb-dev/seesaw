@@ -49,174 +49,154 @@ import static com.nqadmin.swingset.utils.JStuff.sf;
 /**
  * x
  */
-public class DemoExtraDB
-{
-	private DemoExtraDB() { }
+public class DemoExtraDB {
+  private DemoExtraDB() {}
 
-	private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = JStuff.getLogger();
 
-	// NOTE: During play, might not want the RowSet to just disapear.
-	//private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().weakValues().makeMap();
-	private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().makeMap();
+  // NOTE: During play, might not want the RowSet to just disapear.
+  //private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().weakValues().makeMap();
+  private static final Map<Integer, RowSet> simpleSupplierData = new MapMaker().makeMap();
 
-	/** Verify initial state; cursors position same as table index */
-	static void check()
-	{
-		if (Boolean.TRUE)
-			return;
-		simpleSupplierData.forEach((idx, rs) -> {
-			try {
-				if (rs.getRow() != idx) {
-					String s = sf("*********** %s MISMATCHED ROW POSITION ***********",
-							rs.getMetaData().getTableName(1));
-					System.err.println(s);
-					logger.log(Level.ERROR, s);
-				}
-			} catch (SQLException ex) {
-			}
-		});
-	};
+  /** Verify initial state; cursors position same as table index */
+  static void check() {
+    if (Boolean.TRUE) return;
+    simpleSupplierData.forEach((idx, rs) -> {
+      try {
+        if (rs.getRow() != idx) {
+          String s = sf("*********** %s MISMATCHED ROW POSITION ***********",
+                        rs.getMetaData().getTableName(1));
+          System.err.println(s);
+          logger.log(Level.ERROR, s);
+        }
+      } catch (SQLException ex) {}
+    });
+  };
 
-	static boolean isExecuted(RowSet rs)
-	{
-		boolean rc = false;
-		try {
-			rs.getRow();
-			rc = true;
-		} catch (SQLException ex) { }
-		return rc;
-	}
+  static boolean isExecuted(RowSet rs) {
+    boolean rc = false;
+    try {
+      rs.getRow();
+      rc = true;
+    } catch (SQLException ex) {}
+    return rc;
+  }
 
-	static Integer findIdxTbl(RowSet rs)
-	{
-		for (Map.Entry<Integer, RowSet> entry : simpleSupplierData.entrySet()) {
-			if (entry.getValue() == rs)
-				return entry.getKey();
-		}
-		return null;
-	}
+  static Integer findIdxTbl(RowSet rs) {
+    for (Map.Entry<Integer, RowSet> entry : simpleSupplierData.entrySet()) {
+      if (entry.getValue() == rs) return entry.getKey();
+    }
+    return null;
+  }
 
-	static void derefSupplierData(RowSet keepRS)
-	{
-		for (Iterator<Map.Entry<Integer, RowSet>> it
-				= simpleSupplierData.entrySet().iterator(); it.hasNext();) {
-			Map.Entry<Integer, RowSet> cur = it.next();
-			RowSet rs = cur.getValue();
-			if (rs != keepRS) {
-				// TODO: Could monitor rowSet objects and check this when collected.
-				if (RowSetState.isDirty(rs))
-					logger.log(Level.WARNING, () -> 
-							sf("deref dirty RowSet %s", SSUtils.objectID(rs)));
-				it.remove();
-			}
-		}
-	}
-	
-	/**
-	 * Return the RowSet for the specified table; shared if already exists.
-	 * If it doesn't exist, the table is queried.
-	 * <p>
-	 * Each row of the table looks like
-	 * <pre>
-	 *  supplier_id, supplier_name,    status,     city);
-	 * ({tbl}0{row}, 'name{tbl}{row}', {tbl}{row}, 'city{tbl}{row}'),
-	 * </pre>
-	 * 
-	 * @param idxTbl table name ends with this number, like "tbl7"
-	 * @param nRow only used if table doesn't already exist
-	 * @return
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
-	 */
-	static RowSet findSimpleSupplierData(int idxTbl, int nRow)
-			throws SQLException, ClassNotFoundException
-	{
-		if (!DemoUtil.hasDriver(DemoUtil.DemoDriver.H2_MEM))
-			return null;
-		RowSet rowSet = simpleSupplierData.get(idxTbl);
-		if (rowSet != null) {
-			logger.log(Level.INFO, () -> sf("Reuse tbl%d, nRows %d", idxTbl, nRow));
-			return rowSet;
-		}
+  static void derefSupplierData(RowSet keepRS) {
+    for (Iterator<Map.Entry<Integer, RowSet>> it = simpleSupplierData.entrySet().iterator();
+         it.hasNext();) {
+      Map.Entry<Integer, RowSet> cur = it.next();
+      RowSet rs = cur.getValue();
+      if (rs != keepRS) {
+        // TODO: Could monitor rowSet objects and check this when collected.
+        if (RowSetState.isDirty(rs))
+          logger.log(Level.WARNING, () -> sf("deref dirty RowSet %s", SSUtils.objectID(rs)));
+        it.remove();
+      }
+    }
+  }
 
-		logger.log(Level.INFO, () -> sf("Query tbl%d", idxTbl));
-		rowSet = RowSetProvider.newFactory().createJdbcRowSet();
-		rowSet.setUrl(dbUrl());
-		rowSet.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
-		simpleSupplierData.put(idxTbl, rowSet);
-		return rowSet;
-	}
+  /**
+   * Return the RowSet for the specified table; shared if already exists.
+   * If it doesn't exist, the table is queried.
+   * <p>
+   * Each row of the table looks like
+   * <pre>
+   *  supplier_id, supplier_name,    status,     city);
+   * ({tbl}0{row}, 'name{tbl}{row}', {tbl}{row}, 'city{tbl}{row}'),
+   * </pre>
+   *
+   * @param idxTbl table name ends with this number, like "tbl7"
+   * @param nRow only used if table doesn't already exist
+   * @return
+   * @throws SQLException
+   * @throws ClassNotFoundException
+   */
+  static RowSet findSimpleSupplierData(int idxTbl, int nRow)
+      throws SQLException, ClassNotFoundException {
+    if (!DemoUtil.hasDriver(DemoUtil.DemoDriver.H2_MEM)) return null;
+    RowSet rowSet = simpleSupplierData.get(idxTbl);
+    if (rowSet != null) {
+      logger.log(Level.INFO, () -> sf("Reuse tbl%d, nRows %d", idxTbl, nRow));
+      return rowSet;
+    }
 
-	/**
-	 * Create and return the RowSet for the specified table; cache it.
-	 * Exception if the table already exists.
-	 */
-	static RowSet createSimpleSupplierData(int idxTbl, int nRow)
-			throws SQLException, ClassNotFoundException
-	{
-		RowSet rowSet = H2Demo.getRowSet(createSimpleSupplierDataSql(idxTbl, nRow, idxTbl));
-		rowSet.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
-		simpleSupplierData.put(idxTbl, rowSet);
-		return rowSet;
-	}
+    logger.log(Level.INFO, () -> sf("Query tbl%d", idxTbl));
+    rowSet = RowSetProvider.newFactory().createJdbcRowSet();
+    rowSet.setUrl(dbUrl());
+    rowSet.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
+    simpleSupplierData.put(idxTbl, rowSet);
+    return rowSet;
+  }
 
-	//
-	// The start_idx is all about giving columnNames a different columnIndex for testing.
-	//
+  /**
+   * Create and return the RowSet for the specified table; cache it.
+   * Exception if the table already exists.
+   */
+  static RowSet createSimpleSupplierData(int idxTbl, int nRow)
+      throws SQLException, ClassNotFoundException {
+    RowSet rowSet = H2Demo.getRowSet(createSimpleSupplierDataSql(idxTbl, nRow, idxTbl));
+    rowSet.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
+    simpleSupplierData.put(idxTbl, rowSet);
+    return rowSet;
+  }
 
-	/**
-	 * Create and return the RowSet for the specified table.
-	 * Exception if the table already exists.
-	 */
-	static String createSimpleSupplierDataSql(int idxTbl, int nRow, int start_idx)
-			throws SQLException, ClassNotFoundException
-	{
-		String colDefs[] = new String[] {
-			"supplier_id INTEGER DEFAULT NOT NULL PRIMARY KEY",
-			"supplier_name varchar(50)",
-			"status smallint not null",
-			"city varchar(50)"
-		};
-		//String colDefsTemplate = "%s, %s, %s, %s";
-		String colVals[] = new String[] {
-			"{tbl}0{row}",
-			"'name{tbl}{row}'",
-			"{tbl}{row}",
-			"'city{tbl}{row}'" };
-		//String colValsTemplate = "%s, %s, %s, %s";
+  //
+  // The start_idx is all about giving columnNames a different columnIndex for testing.
+  //
 
-		//StringBuilder sb = new StringBuilder("""
-		String createSql = """
+  /**
+   * Create and return the RowSet for the specified table.
+   * Exception if the table already exists.
+   */
+  static String createSimpleSupplierDataSql(int idxTbl, int nRow, int start_idx)
+      throws SQLException, ClassNotFoundException {
+    String colDefs[] = new String[] {"supplier_id INTEGER DEFAULT NOT NULL PRIMARY KEY",
+                                     "supplier_name varchar(50)", "status smallint not null",
+                                     "city varchar(50)"};
+    //String colDefsTemplate = "%s, %s, %s, %s";
+    String colVals[]
+        = new String[] {"{tbl}0{row}", "'name{tbl}{row}'", "{tbl}{row}", "'city{tbl}{row}'"};
+    //String colValsTemplate = "%s, %s, %s, %s";
+
+    //StringBuilder sb = new StringBuilder("""
+    String createSql = """
             CREATE TABLE tbl{tbl}
             (
             {colDefs}
             );
             INSERT INTO tbl{tbl} VALUES
             """;
-		StringBuilder sb = new StringBuilder(
-				createSql.replace("{colDefs}", rotate(colDefs, "    ", '\n', start_idx)));
-		
-		String valsTemplate = "    (" + rotate(colVals, "", ' ', start_idx) + "),\n";
-		for (int row = 1; row <= nRow; row++) {
-			String s = valsTemplate.replace("{row}", String.valueOf(row));
-			sb.append(s);
-		}
-		// replace last line's trailing ",\n" with ";"
-		sb.replace(sb.length() - 2, Integer.MAX_VALUE, ";");
+    StringBuilder sb = new StringBuilder(
+        createSql.replace("{colDefs}", rotate(colDefs, "    ", '\n', start_idx)));
 
-		return sb.toString().replace("{tbl}", "" + String.valueOf(idxTbl));
-	}
+    String valsTemplate = "    (" + rotate(colVals, "", ' ', start_idx) + "),\n";
+    for (int row = 1; row <= nRow; row++) {
+      String s = valsTemplate.replace("{row}", String.valueOf(row));
+      sb.append(s);
+    }
+    // replace last line's trailing ",\n" with ";"
+    sb.replace(sb.length() - 2, Integer.MAX_VALUE, ";");
 
-	/** Create a single comma seperated string with values from rotating input array */
-	private static String rotate(String[] strings, String pre, char end_char, int start_idx)
-	{
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < strings.length; i++) {
-			String string = strings[(start_idx + i) % strings.length];
-			sb.append(pre).append(string).append(',').append(end_char);
-		}
-		sb.setLength(sb.length() - 2); // remove trailing ",x"
+    return sb.toString().replace("{tbl}", "" + String.valueOf(idxTbl));
+  }
 
-		return sb.toString();
-	}
+  /** Create a single comma seperated string with values from rotating input array */
+  private static String rotate(String[] strings, String pre, char end_char, int start_idx) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < strings.length; i++) {
+      String string = strings[(start_idx + i) % strings.length];
+      sb.append(pre).append(string).append(',').append(end_char);
+    }
+    sb.setLength(sb.length() - 2); // remove trailing ",x"
+
+    return sb.toString();
+  }
 }

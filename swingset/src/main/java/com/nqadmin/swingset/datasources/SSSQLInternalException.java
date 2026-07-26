@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
- /* *****************************************************************************
+/* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2024, Ernie R. Rael. All rights reserved.
@@ -46,37 +46,26 @@ package com.nqadmin.swingset.datasources;
  * Internal error.
  */
 @SuppressWarnings("serial")
-public class SSSQLInternalException extends SSSQLException
-{
+public class SSSQLInternalException extends SSSQLException {
+  /** Internal error. */
+  public SSSQLInternalException() {}
 
-	/** Internal error. */
-	public SSSQLInternalException()
-	{
-	}
+  /**
+   * Internal error.
+   * @param message
+   */
+  public SSSQLInternalException(String message) { super(message); }
 
-	/** Internal error.
-	 * @param message
-	 */
-	public SSSQLInternalException(String message)
-	{
-		super(message);
-	}
+  /**
+   * Internal error.
+   * @param message
+   * @param cause
+   */
+  public SSSQLInternalException(String message, Throwable cause) { super(message, cause); }
 
-	/** Internal error.
-	 * @param message
-	 * @param cause
-	 */
-	public SSSQLInternalException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
-	/** Internal error.
-	 * @param cause
-	 */
-	public SSSQLInternalException(Throwable cause)
-	{
-		super(cause);
-	}
-	
+  /**
+   * Internal error.
+   * @param cause
+   */
+  public SSSQLInternalException(Throwable cause) { super(cause); }
 }

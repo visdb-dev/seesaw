@@ -42,166 +42,163 @@ import javax.swing.text.DefaultFormatterFactory;
  * Base for SS formatter factories; supports allow null and ssFormat.
  */
 @SuppressWarnings("serial")
-public abstract class FormatterFactory extends DefaultFormatterFactory
-{
-	private final SSFormat ssFormat;
-	private final AbstractFormatter converter;
-	private final BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
+public abstract class FormatterFactory extends DefaultFormatterFactory {
+  private final SSFormat ssFormat;
+  private final AbstractFormatter converter;
+  private final BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
-	/**
-	 * To build a new FormatterFactory with the specified parameters. Unless noted,
-	 * a parameter is used when constructing the MaskFormatter.<p>
-	 * <p>
-	 * @see <em>Effective Java</em> Item 2 about override.
-	 * @param <T>
-	 */
-	abstract protected static class Builder<T extends Builder<T>> {
-		private AbstractFormatter converter = null;
-		private SSFormat ssFormat = null;
-		private BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
+  /**
+   * To build a new FormatterFactory with the specified parameters. Unless noted,
+   * a parameter is used when constructing the MaskFormatter.<p>
+   * <p>
+   * @see <em>Effective Java</em> Item 2 about override.
+   * @param <T>
+   */
+  abstract protected static class Builder<T extends Builder<T>> {
+    private AbstractFormatter converter = null;
+    private SSFormat ssFormat = null;
+    private BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
-		/** May be used by a formatter to assist string2Value and value2String.
-		 * For example, the SS mask formatters work with strings, the converter
-		 * converts string to value; like a Date.
-		 * It's the last step in stringToValue; it produces the Value
-		 * in the formatted text field.
-		 * @param val
-		 * @return  builder */
-		public T converter(AbstractFormatter val) { converter = val; return self(); }
-		/** *  The {@link SSFormat} used when generating this format factory.
-		 * @param val
-		 * @return  builder */
-		public T ssFormat(SSFormat val) { ssFormat = val; return self(); }
-		/**
-		 *  This overrides the default check for user input data present. The default
-		 * check is done using {@link FormatterAssist#userText(java.lang.String,
-		 * java.lang.String, java.lang.String, java.lang.Character)}. If set, this
-		 * is used by {@link SSFormattedTextField#containsUserText() }.
-		 * @param val
-		 * @return  builder */
-		public T containsUserText(BiFunction<JFormattedTextField, AbstractFormatter,
-								   Boolean> val)
-		{ containsUserText = val; return self(); }
+    /**
+     * May be used by a formatter to assist string2Value and value2String.
+     * For example, the SS mask formatters work with strings, the converter
+     * converts string to value; like a Date.
+     * It's the last step in stringToValue; it produces the Value
+     * in the formatted text field.
+     * @param val
+     * @return  builder
+     */
+    public T converter(AbstractFormatter val) {
+      converter = val;
+      return self();
+    }
+    /**
+     * *  The {@link SSFormat} used when generating this format factory.
+     * @param val
+     * @return  builder
+     */
+    public T ssFormat(SSFormat val) {
+      ssFormat = val;
+      return self();
+    }
+    /**
+     *  This overrides the default check for user input data present. The default
+     * check is done using {@link FormatterAssist#userText(java.lang.String,
+     * java.lang.String, java.lang.String, java.lang.Character)}. If set, this
+     * is used by {@link SSFormattedTextField#containsUserText() }.
+     * @param val
+     * @return  builder
+     */
+    public T containsUserText(BiFunction<JFormattedTextField, AbstractFormatter, Boolean> val) {
+      containsUserText = val;
+      return self();
+    }
 
-		/**
-		 *
-		 * @return
-		 */
-		@SuppressWarnings("unchecked")
-		protected T self() {
-			return (T) this;
-		}
+    /**
+     *
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    protected T self() {
+      return (T) this;
+    }
 
-		/**
-		 * builder
-		 * @return converter
-		 */
-		public AbstractFormatter getConverter()
-		{
-			return converter;
-		}
-	}
+    /**
+     * builder
+     * @return converter
+     */
+    public AbstractFormatter getConverter() { return converter; }
+  }
 
-	/**
-	 * The Format used to create factory.
-	 * @param builder
-	 */
-	public FormatterFactory(Builder<?> builder)
-	{
-		this.ssFormat = Objects.requireNonNull(builder.ssFormat, "format can not be null");
-		this.converter = builder.converter;
-		this.containsUserText = builder.containsUserText;
-	}
-	
-	/**
-	 * The Format used to create factory.
-	 * @return format
-	 */
-	public SSFormat getSSFormat()
-	{
-		return ssFormat;
-	}
+  /**
+   * The Format used to create factory.
+   * @param builder
+   */
+  public FormatterFactory(Builder<?> builder) {
+    this.ssFormat = Objects.requireNonNull(builder.ssFormat, "format can not be null");
+    this.converter = builder.converter;
+    this.containsUserText = builder.containsUserText;
+  }
 
-	/**
-	 * Convert the string as needed and do
-	 * {@link JFormattedTextField#setValue(java.lang.Object) }.
-	 * @param ftf set this text field's value
-	 * @param string convert to a value
-	 * @throws ParseException
-	 */
-	public abstract void switchToNonNullValue(JFormattedTextField ftf, String string)
-			throws ParseException;
+  /**
+   * The Format used to create factory.
+   * @return format
+   */
+  public SSFormat getSSFormat() { return ssFormat; }
 
-	/**
-	 * Converter used with stringToValue and valueToString; typically null.
-	 * @return converter
-	 */
-	public AbstractFormatter getConverter()
-	{
-		return converter;
-	}
+  /**
+   * Convert the string as needed and do
+   * {@link JFormattedTextField#setValue(java.lang.Object) }.
+   * @param ftf set this text field's value
+   * @param string convert to a value
+   * @throws ParseException
+   */
+  public abstract void switchToNonNullValue(JFormattedTextField ftf, String string)
+      throws ParseException;
 
-	/**
-	 * Function used to determine if text field has user input; typically null.
-	 * @return containsUserText
-	 */
-	public BiFunction<JFormattedTextField, AbstractFormatter, Boolean> getContainsUserText()
-	{
-		return containsUserText;
-	}
+  /**
+   * Converter used with stringToValue and valueToString; typically null.
+   * @return converter
+   */
+  public AbstractFormatter getConverter() { return converter; }
 
-	/** use setEditValid method to check that formatter should flip */
-	@SuppressWarnings("serial")
-	protected static class SSNullFormatter extends DefaultFormatter
-	{
-		/**
-		 * The null formatter.
-		 */
-		public SSNullFormatter() {
-			// DO NOT CHANGE
-			setValueClass(String.class);
-			// DO NOT CHANGE
-			setCommitsOnValidEdit(true);
-		}
+  /**
+   * Function used to determine if text field has user input; typically null.
+   * @return containsUserText
+   */
+  public BiFunction<JFormattedTextField, AbstractFormatter, Boolean> getContainsUserText() {
+    return containsUserText;
+  }
 
-		/**
-		 * This method is invoked by the formatter when it is almost done.
-		 * After super.setEditValid, if the text field is a String
-		 * attempt to set the value (which switches the formatter).
-		 * @param valid
-		 */
-		@Override
-		protected void setEditValid(boolean valid) {
-			super.setEditValid(valid);
-			
-			// if a character was added to the Null Formatter,
-			// then set a value to flip to the  (presumably) edit formatter.
-			final JFormattedTextField ftf = getFormattedTextField();
-			Object value = ftf.getValue();
-			// May not need to check for SSNullFormatter, but things change :-)
-			if(value instanceof String stringValue
-					&& ftf.getFormatter() instanceof SSNullFormatter
-					&& ftf.getFormatterFactory() instanceof FormatterFactory ff) {
-				try {
-					ff.switchToNonNullValue(ftf, stringValue);
-					// If ftf is still the null formatter,
-					// then Formatter didn't like the value; notify and get out.
-					if (ftf.getFormatter() instanceof SSNullFormatter) {
-						invalidEdit();
-						return;
-					}
+  /** use setEditValid method to check that formatter should flip */
+  @SuppressWarnings("serial")
+  protected static class SSNullFormatter extends DefaultFormatter {
+    /**
+     * The null formatter.
+     */
+    public SSNullFormatter() {
+      // DO NOT CHANGE
+      setValueClass(String.class);
+      // DO NOT CHANGE
+      setCommitsOnValidEdit(true);
+    }
 
-					// Attempt to put the caret after the character.
-					try {
-						ftf.setCaretPosition(((String)value).length());
-					} catch (IllegalArgumentException ex) {
-					}
-				} catch(ParseException ex) {
-					// mask formatter (probably) got an exception,
-					// back to the null formatter
-					ftf.setValue(null);
-				}
-			}
-		}
-	}
+    /**
+     * This method is invoked by the formatter when it is almost done.
+     * After super.setEditValid, if the text field is a String
+     * attempt to set the value (which switches the formatter).
+     * @param valid
+     */
+    @Override
+    protected void setEditValid(boolean valid) {
+      super.setEditValid(valid);
+
+      // if a character was added to the Null Formatter,
+      // then set a value to flip to the  (presumably) edit formatter.
+      final JFormattedTextField ftf = getFormattedTextField();
+      Object value = ftf.getValue();
+      // May not need to check for SSNullFormatter, but things change :-)
+      if (value instanceof String stringValue && ftf.getFormatter() instanceof SSNullFormatter
+          && ftf.getFormatterFactory() instanceof FormatterFactory ff) {
+        try {
+          ff.switchToNonNullValue(ftf, stringValue);
+          // If ftf is still the null formatter,
+          // then Formatter didn't like the value; notify and get out.
+          if (ftf.getFormatter() instanceof SSNullFormatter) {
+            invalidEdit();
+            return;
+          }
+
+          // Attempt to put the caret after the character.
+          try {
+            ftf.setCaretPosition(((String) value).length());
+          } catch (IllegalArgumentException ex) {}
+        } catch (ParseException ex) {
+          // mask formatter (probably) got an exception,
+          // back to the null formatter
+          ftf.setValue(null);
+        }
+      }
+    }
+  }
 }

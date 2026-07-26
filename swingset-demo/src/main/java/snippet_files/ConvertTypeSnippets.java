@@ -26,17 +26,14 @@ import static com.nqadmin.swingset.datasources.ConvertType.castJDBCToJava;
 /**
  *
  */
-public class ConvertTypeSnippets
-{
-	void castArray() throws SQLException {
-		// @start region=convert_array
-		Object[] arr = f(); // But I "know" the elements are Integer
-		Integer[] newarr = (Integer[]) castJDBCToJava(JDBCType.INTEGER, arr);
-		List<Integer> properList = Arrays.asList(newarr);
-		// @end region=convert_array
-	}
+public class ConvertTypeSnippets {
+  void castArray() throws SQLException {
+    // @start region=convert_array
+    Object[] arr = f(); // But I "know" the elements are Integer
+    Integer[] newarr = (Integer[]) castJDBCToJava(JDBCType.INTEGER, arr);
+    List<Integer> properList = Arrays.asList(newarr);
+    // @end region=convert_array
+  }
 
-	Object[] f(){
-		return null;
-	}
+  Object[] f() { return null; }
 }

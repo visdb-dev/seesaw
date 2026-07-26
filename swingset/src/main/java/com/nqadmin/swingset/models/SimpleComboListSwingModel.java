@@ -48,7 +48,8 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.ListModel;
 
-/** Simple JList or JComboBox model that handle SSLIstItem 
+/**
+ * Simple JList or JComboBox model that handle SSLIstItem
  * without locking or listItemFormat. An instance is used as
  * either a {@link javax.swing.ComboBoxModel} or a
  * {@link javax.swing.ListModel}.
@@ -56,60 +57,56 @@ import javax.swing.ListModel;
  * Example usage as an inner
  * class where all the combo data is accessed from an outer class
  * by the index in the comboList.
- * 
+ *
  * {@snippet class=SimpleComboListSwingModelsSnippets region=init1}
  */
 // TODO: add <T> to avoid user's cast of get*Model() ???
-public abstract class SimpleComboListSwingModel extends AbstractComboBoxListSwingModel
-{
-	/**
-	 * Bounce to super.Typical usage:
-	 * @param itemNumElems see super
-	 * @param itemList  see super
-	 */
-	public SimpleComboListSwingModel(int itemNumElems, List<SSListItem> itemList) {
-		super(itemNumElems, itemList);
-	}
+public abstract class SimpleComboListSwingModel extends AbstractComboBoxListSwingModel {
+  /**
+   * Bounce to super.Typical usage:
+   * @param itemNumElems see super
+   * @param itemList  see super
+   */
+  public SimpleComboListSwingModel(int itemNumElems, List<SSListItem> itemList) {
+    super(itemNumElems, itemList);
+  }
 
-	/**
-	 * @return this as a ListModel
-	 */
-	protected ListModel<?> getListModel() {
-		return AbstractComboBoxListSwingModel.getSimpleListModel(this);
-	}
+  /**
+   * @return this as a ListModel
+   */
+  protected ListModel<?> getListModel() {
+    return AbstractComboBoxListSwingModel.getSimpleListModel(this);
+  }
 
-	/**
-	 * @return this as a ComboModel
-	 */
-	protected ComboBoxModel<?> getComboModel() {
-		return AbstractComboBoxListSwingModel.getSimpleComboBoxModel(this);
-	}
+  /**
+   * @return this as a ComboModel
+   */
+  protected ComboBoxModel<?> getComboModel() {
+    return AbstractComboBoxListSwingModel.getSimpleComboBoxModel(this);
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void checkState() {
-	}
+  /** {@inheritDoc} */
+  @Override
+  protected void checkState() {}
 
-	/** {@inheritDoc} */
-	@Override
-	protected void remodelTakeWriteLock() {
-	}
+  /** {@inheritDoc} */
+  @Override
+  protected void remodelTakeWriteLock() {}
 
-	/** {@inheritDoc} */
-	@Override
-	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
-	}
+  /** {@inheritDoc} */
+  @Override
+  protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {}
 
-	/**
-	 * A no locking, re-use the model.
-	 */
-	final public class Remodel extends AbstractComboBoxListSwingModel.Remodel { }
-	private final Remodel remodel = new Remodel();
+  /**
+   * A no locking, re-use the model.
+   */
+  final public class Remodel extends AbstractComboBoxListSwingModel.Remodel {}
+  private final Remodel remodel = new Remodel();
 
-	/** {@inheritDoc} */
-	@Override
-	public final Remodel getRemodel() {
-		// default is no locking, re-use the model.
-		return remodel;
-	}
+  /** {@inheritDoc} */
+  @Override
+  public final Remodel getRemodel() {
+    // default is no locking, re-use the model.
+    return remodel;
+  }
 }

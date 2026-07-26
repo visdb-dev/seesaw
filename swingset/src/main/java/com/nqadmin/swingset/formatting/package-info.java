@@ -45,15 +45,15 @@
  * and {@link com.nqadmin.swingset.decorators.Validator} to detect bogus values
  * as early as possible and avoid them getting into the database.
  * The components also respects {@link com.nqadmin.swingset.datasources.RSC#getAllowNull()}.
- * 
+ *
  * Formatters and FormatterFactory
- * 
+ *
  * <p>
  * OLD STUFF
  * <p>
  * Generally bound components are implemented by extending SSFormattedTextField and
  * instantiating with a custom FormatterFactory. E.g. {@link SSDateField }
- * 
+ *
  * <p>
  * It would be possible to instead use a MaskFormatter, but custom code has to be written if the field needs to be nullable/blanked
  * by the user. For a MaskFormatter, this triggers a ParseException, which would need to be caught in the code and surplanted by

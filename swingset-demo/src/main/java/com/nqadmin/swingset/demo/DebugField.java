@@ -42,46 +42,37 @@ import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
  */
 @SuppressWarnings("serial")
 public class DebugField extends Field {
-	/**
-	 *  Creates a default SSDateField object using the default date format.
-	 */
-	public DebugField(){
-		this(CUSTOM);
-	}
+  /**
+   *  Creates a default SSDateField object using the default date format.
+   */
+  public DebugField() { this(CUSTOM); }
 
-	/**
-	 *  Creates a new instance of SSDateField with the specified format.
-	 *  @param format - an enum format to be used while the date field is in edit mode
-	 */
-	public DebugField(SSFormat format) {
-		this(createFormatterFactory(format));
-	}
+  /**
+   *  Creates a new instance of SSDateField with the specified format.
+   *  @param format - an enum format to be used while the date field is in edit mode
+   */
+  public DebugField(SSFormat format) { this(createFormatterFactory(format)); }
 
-	/**
-	 * Creates an object of SSDateField with the specified formatter factory
-	 * @param factory - formatter factory to be used
-	 */
-	public DebugField(AbstractFormatterFactory factory) {
-		super(factory);
-	}
+  /**
+   * Creates an object of SSDateField with the specified formatter factory
+   * @param factory - formatter factory to be used
+   */
+  public DebugField(AbstractFormatterFactory factory) { super(factory); }
 
-	@Override
-	public void cleanField()
-	{
-		setValue(getAllowNull() ? null : 777);
-	}
+  @Override
+  public void cleanField() {
+    setValue(getAllowNull() ? null : 777);
+  }
 
-	/**
-	 * Create mask formatter factory with specified format pattern.
-	 * @param _format - Format to be used for date while in editing mode.
-	 * @return a DefaultFormatterFactory for the specified date format
-	 */
-	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
-		SSFormat format = SSFormat.getActualFormat(_format);
-		String formatMask = "###";
-		
-		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.ssFormat(format)
-				.build();
-	}
+  /**
+   * Create mask formatter factory with specified format pattern.
+   * @param _format - Format to be used for date while in editing mode.
+   * @return a DefaultFormatterFactory for the specified date format
+   */
+  public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+    SSFormat format = SSFormat.getActualFormat(_format);
+    String formatMask = "###";
+
+    return new SSMaskFormatterFactory.Builder<>(formatMask).ssFormat(format).build();
+  }
 }

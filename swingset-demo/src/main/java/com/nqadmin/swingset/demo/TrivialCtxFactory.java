@@ -55,138 +55,184 @@ import javax.naming.spi.InitialContextFactory;
  * Naming service that returns a DataSource.
  * This is for a demo/testing situation.
  */
-public class TrivialCtxFactory implements InitialContextFactory
-{
-private static Map<String,Object> jndiStuff = new ConcurrentHashMap<>();
+public class TrivialCtxFactory implements InitialContextFactory {
+  private static Map<String, Object> jndiStuff = new ConcurrentHashMap<>();
 
-/**
- * Used by java's JNDI infrastructure to create initial context.
- * @throws NamingException 
- */
-public TrivialCtxFactory() throws NamingException
-{
-}
+  /**
+   * Used by java's JNDI infrastructure to create initial context.
+   * @throws NamingException
+   */
+  public TrivialCtxFactory() throws NamingException {}
 
-/**
- * {@inheritDoc }
- */
-@Override
-public Context getInitialContext(
-        @SuppressWarnings("UseOfObsoleteCollectionType")
-        java.util.Hashtable<?, ?> env)
-throws NamingException
-{
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public Context getInitialContext(@SuppressWarnings("UseOfObsoleteCollectionType")
+                                   java.util.Hashtable<?, ?> env) throws NamingException {
     return new NullContext() {
-        @Override
-        public Object lookup(String name) throws NamingException
-        {
-			Object obj = jndiStuff.get(name);
-			if (obj == null)
-				throw new NameNotFoundException(name);
-			return obj;
-        }
+      @Override
+      public Object lookup(String name) throws NamingException {
+        Object obj = jndiStuff.get(name);
+        if (obj == null) throw new NameNotFoundException(name);
+        return obj;
+      }
 
-        @Override
-		public void bind(String name, Object obj) throws NamingException
-        {
-			Objects.requireNonNull(name);
-			Objects.requireNonNull(obj);
-			jndiStuff.put(name, obj);
-		}
+      @Override
+      public void bind(String name, Object obj) throws NamingException {
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(obj);
+        jndiStuff.put(name, obj);
+      }
     };
-}
+  }
 
-    /** Every {@linkplain Context} interface method throws Unsupported. */
-    class NullContext implements Context
-    {
-        @Override public Object lookup(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Object lookup(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void bind(Name name, Object obj) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void bind(String name, Object obj) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void rebind(Name name, Object obj) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void rebind(String name, Object obj) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void unbind(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void unbind(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void rename(Name oldName, Name newName) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void rename(String oldName, String newName) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public NamingEnumeration<NameClassPair> list(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public NamingEnumeration<NameClassPair> list(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-        
-        @Override public NamingEnumeration<Binding> listBindings(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public NamingEnumeration<Binding> listBindings(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void destroySubcontext(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void destroySubcontext(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Context createSubcontext(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Context createSubcontext(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Object lookupLink(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Object lookupLink(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public NameParser getNameParser(Name name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public NameParser getNameParser(String name) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Name composeName(Name name, Name prefix) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public String composeName(String name, String prefix) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Object addToEnvironment(String propName, Object propVal) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public Object removeFromEnvironment(String propName) throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override@SuppressWarnings("UseOfObsoleteCollectionType")
-        public java.util.Hashtable<?, ?> getEnvironment() throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public void close() throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
-
-        @Override public String getNameInNamespace() throws NamingException
-        { throw new UnsupportedOperationException("Not supported yet."); }
+  /** Every {@linkplain Context} interface method throws Unsupported. */
+  class NullContext implements Context {
+    @Override
+    public Object lookup(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    
+    @Override
+    public Object lookup(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void bind(Name name, Object obj) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void bind(String name, Object obj) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void rebind(Name name, Object obj) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void rebind(String name, Object obj) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void unbind(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void unbind(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void rename(Name oldName, Name newName) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void rename(String oldName, String newName) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void destroySubcontext(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void destroySubcontext(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Context createSubcontext(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Context createSubcontext(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object lookupLink(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object lookupLink(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public NameParser getNameParser(Name name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public NameParser getNameParser(String name) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Name composeName(Name name, Name prefix) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String composeName(String name, String prefix) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object addToEnvironment(String propName, Object propVal) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object removeFromEnvironment(String propName) throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    @SuppressWarnings("UseOfObsoleteCollectionType")
+    public java.util.Hashtable<?, ?> getEnvironment() throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void close() throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getNameInNamespace() throws NamingException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+  }
 }

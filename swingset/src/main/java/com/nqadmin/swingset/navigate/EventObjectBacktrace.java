@@ -37,24 +37,19 @@ import static com.nqadmin.swingset.navigate.Utils.recordEventBacktrace;
  * Provides a backtrace of when the event is generated
  */
 @SuppressWarnings("serial")
-public class EventObjectBacktrace extends EventObject
-{
-	private final Throwable backtrace;
+public class EventObjectBacktrace extends EventObject {
+  private final Throwable backtrace;
 
-	/**
-	 * @param source
-	 */
-	public EventObjectBacktrace(Object source)
-	{
-		super(source);
-		this.backtrace = recordEventBacktrace() ? new Throwable("EventObjectBacktrace") : null;
-	}
+  /**
+   * @param source
+   */
+  public EventObjectBacktrace(Object source) {
+    super(source);
+    this.backtrace = recordEventBacktrace() ? new Throwable("EventObjectBacktrace") : null;
+  }
 
-	/**
-	 * @return where the event was created, may be null.
-	 */
-	Throwable getEventBacktrace()
-	{
-		return backtrace;
-	}
+  /**
+   * @return where the event was created, may be null.
+   */
+  Throwable getEventBacktrace() { return backtrace; }
 }

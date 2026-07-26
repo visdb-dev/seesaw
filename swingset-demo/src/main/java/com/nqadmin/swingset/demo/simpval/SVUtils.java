@@ -57,48 +57,41 @@ import com.nqadmin.swingset.utils.SSComponent;
  * Helpers for working with Simple Validation framework.
  */
 public class SVUtils {
-	private SVUtils() { }
+  private SVUtils() {}
 
-	/**
-	 * Should probably be from a factory.
-	 * @param comp
-	 * @param validators
-	 * @return 
-	 */
-	@SafeVarargs
-	public static TextComponentValidationItem createDefaultTextValidator(
-			JTextComponent comp, Validator<String>... validators
-	) {
-		Validator<String> merged = ValidatorUtils.merge(validators);
-		Validator<Document> validator = Converter.find(
-				String.class, Document.class).convert(merged);
-		TextComponentValidationItem valItem = new TextComponentValidationItem(
-				comp, ValidationStrategy.DEFAULT,
-				SwingComponentDecorationFactory.getDefault().decorationFor(comp),
-				validator);
-		return valItem;
-	}
+  /**
+   * Should probably be from a factory.
+   * @param comp
+   * @param validators
+   * @return
+   */
+  @SafeVarargs
+  public static TextComponentValidationItem createDefaultTextValidator(
+      JTextComponent comp, Validator<String>... validators) {
+    Validator<String> merged = ValidatorUtils.merge(validators);
+    Validator<Document> validator = Converter.find(String.class, Document.class).convert(merged);
+    TextComponentValidationItem valItem = new TextComponentValidationItem(
+        comp, ValidationStrategy.DEFAULT,
+        SwingComponentDecorationFactory.getDefault().decorationFor(comp), validator);
+    return valItem;
+  }
 
-	public static StringValidator getStringValidator(Function<String, Boolean> condition,
-													 Supplier<String> problem) {
-		return new StringValidator() {
-			@Override
-			public void validate(Problems problems, String compName, String model) {
-				if(!condition.apply(model)) {
-					problems.append(problem.get());
-				}
-			}
-		};
-	}
+  public static StringValidator getStringValidator(Function<String, Boolean> condition,
+                                                   Supplier<String> problem) {
+    return new StringValidator() {
+      @Override
+      public void validate(Problems problems, String compName, String model) {
+        if (!condition.apply(model)) { problems.append(problem.get()); }
+      }
+    };
+  }
 
-	public static ValidationItem decorator(JTextComponent jtc, StringValidator sval) {
-		SSComponent comp = (SSComponent) jtc;
-		TextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(
-				jtc, sval);
-		SimpleValValidatorDecorator deco = new SimpleValValidatorDecorator(textVali);
-		comp.setDecorator(deco);
-		comp.setPluginValidator(deco.getValidator());
-		return textVali;
-	}
-	
+  public static ValidationItem decorator(JTextComponent jtc, StringValidator sval) {
+    SSComponent comp = (SSComponent) jtc;
+    TextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(jtc, sval);
+    SimpleValValidatorDecorator deco = new SimpleValValidatorDecorator(textVali);
+    comp.setDecorator(deco);
+    comp.setPluginValidator(deco.getValidator());
+    return textVali;
+  }
 }

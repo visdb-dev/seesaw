@@ -32,112 +32,103 @@ import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 // TODO: Make this independent of Document, just use a string?
 //		 Set the string on every change to text, after change needs validation?
 public class TextComponentValidationItem extends ValidationListener<JTextComponent>
-        //implements DocumentListener, FocusListener, Runnable
+//implements DocumentListener, FocusListener, Runnable
 {
-    private Validator<Document> validator;
-    private boolean hasFatalProblem = false;
+  private Validator<Document> validator;
+  private boolean hasFatalProblem = false;
 
-    public TextComponentValidationItem(JTextComponent component,
-										 ValidationStrategy strategy,
-										 ValidationUI validationUI,
-										 Validator<Document> validator
-	) {
-        super(JTextComponent.class, validationUI, component);
-        this.validator = validator;
-        if (strategy == null) {
-            throw new NullPointerException("strategy null");
-        }
-/*
-        component.addPropertyChangeListener("enabled", new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                performValidation();
+  public TextComponentValidationItem(JTextComponent component, ValidationStrategy strategy,
+                                     ValidationUI validationUI, Validator<Document> validator) {
+    super(JTextComponent.class, validationUI, component);
+    this.validator = validator;
+    if (strategy == null) { throw new NullPointerException("strategy null"); }
+    /*
+            component.addPropertyChangeListener("enabled", new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    performValidation();
+                }
+            });
+            switch (strategy) {
+                case DEFAULT:
+                case ON_CHANGE_OR_ACTION:
+                    component.getDocument().addDocumentListener(this);
+                    break;
+                case INPUT_VERIFIER:
+                    component.setInputVerifier( new InputVerifier() {
+                        @Override
+                        public boolean verify(JComponent input) {
+                                                    performValidation();
+                                                    return !hasFatalProblem;
+                        }
+                    });
+                    break;
+                case ON_FOCUS_LOSS:
+                    component.addFocusListener(this);
+                    break;
             }
-        });
-        switch (strategy) {
-            case DEFAULT:
-            case ON_CHANGE_OR_ACTION:
-                component.getDocument().addDocumentListener(this);
-                break;
-            case INPUT_VERIFIER:
-                component.setInputVerifier( new InputVerifier() {
-                    @Override
-                    public boolean verify(JComponent input) {
-						performValidation();
-						return !hasFatalProblem;
-                    }
-                });
-                break;
-            case ON_FOCUS_LOSS:
-                component.addFocusListener(this);
-                break;
-        }
-*/
-        performValidation(); // Make sure any initial errors are discovered immediately.
+    */
+    performValidation(); // Make sure any initial errors are discovered immediately.
+  }
+
+  /** just run the validator, no decoration */
+  public boolean validate() {
+    if (!SwingUtilities.isEventDispatchThread()) { SwingUtilities.invokeLater(() -> validate()); }
+    JTextComponent component = getTarget();
+    Problems ps = new Problems();
+    validator.validate(ps, SwingValidationGroup.nameForComponent(component),
+                       component.getDocument());
+    return !ps.hasFatal();
+  }
+
+  protected boolean hasFatalProblem() { return hasFatalProblem; }
+
+  @Override
+  protected final void performValidation(Problems ps) {
+    if (!SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(() -> performValidation(ps));
     }
+    JTextComponent component = getTarget();
+    if (!component.isEnabled()) { return; }
+    validator.validate(ps, SwingValidationGroup.nameForComponent(component),
+                       component.getDocument());
+    hasFatalProblem = ps.hasFatal();
+  }
 
-	/** just run the validator, no decoration */
-	public boolean validate() {
-		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(() -> validate());
-		}
-        JTextComponent component = getTarget();
-		Problems ps = new Problems();
-        validator.validate(ps, SwingValidationGroup.nameForComponent(component), component.getDocument());
-		return !ps.hasFatal();
-	}
+  /*
+      @Override
+      public void focusLost(FocusEvent e) {
+          performValidation();
+      }
 
-	protected boolean hasFatalProblem() {
-		return hasFatalProblem;
-	}
+      @Override
+      public void focusGained(FocusEvent e) {
+      }
 
-    @Override
-    protected final void performValidation(Problems ps){
-		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(() -> performValidation(ps));
-		}
-        JTextComponent component = getTarget();
-        if (!component.isEnabled()) {
-            return;
-        }
-        validator.validate(ps, SwingValidationGroup.nameForComponent(component), component.getDocument());
-        hasFatalProblem = ps.hasFatal();
-    }
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+          removeUpdate(e);
+      }
 
-/*
-    @Override
-    public void focusLost(FocusEvent e) {
-        performValidation();
-    }
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+          //Documents can be legally updated from another thread,
+          //but we will not run validation outside the EDT
+          if (!EventQueue.isDispatchThread()) {
+              EventQueue.invokeLater(this);
+          } else {
+              performValidation();
+          }
+      }
 
-    @Override
-    public void focusGained(FocusEvent e) {
-    }
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+          removeUpdate(e);
+      }
 
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        removeUpdate(e);
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        //Documents can be legally updated from another thread,
-        //but we will not run validation outside the EDT
-        if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(this);
-        } else {
-            performValidation();
-        }
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        removeUpdate(e);
-    }
-
-    // See removeUpdate..
-    @Override
-    public void run() {
-        performValidation();
-    }
-*/
+      // See removeUpdate..
+      @Override
+      public void run() {
+          performValidation();
+      }
+  */
 }

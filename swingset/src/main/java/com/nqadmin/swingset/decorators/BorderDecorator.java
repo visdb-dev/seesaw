@@ -43,7 +43,6 @@
 
 package com.nqadmin.swingset.decorators;
 
-
 import java.awt.Color;
 import java.awt.Insets;
 import java.lang.System.Logger;
@@ -72,413 +71,379 @@ import static java.lang.System.Logger.Level.*;
  */
 // NOTE: TODO: if there is a border and an element is 0, then may not quite right.
 // TODO: could listen to components border property and adjust accordingly.
-public class BorderDecorator extends FocusDecorator
-{
-	private static final Logger logger = JStuff.getLogger();
+public class BorderDecorator extends FocusDecorator {
+  private static final Logger logger = JStuff.getLogger();
 
-	/** Typically the border that the component started with;
-	 * not focus, no error. */
-	protected Border defaultBorder;
+  /**
+   * Typically the border that the component started with;
+   * not focus, no error.
+   */
+  protected Border defaultBorder;
 
-	// ???: allow each border instance to have it's own painter
-	private static BorderDecoratorPaint bdp;
-	// Keep Lookup.Result to allow dynamic changes.
-	private static Lookup.Result<BorderDecoratorPaint> bdpResult;
+  // ???: allow each border instance to have it's own painter
+  private static BorderDecoratorPaint bdp;
+  // Keep Lookup.Result to allow dynamic changes.
+  private static Lookup.Result<BorderDecoratorPaint> bdpResult;
 
-	/**
-	 * Listens to lookup for the value.
-	 * @return the current value from lookup.
-	 */
-	protected static BorderDecoratorPaint getBorderDecoratorPaint()
-	{
-		if (bdp == null) {
-			bdpResult = CentralLookup.getDefault().lookupResult(BorderDecoratorPaint.class);
-			bdpResult.addLookupListener((LookupEvent le) -> {
-				// do nothing if empty
-				bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
-			});
-			bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
-			if (bdp == null)
-				throw new IllegalStateException("BorderDecoratorPaint not found");
-		}
-		return bdp;
-	}
+  /**
+   * Listens to lookup for the value.
+   * @return the current value from lookup.
+   */
+  protected static BorderDecoratorPaint getBorderDecoratorPaint() {
+    if (bdp == null) {
+      bdpResult = CentralLookup.getDefault().lookupResult(BorderDecoratorPaint.class);
+      bdpResult.addLookupListener((LookupEvent le) -> {
+        // do nothing if empty
+        bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
+      });
+      bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
+      if (bdp == null) throw new IllegalStateException("BorderDecoratorPaint not found");
+    }
+    return bdp;
+  }
 
-	/**
-	 * Creates a Border that provides the visual state information for a
-	 * BorderDecorator. Typically one line wide, colored and possibly dashed.
-	 * <p>
-	 * One of these is typically in default CentralLookup.
-	 */
-	public static class BorderDecoratorPaint {
-		/**
-		 * Determine color for specified BorderState; null return means
-		 * use the defaultBorder.
-		 * @param state
-		 * @return
-		 */
-		public Color getBorderColor(ComponentState state)
-		{
-			return switch(state) {
-			case CLEAN -> null;
-			case FOCUSED_CLEAN -> Color.GREEN;
-			case MODIFIED, FOCUSED_MODIFIED  -> Color.ORANGE;
-			case ERROR, FOCUSED_ERROR -> Color.RED;
-			};
-		}
-		
-		/**
-		 * Create a border for specified ComponentState; typically a colored
-		 * solid or dashed border. This single line width border is typically
-		 * one component of a compound border.
-		 * @param state
-		 * @return Border
-		 */
-		public Border getDecoratingBorder(ComponentState state)
-		{
-			Color color = getBorderColor(state);
-			Border decoratingBorder = state.isFocused() && state != ComponentState.FOCUSED_CLEAN
-					? BorderFactory.createDashedBorder(color, 13, 7)
-					: BorderFactory.createLineBorder(color);
-			return decoratingBorder;
-		}
-	}
+  /**
+   * Creates a Border that provides the visual state information for a
+   * BorderDecorator. Typically one line wide, colored and possibly dashed.
+   * <p>
+   * One of these is typically in default CentralLookup.
+   */
+  public static class BorderDecoratorPaint {
+    /**
+     * Determine color for specified BorderState; null return means
+     * use the defaultBorder.
+     * @param state
+     * @return
+     */
+    public Color getBorderColor(ComponentState state) {
+      return switch (state) {
+        case CLEAN -> null;
+        case FOCUSED_CLEAN -> Color.GREEN;
+        case MODIFIED, FOCUSED_MODIFIED -> Color.ORANGE;
+        case ERROR, FOCUSED_ERROR -> Color.RED;
+      };
+    }
 
-	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "unused"})
-	void debugCheck(ComponentState borderState) {
-		if (logger.isLoggable(TRACE)) {
-			String caller = JStuff.getCaller(3);
-			if (caller.contains("focusGained") || caller.contains("focusLost"))
-				; //System.out.println("");
-			else
-				; //System.out.println("");
-		}
-	}
+    /**
+     * Create a border for specified ComponentState; typically a colored
+     * solid or dashed border. This single line width border is typically
+     * one component of a compound border.
+     * @param state
+     * @return Border
+     */
+    public Border getDecoratingBorder(ComponentState state) {
+      Color color = getBorderColor(state);
+      Border decoratingBorder = state.isFocused() && state != ComponentState.FOCUSED_CLEAN
+                                    ? BorderFactory.createDashedBorder(color, 13, 7)
+                                    : BorderFactory.createLineBorder(color);
+      return decoratingBorder;
+    }
+  }
 
-	/** Decorate the component using current state. */
-	@Override
-	public boolean decorate() {
-		final ValidationResult valid = getSSComponent().allValidate();
-		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
-				decoComp().getClass().getSimpleName(), focusComp().isFocusOwner(), valid.comp(), valid.all()));
-		Border b;
-		ComponentState borderState = ComponentState.getComponentState(getSSComponent(), valid);
-		//debugCheck(borderState);
-		b = getBorder(borderState);
+  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "unused"})
+  void debugCheck(ComponentState borderState) {
+    if (logger.isLoggable(TRACE)) {
+      String caller = JStuff.getCaller(3);
+      if (caller.contains("focusGained") || caller.contains("focusLost"))
+        ; //System.out.println("");
+      else
+        ; //System.out.println("");
+    }
+  }
 
-		decoComp().setBorder(b);
+  /** Decorate the component using current state. */
+  @Override
+  public boolean decorate() {
+    final ValidationResult valid = getSSComponent().allValidate();
+    logger.log(TRACE,
+               ()
+                   -> String.format("%s focus: %s, compValid %s, allValid: %s",
+                                    decoComp().getClass().getSimpleName(),
+                                    focusComp().isFocusOwner(), valid.comp(), valid.all()));
+    Border b;
+    ComponentState borderState = ComponentState.getComponentState(getSSComponent(), valid);
+    //debugCheck(borderState);
+    b = getBorder(borderState);
 
-		handleTextDecorator(valid);
+    decoComp().setBorder(b);
 
-		return valid.all();
-	}
+    handleTextDecorator(valid);
 
-	/** {@inheritDoc } */
-	@Override
-	public void install(SSComponent component) {
-		super.install(component);
-		setupDefaultBorder();
-	}
+    return valid.all();
+  }
 
-	/** {@inheritDoc } */
-	@Override
-	public void uninstall() {
-		super.uninstall();
-		defaultBorder = null;
-	}
+  /** {@inheritDoc } */
+  @Override
+  public void install(SSComponent component) {
+    super.install(component);
+    setupDefaultBorder();
+  }
 
-	/** Create a compound border the size of defaultBorder.
-	 * Outside is empty, inside is 1 line.
-	 * @param state
-	 * @return 
-	 */
-	protected Border getBorder(ComponentState state) {
-		if (state == ComponentState.CLEAN)
-			return defaultBorder;
-		logger.log(DEBUG, () -> String.format("%s %s",
-				state, asString(decoComp().getInsets())));
-		Border b;
-		if (decoComp().getBorder() instanceof CompoundBorder cb) {
-			b = emptyLine_empty(cb.getOutsideBorder().getBorderInsets(decoComp()),
-					cb.getInsideBorder().getBorderInsets(decoComp()), state);
-		} else {
-			b = empty_line(decoComp().getInsets(), state);
-		}
-		return b;
-	}
+  /** {@inheritDoc } */
+  @Override
+  public void uninstall() {
+    super.uninstall();
+    defaultBorder = null;
+  }
 
-	/**
-	 * If a component has a border, then the defaultBorder is the
-	 * components original border.
-	 * If the component has no border, give it a default border
-	 * the size of it's insets, but with at least thickness 1.
-	 */
-	protected void setupDefaultBorder() {
-		if (defaultBorder == null) {
-			logger.log(DEBUG, () -> {
-				Border b = decoComp().getBorder();
-				String bi = asString(decoComp().getInsets());
-				String bc = b != null ? b.getClass().getSimpleName() : null;
-				String bs = asString(b, decoComp());
-				return String.format("%s-%s %s %s",
-					decoComp().getClass().getSimpleName(), bc, bi, bs);
-			});
-			Border b = decoComp().getBorder();
-			if (b == null) {
-				b = createDefaultBorder();
-				decoComp().setBorder(b);
-			}
-			defaultBorder = b;
-		}
-	}
+  /**
+   * Create a compound border the size of defaultBorder.
+   * Outside is empty, inside is 1 line.
+   * @param state
+   * @return
+   */
+  protected Border getBorder(ComponentState state) {
+    if (state == ComponentState.CLEAN) return defaultBorder;
+    logger.log(DEBUG, () -> String.format("%s %s", state, asString(decoComp().getInsets())));
+    Border b;
+    if (decoComp().getBorder() instanceof CompoundBorder cb) {
+      b = emptyLine_empty(cb.getOutsideBorder().getBorderInsets(decoComp()),
+                          cb.getInsideBorder().getBorderInsets(decoComp()), state);
+    } else {
+      b = empty_line(decoComp().getInsets(), state);
+    }
+    return b;
+  }
 
-	/**
-	 * This is used to create a border in situations where the component
-	 * does not have a border. It returns an empty border
-	 * the size of it's insets, but with at least thickness 1.
-	 * @return an empty border
-	 */
-	protected Border createDefaultBorder() {
-		Insets i = decoComp().getInsets();
-		return BorderFactory.createEmptyBorder(Math.max(1, i.top),
-											   Math.max(1, i.left),
-											   Math.max(1, i.bottom),
-											   Math.max(1, i.right));
-	}
+  /**
+   * If a component has a border, then the defaultBorder is the
+   * components original border.
+   * If the component has no border, give it a default border
+   * the size of it's insets, but with at least thickness 1.
+   */
+  protected void setupDefaultBorder() {
+    if (defaultBorder == null) {
+      logger.log(DEBUG, () -> {
+        Border b = decoComp().getBorder();
+        String bi = asString(decoComp().getInsets());
+        String bc = b != null ? b.getClass().getSimpleName() : null;
+        String bs = asString(b, decoComp());
+        return String.format("%s-%s %s %s", decoComp().getClass().getSimpleName(), bc, bi, bs);
+      });
+      Border b = decoComp().getBorder();
+      if (b == null) {
+        b = createDefaultBorder();
+        decoComp().setBorder(b);
+      }
+      defaultBorder = b;
+    }
+  }
 
-	/**
-	 * Return a Border that displays the specified state.
-	 * See {@link BorderDecoratorPaint}.
-	 * @param state
-	 * @return
-	 */
-	public static Border getDecoratingBorder(ComponentState state)
-	{
-		return getBorderDecoratorPaint().getDecoratingBorder(state);
-	}
+  /**
+   * This is used to create a border in situations where the component
+   * does not have a border. It returns an empty border
+   * the size of it's insets, but with at least thickness 1.
+   * @return an empty border
+   */
+  protected Border createDefaultBorder() {
+    Insets i = decoComp().getInsets();
+    return BorderFactory.createEmptyBorder(Math.max(1, i.top), Math.max(1, i.left),
+                                           Math.max(1, i.bottom), Math.max(1, i.right));
+  }
 
-	/**
-	 * For cases where the JComponent doesn't have a usable border.
-	 * @param comp
-	 * @return border to use with the SSComponent
-	 */
-	public static Border createEmptyBorder(SSComponent comp)
-	{
-		JComponent jc = (JComponent) comp;
-		Border b = jc.getBorder();
-		if (b instanceof CompoundBorder cb) {
-			Insets oInsets = toInsets(cb.getOutsideBorder(), jc);
-			Insets iInsets = toInsets(cb.getInsideBorder(), jc);
-			b = BorderFactory.createCompoundBorder(
-					BorderFactory.createEmptyBorder(
-							oInsets.top, oInsets.left, oInsets.bottom, oInsets.right),
-					BorderFactory.createEmptyBorder(
-							iInsets.top, iInsets.left, iInsets.bottom, iInsets.right));
-		} else {
-			Insets i = jc.getInsets();
-			b = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
-		}
-		return b;
-	}
-	private static Insets toInsets(Border b, JComponent jc)
-	{
-		return b.getBorderInsets(jc);
-	}
+  /**
+   * Return a Border that displays the specified state.
+   * See {@link BorderDecoratorPaint}.
+   * @param state
+   * @return
+   */
+  public static Border getDecoratingBorder(ComponentState state) {
+    return getBorderDecoratorPaint().getDecoratingBorder(state);
+  }
 
-	//
-	// Below are a few methods that create a CompoundBorder
-	// from either insets or a compound border.
-	// Each direction, top,left,bottom,right is computed separately.
-	// 
-	// The description of the output for each direction uses
-	// "_" for empty or space, and "|" for a line
-	// and the returned border is delineated with brackets
-	// "[outside][inside]". Note the brackets take no space
-	// The line is usually at, or near, the edge of either
-	// the outside or indide.
-	//
-	// For example
-	//         outside   inside 
-	//        [_______][_______]
-	//
+  /**
+   * For cases where the JComponent doesn't have a usable border.
+   * @param comp
+   * @return border to use with the SSComponent
+   */
+  public static Border createEmptyBorder(SSComponent comp) {
+    JComponent jc = (JComponent) comp;
+    Border b = jc.getBorder();
+    if (b instanceof CompoundBorder cb) {
+      Insets oInsets = toInsets(cb.getOutsideBorder(), jc);
+      Insets iInsets = toInsets(cb.getInsideBorder(), jc);
+      b = BorderFactory.createCompoundBorder(
+          BorderFactory.createEmptyBorder(oInsets.top, oInsets.left, oInsets.bottom, oInsets.right),
+          BorderFactory.createEmptyBorder(iInsets.top, iInsets.left, iInsets.bottom,
+                                          iInsets.right));
+    } else {
+      Insets i = jc.getInsets();
+      b = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
+    }
+    return b;
+  }
+  private static Insets toInsets(Border b, JComponent jc) { return b.getBorderInsets(jc); }
 
-	/**
-	 * Create a simple compound border with size specified by param i,
-	 * and a line on the inside of the param color.
-	 * <p>
-	 * [_______][|]
-	 * <p>
-	 * @param i insets that specify size of output border
-	 * @param state components border state
-	 * @return border
-	 */
-	public static Border empty_line(Insets i, ComponentState state)
-	{
-		if (state == ComponentState.CLEAN)
-			throw new IllegalArgumentException();
-		Border decoratingBorder = getDecoratingBorder(state);
-		Border b = BorderFactory.createCompoundBorder(
-				BorderFactory.createEmptyBorder(Math.max(0, i.top - 1),
-						Math.max(0, i.left - 1),
-						Math.max(0, i.bottom - 1),
-						Math.max(0, i.right - 1)),
-				decoratingBorder);
-		return b;
-	}
-	
-	/**
-	 * Create a simple compound border with size specified by param i,
-	 * and a line on the inside of the param color.
-	 * <p>
-	 * [|][_______]
-	 * <p>
-	 * @param i insets that specify size of output border
-	 * @param color color of line
-	 * @return border
-	 */
-	public static Border line_empty(Insets i, Color color) // TODO: BorderState
-	{
-		if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
-		Border b = BorderFactory.createCompoundBorder(
-				BorderFactory.createLineBorder(color),
-				BorderFactory.createEmptyBorder(
-						Math.max(0, i.top - 1),
-						Math.max(0, i.left - 1),
-						Math.max(0, i.bottom - 1),
-						Math.max(0, i.right - 1)));
-		return b;
-	}
+  //
+  // Below are a few methods that create a CompoundBorder
+  // from either insets or a compound border.
+  // Each direction, top,left,bottom,right is computed separately.
+  //
+  // The description of the output for each direction uses
+  // "_" for empty or space, and "|" for a line
+  // and the returned border is delineated with brackets
+  // "[outside][inside]". Note the brackets take no space
+  // The line is usually at, or near, the edge of either
+  // the outside or indide.
+  //
+  // For example
+  //         outside   inside
+  //        [_______][_______]
+  //
 
-	/**
-	 * Create a Compound border the same size as the specified Insets where the
-	 * inside is a compound border of a line and a space, and the outside
-	 * border is the remaining space.
-	 * <p>
-	 * [_______][|_]
-	 * <p>
-	 * @param i insets for size of border
-	 * @param color line color
-	 * @return border, null if problem
-	 */
-	public static Border empty_lineSpace(Insets i, Color color) // TODO: BorderState
-	{
-		if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
-		Border b = BorderFactory.createCompoundBorder(
-				BorderFactory.createEmptyBorder(
-						Math.max(0, i.top - 2),
-						Math.max(0, i.left - 2),
-						Math.max(0, i.bottom - 2),
-						Math.max(0, i.right - 2)),
-				BorderFactory.createCompoundBorder(
-						BorderFactory.createLineBorder(color),
-						BorderFactory.createEmptyBorder(1, 1, 1, 1)));
-		return b;
-	}
+  /**
+   * Create a simple compound border with size specified by param i,
+   * and a line on the inside of the param color.
+   * <p>
+   * [_______][|]
+   * <p>
+   * @param i insets that specify size of output border
+   * @param state components border state
+   * @return border
+   */
+  public static Border empty_line(Insets i, ComponentState state) {
+    if (state == ComponentState.CLEAN) throw new IllegalArgumentException();
+    Border decoratingBorder = getDecoratingBorder(state);
+    Border b = BorderFactory.createCompoundBorder(
+        BorderFactory.createEmptyBorder(Math.max(0, i.top - 1), Math.max(0, i.left - 1),
+                                        Math.max(0, i.bottom - 1), Math.max(0, i.right - 1)),
+        decoratingBorder);
+    return b;
+  }
 
-	/**
-	 * Create a CompoundBorder wth the sizes indicated by the outside-inside
-	 * parameters.
-	 * The top level outside-inside are the same sizes as the input;
-	 * the top level outside is a compound border where the inside is
-	 * a line and the outside is the remaining.
-	 * <p>
-	 * [______|][_______]
-	 * <p>
-	 * @param outside
-	 * @param inside
-	 * @param state components border state
-	 * @return border
-	 */
-	public static Border emptyLine_empty(Insets outside, Insets inside, ComponentState state)
-	{
-		Objects.requireNonNull(outside);
-		Objects.requireNonNull(inside);
-		Objects.requireNonNull(state);
-		//Insets inside = cb.getInsideBorder().getBorderInsets(decoComp());
-		//Insets outside = cb.getOutsideBorder().getBorderInsets(decoComp());
-		Border decoratingBorder = getDecoratingBorder(state);
-		Border b = BorderFactory.createCompoundBorder(
-				BorderFactory.createCompoundBorder(
-						BorderFactory.createEmptyBorder(
-								Math.max(0, outside.top - 1),
-								Math.max(0, outside.left - 1),
-								Math.max(0, outside.bottom - 1),
-								Math.max(0, outside.right - 1)),
-						decoratingBorder),
-				BorderFactory.createEmptyBorder(
-						inside.top, inside.left, inside.bottom, inside.right));
-		return b;
-	}
+  /**
+   * Create a simple compound border with size specified by param i,
+   * and a line on the inside of the param color.
+   * <p>
+   * [|][_______]
+   * <p>
+   * @param i insets that specify size of output border
+   * @param color color of line
+   * @return border
+   */
+  public static Border line_empty(Insets i, Color color) // TODO: BorderState
+  {
+    if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
+    Border b = BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(color),
+        BorderFactory.createEmptyBorder(Math.max(0, i.top - 1), Math.max(0, i.left - 1),
+                                        Math.max(0, i.bottom - 1), Math.max(0, i.right - 1)));
+    return b;
+  }
 
-	/**
-	 * Create a CompoundBorder wth the sizes indicated by the outside-inside
-	 * parameters.
-	 * The top level outside-inside are the same sizes as the input;
-	 * the top level outside is a compound border where the outside is
-	 * a line and the inside is the remaining.
-	 * <p>
-	 * [|______][_______]
-	 * <p>
-	 * @param outside
-	 * @param inside
-	 * @param state components border state
-	 * @return border
-	 */
-	public static Border lineEmpty_empty(Insets outside, Insets inside, ComponentState state)
-	{
-		Objects.requireNonNull(outside);
-		Objects.requireNonNull(inside);
-		Objects.requireNonNull(state);
-		//Insets inside = cb.getInsideBorder().getBorderInsets(decoComp());
-		//Insets outside = cb.getOutsideBorder().getBorderInsets(decoComp());
-		Border decoratingBorder = getDecoratingBorder(state);
-		Border b = BorderFactory.createCompoundBorder(
-				BorderFactory.createCompoundBorder(
-						decoratingBorder,
-						BorderFactory.createEmptyBorder(
-								Math.max(0, outside.top - 1),
-								Math.max(0, outside.left - 1),
-								Math.max(0, outside.bottom - 1),
-								Math.max(0, outside.right - 1))),
-				BorderFactory.createEmptyBorder(
-						inside.top, inside.left, inside.bottom, inside.right));
-		return b;
-	}
+  /**
+   * Create a Compound border the same size as the specified Insets where the
+   * inside is a compound border of a line and a space, and the outside
+   * border is the remaining space.
+   * <p>
+   * [_______][|_]
+   * <p>
+   * @param i insets for size of border
+   * @param color line color
+   * @return border, null if problem
+   */
+  public static Border empty_lineSpace(Insets i, Color color) // TODO: BorderState
+  {
+    if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
+    Border b = BorderFactory.createCompoundBorder(
+        BorderFactory.createEmptyBorder(Math.max(0, i.top - 2), Math.max(0, i.left - 2),
+                                        Math.max(0, i.bottom - 2), Math.max(0, i.right - 2)),
+        BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(color),
+                                           BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+    return b;
+  }
 
-	/**
-	 * Convert a border to a display string which shows compound border nesting
-	 * and terminal border insets.
-	 * @param b a border
-	 * @param jc
-	 * @return String of border for output
-	 */
-	public static String asString(Border b, JComponent jc) {
-		if(b == null)
-			return null;
-		if (b instanceof CompoundBorder cb) {
-			return String.format("[%s,%s]",
-					asString(cb.getOutsideBorder(), jc),
-					asString(cb.getInsideBorder(), jc));
-		}
-		return asString(b.getBorderInsets(jc));
-	}
+  /**
+   * Create a CompoundBorder wth the sizes indicated by the outside-inside
+   * parameters.
+   * The top level outside-inside are the same sizes as the input;
+   * the top level outside is a compound border where the inside is
+   * a line and the outside is the remaining.
+   * <p>
+   * [______|][_______]
+   * <p>
+   * @param outside
+   * @param inside
+   * @param state components border state
+   * @return border
+   */
+  public static Border emptyLine_empty(Insets outside, Insets inside, ComponentState state) {
+    Objects.requireNonNull(outside);
+    Objects.requireNonNull(inside);
+    Objects.requireNonNull(state);
+    //Insets inside = cb.getInsideBorder().getBorderInsets(decoComp());
+    //Insets outside = cb.getOutsideBorder().getBorderInsets(decoComp());
+    Border decoratingBorder = getDecoratingBorder(state);
+    Border b = BorderFactory.createCompoundBorder(
+        BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(
+                Math.max(0, outside.top - 1), Math.max(0, outside.left - 1),
+                Math.max(0, outside.bottom - 1), Math.max(0, outside.right - 1)),
+            decoratingBorder),
+        BorderFactory.createEmptyBorder(inside.top, inside.left, inside.bottom, inside.right));
+    return b;
+  }
 
-	/**
-	 * Convert inset to a display String; like "[2,2,2,2]".
-	 * @param i inset
-	 * @return String for output
-	 */
-	public static String asString(Insets i) {
-		return String.format("[%d,%d,%d,%d]", i.top, i.left, i.bottom, i.right);
-	}
+  /**
+   * Create a CompoundBorder wth the sizes indicated by the outside-inside
+   * parameters.
+   * The top level outside-inside are the same sizes as the input;
+   * the top level outside is a compound border where the outside is
+   * a line and the inside is the remaining.
+   * <p>
+   * [|______][_______]
+   * <p>
+   * @param outside
+   * @param inside
+   * @param state components border state
+   * @return border
+   */
+  public static Border lineEmpty_empty(Insets outside, Insets inside, ComponentState state) {
+    Objects.requireNonNull(outside);
+    Objects.requireNonNull(inside);
+    Objects.requireNonNull(state);
+    //Insets inside = cb.getInsideBorder().getBorderInsets(decoComp());
+    //Insets outside = cb.getOutsideBorder().getBorderInsets(decoComp());
+    Border decoratingBorder = getDecoratingBorder(state);
+    Border b = BorderFactory.createCompoundBorder(
+        BorderFactory.createCompoundBorder(
+            decoratingBorder, BorderFactory.createEmptyBorder(
+                                  Math.max(0, outside.top - 1), Math.max(0, outside.left - 1),
+                                  Math.max(0, outside.bottom - 1), Math.max(0, outside.right - 1))),
+        BorderFactory.createEmptyBorder(inside.top, inside.left, inside.bottom, inside.right));
+    return b;
+  }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public DecoratorStyle getDecoratorStyle()
-	{
-		return DecoratorStyle.BORDER;
-	}
-    
+  /**
+   * Convert a border to a display string which shows compound border nesting
+   * and terminal border insets.
+   * @param b a border
+   * @param jc
+   * @return String of border for output
+   */
+  public static String asString(Border b, JComponent jc) {
+    if (b == null) return null;
+    if (b instanceof CompoundBorder cb) {
+      return String.format("[%s,%s]", asString(cb.getOutsideBorder(), jc),
+                           asString(cb.getInsideBorder(), jc));
+    }
+    return asString(b.getBorderInsets(jc));
+  }
+
+  /**
+   * Convert inset to a display String; like "[2,2,2,2]".
+   * @param i inset
+   * @return String for output
+   */
+  public static String asString(Insets i) {
+    return String.format("[%d,%d,%d,%d]", i.top, i.left, i.bottom, i.right);
+  }
+
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public DecoratorStyle getDecoratorStyle() {
+    return DecoratorStyle.BORDER;
+  }
 }

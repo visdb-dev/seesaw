@@ -32,51 +32,50 @@ package com.nqadmin.swingset.core;
 /**
  * A ComboBox that only has a single displayValue.
  * See {@link ComboBox2} for documentation.
- * 
+ *
  * @param <K> key type
  * @param <D> displayValue type
  */
 @SuppressWarnings("serial")
-public class ComboBox1<K,D> extends ComboBox2<K, D, Object>
-{
-	/**
-	 * Builder; see {@link ComboBox2.Builder}.
-	 * @param <K>
-	 * @param <D>
-	 * @param <T> 
-	 */
-	public abstract static class AbstractBuilder<K, D, T extends AbstractBuilder<K, D, T>>
-			extends ComboBox2.AbstractBuilder<K, D, Object, T> {
-	}
+public class ComboBox1<K, D> extends ComboBox2<K, D, Object> {
+  /**
+   * Builder; see {@link ComboBox2.Builder}.
+   * @param <K>
+   * @param <D>
+   * @param <T>
+   */
+  public abstract static class AbstractBuilder<K, D, T extends AbstractBuilder<K, D, T>>
+      extends ComboBox2.AbstractBuilder<K, D, Object, T> {}
 
-	/** Builder.
-	 * @param <K>
-	 * @param <D> 
-	 */
-	public static class Builder<K, D> extends AbstractBuilder<K, D, Builder<K, D>> {
+  /**
+   * Builder.
+   * @param <K>
+   * @param <D>
+   */
+  public static class Builder<K, D> extends AbstractBuilder<K, D, Builder<K, D>> {
+    /** self type idiom */
+    @Override
+    protected Builder<K, D> self() {
+      return this;
+    }
 
-		/** self type idiom */
-		@Override
-		protected Builder<K, D> self() { return this; }
+    /** create ComboBox1 */
+    @Override
+    public ComboBox1<K, D> build() {
+      return new ComboBox1<>(this);
+    }
+  }
 
-		/** create ComboBox1 */
-		@Override
-		public ComboBox1<K, D> build() { return new ComboBox1<>(this); }
+  /**
+   * @param builder
+   */
+  protected ComboBox1(AbstractBuilder<K, D, ?> builder) { super(builder); }
 
-	}
-
-	/**
-	 * @param builder 
-	 */
-	protected ComboBox1(AbstractBuilder<K, D, ?> builder) {
-		super(builder);
-	}
-
-	/**
-	 * Creates an object of ComboBox with type params of Object.
-	 * Default: see {@link ComboBox2}.
-	 */
-	public ComboBox1() {
-		this(new ComboBox1.Builder<>(){});
-	}
+  /**
+   * Creates an object of ComboBox with type params of Object.
+   * Default: see {@link ComboBox2}.
+   */
+  public ComboBox1() {
+    this(new ComboBox1.Builder<>() {});
+  }
 }

@@ -55,109 +55,101 @@ import static com.nqadmin.swingset.utils.SSUtils.objectID;
  * at end of undo/redo action.
  */
 @SuppressWarnings("serial")
-abstract class ColumnChangeEvent extends EventObjectBacktrace implements ChangeEventData
-{
-	final private Object value;
-	final private boolean error;
+abstract class ColumnChangeEvent extends EventObjectBacktrace implements ChangeEventData {
+  final private Object value;
+  final private boolean error;
 
-	/**
-	 * Create a modification event.
-	 * @param source the component making the modification
-	 * @param value the value written to the rowSet
-	 * @param error true if the component value is in error
-	 */
-	public ColumnChangeEvent(RSC source, Object value,
-								   boolean error) {
-		super(source);
-		this.value = value;
-		this.error = error;
-	}
+  /**
+   * Create a modification event.
+   * @param source the component making the modification
+   * @param value the value written to the rowSet
+   * @param error true if the component value is in error
+   */
+  public ColumnChangeEvent(RSC source, Object value, boolean error) {
+    super(source);
+    this.value = value;
+    this.error = error;
+  }
 
-	public ColumnChangeEvent(ChangeEventData ev)
-	{
-		this(ev.getRSC(), ev.getValue(), ev.isError());
-	}
+  public ColumnChangeEvent(ChangeEventData ev) { this(ev.getRSC(), ev.getValue(), ev.isError()); }
 
-	/**
-	 *
-	 * {@inheritDoc }
-	 */
-	@Override
-	public RSC getSource() {
-		return (RSC) super.getSource();
-	}
+  /**
+   *
+   * {@inheritDoc }
+   */
+  @Override
+  public RSC getSource() {
+    return (RSC) super.getSource();
+  }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public RSC getRSC() {
-		return getSource();
-	}
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public RSC getRSC() {
+    return getSource();
+  }
 
-	/**
-	 * Test if this event is for the specified rowSet.
-	 * @param _rowSet check against this rowSet
-	 * @return true if the event is for the specified rowSet
-	 */
-	public boolean matches(RowSet _rowSet) {
-		return getSource().getRowSet() == _rowSet;
-	}
+  /**
+   * Test if this event is for the specified rowSet.
+   * @param _rowSet check against this rowSet
+   * @return true if the event is for the specified rowSet
+   */
+  public boolean matches(RowSet _rowSet) { return getSource().getRowSet() == _rowSet; }
 
-	/**
-	 * Modified column name.
-	 * @return column name
-	 */
-	public String getColumnName()
-	{
-		return getSource().getColumnName();
-	}
+  /**
+   * Modified column name.
+   * @return column name
+   */
+  public String getColumnName() { return getSource().getColumnName(); }
 
-	/**
-	 * Modified column name.
-	 * @return column name
-	 */
-	public int getColumnIndex()
-	{
-		return getSource().getColumnIndex();
-	}
+  /**
+   * Modified column name.
+   * @return column name
+   */
+  public int getColumnIndex() { return getSource().getColumnIndex(); }
 
-	/**
-	 * Value written to rowSet.
-	 * @return value
-	 */
-	@Override
-	public Object getValue()
-	{
-		return value;
-	}
+  /**
+   * Value written to rowSet.
+   * @return value
+   */
+  @Override
+  public Object getValue() {
+    return value;
+  }
 
-	/**
-	 * Test if this event's component's value is in error.
-	 * @return true if in error.
-	 */
-	@Override
-	public boolean isError() {
-		return error;
-	}
+  /**
+   * Test if this event's component's value is in error.
+   * @return true if in error.
+   */
+  @Override
+  public boolean isError() {
+    return error;
+  }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(getClass().getSimpleName()).append("{")
-				.append("source=").append(objectID(getSource()))
-				.append(',')
-				.append("rowSet=").append(objectID(getSource().getRowSet()))
-				.append(',')
-				.append("column=").append(getColumnName())
-				.append(',')
-				.append("value=").append(value)
-				.append(',')
-				.append("error=").append(error)
-				.append('}');
-		return sb.toString();
-	}
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName())
+        .append("{")
+        .append("source=")
+        .append(objectID(getSource()))
+        .append(',')
+        .append("rowSet=")
+        .append(objectID(getSource().getRowSet()))
+        .append(',')
+        .append("column=")
+        .append(getColumnName())
+        .append(',')
+        .append("value=")
+        .append(value)
+        .append(',')
+        .append("error=")
+        .append(error)
+        .append('}');
+    return sb.toString();
+  }
 }

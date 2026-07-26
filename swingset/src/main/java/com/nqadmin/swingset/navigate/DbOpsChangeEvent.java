@@ -35,31 +35,28 @@ import com.nqadmin.swingset.datasources.DbOpsCustomizer;
  * An allow* flag changed in DbOps.
  */
 @SuppressWarnings("serial")
-public class DbOpsChangeEvent extends EventObjectBacktrace
-{
-	private final DbOpsCustomizer.Allow allow;
+public class DbOpsChangeEvent extends EventObjectBacktrace {
+  private final DbOpsCustomizer.Allow allow;
 
-	/** the DbOps that changed
-	 * @param source
-	 * @param allow */
-	public DbOpsChangeEvent(Object source, DbOpsCustomizer.Allow allow)
-	{
-		super(source);
-		this.allow = allow;
-	}
+  /**
+   * the DbOps that changed
+   * @param source
+   * @param allow
+   */
+  public DbOpsChangeEvent(Object source, DbOpsCustomizer.Allow allow) {
+    super(source);
+    this.allow = allow;
+  }
 
-	/**
-	 * @return the DbOops that changed.
-	 */
-	public DbOpsCustomizer getDbOps() {
-		return (DbOpsCustomizer) getSource();
-	}
+  /**
+   * @return the DbOops that changed.
+   */
+  public DbOpsCustomizer getDbOps() { return (DbOpsCustomizer) getSource(); }
 
-	/** which permission/allow changed
-	 * 
-	 * @return 
-	 */
-	public DbOpsCustomizer.Allow getAllow() {
-		return allow;
-	}
+  /**
+   * which permission/allow changed
+   *
+   * @return
+   */
+  public DbOpsCustomizer.Allow getAllow() { return allow; }
 }

@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -57,66 +57,59 @@ import static com.nqadmin.swingset.utils.JStuff.sf;
  * Used to link a SSTimeField to a time column in a database.
  */
 @SuppressWarnings("serial")
-public class SSTimeField extends DateTimeField
-{
-	/** Logger for component */
-	private static final Logger logger = JStuff.getLogger();
+public class SSTimeField extends DateTimeField {
+  /** Logger for component */
+  private static final Logger logger = JStuff.getLogger();
 
-	/**
-     * Create an SSTimeField using the default format.
-     */
-    public SSTimeField() {
-        this(SSFormat.TIME);
+  /**
+   * Create an SSTimeField using the default format.
+   */
+  public SSTimeField() { this(SSFormat.TIME); }
+
+  /**
+   *  Creates an SSTimeField with the specified format.
+   *  @param format - an enum format to be used while the date field is in edit mode
+   */
+  public SSTimeField(SSFormat format) { this(createFormatterFactory(format)); }
+
+  /**
+   * Creates an object of SSTimeField with the specified formatter factory
+   * @param factory - formatter factory to be used
+   */
+  public SSTimeField(final AbstractFormatterFactory factory) {
+    super(factory);
+    setValue(new java.util.Date());
+  }
+
+  /**
+   * Create TIME formatter factory with specified format pattern.
+   * @param _format - Format to use for time while in editing mode.
+   * @return a DefaultFormatterFactory for the specified time format
+   */
+  public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+    SSFormat format = _format;
+    if (_format.getType() != SSFormat.TIME) {
+      logger.log(Level.ERROR, () -> sf("%s is not a TIME, using default", _format.toString()));
+      format = SSFormat.TIME;
     }
-
-	/**
-	 *  Creates an SSTimeField with the specified format.
-	 *  @param format - an enum format to be used while the date field is in edit mode
-     */
-    public SSTimeField(SSFormat format) {
-        this(createFormatterFactory(format));
+    format = SSFormat.getActualFormat(format);
+    String formatMask;
+    String editPattern;
+    switch (format) {
+      case TIME_HHMMSS -> {
+        formatMask = "##:##:##";
+        editPattern = "HHmmss";
+      }
+      default -> {
+        logger.log(Level.ERROR, "Unknown date format type of " + format);
+        return null;
+      }
     }
-
-    /**
-     * Creates an object of SSTimeField with the specified formatter factory
-     * @param factory - formatter factory to be used
-     */
-    public SSTimeField(final AbstractFormatterFactory factory) {
-        super(factory);
-        setValue(new java.util.Date());
-    }
-
-	/**
-	 * Create TIME formatter factory with specified format pattern.
-	 * @param _format - Format to use for time while in editing mode.
-	 * @return a DefaultFormatterFactory for the specified time format
-	 */
-	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
-		SSFormat format = _format;
-		if (_format.getType() != SSFormat.TIME) {
-			logger.log(Level.ERROR, () -> sf("%s is not a TIME, using default",
-					_format.toString()));
-			format = SSFormat.TIME;
-		}
-		format = SSFormat.getActualFormat(format);
-		String formatMask;
-		String editPattern;
-		switch(format) {
-		case TIME_HHMMSS -> {
-			formatMask = "##:##:##";
-			editPattern = "HHmmss";
-		}
-		default -> {
-			logger.log(Level.ERROR, "Unknown date format type of " + format);
-			return null;
-		}
-		}
-		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.ssFormat(format)
-				.stringValidator(DateTimeField::stringValidator)
-				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
-				.placeholderCharacter('_')
-				.build();
-	}
+    return new SSMaskFormatterFactory.Builder<>(formatMask)
+        .ssFormat(format)
+        .stringValidator(DateTimeField::stringValidator)
+        .converter(new DateFormatter(new SimpleDateFormat(editPattern)))
+        .placeholderCharacter('_')
+        .build();
+  }
 }
-

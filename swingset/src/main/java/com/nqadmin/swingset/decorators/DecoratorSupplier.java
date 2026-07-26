@@ -34,41 +34,37 @@ import java.util.function.Supplier;
 /**
  * Like a factory for Decorator.
  */
-public class DecoratorSupplier
-{
-	private final Supplier<Decorator> supplier;
-	private final Decorator.DecoratorStyle style;
+public class DecoratorSupplier {
+  private final Supplier<Decorator> supplier;
+  private final Decorator.DecoratorStyle style;
 
-	/** create a decorator supplier
-	 * @param supplier */
-	public DecoratorSupplier(Supplier<Decorator> supplier)
-	{
-		this(supplier, supplier.get().getDecoratorStyle());
-	}
+  /**
+   * create a decorator supplier
+   * @param supplier
+   */
+  public DecoratorSupplier(Supplier<Decorator> supplier) {
+    this(supplier, supplier.get().getDecoratorStyle());
+  }
 
-	/** create a decorator supplier
-	 * @param supplier
-	 * @param style
-	 */
-	public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style)
-	{
-		this.supplier = supplier;
-		this.style = style;
-	}
-	
-	/**
-	 * Create and return a decorator.
-	 * @return decorator
-	 */
-	public Decorator get() {
-		return supplier.get();
-	}
+  /**
+   * create a decorator supplier
+   * @param supplier
+   * @param style
+   */
+  public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style) {
+    this.supplier = supplier;
+    this.style = style;
+  }
 
-	/**
-	 * Decorator style.
-	 * @return decorator style
-	 */
-	public Decorator.DecoratorStyle getDecoratorStyle() {
-		return style;
-	}
+  /**
+   * Create and return a decorator.
+   * @return decorator
+   */
+  public Decorator get() { return supplier.get(); }
+
+  /**
+   * Decorator style.
+   * @return decorator style
+   */
+  public Decorator.DecoratorStyle getDecoratorStyle() { return style; }
 }

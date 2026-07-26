@@ -83,448 +83,413 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.JStuff.sf;
 
-
 /**
  * General.
  */
 public class SSUtils {
-	private SSUtils() {}
+  private SSUtils() {}
 
-	/** Temporary for hiding SSCommon; used from SSDBComboBox.
-	 * @param comp component to update
-	 */
-	public static void updateSSComponent_HACK(SSComponent comp) {
-		comp.getSSCommon().updateSSComponent();
-	}
+  /**
+   * Temporary for hiding SSCommon; used from SSDBComboBox.
+   * @param comp component to update
+   */
+  public static void updateSSComponent_HACK(SSComponent comp) {
+    comp.getSSCommon().updateSSComponent();
+  }
 
-	/**
-	 * Use this if you want a 1-1 correspondence between {@code RowSet} and {@code RowsModel};
-	 * for 1-1 only this method should be used.
-	 * If an existing RowsModel for the RowSet is
-	 * not found, a new RowsModel is created.
-	 * If {@link RowsModel#create(javax.sql.RowSet) }
-	 * is used multiple RowsModel can be created for the same RowSet;
-	 * and see {@link RowsModel#getActiveRowModels(javax.sql.RowSet) }
-	 * <p>
-	 * Can also use as a transition aid to RowsModel.
-	 * @param rs
-	 * @return 
-	 */
-	// TODO: could throw exception if more than one model for specified RowSet.
-	public static RowsModel findRowsModel(RowSet rs) {
-		RowsModel rowsModel = RowsModel.getActiveRowModel(rs);
-		if (rowsModel == null)
-			rowsModel = RowsModel.create(rs);
-		return rowsModel;
-	}
+  /**
+   * Use this if you want a 1-1 correspondence between {@code RowSet} and {@code RowsModel};
+   * for 1-1 only this method should be used.
+   * If an existing RowsModel for the RowSet is
+   * not found, a new RowsModel is created.
+   * If {@link RowsModel#create(javax.sql.RowSet) }
+   * is used multiple RowsModel can be created for the same RowSet;
+   * and see {@link RowsModel#getActiveRowModels(javax.sql.RowSet) }
+   * <p>
+   * Can also use as a transition aid to RowsModel.
+   * @param rs
+   * @return
+   */
+  // TODO: could throw exception if more than one model for specified RowSet.
+  public static RowsModel findRowsModel(RowSet rs) {
+    RowsModel rowsModel = RowsModel.getActiveRowModel(rs);
+    if (rowsModel == null) rowsModel = RowsModel.create(rs);
+    return rowsModel;
+  }
 
-	/**
-	 * Check if the SSComponent's listener is added for debug/logging.
-	 * @param comp 
-	 * @return true if the listener is added
-	 */
-	public static boolean isSSComponentListenerAddedDebug(SSComponent comp) {
-		return comp.getSSCommon().isSSComponentListenerAdded();
-	}
+  /**
+   * Check if the SSComponent's listener is added for debug/logging.
+   * @param comp
+   * @return true if the listener is added
+   */
+  public static boolean isSSComponentListenerAddedDebug(SSComponent comp) {
+    return comp.getSSCommon().isSSComponentListenerAdded();
+  }
 
-	/** Put this in the global lookup to create debug row set listeners */
-	public static class DebugRowSetListenerFlag {
-	}
+  /** Put this in the global lookup to create debug row set listeners */
+  public static class DebugRowSetListenerFlag {}
 
-	/**
-	 * Recursively find the {@linkplain SSComponent}s in container and
-	 * visit them.
-	 * 
-	 * @param container
-	 * @param visitor
-	 */
-	public static void visitSSComponents(Container container, Consumer<SSComponent> visitor) {
-		// TODO: should more components have cleanField?
-		final Component[] comps = container.getComponents();
-		for (Component comp : comps) {
-			switch (comp) {
-			case SSComponent c -> visitor.accept(c);
-			// Could also have a VisitAsSSComponent interface
-			// Would mark SSComponent, param becomes Consumer<VisitAsSSComponent>
-			// case VisitAsSSComponent c -> visitor.accept(c)
-			
-			case JRootPane c ->		visitSSComponents(c, visitor);
-			case JPanel c ->		visitSSComponents(c, visitor);
-			case JLayeredPane c ->	visitSSComponents(c, visitor);
-			case JTabbedPane c ->	visitSSComponents(c, visitor);
-			case JScrollPane c ->	visitSSComponents(c.getViewport(), visitor);
-			default -> {
-				// TODO: have a plugin that take "c" and returns true/false
-				//       for whether or not it should be visited;
-				//       i.e. if it should be treated like a container.
-			}
-			}
-		}
-	}
+  /**
+   * Recursively find the {@linkplain SSComponent}s in container and
+   * visit them.
+   *
+   * @param container
+   * @param visitor
+   */
+  public static void visitSSComponents(Container container, Consumer<SSComponent> visitor) {
+    // TODO: should more components have cleanField?
+    final Component[] comps = container.getComponents();
+    for (Component comp : comps) {
+      switch (comp) {
+        case SSComponent c ->
+          visitor.accept(c);
+          // Could also have a VisitAsSSComponent interface
+          // Would mark SSComponent, param becomes Consumer<VisitAsSSComponent>
+          // case VisitAsSSComponent c -> visitor.accept(c)
 
-	// public static Container findRoot(Component c) {
-	// 	return null;
-	// }
+        case JRootPane c -> visitSSComponents(c, visitor);
+        case JPanel c -> visitSSComponents(c, visitor);
+        case JLayeredPane c -> visitSSComponents(c, visitor);
+        case JTabbedPane c -> visitSSComponents(c, visitor);
+        case JScrollPane c -> visitSSComponents(c.getViewport(), visitor);
+        default -> {
+          // TODO: have a plugin that take "c" and returns true/false
+          //       for whether or not it should be visited;
+          //       i.e. if it should be treated like a container.
+        }
+      }
+    }
+  }
 
-	
-	/**
-	 * Notify the user of something...
-	 */
-	// TODO: add option to flash window/panel...
-	public static void beep()
-	{
-		Toolkit.getDefaultToolkit().beep();
+  // public static Container findRoot(Component c) {
+  // 	return null;
+  // }
 
-		// TODO:
-		// UIManager.getLookAndFeel().provideErrorFeedback(JFormattedTextField.this);
-	}
+  /**
+   * Notify the user of something...
+   */
+  // TODO: add option to flash window/panel...
+  public static void beep() {
+    Toolkit.getDefaultToolkit().beep();
 
-	/**
-	 * Get the size of a map taking into account possible weak keys.
-	 * 
-	 * @param map get size of this map
-	 * @return map size
-	 */
-	@SuppressWarnings("null")
-	public static int size(Map<?,?> map)
-	{
-		if (!(map instanceof ConcurrentMap))
-			return map.size();
-		// Can't depend on size() method when weakKeys.
-		int counter = 0;
-		for (Map.Entry<?, ?> _ : map.entrySet()) {
-			counter++;
-		}
-		return counter;
-	}
+    // TODO:
+    // UIManager.getLookAndFeel().provideErrorFeedback(JFormattedTextField.this);
+  }
 
-	/**
-	 * Returns the lookup's current DbSupport.
-	 * Very fast; it listens.
-	 * @return DbSupport
-	 */
-	public static DbSupport dbSupport() {
-		if (dbSupport == null) {
-			dbSupportResult = CentralLookup.getDefault().lookupResult(DbSupport.class);
-			dbSupportResult.addLookupListener((LookupEvent le)-> {
-				dbSupportResult.allInstances().stream().findFirst()
-						.ifPresent(item -> dbSupport = item);
-			});
-			dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
-			if (dbSupport == null)
-				throw new IllegalStateException("SSDBSupport not found");
-		}
-		return dbSupport;
-	}
-	private static DbSupport dbSupport;
-	private static Lookup.Result<DbSupport> dbSupportResult;
+  /**
+   * Get the size of a map taking into account possible weak keys.
+   *
+   * @param map get size of this map
+   * @return map size
+   */
+  @SuppressWarnings("null")
+  public static int size(Map<?, ?> map) {
+    if (!(map instanceof ConcurrentMap)) return map.size();
+    // Can't depend on size() method when weakKeys.
+    int counter = 0;
+    for (Map.Entry<?, ?> _ : map.entrySet()) { counter++; }
+    return counter;
+  }
 
-	/**
-	 * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's
-	 * row set to get the database table's keys.
-	 * If not a CachedRowSet or the key is already set, do nothing.
-	 * Note a JoinRowSet is skipped; only want to set keys for single table.
-	 * @param comp component
-	 */
-	// TODO: Could have an array of primary keys, one entry per column.
-	//		 Could this be needed for joins?
-	public static void setupDefaultPrimaryKeys(SSComponent comp)
-	{
-		RowSet rs = comp.getRowSet();
-		if (rs instanceof JoinRowSet)
-			return;
-		if (!(rs instanceof CachedRowSet crs))
-			return;
-		try {
-			if (crs.getKeyColumns() != null)
-				return;
-			int[] keys = getPrimaryKeyColumns(
-					SSUtils.dbSupport().getSharedConnection(), crs);
-			crs.setKeyColumns(keys);
-		} catch (SQLException ex) {
-		}
-	}
-	private static int[] getPrimaryKeyColumns(Connection connection, CachedRowSet crs) throws SQLException
-	{
-		return getPrimaryKeyColumns(connection.getMetaData(), crs);
-	}
+  /**
+   * Returns the lookup's current DbSupport.
+   * Very fast; it listens.
+   * @return DbSupport
+   */
+  public static DbSupport dbSupport() {
+    if (dbSupport == null) {
+      dbSupportResult = CentralLookup.getDefault().lookupResult(DbSupport.class);
+      dbSupportResult.addLookupListener((LookupEvent le) -> {
+        dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
+      });
+      dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
+      if (dbSupport == null) throw new IllegalStateException("SSDBSupport not found");
+    }
+    return dbSupport;
+  }
+  private static DbSupport dbSupport;
+  private static Lookup.Result<DbSupport> dbSupportResult;
 
-	private static int[] getPrimaryKeyColumns(DatabaseMetaData dbMetaData, CachedRowSet crs) throws SQLException
-	{
-		ResultSetMetaData rsMetaData = crs.getMetaData();
+  /**
+   * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's
+   * row set to get the database table's keys.
+   * If not a CachedRowSet or the key is already set, do nothing.
+   * Note a JoinRowSet is skipped; only want to set keys for single table.
+   * @param comp component
+   */
+  // TODO: Could have an array of primary keys, one entry per column.
+  //		 Could this be needed for joins?
+  public static void setupDefaultPrimaryKeys(SSComponent comp) {
+    RowSet rs = comp.getRowSet();
+    if (rs instanceof JoinRowSet) return;
+    if (!(rs instanceof CachedRowSet crs)) return;
+    try {
+      if (crs.getKeyColumns() != null) return;
+      int[] keys = getPrimaryKeyColumns(SSUtils.dbSupport().getSharedConnection(), crs);
+      crs.setKeyColumns(keys);
+    } catch (SQLException ex) {}
+  }
+  private static int[] getPrimaryKeyColumns(Connection connection, CachedRowSet crs)
+      throws SQLException {
+    return getPrimaryKeyColumns(connection.getMetaData(), crs);
+  }
 
-		int colIdx = 1; // columns from same CachedRowSet; should have same stuff. TRUE?
-		String catalog = rsMetaData.getCatalogName(colIdx);
-		String schema  = rsMetaData.getSchemaName(colIdx);
-		String table   = rsMetaData.getTableName(colIdx);
-		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, catalog, schema, table);
+  private static int[] getPrimaryKeyColumns(DatabaseMetaData dbMetaData, CachedRowSet crs)
+      throws SQLException {
+    ResultSetMetaData rsMetaData = crs.getMetaData();
 
-		int[] keyCols = new int[kinfo.size()];
-		for (KeyInfo ki : kinfo)
-			keyCols[ki.keySeq - 1] = crs.findColumn(ki.columnName);
-		return keyCols;
-	}
+    int colIdx = 1; // columns from same CachedRowSet; should have same stuff. TRUE?
+    String catalog = rsMetaData.getCatalogName(colIdx);
+    String schema = rsMetaData.getSchemaName(colIdx);
+    String table = rsMetaData.getTableName(colIdx);
+    List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, catalog, schema, table);
 
-	public record KeyInfo(int keySeq, String columnName){}
+    int[] keyCols = new int[kinfo.size()];
+    for (KeyInfo ki : kinfo) keyCols[ki.keySeq - 1] = crs.findColumn(ki.columnName);
+    return keyCols;
+  }
 
-	// TODO: keys: should spec catalog/schema?
-	/**
-	 * @param dbMetaData
-	 * @param catalog
-	 * @param schema
-	 * @param tableName
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<KeyInfo> getPrimaryKeyInfoForTable(DatabaseMetaData dbMetaData,
-			String catalog, String schema, String tableName) throws SQLException
-	{
-		// TODO: some versions of Postgress require null catalog. But in this file
-		//       catalog comes from rsMetaData.getCatalogName() which I'm guessing
-		//       returns null.
-		try(ResultSet pKeys = dbMetaData.getPrimaryKeys(catalog,schema,tableName);) {
-			List<KeyInfo> keyInfo = new ArrayList<>(3);
-			while(pKeys.next()) {
-				keyInfo.add(new KeyInfo(pKeys.getInt("KEY_SEQ"), pKeys.getString("COLUMN_NAME")));
-			}
-			return keyInfo;
-		}
-	}
+  public record KeyInfo(int keySeq, String columnName) {}
 
-	// NOTES on isKey
-	// TODO: isKey: Use a wrapper for the value, to represent no table, sql error, ...
-	// TODO: isKey: How to get tableName/columnName for result set column consider joins...
-	// TODO: isKey: How to set if automatic detection not wanted.
-	// TODO: isKey: Should this be in RowSetOps
-	// TODO: isKey: columnName/columnLabel
-	// dbMetaData.getDatabaseProductName()
+  // TODO: keys: should spec catalog/schema?
+  /**
+   * @param dbMetaData
+   * @param catalog
+   * @param schema
+   * @param tableName
+   * @return
+   * @throws SQLException
+   */
+  public static List<KeyInfo> getPrimaryKeyInfoForTable(DatabaseMetaData dbMetaData, String catalog,
+                                                        String schema, String tableName)
+      throws SQLException {
+    // TODO: some versions of Postgress require null catalog. But in this file
+    //       catalog comes from rsMetaData.getCatalogName() which I'm guessing
+    //       returns null.
+    try (ResultSet pKeys = dbMetaData.getPrimaryKeys(catalog, schema, tableName);) {
+      List<KeyInfo> keyInfo = new ArrayList<>(3);
+      while (pKeys.next()) {
+        keyInfo.add(new KeyInfo(pKeys.getInt("KEY_SEQ"), pKeys.getString("COLUMN_NAME")));
+      }
+      return keyInfo;
+    }
+  }
 
-	/**
-	 *
-	 * @param rs
-	 * @param columnName
-	 * @return
-	 * @throws SQLException
-	 */
+  // NOTES on isKey
+  // TODO: isKey: Use a wrapper for the value, to represent no table, sql error, ...
+  // TODO: isKey: How to get tableName/columnName for result set column consider joins...
+  // TODO: isKey: How to set if automatic detection not wanted.
+  // TODO: isKey: Should this be in RowSetOps
+  // TODO: isKey: columnName/columnLabel
+  // dbMetaData.getDatabaseProductName()
 
-	public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, String columnName)
-			throws SQLException
-	{
-	return getPrimaryKeyInfoForTable(rs, rs.findColumn(columnName));
+  /**
+   *
+   * @param rs
+   * @param columnName
+   * @return
+   * @throws SQLException
+   */
 
-	}
-	/**
-	 * Find {@link KeyInfo} for table associated with the specified column.
-	 * Starting with the column's RowSet, get the dbMetaData, determine keys.
-	 * @param rs
-	 * @param colIdx
-	 * @return
-	 * @throws SQLException
-	 */
-	// TODO: isKey: lookup specializations for databases to access special result set info.
-	//public static List<KeyInfo> getPrimaryKeyInfoForTable(RSC comp)
-	public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, int colIdx)
-			throws SQLException
-	{
-		// TODO: isKey: this doesn't seem reliable. Consider join...
-		// TODO: isKey: For now assume column names match
+  public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, String columnName)
+      throws SQLException {
+    return getPrimaryKeyInfoForTable(rs, rs.findColumn(columnName));
+  }
+  /**
+   * Find {@link KeyInfo} for table associated with the specified column.
+   * Starting with the column's RowSet, get the dbMetaData, determine keys.
+   * @param rs
+   * @param colIdx
+   * @return
+   * @throws SQLException
+   */
+  // TODO: isKey: lookup specializations for databases to access special result set info.
+  //public static List<KeyInfo> getPrimaryKeyInfoForTable(RSC comp)
+  public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, int colIdx) throws SQLException {
+    // TODO: isKey: this doesn't seem reliable. Consider join...
+    // TODO: isKey: For now assume column names match
 
-		ResultSetMetaData rsMetaData = rs.getMetaData();
+    ResultSetMetaData rsMetaData = rs.getMetaData();
 
-		String catalog = rsMetaData.getCatalogName(colIdx);
-		String schema  = rsMetaData.getSchemaName(colIdx);
-		String table   = rsMetaData.getTableName(colIdx);
+    String catalog = rsMetaData.getCatalogName(colIdx);
+    String schema = rsMetaData.getSchemaName(colIdx);
+    String table = rsMetaData.getTableName(colIdx);
 
-		// TODO: just call all the names keys. Buggy if join ...
-		List<KeyInfo> ki = SSUtils.dbSupport().runWithConnection(
-				conn -> {
-					DatabaseMetaData dbMetaData = conn.getMetaData();
-					// TODO: some versions of Postgress require null catalog
-					return getPrimaryKeyInfoForTable(dbMetaData, catalog, schema, table);
-				});
-		return ki;
-	}
+    // TODO: just call all the names keys. Buggy if join ...
+    List<KeyInfo> ki = SSUtils.dbSupport().runWithConnection(conn -> {
+      DatabaseMetaData dbMetaData = conn.getMetaData();
+      // TODO: some versions of Postgress require null catalog
+      return getPrimaryKeyInfoForTable(dbMetaData, catalog, schema, table);
+    });
+    return ki;
+  }
 
-	
-	// https://stackoverflow.com/questions/21328371/get-primary-key-column-from-resultset-java
+  // https://stackoverflow.com/questions/21328371/get-primary-key-column-from-resultset-java
 
-	//public static Set<Integer> getPrimaryKeyColumnsForTable(RowSet rs, int columnIndex)
-	//		throws SQLException
-	//{
-	//	String tableName = rs.getMetaData().getTableName(2);
-	//	DataSource ds = null;
-	//	try {
-	//		ds = InitialContext.doLookup(rs.getDataSourceName());
-	//	} catch (NamingException ex) {
-	//		ex.printStackTrace();
-	//	}
-	//	if(ds == null)
-	//		return Collections.emptySet();
-	//	try (Connection conn = ds.getConnection()) {
-	//		return SSUtils.getPrimaryKeyColumnsForTable(conn, tableName);
-	//	}
-	//}
+  //public static Set<Integer> getPrimaryKeyColumnsForTable(RowSet rs, int columnIndex)
+  //		throws SQLException
+  //{
+  //	String tableName = rs.getMetaData().getTableName(2);
+  //	DataSource ds = null;
+  //	try {
+  //		ds = InitialContext.doLookup(rs.getDataSourceName());
+  //	} catch (NamingException ex) {
+  //		ex.printStackTrace();
+  //	}
+  //	if(ds == null)
+  //		return Collections.emptySet();
+  //	try (Connection conn = ds.getConnection()) {
+  //		return SSUtils.getPrimaryKeyColumnsForTable(conn, tableName);
+  //	}
+  //}
 
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// Common Messages
-	//
+  ////////////////////////////////////////////////////////////////////////////
+  //
+  // Common Messages
+  //
 
-	/**
-	 * Error msg.
-	 * @param oldType
-	 * @param newType
-	 * @return 
-	 */
-	public static String JDBCTypeMismatch(JDBCType oldType, JDBCType newType) {
-		return sf("JDBCType mismatch: old %s, new %s", oldType, newType);
-	}
+  /**
+   * Error msg.
+   * @param oldType
+   * @param newType
+   * @return
+   */
+  public static String JDBCTypeMismatch(JDBCType oldType, JDBCType newType) {
+    return sf("JDBCType mismatch: old %s, new %s", oldType, newType);
+  }
 
-	/**
-	 * Error msg.
-	 * @param oldVal
-	 * @param newVal
-	 * @return
-	 */
-	public static String NullabilityMismatch(boolean oldVal, boolean newVal) {
-		return sf("Nullability mismatch: old %s, new %s", oldVal, newVal);
-	}
+  /**
+   * Error msg.
+   * @param oldVal
+   * @param newVal
+   * @return
+   */
+  public static String NullabilityMismatch(boolean oldVal, boolean newVal) {
+    return sf("Nullability mismatch: old %s, new %s", oldVal, newVal);
+  }
 
-	/**
-	 * An unexpected/impossible SQL exception.
-	 * Send mail; Dialog: contact admin; ...?
-	 * @param ex
-	 * @param logger
-	 */
-	public static void randomSQLException(Exception ex, Logger logger) {
-		logger.log(Level.ERROR, ex.getMessage(), ex);
-		beep();
-	}
+  /**
+   * An unexpected/impossible SQL exception.
+   * Send mail; Dialog: contact admin; ...?
+   * @param ex
+   * @param logger
+   */
+  public static void randomSQLException(Exception ex, Logger logger) {
+    logger.log(Level.ERROR, ex.getMessage(), ex);
+    beep();
+  }
 
-	/**
-	 * Report problem accessing image file to user.
-	 * @param logger
-	 * @param comp
-	 * @param title dialog title
-	 * @param path file path
-	 * @param ex error
-	 */
-	// TODO: Only used from Image.java. Does this belong in Image.java?
-	public static void reportError(Logger logger, SSComponent comp, String title, Path path, Exception ex)
-	{
-		String pathName = path != null ? path.toAbsolutePath().toString() : "";
-		logger.log(Level.ERROR, () -> sf("%s: IO Exception %s: file %s: %s",
-				comp.getColumnForLog(), ex.getClass().getSimpleName(),
-				pathName, ex.getMessage()));
+  /**
+   * Report problem accessing image file to user.
+   * @param logger
+   * @param comp
+   * @param title dialog title
+   * @param path file path
+   * @param ex error
+   */
+  // TODO: Only used from Image.java. Does this belong in Image.java?
+  public static void reportError(Logger logger, SSComponent comp, String title, Path path,
+                                 Exception ex) {
+    String pathName = path != null ? path.toAbsolutePath().toString() : "";
+    logger.log(Level.ERROR,
+               ()
+                   -> sf("%s: IO Exception %s: file %s: %s", comp.getColumnForLog(),
+                         ex.getClass().getSimpleName(), pathName, ex.getMessage()));
 
-		// TODO: Alter message according to parameters.
-		//		 For example, if path is null, leave out "file: 'xxx'"
+    // TODO: Alter message according to parameters.
+    //		 For example, if path is null, leave out "file: 'xxx'"
 
-		String msg = sf("<html>"
-				+ "<center>%s</center>"
-				+ "<br/>Details:<br/>"
-				+ "<center>DB column: %s</center>"
-				+ "<center>File: '%s'</center>"
-				+ "<center>Exception: %s</center>",
-				ex.getLocalizedMessage(), comp.getColumnForLog(),
-				pathName, ex.getClass().getSimpleName()
-		);
-		JOptionPane.showMessageDialog((Component)comp, msg,
-				title, JOptionPane.ERROR_MESSAGE);
-	}
+    String msg = sf("<html>"
+                        + "<center>%s</center>"
+                        + "<br/>Details:<br/>"
+                        + "<center>DB column: %s</center>"
+                        + "<center>File: '%s'</center>"
+                        + "<center>Exception: %s</center>",
+                    ex.getLocalizedMessage(), comp.getColumnForLog(), pathName,
+                    ex.getClass().getSimpleName());
+    JOptionPane.showMessageDialog((Component) comp, msg, title, JOptionPane.ERROR_MESSAGE);
+  }
 
+  ////////////////////////////////////////////////////////////////////////////
+  //
+  // Debug Support
+  //
 
+  /**
+   * This is for toString() of an SSComponent, rather than the JComponents string.
+   * @param comp string for this
+   * @return string from component
+   */
+  public static String ssComponentToString(SSComponent comp) {
+    return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getColumnName());
+  }
 
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// Debug Support
-	//
+  /**
+   * Return a unique name for an Object, for example "String@89AB".
+   * Name is SimpleClassName followed by identityHashCode in hex.
+   * Used primarily for debug messages.
+   * @param o The Object
+   * @return unique name for the object or "null"
+   */
+  // TODO: put this in utils/SSUtil
+  public static String objectID(Object o) {
+    if (o == null) { return "null"; }
+    String s = switch (o) {
+      case RowSet rs ->
+        sf("%s[%s]@%X", o.getClass().getSimpleName(), tableName(rs), System.identityHashCode(o));
+      default -> sf("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
+    };
+    return s;
+  }
 
-	/**
-	 * This is for toString() of an SSComponent, rather than the JComponents string.
-	 * @param comp string for this
-	 * @return string from component
-	 */
-	public static String ssComponentToString(SSComponent comp)
-	{
-		return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getColumnName());
-	}
+  /**
+   * Return the name of the table where column 1 came from.
+   * @param rs
+   * @return
+   */
+  public static String tableName(RowSet rs) {
+    try {
+      return rs.getMetaData().getTableName(1);
+    } catch (SQLException ex) {}
+    return null;
+  }
 
-	/**
-	 * Return a unique name for an Object, for example "String@89AB".
-	 * Name is SimpleClassName followed by identityHashCode in hex.
-	 * Used primarily for debug messages.
-	 * @param o The Object
-	 * @return unique name for the object or "null"
-	 */
-	// TODO: put this in utils/SSUtil
-	public static String objectID(Object o) {
-		if (o == null) {
-			return "null";
-		}
-		String s = switch(o) {
-		case RowSet rs -> sf("%s[%s]@%X",
-				o.getClass().getSimpleName(), tableName(rs), System.identityHashCode(o));
-		default -> sf("%s@%X",
-				o.getClass().getSimpleName(), System.identityHashCode(o));
-		};
-		return s;
-	}
+  private static boolean isJunit;
+  private static boolean didJunitCheck;
+  /**
+   * @return true if junit is running.
+   */
+  public static boolean isJunit() {
+    if (!didJunitCheck) {
+      //.filter((f)->{System.err.println("    "+f.getClassName());return true; })
+      StackWalker walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
+      Optional<StackWalker.StackFrame> frame
+          = walker.walk(s -> s.filter((f) -> f.getClassName().startsWith("org.junit")).findFirst());
+      if (frame.isPresent()) isJunit = true;
+      didJunitCheck = true;
+    }
+    return isJunit;
+  }
 
-	/**
-	 * Return the name of the table where column 1 came from.
-	 * @param rs
-	 * @return 
-	 */
-	public static String tableName(RowSet rs) {
-		try {
-			return rs.getMetaData().getTableName(1);
-		} catch (SQLException ex) { }
-		return null;
-	}
+  /**
+   * true if in JUnit and NOT using JUnit logging
+   * @return
+   */
+  public static boolean isJunitPrint() {
+    if (!isJunit()) return false;
+    java.util.logging.Logger juLog = LogManager.getLogManager().getLogger("com.nqadmin.swingset");
+    if (juLog != null) {
+      Handler[] handlers = juLog.getHandlers();
+      if (handlers.length > 0 && handlers[0].getFormatter() instanceof TestFormatterBase)
+        return false;
+    }
+    return true;
+  }
 
-	private static boolean isJunit;
-	private static boolean didJunitCheck;
-	/**
-	 * @return true if junit is running.
-	 */
-	public static boolean isJunit() {
-		if (!didJunitCheck) {
-			//.filter((f)->{System.err.println("    "+f.getClassName());return true; })
-			StackWalker walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
-			Optional<StackWalker.StackFrame> frame = walker.walk(s -> s
-					.filter((f) -> f.getClassName().startsWith("org.junit"))
-					.findFirst());
-			if (frame.isPresent())
-				isJunit = true;
-			didJunitCheck = true;
-		}
-		return isJunit;
-	}
-
-	/** true if in JUnit and NOT using JUnit logging
-	 * @return  */
-	public static boolean isJunitPrint()
-	{
-		if (!isJunit())
-			return false;
-		java.util.logging.Logger juLog = LogManager.getLogManager().getLogger("com.nqadmin.swingset");
-		if (juLog != null) {
-			Handler[] handlers = juLog.getHandlers();
-			if (handlers.length > 0
-					&& handlers[0].getFormatter() instanceof TestFormatterBase)
-				return false;
-		}
-		return true;
-	}
-
-	/**
-	 * This is used to distinguish formatter used in JUnit tests.
-	 * Define it here for use by isJunitPrint.
-	 * This is extended by the unit test logging infrastructure.
-	 */
-	public static class TestFormatterBase extends SimpleFormatter
-	{
-	}
-
+  /**
+   * This is used to distinguish formatter used in JUnit tests.
+   * Define it here for use by isJunitPrint.
+   * This is extended by the unit test logging infrastructure.
+   */
+  public static class TestFormatterBase extends SimpleFormatter {}
 }

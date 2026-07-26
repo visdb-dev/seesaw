@@ -49,85 +49,90 @@ import com.nqadmin.swingset.utils.SSComponent;
  * Component decorator gives a visual indication of the component state.
  * Typically both component and its validator are checked.
  */
-public interface Decorator extends AnyDecorator
-{
-	/**
-	 * Decorator style primarily used with {@link DecoratorSupplier}.
-	 */
-	public static class DecoratorStyle {
-		private final String style;
-		// Well known border styles
-		/** BorderDecorator */
-		public static DecoratorStyle BORDER = new DecoratorStyle("BORDER");
-		/** BackgroundDecorator */
-		public static DecoratorStyle BACKGROUND = new DecoratorStyle("BACKGROUND");
-		/** no decoration */
-		public static DecoratorStyle NONE = new DecoratorStyle("NONE");
+public interface Decorator extends AnyDecorator {
+  /**
+   * Decorator style primarily used with {@link DecoratorSupplier}.
+   */
+  public static class DecoratorStyle {
+    private final String style;
+    // Well known border styles
+    /** BorderDecorator */
+    public static DecoratorStyle BORDER = new DecoratorStyle("BORDER");
+    /** BackgroundDecorator */
+    public static DecoratorStyle BACKGROUND = new DecoratorStyle("BACKGROUND");
+    /** no decoration */
+    public static DecoratorStyle NONE = new DecoratorStyle("NONE");
 
-		/** create named decorator style
-		 * @param style arbitrary string */
-		public DecoratorStyle(String style)
-		{
-			this.style = style;
-		}
+    /**
+     * create named decorator style
+     * @param style arbitrary string
+     */
+    public DecoratorStyle(String style) { this.style = style; }
 
-		/** {@inheritDoc } */
-		@Override
-		public String toString()
-		{
-			return "DecoratorStyle{" + "style=" + style + '}';
-		}
-	}
+    /** {@inheritDoc } */
+    @Override
+    public String toString() {
+      return "DecoratorStyle{"
+          + "style=" + style + '}';
+    }
+  }
 
-	/** Decorate the component using current state.
-	 * The current state is typically obtained by getComponent().isDataValid()
-	 * @return true if the data is valid
-	 */
-	boolean decorate();
+  /**
+   * Decorate the component using current state.
+   * The current state is typically obtained by getComponent().isDataValid()
+   * @return true if the data is valid
+   */
+  boolean decorate();
 
-	// TODO: this method would be useful to only calculate isValid once
-	// /** Decorate the component using isValid state.
-	//  * The default ignores the argument and calls decorate.
-	//  * @param isValid true is component is valid
-	//  */
-	// default void decorate(boolean isValid) { decorate(); }
+  // TODO: this method would be useful to only calculate isValid once
+  // /** Decorate the component using isValid state.
+  //  * The default ignores the argument and calls decorate.
+  //  * @param isValid true is component is valid
+  //  */
+  // default void decorate(boolean isValid) { decorate(); }
 
-	/** This border's style, 
-	 * 
-	 * @return  decorator style */
-	DecoratorStyle getDecoratorStyle();
+  /**
+   * This border's style,
+   *
+   * @return  decorator style
+   */
+  DecoratorStyle getDecoratorStyle();
 
-	/**
-	 * Decorators typically invoke a component's TextDecorator as as well;
-	 * use this method to control that behavior.
-	 * <p>
-	 * A Decorator should default to true.
-	 * A decorator may choose to never decorate text; should document this.
-	 * 
-	 * @param flag 
-	 */
-	void setDecorateTextEnabled(boolean flag);
-    
-	/**
-	 * A decorator that does nothing.
-	 */
-	public static Decorator nullDecorator = new Decorator() {
-		/** {@inheritDoc} */
-		@Override public boolean decorate() { return true; }
+  /**
+   * Decorators typically invoke a component's TextDecorator as as well;
+   * use this method to control that behavior.
+   * <p>
+   * A Decorator should default to true.
+   * A decorator may choose to never decorate text; should document this.
+   *
+   * @param flag
+   */
+  void setDecorateTextEnabled(boolean flag);
 
-		/** {@inheritDoc} */
-		@Override public void install(SSComponent comp) { }
+  /**
+   * A decorator that does nothing.
+   */
+  public static Decorator nullDecorator = new Decorator() {
+    /** {@inheritDoc} */
+    @Override
+    public boolean decorate() { return true; }
 
-		/** {@inheritDoc} */
-		@Override public void uninstall() { }
+    /** {@inheritDoc} */
+    @Override
+    public void install(SSComponent comp) {}
 
-		/** {@inheritDoc} */
-		@Override public DecoratorStyle getDecoratorStyle() { return DecoratorStyle.NONE; }
+    /** {@inheritDoc} */
+    @Override
+    public void uninstall() {}
 
-		@Override
-		public SSComponent getSSComponent() { return null; }
+    /** {@inheritDoc} */
+    @Override
+    public DecoratorStyle getDecoratorStyle() { return DecoratorStyle.NONE; }
 
-		@Override
-		public void setDecorateTextEnabled(boolean flag) { }
-	};
+    @Override
+    public SSComponent getSSComponent() { return null; }
+
+    @Override
+    public void setDecorateTextEnabled(boolean flag) {}
+  };
 }

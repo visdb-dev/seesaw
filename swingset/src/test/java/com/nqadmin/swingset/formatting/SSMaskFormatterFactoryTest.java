@@ -70,274 +70,291 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @SuppressWarnings("javadoc")
 public class SSMaskFormatterFactoryTest {
-	
-	/** x */
-	public SSMaskFormatterFactoryTest() {
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass() {
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass() {
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp() {
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown() {
-	}
+  /** x */
+  public SSMaskFormatterFactoryTest() {}
 
-	/** x */
-	@SuppressWarnings("serial")
-	public static class CustomParentFormatterFactory
-			extends SSMaskFormatterFactory {
-		
-		/** @param <T> */
-		public static class CustomParentBuilder<T extends CustomParentBuilder<T>>
-				extends SSMaskFormatterFactory.Builder<T> {
-			private final String parentArg;
-			private String parentParam = "defaultParentParam";
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
 
-			/** *  @param mask
-			 * @param arg */
-			public CustomParentBuilder(String mask, String arg) {
-				super(mask);
-				parentArg = arg;
-			}
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-			/** @param val
-			 * @return */
-			public T parentParam(String val) { parentParam = val; return self(); }
+  /** x */
+  @BeforeEach
+  public void setUp() {}
 
-			/** @return */
-			@Override
-			public CustomParentFormatterFactory build() { return new CustomParentFormatterFactory(this); }
-		}
+  /** x */
+  @AfterEach
+  public void tearDown() {}
 
-		private final String parentArg;
-		private final String parentParam;
-		/** @param builder */
-		public CustomParentFormatterFactory(CustomParentBuilder<?> builder) {
-			super(builder);
-			parentArg = builder.parentArg;
-			parentParam = builder.parentParam;
-		}
+  /** x */
+  @SuppressWarnings("serial")
+  public static class CustomParentFormatterFactory extends SSMaskFormatterFactory {
+    /** @param <T> */
+    public static class CustomParentBuilder<T extends CustomParentBuilder<T>>
+        extends SSMaskFormatterFactory.Builder<T> {
+      private final String parentArg;
+      private String parentParam = "defaultParentParam";
 
-		String getParentArg() { return parentArg; }
-		String getParentParam() { return parentParam; }
-	}
+      /**
+       * *  @param mask
+       * @param arg
+       */
+      public CustomParentBuilder(String mask, String arg) {
+        super(mask);
+        parentArg = arg;
+      }
 
-	/** x */
-	@SuppressWarnings("serial")
-	public static class CustomChildFormatterFactory
-			extends CustomParentFormatterFactory {
+      /**
+       * @param val
+       * @return
+       */
+      public T parentParam(String val) {
+        parentParam = val;
+        return self();
+      }
 
-		/** @param <T> */
-		public static class CustomChildBuilder<T extends CustomChildBuilder<T>>
-				extends CustomParentBuilder<T> {
-			private final String childArg;
-			private String childParam = "defaultChildParam";
+      /** @return */
+      @Override
+      public CustomParentFormatterFactory build() {
+        return new CustomParentFormatterFactory(this);
+      }
+    }
 
-			/** @param mask
-			 * @param argP
-			 * @param argC */
-			public CustomChildBuilder(String mask, String argP, String argC) {
-				super(mask, argP);
-				childArg = argC;
-			}
+    private final String parentArg;
+    private final String parentParam;
+    /** @param builder */
+    public CustomParentFormatterFactory(CustomParentBuilder<?> builder) {
+      super(builder);
+      parentArg = builder.parentArg;
+      parentParam = builder.parentParam;
+    }
 
-			/** @param val
-			 * @return */
-			public T childParam(String val) { childParam = val; return self(); }
+    String getParentArg() { return parentArg; }
+    String getParentParam() { return parentParam; }
+  }
 
-			/** @return */
-			@Override
-			public CustomChildFormatterFactory build() { return new CustomChildFormatterFactory(this); }
-		}
+  /** x */
+  @SuppressWarnings("serial")
+  public static class CustomChildFormatterFactory extends CustomParentFormatterFactory {
+    /** @param <T> */
+    public static class CustomChildBuilder<T extends CustomChildBuilder<T>>
+        extends CustomParentBuilder<T> {
+      private final String childArg;
+      private String childParam = "defaultChildParam";
 
-		private final String childArg;
-		private final String childParam;
-		/** @param builder */
-		public CustomChildFormatterFactory(CustomChildBuilder<?> builder) {
-			super(builder);
-			childArg = builder.childArg;
-			childParam = builder.childParam;
-		}
+      /**
+       * @param mask
+       * @param argP
+       * @param argC
+       */
+      public CustomChildBuilder(String mask, String argP, String argC) {
+        super(mask, argP);
+        childArg = argC;
+      }
 
-		String getChildArg() { return childArg; }
-		String getChildParam() { return childParam; }
-	}
+      /**
+       * @param val
+       * @return
+       */
+      public T childParam(String val) {
+        childParam = val;
+        return self();
+      }
 
-	/** x */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testParentHier() {
-		System.out.println("ParentHier");
+      /** @return */
+      @Override
+      public CustomChildFormatterFactory build() {
+        return new CustomChildFormatterFactory(this);
+      }
+    }
 
-		CustomParentFormatterFactory.CustomParentBuilder<?> b
-				= new CustomParentFormatterFactory.CustomParentBuilder<>
-			("##/##", "parentArg")
-			.parentParam("parentParam").ssFormat(CUSTOM);
-		CustomParentFormatterFactory ff = b.build();
-		assertEquals("parentArg", ff.getParentArg());
-		assertEquals("parentParam", ff.getParentParam());
-		SSMaskFormatter f = (SSMaskFormatter) ff.getDefaultFormatter();
-		assertEquals("##/##", f.getMask());
-		assertEquals("/", f.getMaskLiterals(false));
-	}
+    private final String childArg;
+    private final String childParam;
+    /** @param builder */
+    public CustomChildFormatterFactory(CustomChildBuilder<?> builder) {
+      super(builder);
+      childArg = builder.childArg;
+      childParam = builder.childParam;
+    }
 
-	/** x */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testChildHier() {
-		System.out.println("ChildHier");
+    String getChildArg() { return childArg; }
+    String getChildParam() { return childParam; }
+  }
 
-		CustomChildFormatterFactory.CustomChildBuilder<?> b
-				= new CustomChildFormatterFactory.CustomChildBuilder<>
-			("##/##", "parentArg", "childArg")
-			.parentParam("parentParam").childParam("childParam").ssFormat(CUSTOM)
-			.ssFormat(CUSTOM).parentParam("parentParam").childParam("childParam")
-			.childParam("childParam").parentParam("parentParam").ssFormat(CUSTOM)
-			.ssFormat(CUSTOM).childParam("childParam").parentParam("parentParam");
+  /** x */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testParentHier() {
+    System.out.println("ParentHier");
 
-		CustomChildFormatterFactory ff = b.build();
-		assertEquals("parentArg", ff.getParentArg());
-		assertEquals("parentParam", ff.getParentParam());
-		assertEquals("childArg", ff.getChildArg());
-		assertEquals("childParam", ff.getChildParam());
-		SSMaskFormatter f = (SSMaskFormatter) ff.getDefaultFormatter();
-		assertEquals("##/##", f.getMask());
-		assertEquals("/ ", f.getMaskLiterals(true));
-	}
+    CustomParentFormatterFactory.CustomParentBuilder<?> b
+        = new CustomParentFormatterFactory.CustomParentBuilder<>("##/##", "parentArg")
+              .parentParam("parentParam")
+              .ssFormat(CUSTOM);
+    CustomParentFormatterFactory ff = b.build();
+    assertEquals("parentArg", ff.getParentArg());
+    assertEquals("parentParam", ff.getParentParam());
+    SSMaskFormatter f = (SSMaskFormatter) ff.getDefaultFormatter();
+    assertEquals("##/##", f.getMask());
+    assertEquals("/", f.getMaskLiterals(false));
+  }
 
-	/** x
-	 * @throws java.text.ParseException */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testGetMaskLiterals() throws ParseException {
-		System.out.println("GetMaskLiterals");
+  /** x */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testChildHier() {
+    System.out.println("ChildHier");
 
-		SSMaskFormatter mf = new SSMaskFormatter(null);
-		String s;
+    CustomChildFormatterFactory.CustomChildBuilder<?> b
+        = new CustomChildFormatterFactory.CustomChildBuilder<>("##/##", "parentArg", "childArg")
+              .parentParam("parentParam")
+              .childParam("childParam")
+              .ssFormat(CUSTOM)
+              .ssFormat(CUSTOM)
+              .parentParam("parentParam")
+              .childParam("childParam")
+              .childParam("childParam")
+              .parentParam("parentParam")
+              .ssFormat(CUSTOM)
+              .ssFormat(CUSTOM)
+              .childParam("childParam")
+              .parentParam("parentParam");
 
-		mf.setMask("# #/# #");
+    CustomChildFormatterFactory ff = b.build();
+    assertEquals("parentArg", ff.getParentArg());
+    assertEquals("parentParam", ff.getParentParam());
+    assertEquals("childArg", ff.getChildArg());
+    assertEquals("childParam", ff.getChildParam());
+    SSMaskFormatter f = (SSMaskFormatter) ff.getDefaultFormatter();
+    assertEquals("##/##", f.getMask());
+    assertEquals("/ ", f.getMaskLiterals(true));
+  }
 
-		// NOTE default placeholder char is a space.
-		s = mf.getMaskLiterals(true);
-		assertEquals(" /", s);
-		s = mf.getMaskLiterals(false);
-		assertEquals(" /", s);
+  /**
+   * x
+   * @throws java.text.ParseException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testGetMaskLiterals() throws ParseException {
+    System.out.println("GetMaskLiterals");
 
-		mf.setPlaceholderCharacter('_');
-		s = mf.getMaskLiterals(true);
-		assertEquals(" /_", s);
-		s = mf.getMaskLiterals(false);
-		assertEquals(" /", s);
-		// Repeat should come out of cache (not worth special code to verify in cache.
-		s = mf.getMaskLiterals(true);
-		assertEquals(" /_", s);
-		s = mf.getMaskLiterals(false);
-		assertEquals(" /", s);
+    SSMaskFormatter mf = new SSMaskFormatter(null);
+    String s;
 
-		mf.setMask("# #/# #-");
-		s = mf.getMaskLiterals(true);
-		assertEquals(" /-_", s);
-		s = mf.getMaskLiterals(false);
-		assertEquals(" /-", s);
-	}
+    mf.setMask("# #/# #");
 
-	/** x */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testGetMaskLiteralsAndPositions() {
-		System.out.println("GetMaskLiteralsAndPositions");
+    // NOTE default placeholder char is a space.
+    s = mf.getMaskLiterals(true);
+    assertEquals(" /", s);
+    s = mf.getMaskLiterals(false);
+    assertEquals(" /", s);
 
-		LiteralsAndPositions lp;
+    mf.setPlaceholderCharacter('_');
+    s = mf.getMaskLiterals(true);
+    assertEquals(" /_", s);
+    s = mf.getMaskLiterals(false);
+    assertEquals(" /", s);
+    // Repeat should come out of cache (not worth special code to verify in cache.
+    s = mf.getMaskLiterals(true);
+    assertEquals(" /_", s);
+    s = mf.getMaskLiterals(false);
+    assertEquals(" /", s);
 
-		lp = getLiteralsAndPositions("##-## ##:#", FORMATTING_CHARS);
-		assertEquals(List.of("-", " ", ":"), lp.literals());
-		assertEquals(List.of(2, 5, 8), lp.positions());
+    mf.setMask("# #/# #-");
+    s = mf.getMaskLiterals(true);
+    assertEquals(" /-_", s);
+    s = mf.getMaskLiterals(false);
+    assertEquals(" /-", s);
+  }
 
-		lp = getLiteralsAndPositions("####-##-## ##:##:##.### *##:##", FORMATTING_CHARS);
-		assertEquals(List.of("-", "-", " ", ":", ":", ".", " ", ":"), lp.literals());
-		assertEquals(List.of(4, 7, 10, 13, 16, 19, 23, 27), lp.positions());
+  /** x */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testGetMaskLiteralsAndPositions() {
+    System.out.println("GetMaskLiteralsAndPositions");
 
-		lp = getLiteralsAndPositions("##-## H ##:#", FORMATTING_CHARS);
-		assertEquals(List.of("-", " ", " ", ":"), lp.literals());
-		assertEquals(List.of(2, 5, 7, 10), lp.positions());
+    LiteralsAndPositions lp;
 
-		lp = getLiteralsAndPositions("##-## 'H ##:#", FORMATTING_CHARS);
-		assertEquals(List.of("-", " ", "H", " ", ":"), lp.literals());
-		assertEquals(List.of(2, 5, 6, 7, 10), lp.positions());
-	}
+    lp = getLiteralsAndPositions("##-## ##:#", FORMATTING_CHARS);
+    assertEquals(List.of("-", " ", ":"), lp.literals());
+    assertEquals(List.of(2, 5, 8), lp.positions());
 
-	private String bounceUserText(MaskFormatter mf, String text) {
-		return userText(
-				text, mf.getMask(), FORMATTING_CHARS, mf.getPlaceholderCharacter());
-	}
+    lp = getLiteralsAndPositions("####-##-## ##:##:##.### *##:##", FORMATTING_CHARS);
+    assertEquals(List.of("-", "-", " ", ":", ":", ".", " ", ":"), lp.literals());
+    assertEquals(List.of(4, 7, 10, 13, 16, 19, 23, 27), lp.positions());
 
-	/** x
-	 * @throws java.text.ParseException */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testUserText() throws ParseException {
-		System.out.println("UserText");
+    lp = getLiteralsAndPositions("##-## H ##:#", FORMATTING_CHARS);
+    assertEquals(List.of("-", " ", " ", ":"), lp.literals());
+    assertEquals(List.of(2, 5, 7, 10), lp.positions());
 
-		String text;
-		MaskFormatter mf = new MaskFormatter();
-		mf.setMask("##-## ##:#");
-		text = bounceUserText(mf, "  -     :  ");
-		assertEquals("", text);
-		text = userText("  -1   2:  ", mf);
-		assertEquals("12", text);
-		text = bounceUserText(mf, "__-__ __:__");
-		assertEquals("________", text);
-		text = userText("_1-__ 3_:__", mf);
-		assertEquals("_1__3___", text);
+    lp = getLiteralsAndPositions("##-## 'H ##:#", FORMATTING_CHARS);
+    assertEquals(List.of("-", " ", "H", " ", ":"), lp.literals());
+    assertEquals(List.of(2, 5, 6, 7, 10), lp.positions());
+  }
 
-		mf.setPlaceholderCharacter('_');
-		text = bounceUserText(mf, "__-__ __:__");
-		assertEquals("", text);
-		text = userText("_1-__ 3_:__", mf);
-		assertEquals("13", text);
-	}
+  private String bounceUserText(MaskFormatter mf, String text) {
+    return userText(text, mf.getMask(), FORMATTING_CHARS, mf.getPlaceholderCharacter());
+  }
 
-	/**
-	 * Test of builder method, of class SSMaskFormatterFactory.
-	 */
-	//@Test
-	//@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	//public void testBuilder() {
-	//	System.out.println("builder");
-	//	String mask = "";
-	//	@SuppressWarnings("rawtypes")
-	//	SSMaskFormatterFactory.Builder expResult = null;
-	//	@SuppressWarnings("rawtypes")
-	//	SSMaskFormatterFactory.Builder result = SSMaskFormatterFactory.builder(mask);
-	//	assertEquals(expResult, result);
-	//	// TODO review the generated test code and remove the default call to fail.
-	//	fail("The test case is a prototype.");
-	//}
+  /**
+   * x
+   * @throws java.text.ParseException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testUserText() throws ParseException {
+    System.out.println("UserText");
 
-	/**
-	 * Test of adjustNullFormatter method, of class SSMaskFormatterFactory.
-	 */
-	//@Test
-	//@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	//public void testAdjustNullFormatter() {
-	//	System.out.println("adjustNullFormatter");
-	//	SSFormattedTextField _ftf = null;
-	//	SSMaskFormatterFactory.adjustNullFormatter(_ftf);
-	//	// TODO review the generated test code and remove the default call to fail.
-	//	fail("The test case is a prototype.");
-	//}
-	
+    String text;
+    MaskFormatter mf = new MaskFormatter();
+    mf.setMask("##-## ##:#");
+    text = bounceUserText(mf, "  -     :  ");
+    assertEquals("", text);
+    text = userText("  -1   2:  ", mf);
+    assertEquals("12", text);
+    text = bounceUserText(mf, "__-__ __:__");
+    assertEquals("________", text);
+    text = userText("_1-__ 3_:__", mf);
+    assertEquals("_1__3___", text);
+
+    mf.setPlaceholderCharacter('_');
+    text = bounceUserText(mf, "__-__ __:__");
+    assertEquals("", text);
+    text = userText("_1-__ 3_:__", mf);
+    assertEquals("13", text);
+  }
+
+  /**
+   * Test of builder method, of class SSMaskFormatterFactory.
+   */
+  //@Test
+  //@SuppressWarnings("UseOfSystemOutOrSystemErr")
+  //public void testBuilder() {
+  //	System.out.println("builder");
+  //	String mask = "";
+  //	@SuppressWarnings("rawtypes")
+  //	SSMaskFormatterFactory.Builder expResult = null;
+  //	@SuppressWarnings("rawtypes")
+  //	SSMaskFormatterFactory.Builder result = SSMaskFormatterFactory.builder(mask);
+  //	assertEquals(expResult, result);
+  //	// TODO review the generated test code and remove the default call to fail.
+  //	fail("The test case is a prototype.");
+  //}
+
+  /**
+   * Test of adjustNullFormatter method, of class SSMaskFormatterFactory.
+   */
+  //@Test
+  //@SuppressWarnings("UseOfSystemOutOrSystemErr")
+  //public void testAdjustNullFormatter() {
+  //	System.out.println("adjustNullFormatter");
+  //	SSFormattedTextField _ftf = null;
+  //	SSMaskFormatterFactory.adjustNullFormatter(_ftf);
+  //	// TODO review the generated test code and remove the default call to fail.
+  //	fail("The test case is a prototype.");
+  //}
 }

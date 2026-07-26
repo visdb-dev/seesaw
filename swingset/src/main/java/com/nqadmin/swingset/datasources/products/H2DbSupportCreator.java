@@ -39,20 +39,16 @@ import com.nqadmin.swingset.datasources.DbSupport;
 /**
  * For H2.
  */
-@ServiceProvider(path="SS/DbSupport/H2", service=DbSupportCreator.class)
-public class H2DbSupportCreator implements DbSupportCreator
-{
-
-	/**
-	 * Construct DbSupport for H2. MetaData doesn't matter.
-	 * @param sharedConnection
-	 * @param dbMeta
-	 * @return DbSupport
-	 */
-	@Override
-	public DbSupport create(Connection sharedConnection, DatabaseMetaData dbMeta)
-	{
-		return new H2DbSupport(sharedConnection);
-	}
-	
+@ServiceProvider(path = "SS/DbSupport/H2", service = DbSupportCreator.class)
+public class H2DbSupportCreator implements DbSupportCreator {
+  /**
+   * Construct DbSupport for H2. MetaData doesn't matter.
+   * @param sharedConnection
+   * @param dbMeta
+   * @return DbSupport
+   */
+  @Override
+  public DbSupport create(Connection sharedConnection, DatabaseMetaData dbMeta) {
+    return new H2DbSupport(sharedConnection);
+  }
 }

@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
-
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -55,79 +54,58 @@ import static org.junit.jupiter.api.Assertions.*;
  * This is not SS directly; examine how DB does automatic conversions.
  */
 @SuppressWarnings("StaticNonFinalUsedInInitialization")
-public class DbConvertOpsTest
-{
-	
-	/** x */
-	public DbConvertOpsTest()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-	}
+public class DbConvertOpsTest {
+  /** x */
+  public DbConvertOpsTest() {}
 
-	RowSet g_rs;
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
 
-	private final Object NO_EXPECT = new Object();
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-	private void updateObject(String col, Object val, Object expect)
-			throws Exception
-	{
-		System.out.printf("    %s from %s\n", col, val.getClass().getSimpleName());
+  /** x */
+  @BeforeEach
+  public void setUp() {}
 
-		g_rs.updateObject(col, val);
-		g_rs.updateRow();
+  /** x */
+  @AfterEach
+  public void tearDown() {}
 
-		Object co = g_rs.getObject(col);
-		//assertTrue(co.getClass() == val.getClass());
+  RowSet g_rs;
 
-		if (expect == NO_EXPECT)
-			return;
-		if (expect != null)
-			assertEquals(expect, co);
-		else if (val instanceof BigDecimal bd)
-			assertEquals(bd.compareTo((BigDecimal) co), 0);
-		else
-			assertEquals(val, co);
-	}
-	private void updateObject(DT dt, Object val)
-			throws Exception
-	{
-		updateObject(dt.col, val, dt.fExpect.apply(dt));
-	}
+  private final Object NO_EXPECT = new Object();
 
-	/**
-	 * Test of ResultSet setObject.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
-	public void testNumericConversions() throws Exception
-	{
-		System.out.println("NumericConversions by updateObject");
+  private void updateObject(String col, Object val, Object expect) throws Exception {
+    System.out.printf("    %s from %s\n", col, val.getClass().getSimpleName());
 
-		g_rs = H2.getRowSetCleanDB("""
+    g_rs.updateObject(col, val);
+    g_rs.updateRow();
+
+    Object co = g_rs.getObject(col);
+    //assertTrue(co.getClass() == val.getClass());
+
+    if (expect == NO_EXPECT) return;
+    if (expect != null) assertEquals(expect, co);
+    else if (val instanceof BigDecimal bd) assertEquals(bd.compareTo((BigDecimal) co), 0);
+    else assertEquals(val, co);
+  }
+  private void updateObject(DT dt, Object val) throws Exception {
+    updateObject(dt.col, val, dt.fExpect.apply(dt));
+  }
+
+  /**
+   * Test of ResultSet setObject.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
+  public void testNumericConversions() throws Exception {
+    System.out.println("NumericConversions by updateObject");
+
+    g_rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -140,86 +118,81 @@ public class DbConvertOpsTest
 				(1, 1, 1)
 			;
             """);
-		g_rs.setCommand("SELECT * FROM tbl");
-		g_rs.execute();
-		g_rs.next();
+    g_rs.setCommand("SELECT * FROM tbl");
+    g_rs.execute();
+    g_rs.next();
 
-		updateObject("c_tinyint", 127.1, 127); // NO EXCEPTION
+    updateObject("c_tinyint", 127.1, 127); // NO EXCEPTION
 
-		// updateObject("c_tinyint", n_smallint); SQLException: 
-		updateObject("c_tinyint", 3, null);
-		updateObject("c_tinyint", 4L, 4);
-		updateObject("c_tinyint", BigDecimal.valueOf(5), 5);
-		updateObject("c_tinyint", "6", 6);
-		updateObject("c_tinyint", 7.1, 7); // NO EXCEPTION
-		updateObject("c_tinyint", 7.8, 8); // ROUNDING
+    // updateObject("c_tinyint", n_smallint); SQLException:
+    updateObject("c_tinyint", 3, null);
+    updateObject("c_tinyint", 4L, 4);
+    updateObject("c_tinyint", BigDecimal.valueOf(5), 5);
+    updateObject("c_tinyint", "6", 6);
+    updateObject("c_tinyint", 7.1, 7); // NO EXCEPTION
+    updateObject("c_tinyint", 7.8, 8); // ROUNDING
 
-		updateObject("c_tinyint", 127.1, 127); // NO EXCEPTION
-		assertThrows(SQLException.class,
-				()->updateObject("c_tinyint", 127.8, 127));
+    updateObject("c_tinyint", 127.1, 127); // NO EXCEPTION
+    assertThrows(SQLException.class, () -> updateObject("c_tinyint", 127.8, 127));
 
-		assertThrows(SQLException.class,
-				()->updateObject("c_tinyint", BigDecimal.valueOf(128), null));
-		assertThrows(SQLException.class,
-				()->updateObject("c_tinyint", "128", 3));
+    assertThrows(SQLException.class,
+                 () -> updateObject("c_tinyint", BigDecimal.valueOf(128), null));
+    assertThrows(SQLException.class, () -> updateObject("c_tinyint", "128", 3));
 
-		g_rs.updateObject("c_tinyint", null);
-		g_rs.updateRow();
+    g_rs.updateObject("c_tinyint", null);
+    g_rs.updateRow();
 
-		updateObject("c_real", (double)Float.MAX_VALUE, Float.MAX_VALUE);
-		// NOTE: no overflow generated, but do get infinity
-		updateObject("c_real", Double.MAX_VALUE, Float.POSITIVE_INFINITY);
-		
-		g_rs = null;
-	}
+    updateObject("c_real", (double) Float.MAX_VALUE, Float.MAX_VALUE);
+    // NOTE: no overflow generated, but do get infinity
+    updateObject("c_real", Double.MAX_VALUE, Float.POSITIVE_INFINITY);
 
-	/**
-	 * Test of ResultSet setObject.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
-	public void testNumericConversionsNoDB() throws Exception
-	{
-		System.out.println("NumericConversionsNoDB");
+    g_rs = null;
+  }
 
-		float f = (float)Double.MAX_VALUE;
-		assertEquals(Float.POSITIVE_INFINITY, f);
+  /**
+   * Test of ResultSet setObject.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
+  public void testNumericConversionsNoDB() throws Exception {
+    System.out.println("NumericConversionsNoDB");
 
-		Double d = Double.MAX_VALUE;
-		f = d.floatValue();
-		assertEquals(Float.POSITIVE_INFINITY, f);
+    float f = (float) Double.MAX_VALUE;
+    assertEquals(Float.POSITIVE_INFINITY, f);
 
-		assertThrows(NumberFormatException.class, () -> Byte.valueOf("128"));
-	}
+    Double d = Double.MAX_VALUE;
+    f = d.floatValue();
+    assertEquals(Float.POSITIVE_INFINITY, f);
 
-	//private record DT(String date, String time){}
-	private class DT {
-		final String col;
-		final String date;
-		final String time;
-		final Function<DT,Object> fExpect;
+    assertThrows(NumberFormatException.class, () -> Byte.valueOf("128"));
+  }
 
-		public DT(String col, String date, String time, Function<DT,Object> fExpect)
-		{
-			this.col = col;
-			this.date = date;
-			this.time = time;
-			this.fExpect = fExpect;
-		}
-	}
+  //private record DT(String date, String time){}
+  private class DT {
+    final String col;
+    final String date;
+    final String time;
+    final Function<DT, Object> fExpect;
 
-	/**
-	 * Test of updateColumnText method, of class RowSetOps.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings("ResultOfObjectAllocationIgnored")
-	public void testDateConversions() throws Exception
-	{
-		System.out.println("DateConversions");
+    public DT(String col, String date, String time, Function<DT, Object> fExpect) {
+      this.col = col;
+      this.date = date;
+      this.time = time;
+      this.fExpect = fExpect;
+    }
+  }
 
-		g_rs = H2.getRowSetCleanDB("""
+  /**
+   * Test of updateColumnText method, of class RowSetOps.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings("ResultOfObjectAllocationIgnored")
+  public void testDateConversions() throws Exception {
+    System.out.println("DateConversions");
+
+    g_rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -232,132 +205,127 @@ public class DbConvertOpsTest
 			INSERT INTO tbl VALUES
                       (1, '2000-01-11','11:11:11','2000-01-11 11:11:11','');
             """);
-		g_rs.setCommand("SELECT * FROM tbl");
-		g_rs.execute();
-		g_rs.next();
+    g_rs.setCommand("SELECT * FROM tbl");
+    g_rs.execute();
+    g_rs.next();
 
-		String sDate = "2222-02-22";
-		String sTime = "12:12:12";
-		String sTimestamp = "2222-02-22 22:22:22";
+    String sDate = "2222-02-22";
+    String sTime = "12:12:12";
+    String sTimestamp = "2222-02-22 22:22:22";
 
-		updateObject("c_date", sDate, Date.valueOf(sDate));
-		updateObject("c_time", sTime, Time.valueOf(sTime));
-		updateObject("c_timestamp", sTimestamp, Timestamp.valueOf(sTimestamp));
-		
-		DT dt1 = new DT("c_timestamp", "2222-02-23", "22:22:23",
-				(dt) -> Timestamp.valueOf(dt.date + " " + dt.time));
-		DT dt2 = new DT("c_date", "2222-02-24", "22:22:24",
-				(dt) -> Date.valueOf(dt.date));
-		DT dt3 = new DT("c_time", "2222-02-25", "22:22:25",
-				(dt) -> Time.valueOf(dt.time));
+    updateObject("c_date", sDate, Date.valueOf(sDate));
+    updateObject("c_time", sTime, Time.valueOf(sTime));
+    updateObject("c_timestamp", sTimestamp, Timestamp.valueOf(sTimestamp));
 
-		for (DT dt : List.of(dt1, dt2, dt3)) {
-			Timestamp ts = Timestamp.valueOf(dt.date + " " + dt.time);
-			updateObject(dt, ts);
-		}
+    DT dt1 = new DT("c_timestamp", "2222-02-23", "22:22:23",
+                    (dt) -> Timestamp.valueOf(dt.date + " " + dt.time));
+    DT dt2 = new DT("c_date", "2222-02-24", "22:22:24", (dt) -> Date.valueOf(dt.date));
+    DT dt3 = new DT("c_time", "2222-02-25", "22:22:25", (dt) -> Time.valueOf(dt.time));
 
-		g_rs.updateObject("c_date", null);
-		g_rs.updateObject("c_time", null);
-		g_rs.updateObject("c_timestamp", null);
-		g_rs.updateRow();
+    for (DT dt : List.of(dt1, dt2, dt3)) {
+      Timestamp ts = Timestamp.valueOf(dt.date + " " + dt.time);
+      updateObject(dt, ts);
+    }
 
-		for (DT dt : List.of(dt1, dt2, dt3)) {
-			LocalDateTime ldt = LocalDateTime.parse(dt.date + "T" + dt.time);
-			updateObject(dt, ldt);
-		}
-	}
+    g_rs.updateObject("c_date", null);
+    g_rs.updateObject("c_time", null);
+    g_rs.updateObject("c_timestamp", null);
+    g_rs.updateRow();
 
+    for (DT dt : List.of(dt1, dt2, dt3)) {
+      LocalDateTime ldt = LocalDateTime.parse(dt.date + "T" + dt.time);
+      updateObject(dt, ldt);
+    }
+  }
 
-	// These values do not "narrow" without overflow.
-	// Object n_tinyint = Byte.valueOf((byte)1);
-	// Object n_smallint = Short.valueOf((short)(Byte.MAX_VALUE + 1));
-	// Object n_integer = Short.MAX_VALUE + 1;
-	// Object n_bigint = Long.valueOf(Integer.MAX_VALUE + 1);
+  // These values do not "narrow" without overflow.
+  // Object n_tinyint = Byte.valueOf((byte)1);
+  // Object n_smallint = Short.valueOf((short)(Byte.MAX_VALUE + 1));
+  // Object n_integer = Short.MAX_VALUE + 1;
+  // Object n_bigint = Long.valueOf(Integer.MAX_VALUE + 1);
 
-	// Object c_decimal", "17.1", new BigDecimal("17.1"));
-	// Object c_numeric", "18", new BigDecimal("18"));
+  // Object c_decimal", "17.1", new BigDecimal("17.1"));
+  // Object c_numeric", "18", new BigDecimal("18"));
 
-	// Object c_real", "19.3", 19.3F);
-	// Object c_double", "20.3", 20.3);
-	// Object c_float", "21.3", 21.3);
+  // Object c_real", "19.3", 19.3F);
+  // Object c_double", "20.3", 20.3);
+  // Object c_float", "21.3", 21.3);
 
-	// Object c_boolean", "true", true);
+  // Object c_boolean", "true", true);
 
-	// Object c_char", "one", "one");
-	// Object c_varchar", "two", "two");
-	// Object c_nchar", "three", "three");
+  // Object c_char", "one", "one");
+  // Object c_varchar", "two", "two");
+  // Object c_nchar", "three", "three");
 
+  // SSComponentInterface comp1 = new SSTextField(rs, "c_date");
+  // SSComponentInterface comp2 = new SSTextField(rs, "c_time");
+  // SSComponentInterface comp3 = new SSTextField(rs, "c_timestamp");
+  // RowSetOps.updateColumnText(comp1, sDate);
+  // RowSetOps.updateColumnText(comp2, sTime);
+  // RowSetOps.updateColumnText(comp3, sTimestamp);
+  // nav.commit();
 
-		// SSComponentInterface comp1 = new SSTextField(rs, "c_date");
-		// SSComponentInterface comp2 = new SSTextField(rs, "c_time");
-		// SSComponentInterface comp3 = new SSTextField(rs, "c_timestamp");
-		// RowSetOps.updateColumnText(comp1, sDate);
-		// RowSetOps.updateColumnText(comp2, sTime);
-		// RowSetOps.updateColumnText(comp3, sTimestamp);
-		// nav.commit();
-
-		// Object co;
-		// co = RowSetOps.getColumnObject(comp1);
-		// assertEquals(java.sql.Date.valueOf(sDate), co);
-		// co = RowSetOps.getColumnObject(comp2);
-		// assertEquals(java.sql.Time.valueOf(sTime), co);
-		// co = RowSetOps.getColumnObject(comp3);
-		// assertEquals(java.sql.Timestamp.valueOf(sTimestamp), co);
+  // Object co;
+  // co = RowSetOps.getColumnObject(comp1);
+  // assertEquals(java.sql.Date.valueOf(sDate), co);
+  // co = RowSetOps.getColumnObject(comp2);
+  // assertEquals(java.sql.Time.valueOf(sTime), co);
+  // co = RowSetOps.getColumnObject(comp3);
+  // assertEquals(java.sql.Timestamp.valueOf(sTimestamp), co);
 }
 
-		// updateColumnText("c_integer", "13", 13);
-		// updateColumnText("c_smallint", "14", 14);
-		// updateColumnText("c_tinyint", "15", 15);
-		// updateColumnText("c_bigint", "16", 16L);
-		// updateColumnText("c_decimal", "17.1", new BigDecimal("17.1"));
-		// updateColumnText("c_numeric", "18", new BigDecimal("18"));
+// updateColumnText("c_integer", "13", 13);
+// updateColumnText("c_smallint", "14", 14);
+// updateColumnText("c_tinyint", "15", 15);
+// updateColumnText("c_bigint", "16", 16L);
+// updateColumnText("c_decimal", "17.1", new BigDecimal("17.1"));
+// updateColumnText("c_numeric", "18", new BigDecimal("18"));
 
-		// updateColumnText("c_real", "19.3", 19.3F);
-		// updateColumnText("c_double", "20.3", 20.3);
-		// updateColumnText("c_float", "21.3", 21.3);
+// updateColumnText("c_real", "19.3", 19.3F);
+// updateColumnText("c_double", "20.3", 20.3);
+// updateColumnText("c_float", "21.3", 21.3);
 
-		// updateColumnText("c_boolean", "true", true);
+// updateColumnText("c_boolean", "true", true);
 
-		// updateColumnText("c_char", "one", "one");
-		// updateColumnText("c_varchar", "two", "two");
-		// updateColumnText("c_nchar", "three", "three");
+// updateColumnText("c_char", "one", "one");
+// updateColumnText("c_varchar", "two", "two");
+// updateColumnText("c_nchar", "three", "three");
 
+// g_rs = H2.getRowSetCleanDB("""
+//     CREATE TABLE tbl
+//     (
+//         c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
 
-		// g_rs = H2.getRowSetCleanDB("""
-        //     CREATE TABLE tbl
-        //     (
-        //         c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
+//     	c_integer integer,
+//     	c_smallint smallint,
+//     	c_tinyint tinyint,
+//     	c_bigint bigint,
+//     	c_decimal decimal(10,5),
+//     	c_numeric numeric,
 
-        //     	c_integer integer,
-        //     	c_smallint smallint,
-        //     	c_tinyint tinyint,
-        //     	c_bigint bigint,
-        //     	c_decimal decimal(10,5),
-        //     	c_numeric numeric,
+//     	c_real real,
+//     	c_double double,
+//     	c_float float,
 
-        //     	c_real real,
-        //     	c_double double,
-        //     	c_float float,
+//     	c_boolean boolean,
+//     	// c_bit bit,
 
-        //     	c_boolean boolean,
-        //     	// c_bit bit,
+//     	c_char char(3),
+//     	c_varchar varchar,
 
-        //     	c_char char(3),
-        //     	c_varchar varchar,
+//     	// c_longvarchar longvarchar,
+//     	// c_nvarchar nvarchar,
+//     	// c_longnvarchar longnvarchar
 
-        //     	// c_longvarchar longvarchar,
-        //     	// c_nvarchar nvarchar,
-        //     	// c_longnvarchar longnvarchar
+//     	c_nchar nchar(5)
+//     );
 
-        //     	c_nchar nchar(5)
-        //     );
-
-		// 	INSERT INTO tbl VALUES
-		// 		(1,
-        //             1, 1, 1, 1, 1, 1,
-        //             1.0, 1.0, 1.0,
-        //             false,
-        //             'aaa', 'a', 'a'
-        //             )
-		// 	;
-        //     """);
+// 	INSERT INTO tbl VALUES
+// 		(1,
+//             1, 1, 1, 1, 1, 1,
+//             1.0, 1.0, 1.0,
+//             false,
+//             'aaa', 'a', 'a'
+//             )
+// 	;
+//     """);

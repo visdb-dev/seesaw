@@ -68,41 +68,31 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * x
  */
-public class TextStylesTest
-{
-	
-	/** x */
-	public TextStylesTest()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-		TextStyles.clearStyles();
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-		TextStyles.clearStyles();
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-	}
+public class TextStylesTest {
+  /** x */
+  public TextStylesTest() {}
 
-	String properties_ok = """
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
+
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {
+    TextStyles.clearStyles();
+  }
+
+  /** x */
+  @BeforeEach
+  public void setUp() {
+    TextStyles.clearStyles();
+  }
+
+  /** x */
+  @AfterEach
+  public void tearDown() {}
+
+  String properties_ok = """
         default.alignment=left
         default.foreground=#333333
         default.background=#FFFFFF
@@ -121,7 +111,7 @@ public class TextStylesTest
         criticalError.foreground=#721C24
         """;
 
-	String json_ok = """
+  String json_ok = """
 		{
 		  "default": {
 			"foreground": "#333333",
@@ -157,7 +147,7 @@ public class TextStylesTest
 		}
         """;
 
-	String expect_json_ok = """
+  String expect_json_ok = """
 
 		=======================================================
 		        THEME VALIDATION & DIAGNOSTIC REPORT
@@ -172,7 +162,7 @@ public class TextStylesTest
 
 		""";
 
-	String expect_json_ok_trees = """
+  String expect_json_ok_trees = """
         Resolved Structural Hierarchy Trees:
         └── default
               • foreground = java.awt.Color[r=51,g=51,b=51]
@@ -199,7 +189,7 @@ public class TextStylesTest
                   • bold = true
         """;
 
-	String json_errors = """
+  String json_errors = """
 		{
 		  "default": {
 			"inherits": "warning",
@@ -229,7 +219,7 @@ public class TextStylesTest
 		}
         """;
 
-	String expect_json_errors = """
+  String expect_json_errors = """
 
 		=======================================================
 		        THEME VALIDATION & DIAGNOSTIC REPORT
@@ -250,7 +240,7 @@ public class TextStylesTest
 
 		""";
 
-	String keep_json = """
+  String keep_json = """
 		{
 			"init1": {
 				"foreground": "blue",
@@ -322,126 +312,120 @@ public class TextStylesTest
 		}
 		""";
 
-	/** Recursively get all the names in the AttributeSet */
-	private Set<Object> getAllAttributeNames(AttributeSet as) {
-		if (as == null)
-			return Collections.emptySet();
-		Set<Object> accum = new HashSet<>();
-		for (Iterator<?> it = as.getAttributeNames().asIterator(); it.hasNext();) {
-			accum.add(it.next());
-		}
-		accum.addAll(getAllAttributeNames(as.getResolveParent()));
-		return accum;
-	}
+  /** Recursively get all the names in the AttributeSet */
+  private Set<Object> getAllAttributeNames(AttributeSet as) {
+    if (as == null) return Collections.emptySet();
+    Set<Object> accum = new HashSet<>();
+    for (Iterator<?> it = as.getAttributeNames().asIterator(); it.hasNext();) {
+      accum.add(it.next());
+    }
+    accum.addAll(getAllAttributeNames(as.getResolveParent()));
+    return accum;
+  }
 
-	private Set<String> getAttributeStringPairs(AttributeSet as, Set<Object> attrNames) {
-		return attrNames.stream()
-				.map(attrName -> attrName.toString() + ":" + as.getAttribute(attrName))
-				.collect(Collectors.toSet());
-	}
+  private Set<String> getAttributeStringPairs(AttributeSet as, Set<Object> attrNames) {
+    return attrNames.stream()
+        .map(attrName -> attrName.toString() + ":" + as.getAttribute(attrName))
+        .collect(Collectors.toSet());
+  }
 
-	private Set<String> getAttributeStringPairs(AttributeSet as) {
-		return getAttributeStringPairs(as, getAllAttributeNames(as));
-	}
+  private Set<String> getAttributeStringPairs(AttributeSet as) {
+    return getAttributeStringPairs(as, getAllAttributeNames(as));
+  }
 
-	/** write contents to random file, return the new file's name.
-	 * If dir is null use system temporary dir.
-	 */
-	private Path createToRandomFileName(Path dir, String ext, String content) {
-		Path path;
-		try {
-			FileAttribute<Set<PosixFilePermission>> fattrib
-					= PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--"));
-			path = dir == null ? Files.createTempFile(null, ext, fattrib)
-					: Files.createTempFile(dir, null, ext, fattrib);
-			Files.writeString(path, content);
-		} catch (IOException ex) {
-			System.getLogger(TextStylesTest.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-			path = null;
-		}
-		return path;
-	}
+  /**
+   * write contents to random file, return the new file's name.
+   * If dir is null use system temporary dir.
+   */
+  private Path createToRandomFileName(Path dir, String ext, String content) {
+    Path path;
+    try {
+      FileAttribute<Set<PosixFilePermission>> fattrib
+          = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--"));
+      path = dir == null ? Files.createTempFile(null, ext, fattrib)
+                         : Files.createTempFile(dir, null, ext, fattrib);
+      Files.writeString(path, content);
+    } catch (IOException ex) {
+      System.getLogger(TextStylesTest.class.getName())
+          .log(System.Logger.Level.ERROR, (String) null, ex);
+      path = null;
+    }
+    return path;
+  }
 
-	/**
-	 * Test of getStyleNames method, of class TextStyles.
-	 * @throws java.io.IOException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testGetStyleNames() throws IOException
-	{
-		System.out.println("getStyleNames");
+  /**
+   * Test of getStyleNames method, of class TextStyles.
+   * @throws java.io.IOException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testGetStyleNames() throws IOException {
+    System.out.println("getStyleNames");
 
-		Reader reader = new StringReader(json_ok);
-		TextStyles.loadStylesFromJson(reader);
+    Reader reader = new StringReader(json_ok);
+    TextStyles.loadStylesFromJson(reader);
 
-		Set<String> expect = Set.of("default", "warning", "criticalError", "default_2", "criticalError_2");
-		Set<String> result = TextStyles.getStyleNames();
-		assertEquals(expect, result);
-	}
+    Set<String> expect
+        = Set.of("default", "warning", "criticalError", "default_2", "criticalError_2");
+    Set<String> result = TextStyles.getStyleNames();
+    assertEquals(expect, result);
+  }
 
-	/**
-	 * Test of getStyle method, of class TextStyles.
-	 * @throws java.io.IOException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testGetStyle() throws IOException
-	{
-		System.out.println("getStyle");
+  /**
+   * Test of getStyle method, of class TextStyles.
+   * @throws java.io.IOException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testGetStyle() throws IOException {
+    System.out.println("getStyle");
 
-		Reader reader = new StringReader(json_ok);
-		TextStyles.loadStylesFromJson(reader);
+    Reader reader = new StringReader(json_ok);
+    TextStyles.loadStylesFromJson(reader);
 
-		AttributeSet result = TextStyles.getStyle("foo");
-		assertEquals(null, result);
+    AttributeSet result = TextStyles.getStyle("foo");
+    assertEquals(null, result);
 
-		Set<String> expect = Set.of(
-				"name:criticalError", "bold:true","size:16",
-				"Alignment:2","family:Monospaced",
-				"background:java.awt.Color[r=255,g=243,b=205]",
-				"foreground:java.awt.Color[r=114,g=28,b=36]");
-		AttributeSet style1 = TextStyles.getStyle("criticalError");
-		Set<String> asPairs = getAttributeStringPairs(style1);
-		assertEquals(expect, asPairs);
+    Set<String> expect = Set.of("name:criticalError", "bold:true", "size:16", "Alignment:2",
+                                "family:Monospaced", "background:java.awt.Color[r=255,g=243,b=205]",
+                                "foreground:java.awt.Color[r=114,g=28,b=36]");
+    AttributeSet style1 = TextStyles.getStyle("criticalError");
+    Set<String> asPairs = getAttributeStringPairs(style1);
+    assertEquals(expect, asPairs);
 
-		// Try it again should get the same item.
-		AttributeSet style2 = TextStyles.getStyle("criticalError");
-		assertTrue(style1 == style2);
-	}
+    // Try it again should get the same item.
+    AttributeSet style2 = TextStyles.getStyle("criticalError");
+    assertTrue(style1 == style2);
+  }
 
-	/**
-	 * Test of loadStyles method, of class TextStyles.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
-	public void testLoadStyles() throws Exception
-	{
-		System.out.println("loadStyles");
-		Path path = createToRandomFileName(null, ".properties", properties_ok);
-		if (path == null) {
-			fail("Could not create path");
-			return;
-		}
-		System.out.printf("    %s\n", path.toString());
+  /**
+   * Test of loadStyles method, of class TextStyles.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
+  public void testLoadStyles() throws Exception {
+    System.out.println("loadStyles");
+    Path path = createToRandomFileName(null, ".properties", properties_ok);
+    if (path == null) {
+      fail("Could not create path");
+      return;
+    }
+    System.out.printf("    %s\n", path.toString());
 
-		try {
-			TextStyles.loadStyles(path);
-			Set<String> asPairs = getAttributeStringPairs(TextStyles.getStyle("warning"));
+    try {
+      TextStyles.loadStyles(path);
+      Set<String> asPairs = getAttributeStringPairs(TextStyles.getStyle("warning"));
 
-			Set<String> expect = Set.of(
-					"name:warning",
-					"scrollbars:vertical", "linewrap:true", "wordwrap:false",
-					"Alignment:1", "foreground:java.awt.Color[r=51,g=51,b=51]",
-					"autoscroll:true", "background:java.awt.Color[r=255,g=243,b=205]");
-			assertEquals(expect, asPairs);
-		} finally {
-			Files.delete(path);
-		}
+      Set<String> expect
+          = Set.of("name:warning", "scrollbars:vertical", "linewrap:true", "wordwrap:false",
+                   "Alignment:1", "foreground:java.awt.Color[r=51,g=51,b=51]", "autoscroll:true",
+                   "background:java.awt.Color[r=255,g=243,b=205]");
+      assertEquals(expect, asPairs);
+    } finally { Files.delete(path); }
 
-		// Did properties, now add something new with json.
-		String json = """
+    // Did properties, now add something new with json.
+    String json = """
 		{
 		    "criticalError_2": {
 		        "inherits": "warning",
@@ -449,7 +433,7 @@ public class TextStylesTest
 		    }
 		}
 		""";
-		String expect = """
+    String expect = """
 
 			=======================================================
 			        THEME VALIDATION & DIAGNOSTIC REPORT
@@ -463,37 +447,34 @@ public class TextStylesTest
 			  • Total Attributes Configured = 13
 
 			""";
-		Reader reader = new StringReader(json);
-		TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
-		assertTrue(status.ok());
-		assertEquals(expect, status.diagnostics());
+    Reader reader = new StringReader(json);
+    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
+    assertTrue(status.ok());
+    assertEquals(expect, status.diagnostics());
 
-		
-		// Error if adding something that exists
-		Reader reader2 = new StringReader("""
+    // Error if adding something that exists
+    Reader reader2 = new StringReader("""
 			{
 			    "warning": {
 			        "foreground": "#040506"
 			    }
 			}
 			""");
-		assertThrows(IllegalArgumentException.class, () -> {
-			TextStyles.loadStylesFromJson(reader2);
-		});
-		// Problem stuff discarded, should still be ok
-		StringBuilder sb = new StringBuilder();
-		sb.setLength(0);
-		boolean ok = TextStyles.runDiagnostics(sb);
-		assertTrue(ok);
-		assertEquals(expect, sb.toString());
+    assertThrows(IllegalArgumentException.class, () -> { TextStyles.loadStylesFromJson(reader2); });
+    // Problem stuff discarded, should still be ok
+    StringBuilder sb = new StringBuilder();
+    sb.setLength(0);
+    boolean ok = TextStyles.runDiagnostics(sb);
+    assertTrue(ok);
+    assertEquals(expect, sb.toString());
 
-		// Error if adding something that exists
-		//
-		// An error occurs but some things have loaded.
-		// In this case, "oops" is loaded, then an error,
-		// It should get backed out, so no change.
-		//
-		Reader reader3 = new StringReader("""
+    // Error if adding something that exists
+    //
+    // An error occurs but some things have loaded.
+    // In this case, "oops" is loaded, then an error,
+    // It should get backed out, so no change.
+    //
+    Reader reader3 = new StringReader("""
 			{
 			    "oops": {
 			        "foreground": "#040506"
@@ -503,254 +484,266 @@ public class TextStylesTest
 			    }
 			}
 			""");
-		assertThrows(IllegalArgumentException.class, () -> {
-			TextStyles.loadStylesFromJson(reader3);
-		});
-		sb.setLength(0);
-		ok = TextStyles.runDiagnostics(sb);
-		assertTrue(ok);
-		assertEquals(expect, sb.toString());
-	}
+    assertThrows(IllegalArgumentException.class, () -> { TextStyles.loadStylesFromJson(reader3); });
+    sb.setLength(0);
+    ok = TextStyles.runDiagnostics(sb);
+    assertTrue(ok);
+    assertEquals(expect, sb.toString());
+  }
 
-	//System.out.println(sb.toString());
-	// int i = 0;
-	// for (; i< Math.min(expect_json_ok_trees.length(), sb.length()); i++)
-	// 	if (expect_json_ok_trees.charAt(i) != sb.charAt(i)) break;
-	/**
-	 * Test of loadJsonConfigurations method, of class TextStyles.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testLoadStylesFromJson_Reader() throws Exception
-	{
-		System.out.println("loadStylesFromJson_Reader");
+  //System.out.println(sb.toString());
+  // int i = 0;
+  // for (; i< Math.min(expect_json_ok_trees.length(), sb.length()); i++)
+  // 	if (expect_json_ok_trees.charAt(i) != sb.charAt(i)) break;
+  /**
+   * Test of loadJsonConfigurations method, of class TextStyles.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testLoadStylesFromJson_Reader() throws Exception {
+    System.out.println("loadStylesFromJson_Reader");
 
-		// File has no errors. Use the Reader.
+    // File has no errors. Use the Reader.
 
-		Reader reader = new StringReader(json_ok);
-		TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
-		assertTrue(status.ok());
-		assertEquals(expect_json_ok, status.diagnostics());
-		assertEquals(expect_json_ok_trees, status.trees());
-	}
-	
-	/**
-	 * Test of loadJsonConfgurations method, of class TextDecoratorStyles.
-	 * Loading file has many errors.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testLoadStylesFromJson_Reader_2() throws Exception
-	{
-		System.out.println("loadStylesFromJson_Reader_2");
+    Reader reader = new StringReader(json_ok);
+    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
+    assertTrue(status.ok());
+    assertEquals(expect_json_ok, status.diagnostics());
+    assertEquals(expect_json_ok_trees, status.trees());
+  }
 
-		// Lots of errors
+  /**
+   * Test of loadJsonConfgurations method, of class TextDecoratorStyles.
+   * Loading file has many errors.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testLoadStylesFromJson_Reader_2() throws Exception {
+    System.out.println("loadStylesFromJson_Reader_2");
 
-		// Read a configuration with errors
+    // Lots of errors
 
-		Reader reader = new StringReader(json_errors);
-		TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
-		assertFalse(status.ok());
-		assertEquals(expect_json_errors, status.diagnostics());
+    // Read a configuration with errors
 
-		// Load should leave things in a good state.
-		StringBuilder sb = new StringBuilder();
-		boolean ok = TextStyles.runDiagnostics(sb);
-		assertTrue(ok);
-	}
+    Reader reader = new StringReader(json_errors);
+    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
+    assertFalse(status.ok());
+    assertEquals(expect_json_errors, status.diagnostics());
 
-	/**
-	 * Test of applyStyle method, of class TextStyles;
+    // Load should leave things in a good state.
+    StringBuilder sb = new StringBuilder();
+    boolean ok = TextStyles.runDiagnostics(sb);
+    assertTrue(ok);
+  }
+
+  /**
+   * Test of applyStyle method, of class TextStyles;
 also a test of memento.
-	 * @throws java.io.IOException
-	 * @throws java.lang.InterruptedException
-	 * @throws java.lang.reflect.InvocationTargetException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testApplyStyle_JTextField_AttributeSet() throws IOException, InterruptedException, InvocationTargetException
-	{
-		System.out.println("applyStyle");
+   * @throws java.io.IOException
+   * @throws java.lang.InterruptedException
+   * @throws java.lang.reflect.InvocationTargetException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testApplyStyle_JTextField_AttributeSet()
+      throws IOException, InterruptedException, InvocationTargetException {
+    System.out.println("applyStyle");
 
-		Reader reader = new StringReader(json_ok);
-		TextStyles.loadStylesFromJson(reader);
+    Reader reader = new StringReader(json_ok);
+    TextStyles.loadStylesFromJson(reader);
 
-		EventQueue.invokeAndWait(() -> {
-			JTextField textField = new JTextField();
-			TextStyles.ComponentMemento mementoOrig = TextStyles.getMemento(textField);
-			AttributeSet style = TextStyles.getStyle("warning");
-			TextStyles.applyStyle(textField, style);
-			TextStyles.ComponentMemento mementoNew = TextStyles.getMemento(textField);
-			
-			String expect = "TextComponentStyleMemento{foreground=#333333, background=#fff3cd, font=java.awt.Font[family=Monospaced,name=Monospaced,style=plain,size=16], opaque=true, underline=false, strikethrough=false, alignment=right, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
-			assertEquals(expect, mementoNew.toString());
-			
-			mementoOrig.restoreTo(textField);
-			TextStyles.ComponentMemento mementoRestored = TextStyles.getMemento(textField);
-			assertEquals(mementoOrig, mementoRestored);
-		});
-	}
+    EventQueue.invokeAndWait(() -> {
+      JTextField textField = new JTextField();
+      TextStyles.ComponentMemento mementoOrig = TextStyles.getMemento(textField);
+      AttributeSet style = TextStyles.getStyle("warning");
+      TextStyles.applyStyle(textField, style);
+      TextStyles.ComponentMemento mementoNew = TextStyles.getMemento(textField);
 
-	/**
-	 * Check out "keep".
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws InvocationTargetException
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testApplyStyle_JTextField_keep() throws IOException, InterruptedException, InvocationTargetException
-	{
-		System.out.println("applyStyle keep");
+      String expect = "TextComponentStyleMemento{foreground=#333333, background=#fff3cd, "
+                      + "font=java.awt.Font[family=Monospaced,name=Monospaced,style=plain,size=16],"
+                      + " opaque=true, underline=false, strikethrough=false, alignment=right, "
+                      + "isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+      assertEquals(expect, mementoNew.toString());
 
-		Reader reader = new StringReader(keep_json);
-		TextStyles.loadStylesFromJson(reader);
+      mementoOrig.restoreTo(textField);
+      TextStyles.ComponentMemento mementoRestored = TextStyles.getMemento(textField);
+      assertEquals(mementoOrig, mementoRestored);
+    });
+  }
 
-		EventQueue.invokeAndWait(() -> {
-			JTextField textField = new JTextField();
-			TextStyles.ComponentMemento mementoOrig = TextStyles.getMemento(textField);
-			//System.out.println(sf("mementoOrig %s\n", mementoOrig));
-			String expectOrig = "TextComponentStyleMemento{foreground=#333333, background=#ffffff, font=javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12], opaque=true, underline=false, strikethrough=false, alignment=10, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
-			assertEquals(expectOrig, mementoOrig.toString());
+  /**
+   * Check out "keep".
+   * @throws IOException
+   * @throws InterruptedException
+   * @throws InvocationTargetException
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testApplyStyle_JTextField_keep()
+      throws IOException, InterruptedException, InvocationTargetException {
+    System.out.println("applyStyle keep");
 
-			TextStyles.applyStyle(textField, TextStyles.getStyle("init1"));
-			TextStyles.ComponentMemento mementoInit1 = TextStyles.getMemento(textField);
-			//System.out.println(sf("mementoInit1 %s\n", mementoInit1));
-			String expectInit1 = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, font=java.awt.Font[family=Serif,name=Serif,style=bolditalic,size=10], opaque=false, underline=true, strikethrough=true, alignment=right, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
-			assertEquals(expectInit1, mementoInit1.toString());
+    Reader reader = new StringReader(keep_json);
+    TextStyles.loadStylesFromJson(reader);
 
-			// when style attriute not included, should keep current value
-			TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
-			assertEquals(expectInit1, mementoInit1.toString());
+    EventQueue.invokeAndWait(() -> {
+      JTextField textField = new JTextField();
+      TextStyles.ComponentMemento mementoOrig = TextStyles.getMemento(textField);
+      //System.out.println(sf("mementoOrig %s\n", mementoOrig));
+      String expectOrig
+          = "TextComponentStyleMemento{foreground=#333333, background=#ffffff, "
+            + "font=javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12],"
+            + " opaque=true, underline=false, strikethrough=false, alignment=10, isTextArea=false, "
+            + "lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+      assertEquals(expectOrig, mementoOrig.toString());
 
-			TextStyles.applyStyle(textField, TextStyles.getStyle("try1"));
-			TextStyles.ComponentMemento mementoTry = TextStyles.getMemento(textField);
-			//System.out.println(sf("mementoInit1Try1 %s\n", mementoTry));
-			String expectInit1Try1 = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, font=java.awt.Font[family=Serif,name=Serif,style=bold,size=14], opaque=false, underline=false, strikethrough=true, alignment=center, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
-			assertEquals(expectInit1Try1, mementoTry.toString());
+      TextStyles.applyStyle(textField, TextStyles.getStyle("init1"));
+      TextStyles.ComponentMemento mementoInit1 = TextStyles.getMemento(textField);
+      //System.out.println(sf("mementoInit1 %s\n", mementoInit1));
+      String expectInit1 = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, "
+                           + "font=java.awt.Font[family=Serif,name=Serif,style=bolditalic,size=10],"
+                           + " opaque=false, underline=true, strikethrough=true, alignment=right, "
+                           + "isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+      assertEquals(expectInit1, mementoInit1.toString());
 
-			// when style attriute not included, should keep current value
-			TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
-			assertEquals(expectInit1Try1, mementoTry.toString());
+      // when style attriute not included, should keep current value
+      TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
+      assertEquals(expectInit1, mementoInit1.toString());
 
-			TextStyles.applyStyle(textField, TextStyles.getStyle("default"));
-			TextStyles.ComponentMemento mementoDefault = TextStyles.getMemento(textField);
-			//System.out.println(sf("mementoInit1Try1Default %s\n", mementoDefault));
-			String expectDefault = "TextComponentStyleMemento{foreground=#000000, background=#ffffff, font=java.awt.Font[family=Monospaced,name=Monospaced,style=plain,size=12], opaque=true, underline=false, strikethrough=false, alignment=left, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
-			assertEquals(expectDefault, mementoDefault.toString());
+      TextStyles.applyStyle(textField, TextStyles.getStyle("try1"));
+      TextStyles.ComponentMemento mementoTry = TextStyles.getMemento(textField);
+      //System.out.println(sf("mementoInit1Try1 %s\n", mementoTry));
+      String expectInit1Try1
+          = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, "
+            + "font=java.awt.Font[family=Serif,name=Serif,style=bold,size=14], opaque=false, "
+            + "underline=false, strikethrough=true, alignment=center, isTextArea=false, "
+            + "lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+      assertEquals(expectInit1Try1, mementoTry.toString());
 
-			// when style attriute not included, should keep current value
-			TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
-			assertEquals(expectDefault, mementoDefault.toString());
+      // when style attriute not included, should keep current value
+      TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
+      assertEquals(expectInit1Try1, mementoTry.toString());
 
-			textField = new JTextField();
-			mementoOrig = TextStyles.getMemento(textField);
-			//System.out.println(sf("mementoOrig %s\n", mementoOrig));
-			assertEquals(expectOrig, mementoOrig.toString());
+      TextStyles.applyStyle(textField, TextStyles.getStyle("default"));
+      TextStyles.ComponentMemento mementoDefault = TextStyles.getMemento(textField);
+      //System.out.println(sf("mementoInit1Try1Default %s\n", mementoDefault));
+      String expectDefault
+          = "TextComponentStyleMemento{foreground=#000000, background=#ffffff, "
+            + "font=java.awt.Font[family=Monospaced,name=Monospaced,style=plain,size=12], "
+            + "opaque=true, underline=false, strikethrough=false, alignment=left, "
+            + "isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+      assertEquals(expectDefault, mementoDefault.toString());
 
-			TextStyles.applyStyle(textField, TextStyles.getStyle("init1"));
-			mementoInit1 = TextStyles.getMemento(textField);
-			//System.out.println(sf("mementoInit %s\n", mementoInit1));
-			assertEquals(expectInit1, mementoInit1.toString());
+      // when style attriute not included, should keep current value
+      TextStyles.applyStyle(textField, TextStyles.getStyle("empty"));
+      assertEquals(expectDefault, mementoDefault.toString());
 
-			TextStyles.applyStyle(textField, TextStyles.getStyle("try2"));
-			mementoTry = TextStyles.getMemento(textField);
-			System.out.println(sf("mementoInit1Try2 %s\n", mementoTry));
-			String expectInit1Try2 = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, font=java.awt.Font[family=Serif,name=Serif,style=italic,size=10], opaque=true, underline=true, strikethrough=false, alignment=right, isTextArea=false, lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
-			assertEquals(expectInit1Try2, mementoTry.toString());
+      textField = new JTextField();
+      mementoOrig = TextStyles.getMemento(textField);
+      //System.out.println(sf("mementoOrig %s\n", mementoOrig));
+      assertEquals(expectOrig, mementoOrig.toString());
 
-			TextStyles.applyStyle(textField, TextStyles.getStyle("default"));
-			mementoDefault = TextStyles.getMemento(textField);
-			System.out.println(sf("mementoInit1Try2Default %s\n", mementoDefault));
-			assertEquals(expectDefault, mementoDefault.toString());
-		});
-	}
+      TextStyles.applyStyle(textField, TextStyles.getStyle("init1"));
+      mementoInit1 = TextStyles.getMemento(textField);
+      //System.out.println(sf("mementoInit %s\n", mementoInit1));
+      assertEquals(expectInit1, mementoInit1.toString());
 
-	/**
-	 * Test of applyStyle method, of class TextDecoratorStyles.
-	 */
-	// / @Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testApplyStyle_JTextArea_AttributeSet()
-	{
-		System.out.println("applyStyle");
-		JTextArea textArea = null;
-		AttributeSet style = null;
-		TextStyles.applyStyle(textArea, style);
-		// TODO review the generated test code and remove the default call to fail.
-		fail("The test case is a prototype.");
-	}
+      TextStyles.applyStyle(textField, TextStyles.getStyle("try2"));
+      mementoTry = TextStyles.getMemento(textField);
+      System.out.println(sf("mementoInit1Try2 %s\n", mementoTry));
+      String expectInit1Try2
+          = "TextComponentStyleMemento{foreground=#0000ff, background=#ffff00, "
+            + "font=java.awt.Font[family=Serif,name=Serif,style=italic,size=10], opaque=true, "
+            + "underline=true, strikethrough=false, alignment=right, isTextArea=false, "
+            + "lineWrap=false, wordWrap=false, vsb=0, hsb=0}";
+      assertEquals(expectInit1Try2, mementoTry.toString());
 
-	/**
-	 *
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String dir = "/tmp"; // get the style files from this directory
-		Function<String, Path> toPath = (fn) -> Path.of(dir, fn);
+      TextStyles.applyStyle(textField, TextStyles.getStyle("default"));
+      mementoDefault = TextStyles.getMemento(textField);
+      System.out.println(sf("mementoInit1Try2Default %s\n", mementoDefault));
+      assertEquals(expectDefault, mementoDefault.toString());
+    });
+  }
 
-        JFrame frame = new JFrame("Validating Chain Style Loader");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 180);
-        frame.setLayout(new FlowLayout());
+  /**
+   * Test of applyStyle method, of class TextDecoratorStyles.
+   */
+  // / @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testApplyStyle_JTextArea_AttributeSet() {
+    System.out.println("applyStyle");
+    JTextArea textArea = null;
+    AttributeSet style = null;
+    TextStyles.applyStyle(textArea, style);
+    // TODO review the generated test code and remove the default call to fail.
+    fail("The test case is a prototype.");
+  }
 
-        JTextField textField = new JTextField("Validating alignment Styles!", 30);
-        frame.add(textField);
+  /**
+   *
+   * @param args
+   */
+  public static void main(String[] args) {
+    String dir = "/tmp"; // get the style files from this directory
+    Function<String, Path> toPath = (fn) -> Path.of(dir, fn);
 
-        JButton btnLoadJson = new JButton("Load JSON (Critical Error Style)");
-        // btnLoadJson.addActionListener(e -> loadDiagnoseAndApply(
-		// 		textField, toPath.apply("styles.json"), "criticalError"));
-        btnLoadJson.addActionListener(e -> new LoadThenApply(
-				toPath.apply("styles.json"), "criticalError", textField).execute());
+    JFrame frame = new JFrame("Validating Chain Style Loader");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(500, 180);
+    frame.setLayout(new FlowLayout());
 
-		JButton btnLoadProps = new JButton("Load Props (Warning Style)");
-		btnLoadProps.addActionListener(e -> new LoadThenApply(
-				toPath.apply("styles.properties"), "warning", textField).execute());
+    JTextField textField = new JTextField("Validating alignment Styles!", 30);
+    frame.add(textField);
 
-        frame.add(btnLoadJson);
-        frame.add(btnLoadProps);
-        frame.setVisible(true);
+    JButton btnLoadJson = new JButton("Load JSON (Critical Error Style)");
+    // btnLoadJson.addActionListener(e -> loadDiagnoseAndApply(
+    // 		textField, toPath.apply("styles.json"), "criticalError"));
+    btnLoadJson.addActionListener(
+        e -> new LoadThenApply(toPath.apply("styles.json"), "criticalError", textField).execute());
+
+    JButton btnLoadProps = new JButton("Load Props (Warning Style)");
+    btnLoadProps.addActionListener(
+        e -> new LoadThenApply(toPath.apply("styles.properties"), "warning", textField).execute());
+
+    frame.add(btnLoadJson);
+    frame.add(btnLoadProps);
+    frame.setVisible(true);
+  }
+
+  static class LoadThenApply extends SwingWorker<Object, Object> {
+    private final Path path;
+    private final String styleName;
+    private final JTextField field;
+
+    public LoadThenApply(Path path, String styleName, JTextField field) {
+      this.path = path;
+      this.styleName = styleName;
+      this.field = field;
     }
 
-	static class LoadThenApply extends SwingWorker<Object, Object> {
-		private final Path path;
-		private final String styleName;
-		private final JTextField field;
+    @Override
+    protected Object doInBackground() throws Exception {
+      TextStyles.clearStyles();
+      TextStyles.loadStyles(path);
+      return null;
+    }
 
-		public LoadThenApply(Path path, String styleName, JTextField field)
-		{
-			this.path = path;
-			this.styleName = styleName;
-			this.field = field;
-		}
-
-		@Override
-		protected Object doInBackground() throws Exception
-		{
-			TextStyles.clearStyles();
-            TextStyles.loadStyles(path);
-			return null;
-		}
-
-		@Override
-		protected void done()
-		{
-			try {
-				get();
-				AttributeSet style = TextStyles.getStyle(styleName);
-				if (style != null) {
-					TextStyles.applyStyle(field, style);
-				} else {
-					JOptionPane.showMessageDialog(null, sf("Style '%s' not found.", styleName));
-				}
-			} catch (InterruptedException | ExecutionException ex) {
-				System.getLogger(TextStylesTest.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-			}
-		}
-
-		
-
-	}
+    @Override
+    protected void done() {
+      try {
+        get();
+        AttributeSet style = TextStyles.getStyle(styleName);
+        if (style != null) {
+          TextStyles.applyStyle(field, style);
+        } else {
+          JOptionPane.showMessageDialog(null, sf("Style '%s' not found.", styleName));
+        }
+      } catch (InterruptedException | ExecutionException ex) {
+        System.getLogger(TextStylesTest.class.getName())
+            .log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+    }
+  }
 }

@@ -47,39 +47,34 @@ import static java.lang.System.Logger.Level.DEBUG;
  * If no style name is available for a ComponentState, {@link TextStyles#RESET}
  * is used.
  */
-public class ComponentStateTextDecorator extends BaseTextDecorator
-{
-	private static final Logger logger = JStuff.getLogger();
+public class ComponentStateTextDecorator extends BaseTextDecorator {
+  private static final Logger logger = JStuff.getLogger();
 
-	private final EnumMap<ComponentState, String> styleNames = new EnumMap<>(ComponentState.class);
+  private final EnumMap<ComponentState, String> styleNames = new EnumMap<>(ComponentState.class);
 
-	/** Create using specified map.
-	 * @param map
-	 */
-	public ComponentStateTextDecorator(Map<ComponentState, String> map)
-	{
-		styleNames.putAll(map);
-	}
+  /**
+   * Create using specified map.
+   * @param map
+   */
+  public ComponentStateTextDecorator(Map<ComponentState, String> map) { styleNames.putAll(map); }
 
-	/** Decorate the text according to {@code valid}.
-	 * @param valid
-	 */
-	public void decorateText(SSComponent.ValidationResult valid)
-	{
-		ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
-		AttributeSet style = TextStyles.getStyle(styleNames.get(state));
-		TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
-		logger.log(DEBUG, sf("Style: %s",
-				jComp().getClientProperty(TextStyles.STYLE_NAME)));
-	}
-	
-	/**
-	 * Validate the component and decorate the text accordingly.
-	 */
-	@Override
-	public void decorateText()
-	{
-		SSComponent.ValidationResult valid = getSSComponent().allValidate();
-		decorateText(valid);
-	}
+  /**
+   * Decorate the text according to {@code valid}.
+   * @param valid
+   */
+  public void decorateText(SSComponent.ValidationResult valid) {
+    ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
+    AttributeSet style = TextStyles.getStyle(styleNames.get(state));
+    TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
+    logger.log(DEBUG, sf("Style: %s", jComp().getClientProperty(TextStyles.STYLE_NAME)));
+  }
+
+  /**
+   * Validate the component and decorate the text accordingly.
+   */
+  @Override
+  public void decorateText() {
+    SSComponent.ValidationResult valid = getSSComponent().allValidate();
+    decorateText(valid);
+  }
 }

@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -51,7 +51,7 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 /**
  * Used to display values stored in the database as a boolean.
- * The SSCheckBox can be bound to a numeric or boolean database column. 
+ * The SSCheckBox can be bound to a numeric or boolean database column.
  * The boolean value is converted to the data base type by the
  * {@linkplain #setColumnObject(java.lang.Object) } infrastructure.
  * Currently, Dec 2024, if bound to a numeric database column, a checked
@@ -61,46 +61,39 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  * values returned for the checked and unchecked SSCheckBox states.
  */
 @SuppressWarnings("serial")
-public class SSCheckBox extends CheckBox
-{
-	/**
-	 * Creates an object of SSCheckBox.
-	 */
-	public SSCheckBox() {
-		super();
-	}
+public class SSCheckBox extends CheckBox {
+  /**
+   * Creates an object of SSCheckBox.
+   */
+  public SSCheckBox() { super(); }
 
-	/**
-	 * Creates an object of SSCheckBox.
-	 *
-	 * @param _text Checkbox label
-	 */
-	public SSCheckBox(String _text) {
-		super(_text);
-	}
-	
-	/**
-	 * Creates an object of SSCheckBox binding it to the specified column in the
-	 * given RowSet.
-	 *
-	 * @param rowsModel        datasource to be used.
-	 * @param columnName name of the column to which this check box should be
-	 */
-	public SSCheckBox(RowsModel rowsModel, String columnName) {
-		super(rowsModel, columnName);
-	}
-	
-	/**
-	 * Creates an object of SSCheckBox binding it to the specified column in the
-	 * given RowSet.
-	 *
-	 * @param _rowSet        datasource to be used.
-	 * @param _boundColumnName name of the column to which this check box should be
-	 * @deprecated use RowsModel insted of RowSet
-	 */
-	@Deprecated
-	public SSCheckBox(RowSet _rowSet, String _boundColumnName) {
-		super(findRowsModel(_rowSet), _boundColumnName);
-	}
+  /**
+   * Creates an object of SSCheckBox.
+   *
+   * @param _text Checkbox label
+   */
+  public SSCheckBox(String _text) { super(_text); }
+
+  /**
+   * Creates an object of SSCheckBox binding it to the specified column in the
+   * given RowSet.
+   *
+   * @param rowsModel        datasource to be used.
+   * @param columnName name of the column to which this check box should be
+   */
+  public SSCheckBox(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
+
+  /**
+   * Creates an object of SSCheckBox binding it to the specified column in the
+   * given RowSet.
+   *
+   * @param _rowSet        datasource to be used.
+   * @param _boundColumnName name of the column to which this check box should be
+   * @deprecated use RowsModel insted of RowSet
+   */
+  @Deprecated
+  public SSCheckBox(RowSet _rowSet, String _boundColumnName) {
+    super(findRowsModel(_rowSet), _boundColumnName);
+  }
 
 } // end public class SSCheckBox

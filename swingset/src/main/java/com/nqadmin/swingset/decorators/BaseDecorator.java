@@ -35,31 +35,28 @@ import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
  * Some handling for the TextDecorator; {@link #handleTextDecorator(ValidationResult)}
  * should be called at the end of subclass' decorate().
  */
-public abstract class BaseDecorator extends BaseAnyDecorator implements Decorator
-{
-	private boolean decorateTextEnabled = true;
+public abstract class BaseDecorator extends BaseAnyDecorator implements Decorator {
+  private boolean decorateTextEnabled = true;
 
-	/** Focus decorators typically decorate text as well;
-	 * this can be used to control that behavior.
-	 * @param flag 
-	 */
-	@Override
-	public void setDecorateTextEnabled(boolean flag) {
-		decorateTextEnabled = flag;
-	}
+  /**
+   * Focus decorators typically decorate text as well;
+   * this can be used to control that behavior.
+   * @param flag
+   */
+  @Override
+  public void setDecorateTextEnabled(boolean flag) {
+    decorateTextEnabled = flag;
+  }
 
-	/**
-	 * Deal with a TextDecorator for this component.
-	 * @param valid
-	 */
-	protected void handleTextDecorator(ValidationResult valid) {
-		if (!decorateTextEnabled)
-			return;
-		TextDecorator td = getSSComponent().getTextDecorator();
-		assert td != null;
-		if (td instanceof ComponentStateTextDecorator std)
-			std.decorateText(valid);
-		else
-			td.decorateText();
-	}
+  /**
+   * Deal with a TextDecorator for this component.
+   * @param valid
+   */
+  protected void handleTextDecorator(ValidationResult valid) {
+    if (!decorateTextEnabled) return;
+    TextDecorator td = getSSComponent().getTextDecorator();
+    assert td != null;
+    if (td instanceof ComponentStateTextDecorator std) std.decorateText(valid);
+    else td.decorateText();
+  }
 }

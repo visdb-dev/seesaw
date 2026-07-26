@@ -36,34 +36,25 @@ import com.nqadmin.swingset.datasources.DefaultDbSupport;
 /**
  * For H2 metadata DatabaseProductName.
  */
-public class H2DbSupport extends DefaultDbSupport
-{
-	/**
-	 * For H2.
-	 * @param sharedConnection
-	 */
-	public H2DbSupport(Connection sharedConnection)
-	{
-		super(sharedConnection);
-	}
+public class H2DbSupport extends DefaultDbSupport {
+  /**
+   * For H2.
+   * @param sharedConnection
+   */
+  public H2DbSupport(Connection sharedConnection) { super(sharedConnection); }
 
-	/** {@inheritDoc } */
-	@Override
-	public String createRownumQuery(String selectColumns, String rownumberColumn,
-			String tableName, String trailingClause)
-	{
-		String query = """
+  /** {@inheritDoc } */
+  @Override
+  public String createRownumQuery(String selectColumns, String rownumberColumn, String tableName,
+                                  String trailingClause) {
+    String query = """
                  SELECT {selectColumns}, ROWNUM() AS {rownumberColumn}
                  FROM {tableName}
                  {trailingClause};
-                 """
-				.replace("{selectColumns}", selectColumns)
-				.replace("{rownumberColumn}", rownumberColumn)
-				.replace("{tableName}", tableName)
-				.replace("{trailingClause}", trailingClause)
-				;
-		return query;
-	}
-
-	
+                 """.replace("{selectColumns}", selectColumns)
+                       .replace("{rownumberColumn}", rownumberColumn)
+                       .replace("{tableName}", tableName)
+                       .replace("{trailingClause}", trailingClause);
+    return query;
+  }
 }

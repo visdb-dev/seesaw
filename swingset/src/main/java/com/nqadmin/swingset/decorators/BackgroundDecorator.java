@@ -53,72 +53,68 @@ import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 
 import static java.lang.System.Logger.Level.*;
 
-
 /**
  * Decorate the background when SSComponent has focus, chose color dependent
  * on having valid data.
  */
-public class BackgroundDecorator extends FocusDecorator
-{
-	private static final Logger logger = JStuff.getLogger();
+public class BackgroundDecorator extends FocusDecorator {
+  private static final Logger logger = JStuff.getLogger();
 
-	private final Color standardBackgroundColor = getDefaultBackgroundColor();
-	private Color focusBackgroundColor = new Color(204, 255, 255); // Tealish
-	private final Color errorBackgroundColor = Color.PINK;
-	private final Color modifiedBackgroundColor = Color.YELLOW;
+  private final Color standardBackgroundColor = getDefaultBackgroundColor();
+  private Color focusBackgroundColor = new Color(204, 255, 255); // Tealish
+  private final Color errorBackgroundColor = Color.PINK;
+  private final Color modifiedBackgroundColor = Color.YELLOW;
 
-	/** Decorate the component using current state. */
-	@Override
-	public boolean decorate() {
-		final ValidationResult valid = getSSComponent().allValidate();
-		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
-				decoComp().getClass().getSimpleName(), focusComp().isFocusOwner(), valid.comp(), valid.all()));
+  /** Decorate the component using current state. */
+  @Override
+  public boolean decorate() {
+    final ValidationResult valid = getSSComponent().allValidate();
+    logger.log(TRACE,
+               ()
+                   -> String.format("%s focus: %s, compValid %s, allValid: %s",
+                                    decoComp().getClass().getSimpleName(),
+                                    focusComp().isFocusOwner(), valid.comp(), valid.all()));
 
-		ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
-		Color color = state.isError() ? errorBackgroundColor
-				: state.isModified() ? modifiedBackgroundColor
-				: state.isFocused() ? focusBackgroundColor
-				: standardBackgroundColor;
-		decoComp().setBackground(color);
+    ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
+    Color color = state.isError()      ? errorBackgroundColor
+                  : state.isModified() ? modifiedBackgroundColor
+                  : state.isFocused()  ? focusBackgroundColor
+                                       : standardBackgroundColor;
+    decoComp().setBackground(color);
 
-		handleTextDecorator(valid);
+    handleTextDecorator(valid);
 
-		return valid.all();
-	}
+    return valid.all();
+  }
 
-	private static Color defaultBackgroundColor;
+  private static Color defaultBackgroundColor;
 
-	private static Color getDefaultBackgroundColor() {
-		if (defaultBackgroundColor == null) {
-			defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
-			if (defaultBackgroundColor == null) {
-				defaultBackgroundColor = Color.WHITE;
-			}
-		}
-		return defaultBackgroundColor;
-	}
+  private static Color getDefaultBackgroundColor() {
+    if (defaultBackgroundColor == null) {
+      defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
+      if (defaultBackgroundColor == null) { defaultBackgroundColor = Color.WHITE; }
+    }
+    return defaultBackgroundColor;
+  }
 
-	// TODO: these [sg]etters probably better as named properties?
+  // TODO: these [sg]etters probably better as named properties?
 
-	// Implement the get/setFocusBackgroundColor since SSFormattedTextField...
-	/** @return the background color */
-	public Color getFocusBackgroundColor() {
-		return focusBackgroundColor;
-	}
+  // Implement the get/setFocusBackgroundColor since SSFormattedTextField...
+  /** @return the background color */
+  public Color getFocusBackgroundColor() { return focusBackgroundColor; }
 
-	/**
-	 * @param focusBackgroundColor the new background color to use
-	 */
-	public void setFocusBackgroundColor(final Color focusBackgroundColor) {
-		this.focusBackgroundColor = focusBackgroundColor;
-	}
+  /**
+   * @param focusBackgroundColor the new background color to use
+   */
+  public void setFocusBackgroundColor(final Color focusBackgroundColor) {
+    this.focusBackgroundColor = focusBackgroundColor;
+  }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public DecoratorStyle getDecoratorStyle()
-	{
-		return DecoratorStyle.BACKGROUND;
-	}
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public DecoratorStyle getDecoratorStyle() {
+    return DecoratorStyle.BACKGROUND;
+  }
 }

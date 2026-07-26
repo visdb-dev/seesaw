@@ -39,32 +39,30 @@ package com.nqadmin.swingset.enums;
 
 /**
  * Predefined gender options.
- * 
+ *
  * @see com.nqadmin.swingset.SSComboBox#setDisplayValues(java.lang.Class)
  * @see com.nqadmin.swingset.SSList#setDisplayValues(java.lang.Class)
  * @since 4.0
  */
 public enum Gender3 {
-	/** Predefined "male" option. */
-	MALE("Male"),
-	/** Predefined "female" option. */
-	FEMALE("Female"),
-	/** Predefined "unisex" option. */
-	UNISEX("Unisex");
+  /** Predefined "male" option. */
+  MALE("Male"),
+  /** Predefined "female" option. */
+  FEMALE("Female"),
+  /** Predefined "unisex" option. */
+  UNISEX("Unisex");
 
-	private final String displayValue;
+  private final String displayValue;
 
-	private Gender3(String _displayValue) {
-		displayValue = _displayValue;
-	}
-	
-	/**
-	 * Generate user visible display string.
-	 * @return string to display
-	 */
-	@Override
-	public String toString() {
-		// TODO: lookup internationalization
-		return displayValue;
-	}
+  private Gender3(String _displayValue) { displayValue = _displayValue; }
+
+  /**
+   * Generate user visible display string.
+   * @return string to display
+   */
+  @Override
+  public String toString() {
+    // TODO: lookup internationalization
+    return displayValue;
+  }
 }

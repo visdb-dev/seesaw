@@ -52,117 +52,127 @@ import static java.lang.System.Logger.Level.*;
  * MaskFormatter doesn't use this.
  */
 @SuppressWarnings("serial")
-public class SSFormatterFactory extends FormatterFactory
-{
-	/** Logger for component */
-	private static final Logger logger = JStuff.getLogger();
+public class SSFormatterFactory extends FormatterFactory {
+  /** Logger for component */
+  private static final Logger logger = JStuff.getLogger();
 
-	/**
-	 *
-	 * @param builder
-	 */
-	protected SSFormatterFactory(Builder<?> builder)
-	{
-		super(builder);
+  /**
+   *
+   * @param builder
+   */
+  protected SSFormatterFactory(Builder<?> builder) {
+    super(builder);
 
-		createDefaultFormatterIfNeeded(builder);
+    createDefaultFormatterIfNeeded(builder);
 
-		setDefaultFormatter(builder.defaultFormatter);
-		setDisplayFormatter(builder.displayFormatter);
-		setEditFormatter(builder.editFormatter);
-	}
+    setDefaultFormatter(builder.defaultFormatter);
+    setDisplayFormatter(builder.displayFormatter);
+    setEditFormatter(builder.editFormatter);
+  }
 
-	/**
-	 * Use this factory's EditorFormatter to convert stringValue to value.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public void switchToNonNullValue(JFormattedTextField ftf, String stringValue)
-			throws ParseException
-	{
-		if (!(getEditFormatter() instanceof FormatterAssist fa)) {
-			logger.log(WARNING, "Unexpected type of edit formatter");
-			return;
-		}
-		ftf.setValue(fa.stringToValue(stringValue));
-		if (logger.isLoggable(TRACE)) {
-			Object v = ftf.getValue();
-			logger.log(TRACE, ()->sf("switch: '%s' to %s %s", stringValue,
-					v != null ? v.getClass().getSimpleName() : null, v));
-		}
-	}
+  /**
+   * Use this factory's EditorFormatter to convert stringValue to value.
+   * {@inheritDoc }
+   */
+  @Override
+  public void switchToNonNullValue(JFormattedTextField ftf, String stringValue)
+      throws ParseException {
+    if (!(getEditFormatter() instanceof FormatterAssist fa)) {
+      logger.log(WARNING, "Unexpected type of edit formatter");
+      return;
+    }
+    ftf.setValue(fa.stringToValue(stringValue));
+    if (logger.isLoggable(TRACE)) {
+      Object v = ftf.getValue();
+      logger.log(TRACE,
+                 ()
+                     -> sf("switch: '%s' to %s %s", stringValue,
+                           v != null ? v.getClass().getSimpleName() : null, v));
+    }
+  }
 
-	/** SSFormatterFactory builder.
-	 * @param <T>
-	 */
-	public static class Builder<T extends Builder<T>>
-			extends FormatterFactory.Builder<T>
-	{
-		private AbstractFormatter defaultFormatter;
-		private AbstractFormatter displayFormatter;
-		private AbstractFormatter editFormatter;
+  /**
+   * SSFormatterFactory builder.
+   * @param <T>
+   */
+  public static class Builder<T extends Builder<T>> extends FormatterFactory.Builder<T> {
+    private AbstractFormatter defaultFormatter;
+    private AbstractFormatter displayFormatter;
+    private AbstractFormatter editFormatter;
 
-		/**
-		 * Create the builder.
-		 */
-		public Builder() {
-		}
+    /**
+     * Create the builder.
+     */
+    public Builder() {}
 
-		/** formatter
-		 * @param val
-		 * @return  builder */
-		public T defaultFormatter(AbstractFormatter val)
-		{ defaultFormatter = val; return self(); }
-		/** formatter
-		 * @param val
-		 * @return  builder */
-		public T displayFormatter(AbstractFormatter val)
-		{ displayFormatter = val; return self(); }
-		/** formatter
-		 * @param val
-		 * @return  builder */
-		public T editFormatter(AbstractFormatter val)
-		{ editFormatter = val; return self(); }
+    /**
+     * formatter
+     * @param val
+     * @return  builder
+     */
+    public T defaultFormatter(AbstractFormatter val) {
+      defaultFormatter = val;
+      return self();
+    }
+    /**
+     * formatter
+     * @param val
+     * @return  builder
+     */
+    public T displayFormatter(AbstractFormatter val) {
+      displayFormatter = val;
+      return self();
+    }
+    /**
+     * formatter
+     * @param val
+     * @return  builder
+     */
+    public T editFormatter(AbstractFormatter val) {
+      editFormatter = val;
+      return self();
+    }
 
-		/** create the factory
-		 * @return the factory */
-		public SSFormatterFactory build() {
-			return new SSFormatterFactory(this);
-		}
-	}
+    /**
+     * create the factory
+     * @return the factory
+     */
+    public SSFormatterFactory build() { return new SSFormatterFactory(this); }
+  }
 
-	/**
-	 * During build, if the default formatter is not specified and the display
-	 * formatter is a subclass of International formatter then a default
-	 * formatter is created with the display formatter's class and format.
-	 * <p>
-	 * This modifies the builder.
-	 */
-	private static void createDefaultFormatterIfNeeded(Builder<?> builder)
-	{
-		if (builder.defaultFormatter == null
-				&& builder.displayFormatter instanceof InternationalFormatter ifm) {
-			Format dispFormat = ifm.getFormat();
-			try {
-				Constructor<?>[] ctors = builder.displayFormatter.getClass()
-						.getDeclaredConstructors();
-				for (Constructor<?> ctor : ctors) {
-					if (ctor.getParameterCount() != 1)
-						continue;
-					if (ctor.getParameterTypes()[0].isInstance(dispFormat)) {
-						builder.defaultFormatter = (AbstractFormatter) ctor.newInstance(dispFormat);
-						logger.log(DEBUG, ()->sf("Creating defaultFormatter %s for %s",
-								builder.defaultFormatter.getClass().getSimpleName(),
-								dispFormat.getClass().getSimpleName()));
-						break;
-					}
-				}
-			} catch (SecurityException | InstantiationException
-					| IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException ex) {
-						logger.log(WARNING, ()->sf("Creating defaultFormatter for %s",
-								dispFormat.getClass().getSimpleName()), ex);
-			}
-		}
-	}
+  /**
+   * During build, if the default formatter is not specified and the display
+   * formatter is a subclass of International formatter then a default
+   * formatter is created with the display formatter's class and format.
+   * <p>
+   * This modifies the builder.
+   */
+  private static void createDefaultFormatterIfNeeded(Builder<?> builder) {
+    if (builder.defaultFormatter == null
+        && builder.displayFormatter instanceof InternationalFormatter ifm) {
+      Format dispFormat = ifm.getFormat();
+      try {
+        Constructor<?>[] ctors = builder.displayFormatter.getClass().getDeclaredConstructors();
+        for (Constructor<?> ctor : ctors) {
+          if (ctor.getParameterCount() != 1) continue;
+          if (ctor.getParameterTypes()[0].isInstance(dispFormat)) {
+            builder.defaultFormatter = (AbstractFormatter) ctor.newInstance(dispFormat);
+            logger.log(DEBUG,
+                       ()
+                           -> sf("Creating defaultFormatter %s for %s",
+                                 builder.defaultFormatter.getClass().getSimpleName(),
+                                 dispFormat.getClass().getSimpleName()));
+            break;
+          }
+        }
+      } catch (SecurityException | InstantiationException | IllegalAccessException
+               | IllegalArgumentException | InvocationTargetException ex) {
+        logger.log(
+            WARNING,
+            ()
+                -> sf("Creating defaultFormatter for %s", dispFormat.getClass().getSimpleName()),
+            ex);
+      }
+    }
+  }
 }

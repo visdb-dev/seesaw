@@ -75,213 +75,217 @@ import static java.lang.System.Logger.Level.*;
  </ul>
  */
 @SuppressWarnings("serial")
-public class Example4Advanced extends Example4
-{
-	private final JButton extraButton1 = new JButton();
-	private final JButton extraButton2 = new JButton();
+public class Example4Advanced extends Example4 {
+  private final JButton extraButton1 = new JButton();
+  private final JButton extraButton2 = new JButton();
 
-	@Override
-	void cmbPartColorChangeOptions() {
-		// This method must be called from Example4 before
-		// some other initialization, like bind, SSSyncManager.
-		cmbPartColor.setDisplayValues(List.of("Green", "Blue"), List.of(1,2));
-		//cmbPartColor.setDisplayValues(new String[] { "Yellow", "Purple" }, new int[] {3,4});
-	}
+  @Override
+  void cmbPartColorChangeOptions() {
+    // This method must be called from Example4 before
+    // some other initialization, like bind, SSSyncManager.
+    cmbPartColor.setDisplayValues(List.of("Green", "Blue"), List.of(1, 2));
+    //cmbPartColor.setDisplayValues(new String[] { "Yellow", "Purple" }, new int[] {3,4});
+  }
 
-	/**
-	 * Constructor for Example4Advanced
-	 * <p>
-	 * @param _dbConn - database connection
-	 */
-	public Example4Advanced(Connection _dbConn) {
-		super(_dbConn);
+  /**
+   * Constructor for Example4Advanced
+   * <p>
+   * @param _dbConn - database connection
+   */
+  public Example4Advanced(Connection _dbConn) {
+    super(_dbConn);
 
-		setTitle("Example4 Advanced");
+    setTitle("Example4 Advanced");
 
-		// NOTE: cmbPartColorChangeOptions has already been called.
+    // NOTE: cmbPartColorChangeOptions has already been called.
 
-		//////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
 
-		// Example of using SSComboBox.setListItemFormat().
-		// Use a custom message when a null/missing Option
-		// is encountered in an SSComboBox.
-		// NOTE: the default message is "# - Option Not Found"
-		cmbPartColor.setListItemFormat(new SSListItemFormat() {
-			@Override
-			protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
-				if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
-						&& getElem(_elemIndex, _listItem) == null) {
-					Object key = getElem(cmbPartColor.getKeyFormatIndex(), _listItem);
-					_sb.append(key != null ? key.toString() : null)
-							.append(" - BUG: MISSING OPTION");
-				} else {
-					super.appendValue(_sb, _elemIndex, _listItem);
-				}
-			}
-		});
+    // Example of using SSComboBox.setListItemFormat().
+    // Use a custom message when a null/missing Option
+    // is encountered in an SSComboBox.
+    // NOTE: the default message is "# - Option Not Found"
+    cmbPartColor.setListItemFormat(new SSListItemFormat() {
+      @Override
+      protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
+        if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
+            && getElem(_elemIndex, _listItem) == null) {
+          Object key = getElem(cmbPartColor.getKeyFormatIndex(), _listItem);
+          _sb.append(key != null ? key.toString() : null).append(" - BUG: MISSING OPTION");
+        } else {
+          super.appendValue(_sb, _elemIndex, _listItem);
+        }
+      }
+    });
 
-		//////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
 
-		// Missing option handling has some controls.
-		// Here we just get the current value, log it and put it back;
-		// so we're still using the default handling. See javadoc as needed.
+    // Missing option handling has some controls.
+    // Here we just get the current value, log it and put it back;
+    // so we're still using the default handling. See javadoc as needed.
 
-		// Get previous value of MissingDisplayValueControl
-		EnumSet<MissingDisplayValueControl> mmc = cmbPartColor.setMissingDisplayValueControl(EnumSet.noneOf(MissingDisplayValueControl.class));
-		// restore the default
-		cmbPartColor.setMissingDisplayValueControl(mmc);
+    // Get previous value of MissingDisplayValueControl
+    EnumSet<MissingDisplayValueControl> mmc = cmbPartColor.setMissingDisplayValueControl(
+        EnumSet.noneOf(MissingDisplayValueControl.class));
+    // restore the default
+    cmbPartColor.setMissingDisplayValueControl(mmc);
 
-		// With the following two lines retain the missing mapping option in list
-		// for all records, even those without a missing option.
-		//mmc.remove(MissingDisplayValueControl.MC_CLEANUP);
-		//cmbPartColor.setMissingDisplayValueControl(mmc);
+    // With the following two lines retain the missing mapping option in list
+    // for all records, even those without a missing option.
+    //mmc.remove(MissingDisplayValueControl.MC_CLEANUP);
+    //cmbPartColor.setMissingDisplayValueControl(mmc);
 
-		// log the MissingDisplayValueControl values
-		logger.log(INFO, () -> ("MissingMappingFlags: " + mmc));
+    // log the MissingDisplayValueControl values
+    logger.log(INFO, () -> ("MissingMappingFlags: " + mmc));
 
+    //////////////////////////////////////////////////////////////////////
 
-		//////////////////////////////////////////////////////////////////////
-		
-		// Illustrate use of InputMap/ActionMap for custom key and extra button handling.
-		// Setup F3-F11 mnemonics to correspond to the buttons on Navigator.
-		// There are also two new buttons below the Navigator (extra first and last)
-		//
-		// The actions here are currently the only Actions available in the SSDataNavigator
-		// ActionMap.
-		//
-		// See https://docs.oracle.com/javase/tutorial/uiswing/misc/action.html
-			
-		// Hotkeys/mnemonics
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"), ACT_FIRST);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"), ACT_PREVIOUS);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), ACT_NEXT);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), ACT_LAST);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), ACT_COMMIT);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), ACT_REVERT);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), ACT_REFRESH);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"), ACT_ADD);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"), ACT_DELETE);
+    // Illustrate use of InputMap/ActionMap for custom key and extra button handling.
+    // Setup F3-F11 mnemonics to correspond to the buttons on Navigator.
+    // There are also two new buttons below the Navigator (extra first and last)
+    //
+    // The actions here are currently the only Actions available in the SSDataNavigator
+    // ActionMap.
+    //
+    // See https://docs.oracle.com/javase/tutorial/uiswing/misc/action.html
 
-		final Container contentPane = getContentPane();
-		final GridBagConstraints constraints = new GridBagConstraints();
-		
-		// Do something with the "Extra" buttons
+    // Hotkeys/mnemonics
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F3"), ACT_FIRST);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F4"), ACT_PREVIOUS);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F5"), ACT_NEXT);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F6"), ACT_LAST);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F7"), ACT_COMMIT);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F8"), ACT_REVERT);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F9"), ACT_REFRESH);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F10"), ACT_ADD);
+    navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke("F11"), ACT_DELETE);
 
-		// goto First record
-		extraButton1.setAction(navigator.getActionMap().get(ACT_FIRST));
-		constraints.gridx = 0;
-		contentPane.add(extraButton1, constraints);
-		
-		// goto Last record
-		extraButton2.setAction(navigator.getActionMap().get(ACT_LAST));
-		constraints.gridx = 1;
-		contentPane.add(extraButton2, constraints);
+    final Container contentPane = getContentPane();
+    final GridBagConstraints constraints = new GridBagConstraints();
 
-		pack();
+    // Do something with the "Extra" buttons
 
-		testFormatChange();
+    // goto First record
+    extraButton1.setAction(navigator.getActionMap().get(ACT_FIRST));
+    constraints.gridx = 0;
+    contentPane.add(extraButton1, constraints);
 
-		navigator.addPropertyChangeListener("rowSet", (PropertyChangeEvent evt) -> {
-			extraButton1.setAction(navigator.getActionMap().get(ACT_FIRST));
-			extraButton2.setAction(navigator.getActionMap().get(ACT_LAST));
-		});
+    // goto Last record
+    extraButton2.setAction(navigator.getActionMap().get(ACT_LAST));
+    constraints.gridx = 1;
+    contentPane.add(extraButton2, constraints);
 
-	}
+    pack();
 
-	private void testFormatChange()
-	{
-		// The following is not a feature per se. It is for tracking down
-		// a problem using a new feature, setListItemFormat, after the
-		// combobox is fully initialized.
+    testFormatChange();
 
-		// Test that changing ListItemFormat redraws the combo.
-		// Change the formatter when first char of txtPartName set to '***'
+    navigator.addPropertyChangeListener("rowSet", (PropertyChangeEvent evt) -> {
+      extraButton1.setAction(navigator.getActionMap().get(ACT_FIRST));
+      extraButton2.setAction(navigator.getActionMap().get(ACT_LAST));
+    });
+  }
 
-		// *******************************************************************
-		// If set the following to TRUE, then when insert '***' at the
-		// beginning of txtPartName a setListItemFormat(new format...) is done.
-		// *******************************************************************
-		if(Boolean.TRUE) {
-			// Use this to demonstrate a failure.
-			// Forces the row to be updated changes color to null
-			// if the current row has a missing option
-			AbstractDocument doc = (AbstractDocument) txtPartName.getDocument();
-			// both branches show the same failure mode.
-			if(Boolean.TRUE) {
-				doc.setDocumentFilter(new DocumentFilter() {
-					@Override
-					public void insertString(DocumentFilter.FilterBypass fb,
-							int offset, String string, AttributeSet attr)
-							throws BadLocationException {
-						if(checkText(fb, offset, 0, string))
-							super.insertString(fb, offset, string, attr);
-					}
-					
-					@Override
-					public void replace(DocumentFilter.FilterBypass fb,
-							int offset, int length, String text, AttributeSet attrs)
-							throws BadLocationException {
-						if(checkText(fb, offset, length, text))
-							super.replace(fb, offset, length, text, attrs);
-					}
-					
-					/** return true to proceed with action */
-					boolean checkText(FilterBypass fb,
-							int offset, int length, String text)
-							throws BadLocationException {
-						Document doc01 = fb.getDocument();
-						String newText = doc01.getText(0, offset) + text
-								+ doc01.getText(offset + length,
-										doc01.getLength() - (offset + length));
-						if(newText.startsWith("***") && offset < 3) {
-							super.remove(fb, 0, 2);
-							changeListFormatter("2");
-							return false;
-						}
-						return true;
-					}
-				});
-			} else {
-				doc.addDocumentListener(new DocumentListener() {
-					@Override public void insertUpdate(DocumentEvent e) { check(); }
-					@Override public void removeUpdate(DocumentEvent e) { }
-					@Override public void changedUpdate(DocumentEvent e) { }
-					
-					void check() {
-						String text = txtPartName.getText();
-						if(text.startsWith("***")) {
-							EventQueue.invokeLater(() -> txtPartName.setText(text.substring(3)));
-							changeListFormatter("1");
-						}
-					}
-				});
-			}
-		}
+  private void testFormatChange() {
+    // The following is not a feature per se. It is for tracking down
+    // a problem using a new feature, setListItemFormat, after the
+    // combobox is fully initialized.
 
-	}
+    // Test that changing ListItemFormat redraws the combo.
+    // Change the formatter when first char of txtPartName set to '***'
 
-	private int countChange = 2;
-	// Test that changing ListItemFormat redraws the combo
-	private void changeListFormatter(String tag) {
-		countChange++;
-		int captureCountChange = countChange;
-		logger.log(INFO, sf("change%s formatter: %d", tag, countChange));
-		EventQueue.invokeLater(() -> {
-			cmbPartColor.setListItemFormat(new SSListItemFormat() {
-				@Override
-				protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
-					if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
-							&& getElem(_elemIndex, _listItem) == null
-							&& !Objects.equals(cmbPartColor.getNullItem(), _listItem)) {
-						Object key = getElem(cmbPartColor.getKeyFormatIndex(), _listItem);
-						_sb.append(key != null ? key.toString() : null)
-								.append(" - change: ")
-								.append(captureCountChange);
-					} else {
-						super.appendValue(_sb, _elemIndex, _listItem);
-					}
-				}
-			});
-		});
-	}
+    // *******************************************************************
+    // If set the following to TRUE, then when insert '***' at the
+    // beginning of txtPartName a setListItemFormat(new format...) is done.
+    // *******************************************************************
+    if (Boolean.TRUE) {
+      // Use this to demonstrate a failure.
+      // Forces the row to be updated changes color to null
+      // if the current row has a missing option
+      AbstractDocument doc = (AbstractDocument) txtPartName.getDocument();
+      // both branches show the same failure mode.
+      if (Boolean.TRUE) {
+        doc.setDocumentFilter(new DocumentFilter() {
+          @Override
+          public void insertString(DocumentFilter.FilterBypass fb, int offset, String string,
+                                   AttributeSet attr) throws BadLocationException {
+            if (checkText(fb, offset, 0, string)) super.insertString(fb, offset, string, attr);
+          }
+
+          @Override
+          public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text,
+                              AttributeSet attrs) throws BadLocationException {
+            if (checkText(fb, offset, length, text)) super.replace(fb, offset, length, text, attrs);
+          }
+
+          /** return true to proceed with action */
+          boolean checkText(FilterBypass fb, int offset, int length, String text)
+              throws BadLocationException {
+            Document doc01 = fb.getDocument();
+            String newText
+                = doc01.getText(0, offset) + text
+                  + doc01.getText(offset + length, doc01.getLength() - (offset + length));
+            if (newText.startsWith("***") && offset < 3) {
+              super.remove(fb, 0, 2);
+              changeListFormatter("2");
+              return false;
+            }
+            return true;
+          }
+        });
+      } else {
+        doc.addDocumentListener(new DocumentListener() {
+          @Override
+          public void insertUpdate(DocumentEvent e) {
+            check();
+          }
+          @Override
+          public void removeUpdate(DocumentEvent e) {}
+          @Override
+          public void changedUpdate(DocumentEvent e) {}
+
+          void check() {
+            String text = txtPartName.getText();
+            if (text.startsWith("***")) {
+              EventQueue.invokeLater(() -> txtPartName.setText(text.substring(3)));
+              changeListFormatter("1");
+            }
+          }
+        });
+      }
+    }
+  }
+
+  private int countChange = 2;
+  // Test that changing ListItemFormat redraws the combo
+  private void changeListFormatter(String tag) {
+    countChange++;
+    int captureCountChange = countChange;
+    logger.log(INFO, sf("change%s formatter: %d", tag, countChange));
+    EventQueue.invokeLater(() -> {
+      cmbPartColor.setListItemFormat(new SSListItemFormat() {
+        @Override
+        protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
+          if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
+              && getElem(_elemIndex, _listItem) == null
+              && !Objects.equals(cmbPartColor.getNullItem(), _listItem)) {
+            Object key = getElem(cmbPartColor.getKeyFormatIndex(), _listItem);
+            _sb.append(key != null ? key.toString() : null)
+                .append(" - change: ")
+                .append(captureCountChange);
+          } else {
+            super.appendValue(_sb, _elemIndex, _listItem);
+          }
+        }
+      });
+    });
+  }
 }

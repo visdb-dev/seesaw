@@ -48,29 +48,27 @@ import com.nqadmin.swingset.utils.SSComponent;
 /**
  * Decorator that adjusts text style.
  */
-public interface TextDecorator extends AnyDecorator
-{
-	/**
-	 * Modify the text according to style; commonly modifies text color.
-	 * See {@link TextStyles}.
-	 */
-	void decorateText();
+public interface TextDecorator extends AnyDecorator {
+  /**
+   * Modify the text according to style; commonly modifies text color.
+   * See {@link TextStyles}.
+   */
+  void decorateText();
 
-	/**
-	 * TextDecorator that does nothing
-	 */
-	public static TextDecorator nullTextDecorator = new TextDecorator()
-	{
-		@Override public void decorateText() { }
+  /**
+   * TextDecorator that does nothing
+   */
+  public static TextDecorator nullTextDecorator = new TextDecorator() {
+    @Override
+    public void decorateText() {}
 
-		@Override public void install(SSComponent component) { }
+    @Override
+    public void install(SSComponent component) {}
 
-		@Override public void uninstall() { }
+    @Override
+    public void uninstall() {}
 
-		@Override
-		public SSComponent getSSComponent()
-		{
-			return null;
-		}
-	};
+    @Override
+    public SSComponent getSSComponent() { return null; }
+  };
 }

@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
- /* *****************************************************************************
+/* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2024, Ernie R. Rael. All rights reserved.
@@ -46,42 +46,28 @@ package com.nqadmin.swingset.datasources;
  * Type conversion Exception.
  */
 @SuppressWarnings("serial")
-public class SSSQLConversionException extends SSSQLException
-{
+public class SSSQLConversionException extends SSSQLException {
+  /**
+   * Type conversion error.
+   * @param reason
+   */
+  public SSSQLConversionException(String reason) { super(reason); }
 
-	/**
-	 * Type conversion error.
-	 * @param reason
-	 */
-	public SSSQLConversionException(String reason)
-	{
-		super(reason);
-	}
+  /**
+   * Type conversion error.
+   */
+  public SSSQLConversionException() {}
 
-	/**
-	 * Type conversion error.
-	 */
-	public SSSQLConversionException()
-	{
-	}
+  /**
+   * Type conversion error.
+   * @param cause
+   */
+  public SSSQLConversionException(Throwable cause) { super(cause); }
 
-	/**
-	 * Type conversion error.
-	 * @param cause
-	 */
-	public SSSQLConversionException(Throwable cause)
-	{
-		super(cause);
-	}
-
-	/**
-	 * Type conversion error.
-	 * @param reason
-	 * @param cause
-	 */
-	public SSSQLConversionException(String reason, Throwable cause)
-	{
-		super(reason, cause);
-	}
-	
+  /**
+   * Type conversion error.
+   * @param reason
+   * @param cause
+   */
+  public SSSQLConversionException(String reason, Throwable cause) { super(reason, cause); }
 }

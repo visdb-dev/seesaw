@@ -53,73 +53,64 @@ import com.nqadmin.swingset.utils.SSComponent;
  * {@linkplain #jc() } returns the component cast as a {@linkplain JTextComponent}.
  */
 public abstract class TextComponentValidator implements Validator {
-	/** this component */
-	private SSComponent component;
+  /** this component */
+  private SSComponent component;
 
-	/**
-	 * Create a validator for use with a {@linkplain JTextComponent};
-	 * argument is a {@linkplain Function} that takes a String and
-	 * performs validation.
-	 * @param validator validation function returns true if valid
-	 * @return the validator
-	 */
-	public static Validator create(Function<String, Boolean> validator)
-	{
-		return new TextComponentValidatorFunction(validator);
-	}
+  /**
+   * Create a validator for use with a {@linkplain JTextComponent};
+   * argument is a {@linkplain Function} that takes a String and
+   * performs validation.
+   * @param validator validation function returns true if valid
+   * @return the validator
+   */
+  public static Validator create(Function<String, Boolean> validator) {
+    return new TextComponentValidatorFunction(validator);
+  }
 
-	/**
-	 * Install this validator into the component.
-	 * @param component to validate
-	 * @throws IllegalArgumentException if component is not a JTextComponent
-	 */
-	@Override
-	public void install(SSComponent component) {
-		if (!(component instanceof JTextComponent)) {
-			throw new IllegalArgumentException("Must be a JTextComponent");
-		}
-		this.component = component;
-	}
+  /**
+   * Install this validator into the component.
+   * @param component to validate
+   * @throws IllegalArgumentException if component is not a JTextComponent
+   */
+  @Override
+  public void install(SSComponent component) {
+    if (!(component instanceof JTextComponent)) {
+      throw new IllegalArgumentException("Must be a JTextComponent");
+    }
+    this.component = component;
+  }
 
-	/** {@inheritDoc} */
-	@Override
-	public void uninstall() {
-	}
+  /** {@inheritDoc} */
+  @Override
+  public void uninstall() {}
 
-	/**
-	 * Return the component associated with this validator
-	 * @return the component
-	 */
-	public SSComponent getComponent() {
-		return component;
-	}
+  /**
+   * Return the component associated with this validator
+   * @return the component
+   */
+  public SSComponent getComponent() { return component; }
 
-	/**
-	 * Return the SSComponent as a JComponent.
-	 * @return the SSComponent
-	 */
-	protected final JTextComponent jc() {
-		return (JTextComponent) component;
-	}
+  /**
+   * Return the SSComponent as a JComponent.
+   * @return the SSComponent
+   */
+  protected final JTextComponent jc() { return (JTextComponent) component; }
 
-	private static class TextComponentValidatorFunction
-			extends TextComponentValidator
-	{
-		private final Function<String, Boolean> validator;
-		
-		/**
-		 * A validator for use with a {@linkplain JTextComponent};
-		 * argument is a {@linkplain Function} that performs validation.
-		 * @param validator validation function
-		 */
-		public TextComponentValidatorFunction(Function<String, Boolean> validator)
-		{
-			this.validator = validator;
-		}
-		
-		@Override
-		public boolean validate() {
-			return validator.apply(jc().getText());
-		}
-	}
+  private static class TextComponentValidatorFunction extends TextComponentValidator {
+    private final Function<String, Boolean> validator;
+
+    /**
+     * A validator for use with a {@linkplain JTextComponent};
+     * argument is a {@linkplain Function} that performs validation.
+     * @param validator validation function
+     */
+    public TextComponentValidatorFunction(Function<String, Boolean> validator) {
+      this.validator = validator;
+    }
+
+    @Override
+    public boolean validate() {
+      return validator.apply(jc().getText());
+    }
+  }
 }

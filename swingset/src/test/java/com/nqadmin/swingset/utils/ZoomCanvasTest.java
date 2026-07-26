@@ -46,204 +46,201 @@ import com.nqadmin.swingset.utils.ZoomCanvas.CoordSystem;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** x */
-public class ZoomCanvasTest
-{
-	
-	/** x */
-	public ZoomCanvasTest()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-        // 1. Create a mock image (100x100 pixels)
-        mockImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+public class ZoomCanvasTest {
+  /** x */
+  public ZoomCanvasTest() {}
 
-        // 2. Set up zoom factor
-        zoomFactor = 2.0; // Scaled image is 200x200 screen pixels
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
 
-        // 3. Set up the scroll pane
-        mockScrollPane = new JScrollPane();
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
 
-        // 4. Set up the canvas panel. 
-        // override getWidth/getHeight to simulate a large panel that centers the image.
-        canvas = new ZoomCanvas(mockScrollPane, () -> zoomFactor) {
-            @Override
-			// 300 width leaves a 50px margin on left/right
-            public int getWidth() { return 300; }
-            @Override
-			// 300 height leaves a 50px margin on top/bottom
-            public int getHeight() { return 300; }
-        };
-        // 5. Set up the scroll pane viewport
-		mockScrollPane.getViewport().setView(canvas);
-        // 6. add the image to the canvas
-		canvas.setImage(mockImage);
+  /** x */
+  @BeforeEach
+  public void setUp() {
+    // 1. Create a mock image (100x100 pixels)
+    mockImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 
+    // 2. Set up zoom factor
+    zoomFactor = 2.0; // Scaled image is 200x200 screen pixels
 
-        // Simulate that the user has scrolled 10 pixels down and 20 pixels right
-        mockScrollPane.getViewport().setViewPosition(new Point(20, 10));
-	}
-	
-	@AfterEach
-	public void tearDown()
-	{
-	}
+    // 3. Set up the scroll pane
+    mockScrollPane = new JScrollPane();
 
-    private JScrollPane mockScrollPane;
-    private BufferedImage mockImage;
-    private double zoomFactor;
-	private ZoomCanvas canvas;
+    // 4. Set up the canvas panel.
+    // override getWidth/getHeight to simulate a large panel that centers the image.
+    canvas = new ZoomCanvas(mockScrollPane, () -> zoomFactor) {
+      @Override
+      // 300 width leaves a 50px margin on left/right
+      public int getWidth() {
+        return 300;
+      }
+      @Override
+      // 300 height leaves a 50px margin on top/bottom
+      public int getHeight() {
+        return 300;
+      }
+    };
+    // 5. Set up the scroll pane viewport
+    mockScrollPane.getViewport().setView(canvas);
+    // 6. add the image to the canvas
+    canvas.setImage(mockImage);
 
-    @Test
-    @DisplayName("Identical coordinate system conversion should bypass math but return a unique cloned object")
-    void testIdenticalSystemOptimization() {
-        Point originalPoint = new Point(45, 90);
+    // Simulate that the user has scrolled 10 pixels down and 20 pixels right
+    mockScrollPane.getViewport().setViewPosition(new Point(20, 10));
+  }
 
-        Point translatedPoint = canvas.translate(
-                originalPoint, CoordSystem.IMAGE, CoordSystem.IMAGE);
+  @AfterEach
+  public void tearDown() {}
 
-        // Values must match
-        assertEquals(originalPoint, translatedPoint);
-        // It must NOT be the same object instance in memory (Immutability protection)
-        assertNotSame(originalPoint, translatedPoint);
-    }
-	
-	@Test
-    @DisplayName("Translate CANVAS coordinates to raw IMAGE pixels with dynamic margins and zoom applied")
-    void testCanvasToImageTranslation() {
-        // Calculation check:
-        // Scaled image is 200x200 inside a 300x300 canvas. 
-        // Offset margin is (300 - 200) / 2 = 50 pixels.
-        // Image space offset is 50 / 2.0 = 25 units.
-        
-        // Let's click at canvas pixel (150, 150) -> exact center of the canvas
-        Point canvasPoint = new Point(150, 150);
+  private JScrollPane mockScrollPane;
+  private BufferedImage mockImage;
+  private double zoomFactor;
+  private ZoomCanvas canvas;
 
-        Point imagePoint = canvas.translate(
-                canvasPoint, CoordSystem.CANVAS, CoordSystem.IMAGE);
+  @Test
+  @DisplayName(
+      "Identical coordinate system conversion should bypass math but return a unique cloned object")
+  void
+  testIdenticalSystemOptimization() {
+    Point originalPoint = new Point(45, 90);
 
-        // (150 / 2.0) - 25 = 75 - 25 = 50
-        assertEquals(new Point(50, 50), imagePoint, "Center of the canvas should map to center of the image");
-    }
+    Point translatedPoint = canvas.translate(originalPoint, CoordSystem.IMAGE, CoordSystem.IMAGE);
 
-    @Test
-    @DisplayName("Translate VIEWPORT coordinates to IMAGE pixels while accounting for active scroll positions")
-    void testViewportToImageTranslationWithScrolling() {
-        // Scroll position is set to X=20, Y=10 in setUp()
-        // If a user clicks at (130, 140) on the physical window (Viewport):
-        // Panel coordinate becomes: X = 130 + 20 = 150, Y = 140 + 10 = 150
-        Point viewportPoint = new Point(130, 140);
+    // Values must match
+    assertEquals(originalPoint, translatedPoint);
+    // It must NOT be the same object instance in memory (Immutability protection)
+    assertNotSame(originalPoint, translatedPoint);
+  }
 
-        Point imagePoint = canvas.translate(
-                viewportPoint, CoordSystem.VIEWPORT, CoordSystem.IMAGE);
+  @Test
+  @DisplayName(
+      "Translate CANVAS coordinates to raw IMAGE pixels with dynamic margins and zoom applied")
+  void
+  testCanvasToImageTranslation() {
+    // Calculation check:
+    // Scaled image is 200x200 inside a 300x300 canvas.
+    // Offset margin is (300 - 200) / 2 = 50 pixels.
+    // Image space offset is 50 / 2.0 = 25 units.
 
-        // After accounting for the scroll offset, it resolves to panel (150, 150) -> image (50, 50)
-        assertEquals(new Point(50, 50), imagePoint);
-    }
+    // Let's click at canvas pixel (150, 150) -> exact center of the canvas
+    Point canvasPoint = new Point(150, 150);
 
-    @Test
-    @DisplayName("Translate IMAGE pixels out to VIEWPORT coordinates considering layout padding and scroll offsets")
-    void testImageToViewportTranslation() {
-        // Target image pixel is the top-left corner (0,0)
-        Point imagePoint = new Point(0, 0);
+    Point imagePoint = canvas.translate(canvasPoint, CoordSystem.CANVAS, CoordSystem.IMAGE);
 
-        Point viewportPoint = canvas.translate(
-                imagePoint, CoordSystem.IMAGE, CoordSystem.VIEWPORT);
+    // (150 / 2.0) - 25 = 75 - 25 = 50
+    assertEquals(new Point(50, 50), imagePoint,
+                 "Center of the canvas should map to center of the image");
+  }
 
-        // Math sequence:
-        // Image (0,0) -> Scaled Image (25, 25) -> Panel (50, 50)
-        // Panel (50, 50) minus Scroll position (20, 10) = Viewport (30, 40)
-        assertEquals(new Point(30, 40), viewportPoint);
-    }
+  @Test
+  @DisplayName(
+      "Translate VIEWPORT coordinates to IMAGE pixels while accounting for active scroll positions")
+  void
+  testViewportToImageTranslationWithScrolling() {
+    // Scroll position is set to X=20, Y=10 in setUp()
+    // If a user clicks at (130, 140) on the physical window (Viewport):
+    // Panel coordinate becomes: X = 130 + 20 = 150, Y = 140 + 10 = 150
+    Point viewportPoint = new Point(130, 140);
 
-	// /**
-	//  * Test of translate method, of class ZoomCanvas.
-	//  */
-	// @Test
-	// public void testTranslate()
-	// {
-	// 	System.out.println("translate");
-	// 	Point fromPoint = null;
-	// 	ZoomCanvas.CoordSystem fromCoordSystem = null;
-	// 	ZoomCanvas.CoordSystem toCoordSystem = null;
-	// 	ZoomCanvas instance = null;
-	// 	Point expResult = null;
-	// 	Point result = instance.translate(fromPoint, fromCoordSystem, toCoordSystem);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+    Point imagePoint = canvas.translate(viewportPoint, CoordSystem.VIEWPORT, CoordSystem.IMAGE);
 
-	// /**
-	//  * Test of setImage method, of class ZoomCanvas.
-	//  */
-	// @Test
-	// public void testSetImage()
-	// {
-	// 	System.out.println("setImage");
-	// 	BufferedImage newImage = null;
-	// 	ZoomCanvas instance = null;
-	// 	instance.setImage(newImage);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+    // After accounting for the scroll offset, it resolves to panel (150, 150) -> image (50, 50)
+    assertEquals(new Point(50, 50), imagePoint);
+  }
 
-	// /**
-	//  * Test of getCurrentImage method, of class ZoomCanvas.
-	//  */
-	// @Test
-	// public void testGetCurrentImage()
-	// {
-	// 	System.out.println("getCurrentImage");
-	// 	ZoomCanvas instance = null;
-	// 	BufferedImage expResult = null;
-	// 	BufferedImage result = instance.getCurrentImage();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+  @Test
+  @DisplayName("Translate IMAGE pixels out to VIEWPORT coordinates considering layout padding and "
+               + "scroll offsets")
+  void
+  testImageToViewportTranslation() {
+    // Target image pixel is the top-left corner (0,0)
+    Point imagePoint = new Point(0, 0);
 
-	// /**
-	//  * Test of getPreferredSize method, of class ZoomCanvas.
-	//  */
-	// @Test
-	// public void testGetPreferredSize()
-	// {
-	// 	System.out.println("getPreferredSize");
-	// 	ZoomCanvas instance = null;
-	// 	Dimension expResult = null;
-	// 	Dimension result = instance.getPreferredSize();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+    Point viewportPoint = canvas.translate(imagePoint, CoordSystem.IMAGE, CoordSystem.VIEWPORT);
 
-	// /**
-	//  * Test of paintComponent method, of class ZoomCanvas.
-	//  */
-	// @Test
-	// public void testPaintComponent()
-	// {
-	// 	System.out.println("paintComponent");
-	// 	Graphics g = null;
-	// 	ZoomCanvas instance = null;
-	// 	instance.paintComponent(g);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+    // Math sequence:
+    // Image (0,0) -> Scaled Image (25, 25) -> Panel (50, 50)
+    // Panel (50, 50) minus Scroll position (20, 10) = Viewport (30, 40)
+    assertEquals(new Point(30, 40), viewportPoint);
+  }
+
+  // /**
+  //  * Test of translate method, of class ZoomCanvas.
+  //  */
+  // @Test
+  // public void testTranslate()
+  // {
+  // 	System.out.println("translate");
+  // 	Point fromPoint = null;
+  // 	ZoomCanvas.CoordSystem fromCoordSystem = null;
+  // 	ZoomCanvas.CoordSystem toCoordSystem = null;
+  // 	ZoomCanvas instance = null;
+  // 	Point expResult = null;
+  // 	Point result = instance.translate(fromPoint, fromCoordSystem, toCoordSystem);
+  // 	assertEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of setImage method, of class ZoomCanvas.
+  //  */
+  // @Test
+  // public void testSetImage()
+  // {
+  // 	System.out.println("setImage");
+  // 	BufferedImage newImage = null;
+  // 	ZoomCanvas instance = null;
+  // 	instance.setImage(newImage);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of getCurrentImage method, of class ZoomCanvas.
+  //  */
+  // @Test
+  // public void testGetCurrentImage()
+  // {
+  // 	System.out.println("getCurrentImage");
+  // 	ZoomCanvas instance = null;
+  // 	BufferedImage expResult = null;
+  // 	BufferedImage result = instance.getCurrentImage();
+  // 	assertEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of getPreferredSize method, of class ZoomCanvas.
+  //  */
+  // @Test
+  // public void testGetPreferredSize()
+  // {
+  // 	System.out.println("getPreferredSize");
+  // 	ZoomCanvas instance = null;
+  // 	Dimension expResult = null;
+  // 	Dimension result = instance.getPreferredSize();
+  // 	assertEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of paintComponent method, of class ZoomCanvas.
+  //  */
+  // @Test
+  // public void testPaintComponent()
+  // {
+  // 	System.out.println("paintComponent");
+  // 	Graphics g = null;
+  // 	ZoomCanvas instance = null;
+  // 	instance.paintComponent(g);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
 }

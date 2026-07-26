@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -57,75 +57,69 @@ import com.nqadmin.swingset.utils.JStuff;
 
 @SuppressWarnings("serial")
 public class SSDateField extends DateTimeField {
-	/** Logger for component */
-	private static final Logger logger = JStuff.getLogger();
+  /** Logger for component */
+  private static final Logger logger = JStuff.getLogger();
 
-	/**
-	 *  Creates a default SSDateField object using the default date format.
-	 */
-	public SSDateField(){
-		this(SSFormat.DATE);
-	}
+  /**
+   *  Creates a default SSDateField object using the default date format.
+   */
+  public SSDateField() { this(SSFormat.DATE); }
 
-	/**
-	 *  Creates a new instance of SSDateField with the specified format.
-	 *  @param _format - an enum format to be used while the date field is in edit mode
-	 */
-	public SSDateField(final SSFormat _format) {
-		this(createFormatterFactory(_format));
-	}
+  /**
+   *  Creates a new instance of SSDateField with the specified format.
+   *  @param _format - an enum format to be used while the date field is in edit mode
+   */
+  public SSDateField(final SSFormat _format) { this(createFormatterFactory(_format)); }
 
-	/**
-	 * Creates an object of SSDateField with the specified formatter factory
-	 * @param factory - formatter factory to be used
-	 */
-	public SSDateField(final AbstractFormatterFactory factory) {
-		super(factory);
-	}
-		
-	/**
-	 * Create DATE formatter factory with specified format pattern.
-	 * See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
-	 * @param _format - Format to be used for date while in editing mode.
-	 * @return a DefaultFormatterFactory for the specified date format
-	 */
-	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
-		SSFormat format = _format;
-		if ( _format.getType() != SSFormat.DATE ) {
-			// I'd be inclined to exception
-			// throw new IllegalArgumentException(
-			// 		String.format("% is not a DATE", _format.toString()));
-			logger.log(Level.ERROR, () -> String.format("%s is not a DATE, using default",
-					_format.toString()));
-			format = SSFormat.DATE;
-		}
-		format = SSFormat.getActualFormat(format);
-		String formatMask;
-		String editPattern;
-		switch(format) {
-		case DATE_MMDDYYYY_SLASH -> {
-			formatMask = "##/##/####";
-			editPattern = "MMddyyyy";
-		}
-		case DATE_DDMMYYYY_SLASH -> {
-			formatMask = "##/##/####";
-			editPattern = "ddMMyyyy";
-		}
-		case DATE_YYYYMMDD_STROKE -> {
-			formatMask = "####-##-##";
-			editPattern = "yyyyMMdd";
-		}
-		default -> {
-			logger.log(Level.ERROR, "Unknown date format type of " + format);
-			return null;
-		}
-		}
-		
-		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.ssFormat(format)
-				.stringValidator(DateTimeField::stringValidator)
-				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
-				.placeholderCharacter('_')
-				.build();
-	}
+  /**
+   * Creates an object of SSDateField with the specified formatter factory
+   * @param factory - formatter factory to be used
+   */
+  public SSDateField(final AbstractFormatterFactory factory) { super(factory); }
+
+  /**
+   * Create DATE formatter factory with specified format pattern.
+   * See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+   * @param _format - Format to be used for date while in editing mode.
+   * @return a DefaultFormatterFactory for the specified date format
+   */
+  public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+    SSFormat format = _format;
+    if (_format.getType() != SSFormat.DATE) {
+      // I'd be inclined to exception
+      // throw new IllegalArgumentException(
+      // 		String.format("% is not a DATE", _format.toString()));
+      logger.log(Level.ERROR,
+                 () -> String.format("%s is not a DATE, using default", _format.toString()));
+      format = SSFormat.DATE;
+    }
+    format = SSFormat.getActualFormat(format);
+    String formatMask;
+    String editPattern;
+    switch (format) {
+      case DATE_MMDDYYYY_SLASH -> {
+        formatMask = "##/##/####";
+        editPattern = "MMddyyyy";
+      }
+      case DATE_DDMMYYYY_SLASH -> {
+        formatMask = "##/##/####";
+        editPattern = "ddMMyyyy";
+      }
+      case DATE_YYYYMMDD_STROKE -> {
+        formatMask = "####-##-##";
+        editPattern = "yyyyMMdd";
+      }
+      default -> {
+        logger.log(Level.ERROR, "Unknown date format type of " + format);
+        return null;
+      }
+    }
+
+    return new SSMaskFormatterFactory.Builder<>(formatMask)
+        .ssFormat(format)
+        .stringValidator(DateTimeField::stringValidator)
+        .converter(new DateFormatter(new SimpleDateFormat(editPattern)))
+        .placeholderCharacter('_')
+        .build();
+  }
 }

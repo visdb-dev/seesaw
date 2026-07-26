@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -56,77 +56,67 @@ import static com.nqadmin.swingset.formatting.NumberField.createNumberFormat;
  */
 @SuppressWarnings("serial")
 public class SSPercentField extends NumberField {
+  /**
+   * Creates a default object of SSPercentField
+   */
+  public SSPercentField() { this(createFormatterFactory(SSFormat.CUSTOM, null, null)); }
 
-	/**
-     * Creates a default object of SSPercentField
-     */
-    public SSPercentField() {
-        this(createFormatterFactory(SSFormat.CUSTOM, null, null));
-    }
+  /**
+   * Creates a default object of SSPercentField.
+   * @param precision - number of digits needed for integer part of the number
+   * @param decimals  - number of digits needed for the fraction part of the number
+   */
+  public SSPercentField(int precision, int decimals) {
+    this(createFormatterFactory(SSFormat.CUSTOM, precision, decimals));
+  }
 
-	/**
-     * Creates a default object of SSPercentField.
-	 * @param precision - number of digits needed for integer part of the number
-	 * @param decimals  - number of digits needed for the fraction part of the number
-     */
-    public SSPercentField(int precision, int decimals) {
-        this(createFormatterFactory(SSFormat.CUSTOM, precision, decimals));
-    }
+  /**
+   * Creates an object of SSPercentField with the specified formatter factory
+   * @param factory - formatter factory to be used
+   */
+  public SSPercentField(AbstractFormatterFactory factory) { super(factory); }
 
-    /**
-     * Creates an object of SSPercentField with the specified formatter factory
-     * @param factory - formatter factory to be used
-     */
-    public SSPercentField(AbstractFormatterFactory factory) {
-        super(factory);
-    }
+  /**
+   * Get the multiplier used in percent.
+   * @return multiplier
+   */
+  public int getMultiplier() { return getNumberFormatParam((nf) -> nf.getMultiplier()); }
 
-	/**
-	 * Get the multiplier used in percent.
-	 * @return multiplier
-	 */
-	public int getMultiplier() {
-		return getNumberFormatParam((nf) -> nf.getMultiplier());
-	}
+  /**
+   * Sets the multiplier for use in percent. With multiplier 100,
+   * 1.23 is formatted as "123", and "123" is parsed into 1.23.
+   * @param multiplier the new multiplier
+   */
+  public void setMultiplier(int multiplier) {
+    setFormatParam((nf) -> nf.setMultiplier(multiplier));
+  }
 
-	/**
-	 * Sets the multiplier for use in percent. With multiplier 100,
-	 * 1.23 is formatted as "123", and "123" is parsed into 1.23.
-	 * @param multiplier the new multiplier
-	 */
-	public void setMultiplier(int multiplier) {
-		setFormatParam((nf) -> nf.setMultiplier(multiplier));
-	}
+  /**
+   * Create a FormatterFactory.
+   * @param ssFormat
+   * @param precision - number of digits needed for integer part of the number
+   * @param decimals - number of digits needed for fraction part of the number
+   * @return FormatterFactory.
+   */
+  public static DefaultFormatterFactory createFormatterFactory(
+      SSFormat ssFormat, Integer precision, Integer decimals
+      //, Locale editLocale, Locale displayLocale
+  ) {
+    Objects.requireNonNull(ssFormat);
 
-	/**
-	 * Create a FormatterFactory.
-	 * @param ssFormat
-	 * @param precision - number of digits needed for integer part of the number
-	 * @param decimals - number of digits needed for fraction part of the number
-	 * @return FormatterFactory.
-	 */
-	public static DefaultFormatterFactory createFormatterFactory(
-			SSFormat ssFormat, Integer precision, Integer decimals
-			//, Locale editLocale, Locale displayLocale
-	)
-	{
-		Objects.requireNonNull(ssFormat);
+    NumberFormat displayFormat
+        = createNumberFormat(() -> NumberFormat.getPercentInstance(Locale.US));
+    NumberFormat editFormat = createNumberFormat(() -> NumberFormat.getInstance(Locale.US));
+    // Make sure edit format has the multiplier default for percent.
+    ((DecimalFormat) editFormat).setMultiplier(((DecimalFormat) displayFormat).getMultiplier());
 
-		NumberFormat displayFormat = createNumberFormat(
-				()->NumberFormat.getPercentInstance(Locale.US));
-		NumberFormat editFormat = createNumberFormat(
-				()->NumberFormat.getInstance(Locale.US));
-		// Make sure edit format has the multiplier default for percent.
-		((DecimalFormat)editFormat).setMultiplier(
-				((DecimalFormat)displayFormat).getMultiplier());
+    initPrecision(precision, editFormat, displayFormat);
+    initDecimals(decimals, editFormat, displayFormat);
 
-		initPrecision(precision, editFormat, displayFormat);
-		initDecimals(decimals, editFormat, displayFormat);
-		
-		return new SSFormatterFactory.Builder<>()
-				.ssFormat(ssFormat)
-				.editFormatter(new SSNumberFormatter(editFormat))
-				.displayFormatter(new SSNumberFormatter(displayFormat))
-				.build();
-	}
+    return new SSFormatterFactory.Builder<>()
+        .ssFormat(ssFormat)
+        .editFormatter(new SSNumberFormatter(editFormat))
+        .displayFormatter(new SSNumberFormatter(displayFormat))
+        .build();
+  }
 }

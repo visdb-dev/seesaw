@@ -54,487 +54,463 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * ConvertTypeTest.
  */
-public class ConvertTypeTest
-{
-	
-	/** x */
-	public ConvertTypeTest()
-	{
-	}
-	
-	/** x */
-	@BeforeAll
-	public static void setUpClass()
-	{
-	}
-	
-	/** x */
-	@AfterAll
-	public static void tearDownClass()
-	{
-	}
-	
-	/** x */
-	@BeforeEach
-	public void setUp()
-	{
-	}
-	
-	/** x */
-	@AfterEach
-	public void tearDown()
-	{
-	}
-
-	// TODO: more tests
-
-	/**
-	 * Test of verifyConvertToType method, of class ConvertType.
-	 */
-	@Test
-	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
-	public void testVerifyConvertToType()
-	{
-		System.out.println("verifyConvertToType");
-
-		EnumSet<JDBCType> allow = null;
-
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.DATE, Date.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.DATE, java.sql.Date.class, allow));
-		assertThrows(AssertionError.class, ()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.DATE, java.sql.Time.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.DATE, java.sql.Timestamp.class, allow));
-
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIME, Date.class, allow));
-		assertThrows(AssertionError.class, ()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIME, java.sql.Date.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIME, java.sql.Time.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIME, java.sql.Timestamp.class, allow));
-
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIMESTAMP, Date.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIMESTAMP, java.sql.Date.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIMESTAMP, java.sql.Time.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIMESTAMP, java.sql.Timestamp.class, allow));
-
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.DATE, LocalDate.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIME, LocalTime.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.TIMESTAMP, LocalDateTime.class, allow));
-		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
-				JDBCType.DATE, LocalDateTime.class, allow));
-	}
-
-	/** x
-	 * @throws java.lang.Exception */
-	@Test
-	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
-	public void testConvertStringToNumber() throws Exception
-	{
-		System.out.println("convertStringToNumber");
-		Object rv;
-		
-		rv = convertToType("123", JDBCType.TINYINT);
-		assertEquals(Integer.class, rv.getClass());
-		assertEquals(123, rv);
-		rv = convertToType("123", JDBCType.SMALLINT);
-		assertEquals(Integer.class, rv.getClass());
-		assertEquals((Integer)123, rv);
-		rv = convertToType("123", JDBCType.INTEGER);
-		assertEquals(Integer.class, rv.getClass());
-		assertEquals((Integer)123, rv);
-		rv = convertToType("123", JDBCType.BIGINT);
-		assertEquals(Long.class, rv.getClass());
-		assertEquals(123L, rv);
-		rv = convertToType("123", JDBCType.REAL);
-		assertEquals(Float.class, rv.getClass());
-		assertEquals(123F, rv);
-		rv = convertToType("123", JDBCType.FLOAT);
-		assertEquals(Double.class, rv.getClass());
-		assertEquals(123D, rv);
-		rv = convertToType("123", JDBCType.DOUBLE);
-		assertEquals(Double.class, rv.getClass());
-		assertEquals(123D, rv);
-		rv = convertToType("123", JDBCType.NUMERIC);
-		assertEquals(BigDecimal.class, rv.getClass());
-		assertEquals(BigDecimal.valueOf(123), rv);
-		rv = convertToType("123", JDBCType.DECIMAL);
-		assertEquals(BigDecimal.class, rv.getClass());
-		assertEquals(BigDecimal.valueOf(123), rv);
-
-		// Java types
-		rv = convertToType("123", Byte.class);
-		assertEquals(Byte.class, rv.getClass());
-		assertEquals((byte)123, rv);
-		rv = convertToType("123", Short.class);
-		assertEquals(Short.class, rv.getClass());
-		assertEquals((short)123, rv);
-		rv = convertToType("123", Integer.class);
-		assertEquals(Integer.class, rv.getClass());
-		assertEquals(123, rv);
-		rv = convertToType("123", Long.class);
-		assertEquals(Long.class, rv.getClass());
-		assertEquals(123L, rv);
-		rv = convertToType("123", Float.class);
-		assertEquals(Float.class, rv.getClass());
-		assertEquals(123F, rv);
-		rv = convertToType("123", Double.class);
-		assertEquals(Double.class, rv.getClass());
-		assertEquals(123D, rv);
-		rv = convertToType("123", BigDecimal.class);
-		assertEquals(BigDecimal.class, rv.getClass());
-		assertEquals(BigDecimal.valueOf(123), rv);
-
-		assertThrows(SSSQLConversionException.class, () -> convertToType(
-				String.valueOf(Byte.MAX_VALUE + 1), Byte.class));
-		assertThrows(SSSQLConversionException.class, () -> convertToType(
-				String.valueOf(Short.MAX_VALUE + 1), Short.class));
-		assertThrows(SSSQLConversionException.class, () -> convertToType(
-				String.valueOf((long)Integer.MAX_VALUE + 1), Integer.class));
-		assertThrows(SSSQLConversionException.class, () -> convertToType(
-				BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE).toString(),
-				Long.class));
-
-		// Primitive types ???
-		// rv = convertObjectType("123", long.class);
-		// assertEquals(Long.class, rv.getClass());
-		// assertEquals(123L, rv);
-	}
-
-	/** x
-	 * @throws java.lang.Exception */
-	@Test
-	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
-	public void testConvertNumberToNumber() throws Exception
-	{
-		System.out.println("convertNumberToNumber");
-		@SuppressWarnings("unused")
-		Object rv;
-
-		rv = convertToType((long)Byte.MAX_VALUE, Byte.class);
-		assertEquals(Byte.MAX_VALUE, rv);
-		assertThrows(SSSQLConversionException.class,
-				() -> convertToType((long)(Byte.MAX_VALUE + 1), Byte.class));
-
-		rv = convertToType((long)Short.MAX_VALUE, Short.class);
-		assertEquals(Short.MAX_VALUE, rv);
-		assertThrows(SSSQLConversionException.class,
-				() -> convertToType((long)(Short.MAX_VALUE + 1), Short.class));
-
-		rv = convertToType((long)Integer.MAX_VALUE, Integer.class);
-		assertEquals(Integer.MAX_VALUE, rv);
-		assertThrows(SSSQLConversionException.class,
-				() -> convertToType((long)Integer.MAX_VALUE + 1, Integer.class));
-
-		rv = convertToType(Long.MAX_VALUE, Long.class);
-		assertEquals(Long.MAX_VALUE, rv);
-		rv = convertToType(BigDecimal.valueOf(Long.MAX_VALUE), Long.class);
-		assertEquals(Long.MAX_VALUE, rv);
-
-		assertThrows(SSSQLConversionException.class, () -> convertToType(
-				BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.ONE),
-				Long.class));
-	}
-
-	/**
-	 *
-	 * @throws Exception
-	 */
-	@Test
-	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
-	public void testConvertBoolean() throws Exception
-	{
-		System.out.println("convertBoolean");
-		@SuppressWarnings("unused")
-		Object rv;
-
-		assertEquals(true, convertToType(true, JDBCType.BIT));
-		assertEquals(true, convertToType(Byte.MAX_VALUE, JDBCType.BOOLEAN));
-		assertEquals(true, convertToType(Short.MAX_VALUE, JDBCType.BIT));
-		assertEquals(true, convertToType(Integer.MAX_VALUE, JDBCType.BOOLEAN));
-		assertEquals(true, convertToType(Long.MAX_VALUE, JDBCType.BIT));
-		assertEquals(true, convertToType(BigDecimal.valueOf(Long.MAX_VALUE), JDBCType.BIT));
-		assertThrows(SSSQLConversionException.class,
-				() -> convertToType(Double.MAX_VALUE, JDBCType.BIT));
-
-		assertEquals(false, convertToType(false, JDBCType.BIT));
-		assertEquals(false, convertToType((short)0, JDBCType.BIT));
-
-		assertEquals(1, rv = convertToType(true, JDBCType.TINYINT));
-		assertEquals(Integer.class, rv.getClass());
-		assertEquals(1, rv = convertToType(true, JDBCType.SMALLINT));
-		assertEquals(Integer.class, rv.getClass());
-		assertEquals(1, rv = convertToType(true, JDBCType.INTEGER));
-		assertEquals(Integer.class, rv.getClass());
-		assertEquals(BigDecimal.ONE, rv = convertToType(true, JDBCType.NUMERIC));
-		assertEquals(BigDecimal.class, rv.getClass());
-
-		assertEquals(0, convertToType(false, JDBCType.SMALLINT));
-		assertEquals(BigDecimal.ZERO, convertToType(false, JDBCType.NUMERIC));
-
-		// Why is floating point OK? Should this be an excep[tion?
-		assertEquals(1.0F, convertToType(true, JDBCType.REAL));
-	}
-	//EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
-
-	/**
-	 * Test of convertObjectType method, of class ConvertType.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
-	public void testConvertObjectType_Object_JDBCType() throws Exception
-	{
-		System.out.println("convertObjectType_JDBCType");
-		Object rv;
-
-		LocalDateTime ldt = LocalDateTime.of(2111, 11, 11, 11, 11, 11);
-		LocalDate ld = LocalDate.of(2111, 11, 11);
-		LocalTime lt = LocalTime.of(11, 11, 11);
-
-		java.sql.Timestamp ts = Timestamp.valueOf(ldt);
-		java.sql.Date d = java.sql.Date.valueOf(ld);
-		java.sql.Time t = java.sql.Time.valueOf(lt);
-
-		Date ud = new java.util.Date(ts.getTime());
-
-		// to java.sql.TIMESTAMP
-		rv = convertToType(ud, JDBCType.TIMESTAMP);
-		assertEquals(java.sql.Timestamp.class, rv.getClass());
-		assertEquals(ts, rv);
-
-		rv = convertToType(ts, JDBCType.TIMESTAMP);
-		assertEquals(java.sql.Timestamp.class, rv.getClass());
-		assertEquals(ts, rv);
-
-		rv = convertToType(d, JDBCType.TIMESTAMP);
-		assertEquals(java.sql.Timestamp.class, rv.getClass());
-		assertEquals(java.sql.Timestamp.valueOf(ld.atStartOfDay()), rv);
-
-		rv = convertToType(t, JDBCType.TIMESTAMP);
-		assertEquals(java.sql.Timestamp.class, rv.getClass());
-		assertEquals(java.sql.Timestamp.valueOf(lt.atDate(LocalDate.EPOCH)), rv);
-
-		rv = convertToType(ldt, JDBCType.TIMESTAMP);
-		assertEquals(java.sql.Timestamp.class, rv.getClass());
-		assertEquals(ts, rv);
-
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(ld, JDBCType.TIMESTAMP));
-
-		assertThrows(SSSQLConversionException.class,
-					 ()->convertToType(lt, JDBCType.TIMESTAMP));
-
-
-		// to java.sql.DATE
-		rv = convertToType(ud, JDBCType.DATE);
-		assertEquals(java.sql.Date.class, rv.getClass());
-		assertEquals(d, rv);
-
-		rv = convertToType(ts, JDBCType.DATE);
-		assertEquals(java.sql.Date.class, rv.getClass());
-		assertEquals(d, rv);
-
-		rv = convertToType(d, JDBCType.DATE);
-		assertEquals(java.sql.Date.class, rv.getClass());
-		assertEquals(d, rv);
-
-		assertThrows(SSSQLConversionException.class,
-					 ()->convertToType(t, JDBCType.DATE));
-
-		rv = convertToType(ldt, JDBCType.DATE);
-		assertEquals(java.sql.Date.class, rv.getClass());
-		assertEquals(d, rv);
-
-		rv = convertToType(ld, JDBCType.DATE);
-		assertEquals(java.sql.Date.class, rv.getClass());
-		assertEquals(d, rv);
-
-		assertThrows(SSSQLConversionException.class,
-					 ()->convertToType(lt, JDBCType.DATE));
-
-
-		// to java.sql.TIME
-		rv = convertToType(ud, JDBCType.TIME);
-		assertEquals(java.sql.Time.class, rv.getClass());
-		assertEquals(t, rv);
-
-		rv = convertToType(ts, JDBCType.TIME);
-		assertEquals(java.sql.Time.class, rv.getClass());
-		assertEquals(t, rv);
-
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(d, JDBCType.TIME));
-
-		rv = convertToType(t, JDBCType.TIME);
-		assertEquals(java.sql.Time.class, rv.getClass());
-		assertEquals(t, rv);
-
-		rv = convertToType(ldt, JDBCType.TIME);
-		assertEquals(java.sql.Time.class, rv.getClass());
-		assertEquals(t, rv);
-
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(ld, JDBCType.TIME));
-
-		rv = convertToType(lt, JDBCType.TIME);
-		assertEquals(java.sql.Time.class, rv.getClass());
-		assertEquals(t, rv);
-	}
-
-	/**
-	 * Test of convertObjectType method, of class ConvertType.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
-	public void testConvertObjectType_Object_Class() throws Exception
-	{
-		System.out.println("convertObjectType_Class");
-		Object rv;
-
-		LocalDateTime ldt = LocalDateTime.of(2111, 11, 11, 11, 11, 11);
-		LocalDate ld = LocalDate.of(2111, 11, 11);
-		LocalTime lt = LocalTime.of(11, 11, 11);
-
-		java.sql.Timestamp ts = Timestamp.valueOf(ldt);
-		java.sql.Date d = java.sql.Date.valueOf(ld);
-		java.sql.Time t = java.sql.Time.valueOf(lt);
-
-		// Date ud = new java.util.Date(ts.getTime());
-
-		// to LocalDateTime
-		rv = convertToType(ts, LocalDateTime.class);
-		assertEquals(LocalDateTime.class, rv.getClass());
-		assertEquals(ldt, rv);
-
-		rv = convertToType(d, LocalDateTime.class);
-		assertEquals(LocalDateTime.class, rv.getClass());
-		assertEquals(ld.atStartOfDay(), rv);
-
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(t, LocalDateTime.class));
-
-
-		// to LocalDate
-		// TODO???
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(ts, LocalDate.class));
-
-		rv = convertToType(d, LocalDate.class);
-		assertEquals(LocalDate.class, rv.getClass());
-		assertEquals(ld, rv);
-
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(t, LocalDate.class));
-
-
-		// to LocalTime
-		// TODO???
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(ts, LocalTime.class));
-
-		assertThrows(SSSQLConversionException.class,
-				()->convertToType(d, LocalTime.class));
-
-		rv = convertToType(t, LocalTime.class);
-		assertEquals(LocalTime.class, rv.getClass());
-		assertEquals(lt, rv);
-	}
-
-	/**
-	 * Test of findJavaTypeClass method, of class ConvertType.
-	 * @throws java.lang.Exception
-	 */
-	@Test
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testFindJavaTypeClass() throws Exception
-	{
-		System.out.println("findJavaTypeClass");
-
-		Class<?> clazz;
-		
-		clazz = findJavaTypeClass(JDBCType.TIME_WITH_TIMEZONE);
-		assertEquals(OffsetTime.class, clazz);
-		
-		clazz = findJavaTypeClass(JDBCType.TIMESTAMP_WITH_TIMEZONE);
-		assertEquals(OffsetDateTime.class, clazz);
-	}
-
-
-
-
-	// /**
-	//  * Test of getJDBCType method, of class ConvertType.
-	//  */
-	// @Test
-	// public void testGetJDBCType()
-	// {
-	// 	System.out.println("getJDBCType");
-	// 	int sqlType = 0;
-	// 	JDBCType expResult = null;
-	// 	JDBCType result = ConvertType.getJDBCType(sqlType);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of castJDBCToJava method, of class ConvertType.
-	//  */
-	// @Test
-	// public void testCastJDBCToJava_JDBCType_ObjectArr() throws Exception
-	// {
-	// 	System.out.println("castJDBCToJava");
-	// 	JDBCType _jdbcType = null;
-	// 	Object[] _objects = null;
-	// 	Object[] expResult = null;
-	// 	Object[] result = ConvertType.castJDBCToJava(_jdbcType, _objects);
-	// 	assertArrayEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of castJDBCToJava method, of class ConvertType.
-	//  */
-	// @Test
-	// public void testCastJDBCToJava_JDBCType_Object() throws Exception
-	// {
-	// 	System.out.println("castJDBCToJava");
-	// 	JDBCType _jdbcType = null;
-	// 	Object _object = null;
-	// 	Object expResult = null;
-	// 	Object result = ConvertType.castJDBCToJava(_jdbcType, _object);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of findJavaTypeClass method, of class ConvertType.
-	//  */
-	// @Test
-	// public void testFindJavaTypeClass() throws Exception
-	// {
-	// 	System.out.println("findJavaTypeClass");
-	// 	JDBCType _jdbcType = null;
-	// 	Class expResult = null;
-	// 	Class result = ConvertType.findJavaTypeClass(_jdbcType);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-	
+public class ConvertTypeTest {
+  /** x */
+  public ConvertTypeTest() {}
+
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {}
+
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
+
+  /** x */
+  @BeforeEach
+  public void setUp() {}
+
+  /** x */
+  @AfterEach
+  public void tearDown() {}
+
+  // TODO: more tests
+
+  /**
+   * Test of verifyConvertToType method, of class ConvertType.
+   */
+  @Test
+  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
+  public void testVerifyConvertToType() {
+    System.out.println("verifyConvertToType");
+
+    EnumSet<JDBCType> allow = null;
+
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.DATE, Date.class, allow));
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.DATE, java.sql.Date.class, allow));
+    assertThrows(
+        AssertionError.class,
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.DATE, java.sql.Time.class, allow));
+    assertDoesNotThrow(()
+                           -> ConvertType.assertConvertFromJdbcType(
+                               JDBCType.DATE, java.sql.Timestamp.class, allow));
+
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.TIME, Date.class, allow));
+    assertThrows(
+        AssertionError.class,
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.TIME, java.sql.Date.class, allow));
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.TIME, java.sql.Time.class, allow));
+    assertDoesNotThrow(()
+                           -> ConvertType.assertConvertFromJdbcType(
+                               JDBCType.TIME, java.sql.Timestamp.class, allow));
+
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.TIMESTAMP, Date.class, allow));
+    assertDoesNotThrow(()
+                           -> ConvertType.assertConvertFromJdbcType(JDBCType.TIMESTAMP,
+                                                                    java.sql.Date.class, allow));
+    assertDoesNotThrow(()
+                           -> ConvertType.assertConvertFromJdbcType(JDBCType.TIMESTAMP,
+                                                                    java.sql.Time.class, allow));
+    assertDoesNotThrow(()
+                           -> ConvertType.assertConvertFromJdbcType(
+                               JDBCType.TIMESTAMP, java.sql.Timestamp.class, allow));
+
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.DATE, LocalDate.class, allow));
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.TIME, LocalTime.class, allow));
+    assertDoesNotThrow(()
+                           -> ConvertType.assertConvertFromJdbcType(JDBCType.TIMESTAMP,
+                                                                    LocalDateTime.class, allow));
+    assertDoesNotThrow(
+        () -> ConvertType.assertConvertFromJdbcType(JDBCType.DATE, LocalDateTime.class, allow));
+  }
+
+  /**
+   * x
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testConvertStringToNumber() throws Exception {
+    System.out.println("convertStringToNumber");
+    Object rv;
+
+    rv = convertToType("123", JDBCType.TINYINT);
+    assertEquals(Integer.class, rv.getClass());
+    assertEquals(123, rv);
+    rv = convertToType("123", JDBCType.SMALLINT);
+    assertEquals(Integer.class, rv.getClass());
+    assertEquals((Integer) 123, rv);
+    rv = convertToType("123", JDBCType.INTEGER);
+    assertEquals(Integer.class, rv.getClass());
+    assertEquals((Integer) 123, rv);
+    rv = convertToType("123", JDBCType.BIGINT);
+    assertEquals(Long.class, rv.getClass());
+    assertEquals(123L, rv);
+    rv = convertToType("123", JDBCType.REAL);
+    assertEquals(Float.class, rv.getClass());
+    assertEquals(123F, rv);
+    rv = convertToType("123", JDBCType.FLOAT);
+    assertEquals(Double.class, rv.getClass());
+    assertEquals(123D, rv);
+    rv = convertToType("123", JDBCType.DOUBLE);
+    assertEquals(Double.class, rv.getClass());
+    assertEquals(123D, rv);
+    rv = convertToType("123", JDBCType.NUMERIC);
+    assertEquals(BigDecimal.class, rv.getClass());
+    assertEquals(BigDecimal.valueOf(123), rv);
+    rv = convertToType("123", JDBCType.DECIMAL);
+    assertEquals(BigDecimal.class, rv.getClass());
+    assertEquals(BigDecimal.valueOf(123), rv);
+
+    // Java types
+    rv = convertToType("123", Byte.class);
+    assertEquals(Byte.class, rv.getClass());
+    assertEquals((byte) 123, rv);
+    rv = convertToType("123", Short.class);
+    assertEquals(Short.class, rv.getClass());
+    assertEquals((short) 123, rv);
+    rv = convertToType("123", Integer.class);
+    assertEquals(Integer.class, rv.getClass());
+    assertEquals(123, rv);
+    rv = convertToType("123", Long.class);
+    assertEquals(Long.class, rv.getClass());
+    assertEquals(123L, rv);
+    rv = convertToType("123", Float.class);
+    assertEquals(Float.class, rv.getClass());
+    assertEquals(123F, rv);
+    rv = convertToType("123", Double.class);
+    assertEquals(Double.class, rv.getClass());
+    assertEquals(123D, rv);
+    rv = convertToType("123", BigDecimal.class);
+    assertEquals(BigDecimal.class, rv.getClass());
+    assertEquals(BigDecimal.valueOf(123), rv);
+
+    assertThrows(SSSQLConversionException.class,
+                 () -> convertToType(String.valueOf(Byte.MAX_VALUE + 1), Byte.class));
+    assertThrows(SSSQLConversionException.class,
+                 () -> convertToType(String.valueOf(Short.MAX_VALUE + 1), Short.class));
+    assertThrows(SSSQLConversionException.class,
+                 () -> convertToType(String.valueOf((long) Integer.MAX_VALUE + 1), Integer.class));
+    assertThrows(
+        SSSQLConversionException.class,
+        ()
+            -> convertToType(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE).toString(),
+                             Long.class));
+
+    // Primitive types ???
+    // rv = convertObjectType("123", long.class);
+    // assertEquals(Long.class, rv.getClass());
+    // assertEquals(123L, rv);
+  }
+
+  /**
+   * x
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testConvertNumberToNumber() throws Exception {
+    System.out.println("convertNumberToNumber");
+    @SuppressWarnings("unused")
+    Object rv;
+
+    rv = convertToType((long) Byte.MAX_VALUE, Byte.class);
+    assertEquals(Byte.MAX_VALUE, rv);
+    assertThrows(SSSQLConversionException.class,
+                 () -> convertToType((long) (Byte.MAX_VALUE + 1), Byte.class));
+
+    rv = convertToType((long) Short.MAX_VALUE, Short.class);
+    assertEquals(Short.MAX_VALUE, rv);
+    assertThrows(SSSQLConversionException.class,
+                 () -> convertToType((long) (Short.MAX_VALUE + 1), Short.class));
+
+    rv = convertToType((long) Integer.MAX_VALUE, Integer.class);
+    assertEquals(Integer.MAX_VALUE, rv);
+    assertThrows(SSSQLConversionException.class,
+                 () -> convertToType((long) Integer.MAX_VALUE + 1, Integer.class));
+
+    rv = convertToType(Long.MAX_VALUE, Long.class);
+    assertEquals(Long.MAX_VALUE, rv);
+    rv = convertToType(BigDecimal.valueOf(Long.MAX_VALUE), Long.class);
+    assertEquals(Long.MAX_VALUE, rv);
+
+    assertThrows(
+        SSSQLConversionException.class,
+        () -> convertToType(BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.ONE), Long.class));
+  }
+
+  /**
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testConvertBoolean() throws Exception {
+    System.out.println("convertBoolean");
+    @SuppressWarnings("unused")
+    Object rv;
+
+    assertEquals(true, convertToType(true, JDBCType.BIT));
+    assertEquals(true, convertToType(Byte.MAX_VALUE, JDBCType.BOOLEAN));
+    assertEquals(true, convertToType(Short.MAX_VALUE, JDBCType.BIT));
+    assertEquals(true, convertToType(Integer.MAX_VALUE, JDBCType.BOOLEAN));
+    assertEquals(true, convertToType(Long.MAX_VALUE, JDBCType.BIT));
+    assertEquals(true, convertToType(BigDecimal.valueOf(Long.MAX_VALUE), JDBCType.BIT));
+    assertThrows(SSSQLConversionException.class,
+                 () -> convertToType(Double.MAX_VALUE, JDBCType.BIT));
+
+    assertEquals(false, convertToType(false, JDBCType.BIT));
+    assertEquals(false, convertToType((short) 0, JDBCType.BIT));
+
+    assertEquals(1, rv = convertToType(true, JDBCType.TINYINT));
+    assertEquals(Integer.class, rv.getClass());
+    assertEquals(1, rv = convertToType(true, JDBCType.SMALLINT));
+    assertEquals(Integer.class, rv.getClass());
+    assertEquals(1, rv = convertToType(true, JDBCType.INTEGER));
+    assertEquals(Integer.class, rv.getClass());
+    assertEquals(BigDecimal.ONE, rv = convertToType(true, JDBCType.NUMERIC));
+    assertEquals(BigDecimal.class, rv.getClass());
+
+    assertEquals(0, convertToType(false, JDBCType.SMALLINT));
+    assertEquals(BigDecimal.ZERO, convertToType(false, JDBCType.NUMERIC));
+
+    // Why is floating point OK? Should this be an excep[tion?
+    assertEquals(1.0F, convertToType(true, JDBCType.REAL));
+  }
+  //EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
+
+  /**
+   * Test of convertObjectType method, of class ConvertType.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testConvertObjectType_Object_JDBCType() throws Exception {
+    System.out.println("convertObjectType_JDBCType");
+    Object rv;
+
+    LocalDateTime ldt = LocalDateTime.of(2111, 11, 11, 11, 11, 11);
+    LocalDate ld = LocalDate.of(2111, 11, 11);
+    LocalTime lt = LocalTime.of(11, 11, 11);
+
+    java.sql.Timestamp ts = Timestamp.valueOf(ldt);
+    java.sql.Date d = java.sql.Date.valueOf(ld);
+    java.sql.Time t = java.sql.Time.valueOf(lt);
+
+    Date ud = new java.util.Date(ts.getTime());
+
+    // to java.sql.TIMESTAMP
+    rv = convertToType(ud, JDBCType.TIMESTAMP);
+    assertEquals(java.sql.Timestamp.class, rv.getClass());
+    assertEquals(ts, rv);
+
+    rv = convertToType(ts, JDBCType.TIMESTAMP);
+    assertEquals(java.sql.Timestamp.class, rv.getClass());
+    assertEquals(ts, rv);
+
+    rv = convertToType(d, JDBCType.TIMESTAMP);
+    assertEquals(java.sql.Timestamp.class, rv.getClass());
+    assertEquals(java.sql.Timestamp.valueOf(ld.atStartOfDay()), rv);
+
+    rv = convertToType(t, JDBCType.TIMESTAMP);
+    assertEquals(java.sql.Timestamp.class, rv.getClass());
+    assertEquals(java.sql.Timestamp.valueOf(lt.atDate(LocalDate.EPOCH)), rv);
+
+    rv = convertToType(ldt, JDBCType.TIMESTAMP);
+    assertEquals(java.sql.Timestamp.class, rv.getClass());
+    assertEquals(ts, rv);
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(ld, JDBCType.TIMESTAMP));
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(lt, JDBCType.TIMESTAMP));
+
+    // to java.sql.DATE
+    rv = convertToType(ud, JDBCType.DATE);
+    assertEquals(java.sql.Date.class, rv.getClass());
+    assertEquals(d, rv);
+
+    rv = convertToType(ts, JDBCType.DATE);
+    assertEquals(java.sql.Date.class, rv.getClass());
+    assertEquals(d, rv);
+
+    rv = convertToType(d, JDBCType.DATE);
+    assertEquals(java.sql.Date.class, rv.getClass());
+    assertEquals(d, rv);
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(t, JDBCType.DATE));
+
+    rv = convertToType(ldt, JDBCType.DATE);
+    assertEquals(java.sql.Date.class, rv.getClass());
+    assertEquals(d, rv);
+
+    rv = convertToType(ld, JDBCType.DATE);
+    assertEquals(java.sql.Date.class, rv.getClass());
+    assertEquals(d, rv);
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(lt, JDBCType.DATE));
+
+    // to java.sql.TIME
+    rv = convertToType(ud, JDBCType.TIME);
+    assertEquals(java.sql.Time.class, rv.getClass());
+    assertEquals(t, rv);
+
+    rv = convertToType(ts, JDBCType.TIME);
+    assertEquals(java.sql.Time.class, rv.getClass());
+    assertEquals(t, rv);
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(d, JDBCType.TIME));
+
+    rv = convertToType(t, JDBCType.TIME);
+    assertEquals(java.sql.Time.class, rv.getClass());
+    assertEquals(t, rv);
+
+    rv = convertToType(ldt, JDBCType.TIME);
+    assertEquals(java.sql.Time.class, rv.getClass());
+    assertEquals(t, rv);
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(ld, JDBCType.TIME));
+
+    rv = convertToType(lt, JDBCType.TIME);
+    assertEquals(java.sql.Time.class, rv.getClass());
+    assertEquals(t, rv);
+  }
+
+  /**
+   * Test of convertObjectType method, of class ConvertType.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testConvertObjectType_Object_Class() throws Exception {
+    System.out.println("convertObjectType_Class");
+    Object rv;
+
+    LocalDateTime ldt = LocalDateTime.of(2111, 11, 11, 11, 11, 11);
+    LocalDate ld = LocalDate.of(2111, 11, 11);
+    LocalTime lt = LocalTime.of(11, 11, 11);
+
+    java.sql.Timestamp ts = Timestamp.valueOf(ldt);
+    java.sql.Date d = java.sql.Date.valueOf(ld);
+    java.sql.Time t = java.sql.Time.valueOf(lt);
+
+    // Date ud = new java.util.Date(ts.getTime());
+
+    // to LocalDateTime
+    rv = convertToType(ts, LocalDateTime.class);
+    assertEquals(LocalDateTime.class, rv.getClass());
+    assertEquals(ldt, rv);
+
+    rv = convertToType(d, LocalDateTime.class);
+    assertEquals(LocalDateTime.class, rv.getClass());
+    assertEquals(ld.atStartOfDay(), rv);
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(t, LocalDateTime.class));
+
+    // to LocalDate
+    // TODO???
+    assertThrows(SSSQLConversionException.class, () -> convertToType(ts, LocalDate.class));
+
+    rv = convertToType(d, LocalDate.class);
+    assertEquals(LocalDate.class, rv.getClass());
+    assertEquals(ld, rv);
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(t, LocalDate.class));
+
+    // to LocalTime
+    // TODO???
+    assertThrows(SSSQLConversionException.class, () -> convertToType(ts, LocalTime.class));
+
+    assertThrows(SSSQLConversionException.class, () -> convertToType(d, LocalTime.class));
+
+    rv = convertToType(t, LocalTime.class);
+    assertEquals(LocalTime.class, rv.getClass());
+    assertEquals(lt, rv);
+  }
+
+  /**
+   * Test of findJavaTypeClass method, of class ConvertType.
+   * @throws java.lang.Exception
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testFindJavaTypeClass() throws Exception {
+    System.out.println("findJavaTypeClass");
+
+    Class<?> clazz;
+
+    clazz = findJavaTypeClass(JDBCType.TIME_WITH_TIMEZONE);
+    assertEquals(OffsetTime.class, clazz);
+
+    clazz = findJavaTypeClass(JDBCType.TIMESTAMP_WITH_TIMEZONE);
+    assertEquals(OffsetDateTime.class, clazz);
+  }
+
+  // /**
+  //  * Test of getJDBCType method, of class ConvertType.
+  //  */
+  // @Test
+  // public void testGetJDBCType()
+  // {
+  // 	System.out.println("getJDBCType");
+  // 	int sqlType = 0;
+  // 	JDBCType expResult = null;
+  // 	JDBCType result = ConvertType.getJDBCType(sqlType);
+  // 	assertEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of castJDBCToJava method, of class ConvertType.
+  //  */
+  // @Test
+  // public void testCastJDBCToJava_JDBCType_ObjectArr() throws Exception
+  // {
+  // 	System.out.println("castJDBCToJava");
+  // 	JDBCType _jdbcType = null;
+  // 	Object[] _objects = null;
+  // 	Object[] expResult = null;
+  // 	Object[] result = ConvertType.castJDBCToJava(_jdbcType, _objects);
+  // 	assertArrayEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of castJDBCToJava method, of class ConvertType.
+  //  */
+  // @Test
+  // public void testCastJDBCToJava_JDBCType_Object() throws Exception
+  // {
+  // 	System.out.println("castJDBCToJava");
+  // 	JDBCType _jdbcType = null;
+  // 	Object _object = null;
+  // 	Object expResult = null;
+  // 	Object result = ConvertType.castJDBCToJava(_jdbcType, _object);
+  // 	assertEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
+
+  // /**
+  //  * Test of findJavaTypeClass method, of class ConvertType.
+  //  */
+  // @Test
+  // public void testFindJavaTypeClass() throws Exception
+  // {
+  // 	System.out.println("findJavaTypeClass");
+  // 	JDBCType _jdbcType = null;
+  // 	Class expResult = null;
+  // 	Class result = ConvertType.findJavaTypeClass(_jdbcType);
+  // 	assertEquals(expResult, result);
+  // 	// TODO review the generated test code and remove the default call to fail.
+  // 	fail("The test case is a prototype.");
+  // }
 }

@@ -47,25 +47,18 @@ import java.beans.PropertyChangeEvent;
 /**
  * Broadcast focus has changed
  */
-public class FocusChangeEvent
-{
-	private final PropertyChangeEvent pce;
+public class FocusChangeEvent {
+  private final PropertyChangeEvent pce;
 
-	/**
-	 * Broadcast event for focus change.
-	 * @param pce pce
-	 */
-	public FocusChangeEvent(PropertyChangeEvent pce)
-	{
-		this.pce = pce;
-	}
+  /**
+   * Broadcast event for focus change.
+   * @param pce pce
+   */
+  public FocusChangeEvent(PropertyChangeEvent pce) { this.pce = pce; }
 
-	/** 
-	 * The change event.
-	 * @return event
-	 */
-	public PropertyChangeEvent getPce()
-	{
-		return pce;
-	}
+  /**
+   * The change event.
+   * @return event
+   */
+  public PropertyChangeEvent getPce() { return pce; }
 }

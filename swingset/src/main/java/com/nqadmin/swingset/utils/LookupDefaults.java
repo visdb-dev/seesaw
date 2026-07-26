@@ -65,108 +65,98 @@ import com.nqadmin.swingset.navigate.Utils;
  *     }
  * }
  */
-public class LookupDefaults
-{
-	private LookupDefaults() { }
-	private static final System.Logger logger = System.getLogger(LookupDefaults.class.getName());
-	static { Utils.getGlobalEventBus(); }
+public class LookupDefaults {
+  private LookupDefaults() {}
+  private static final System.Logger logger = System.getLogger(LookupDefaults.class.getName());
+  static { Utils.getGlobalEventBus(); }
 
-	private static boolean initialized;
-	/**
-	 * This is automatically called around first library use,
-	 * not including CentralLookup, to initialize
-	 * default CentralLookup elements that are required by the library
-	 * and are not already present or setup by the application.
-	 * <p>
-	 * Might be better to initialize where needed if no value.
-	 * But this does serve to document some of the things that can be put in lookup.
-	 */
-	public static void init() {
-		if (initialized)
-			return;
+  private static boolean initialized;
+  /**
+   * This is automatically called around first library use,
+   * not including CentralLookup, to initialize
+   * default CentralLookup elements that are required by the library
+   * and are not already present or setup by the application.
+   * <p>
+   * Might be better to initialize where needed if no value.
+   * But this does serve to document some of the things that can be put in lookup.
+   */
+  public static void init() {
+    if (initialized) return;
 
-		initStyles();
+    initStyles();
 
-		CentralLookup lkup = CentralLookup.getDefault();
+    CentralLookup lkup = CentralLookup.getDefault();
 
-		//
-		// There should be a DecoratorStyle.
-		//
-		Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
-		if (style == null)
-			lkup.add(Decorator.DecoratorStyle.BORDER);
+    //
+    // There should be a DecoratorStyle.
+    //
+    Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
+    if (style == null) lkup.add(Decorator.DecoratorStyle.BORDER);
 
-		//
-		// There should be BORDER and BACKGROUND decorators.
-		//
-		var decos = lkup.lookupAll(DecoratorSupplier.class);
+    //
+    // There should be BORDER and BACKGROUND decorators.
+    //
+    var decos = lkup.lookupAll(DecoratorSupplier.class);
 
-		boolean hasBorder = false;
-		boolean hasBackground = false;
-		for (var deco : decos) {
-			if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BORDER))
-				hasBorder = true;
-			if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BACKGROUND))
-				hasBackground = true;
-		}
-		if (!hasBorder)
-			lkup.add(new DecoratorSupplier(() -> {return new BorderDecorator();}));
-		if (!hasBackground)
-			lkup.add(new DecoratorSupplier(() -> {return new BackgroundDecorator();}));
+    boolean hasBorder = false;
+    boolean hasBackground = false;
+    for (var deco : decos) {
+      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BORDER)) hasBorder = true;
+      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BACKGROUND))
+        hasBackground = true;
+    }
+    if (!hasBorder) lkup.add(new DecoratorSupplier(() -> { return new BorderDecorator(); }));
+    if (!hasBackground)
+      lkup.add(new DecoratorSupplier(() -> { return new BackgroundDecorator(); }));
 
-		//
-		// There should be a BorderDecoratorPaint.
-		//
-		if (lkup.lookup(BorderDecorator.BorderDecoratorPaint.class) == null)
-			lkup.add(new BorderDecorator.BorderDecoratorPaint());
+    //
+    // There should be a BorderDecoratorPaint.
+    //
+    if (lkup.lookup(BorderDecorator.BorderDecoratorPaint.class) == null)
+      lkup.add(new BorderDecorator.BorderDecoratorPaint());
 
-		initialized = true;
-	}
+    initialized = true;
+  }
 
-	private static boolean initializedStyles;
+  private static boolean initializedStyles;
 
-	/**
-	 * Set up the default styles; does nothing if any styles are already set.
-	 * If an app wants to add some of it own styles, with names that do not
-	 * conflict, this should be called first rather than waiting for the
-	 * default initialization.
-	 * If an app want to replace the default styles then add them before
-	 * this is called.
-	 */
-	public static void initStyles() {
-		if (initializedStyles)
-			return;
-		
-		if (!TextStyles.getStyleNames().isEmpty())
-			return;
+  /**
+   * Set up the default styles; does nothing if any styles are already set.
+   * If an app wants to add some of it own styles, with names that do not
+   * conflict, this should be called first rather than waiting for the
+   * default initialization.
+   * If an app want to replace the default styles then add them before
+   * this is called.
+   */
+  public static void initStyles() {
+    if (initializedStyles) return;
 
-		if (EventQueue.isDispatchThread()) {
-			String msg = "LookupDefaults.initStyles() invoked from EDT.";
-			Exception ex = new Exception(msg);
-			logger.log(Level.ERROR, msg, ex);
+    if (!TextStyles.getStyleNames().isEmpty()) return;
 
-			// Problem if EDT tries to access TextStyles before loading complete.
-			new SwingWorker<Object, Object>() {
-				@Override
-				protected Object doInBackground() throws Exception
-				{
-					initStyles();
-					return null;
-				}
-			}.execute();
-			return;
-		}
+    if (EventQueue.isDispatchThread()) {
+      String msg = "LookupDefaults.initStyles() invoked from EDT.";
+      Exception ex = new Exception(msg);
+      logger.log(Level.ERROR, msg, ex);
 
-		Reader reader = new StringReader(DEFAULT_STYLES_JSON);
-		try {
-			TextStyles.loadStylesFromJson(reader);
-		} catch (IOException ex) {
-			logger.log(Level.ERROR, (String) null, ex);
-		}
-		initializedStyles = true;
-	}
-	/** This can be manually loaded if the Styles get cleared. */
-	public static final String DEFAULT_STYLES_JSON = """
+      // Problem if EDT tries to access TextStyles before loading complete.
+      new SwingWorker<Object, Object>() {
+        @Override
+        protected Object doInBackground() throws Exception {
+          initStyles();
+          return null;
+        }
+      }.execute();
+      return;
+    }
+
+    Reader reader = new StringReader(DEFAULT_STYLES_JSON);
+    try {
+      TextStyles.loadStylesFromJson(reader);
+    } catch (IOException ex) { logger.log(Level.ERROR, (String) null, ex); }
+    initializedStyles = true;
+  }
+  /** This can be manually loaded if the Styles get cleared. */
+  public static final String DEFAULT_STYLES_JSON = """
         {
           "negative_number": {
             "foreground": "red"

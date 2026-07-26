@@ -35,18 +35,19 @@ import com.nqadmin.swingset.utils.SSComponent;
  * Any kind of decorator.
  */
 public interface AnyDecorator {
-	/** Install this decorator into the component. Installs listeners
-	 * @param component the componenet
-	 */
-	void install(SSComponent component);
+  /**
+   * Install this decorator into the component. Installs listeners
+   * @param component the componenet
+   */
+  void install(SSComponent component);
 
-	/** Remove decorator/listeners from component. */
-	void uninstall();
-	
-	/**
-	 * Return the SSComponent associated with this decorator.
-	 * 
-	 * @return the component
-	 */
-	SSComponent getSSComponent();
+  /** Remove decorator/listeners from component. */
+  void uninstall();
+
+  /**
+   * Return the SSComponent associated with this decorator.
+   *
+   * @return the component
+   */
+  SSComponent getSSComponent();
 }

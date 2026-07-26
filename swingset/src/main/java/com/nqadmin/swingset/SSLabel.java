@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -56,58 +56,51 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  * except of course to set a label's value from a RowSet.
  */
 @SuppressWarnings("serial")
-public class SSLabel extends Label
-{
+public class SSLabel extends Label {
+  /**
+   * Empty constructor needed for deserialization. Creates a SSLabel instance with
+   * no image and no text.
+   */
+  public SSLabel() {}
 
-	/**
-	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
-	 * no image and no text.
-	 */
-	public SSLabel() {
-	}
+  /**
+   * Creates a SSLabel instance with the specified image.
+   *
+   * @param _image specified image for label
+   */
+  public SSLabel(final Icon _image) { super(_image); }
 
-	/**
-	 * Creates a SSLabel instance with the specified image.
-	 *
-	 * @param _image specified image for label
-	 */
-	public SSLabel(final Icon _image) {
-		super(_image);
-	}
+  /**
+   * Creates a SSLabel instance with the specified image and horizontal alignment.
+   *
+   * @param _image               specified image for label
+   * @param _horizontalAlignment horizontal alignment
+   */
+  public SSLabel(final Icon _image, final int _horizontalAlignment) {
+    super(_image, _horizontalAlignment);
+  }
 
-	/**
-	 * Creates a SSLabel instance with the specified image and horizontal alignment.
-	 *
-	 * @param _image               specified image for label
-	 * @param _horizontalAlignment horizontal alignment
-	 */
-	public SSLabel(final Icon _image, final int _horizontalAlignment) {
-		super(_image, _horizontalAlignment);
-	}
+  /**
+   * Creates a SSLabel instance with no image and binds it to the specified RowSet
+   * column.
+   *
+   * @param rowsModel          datasource to be used.
+   * @param columnName name of the column to which this label should be
+   *                         bound
+   */
+  public SSLabel(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
 
-	/**
-	 * Creates a SSLabel instance with no image and binds it to the specified RowSet
-	 * column.
-	 *
-	 * @param rowsModel          datasource to be used.
-	 * @param columnName name of the column to which this label should be
-	 *                         bound
-	 */
-	public SSLabel(RowsModel rowsModel, String columnName) {
-		super(rowsModel, columnName);
-	}
-
-	/**
-	 * Creates a SSLabel instance with no image and binds it to the specified RowSet
-	 * column.
-	 *
-	 * @param _rowSet          datasource to be used.
-	 * @param columnName name of the column to which this label should be
-	 *                         bound
-	 * @deprecated use RowsModel insted of RowSet
-	 */
-	@Deprecated
-	public SSLabel(final RowSet _rowSet, final String columnName) {
-		super(findRowsModel(_rowSet), columnName);
-	}
+  /**
+   * Creates a SSLabel instance with no image and binds it to the specified RowSet
+   * column.
+   *
+   * @param _rowSet          datasource to be used.
+   * @param columnName name of the column to which this label should be
+   *                         bound
+   * @deprecated use RowsModel insted of RowSet
+   */
+  @Deprecated
+  public SSLabel(final RowSet _rowSet, final String columnName) {
+    super(findRowsModel(_rowSet), columnName);
+  }
 } // end public class SSLabel extends JLabel {

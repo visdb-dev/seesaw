@@ -25,43 +25,37 @@ import com.nqadmin.swingset.utils.SSComponent;
  * x
  */
 @SuppressWarnings("serial")
-public class DbReaderDbUpdater extends JCheckBox implements SSComponent
-{
-	@SuppressWarnings("unused")
-    void F() {
-        // @start region=setColumnReader
-        setColumnReader((rs, cidx, _) -> {
-            return rs.getBytes(cidx);
-        });
-        // @end region=setColumnReader
-        // @start region=setColumnUpdater
-        setColumnUpdater((rs, cidx, _, value) -> {
-            if (value == null) {
-                rs.updateNull(cidx);
-                return RowSetOps.UPDATE_NULL;
-            } else {
-                rs.updateBytes(cidx, (byte[]) value);
-                return new RowSetOps.DbUpdate(value);
-            }
-        });
-        // @end region=setColumnUpdater
-    }
+public class DbReaderDbUpdater extends JCheckBox implements SSComponent {
+  @SuppressWarnings("unused")
+  void F() {
+    // @start region=setColumnReader
+    setColumnReader((rs, cidx, _) -> { return rs.getBytes(cidx); });
+    // @end region=setColumnReader
+    // @start region=setColumnUpdater
+    setColumnUpdater((rs, cidx, _, value) -> {
+      if (value == null) {
+        rs.updateNull(cidx);
+        return RowSetOps.UPDATE_NULL;
+      } else {
+        rs.updateBytes(cidx, (byte[]) value);
+        return new RowSetOps.DbUpdate(value);
+      }
+    });
+    // @end region=setColumnUpdater
+  }
 
-	/**
-	 *x
-	 */
-	@Override
-	public void cleanField()
-	{
-	}
+  /**
+   *x
+   */
+  @Override
+  public void cleanField() {}
 
-	/**
-	 *x
-	 * @return
-	 */
-	@Override
-	public Hook getSSComponentHook()
-	{
-		return null;
-	}
+  /**
+   *x
+   * @return
+   */
+  @Override
+  public Hook getSSComponentHook() {
+    return null;
+  }
 }
