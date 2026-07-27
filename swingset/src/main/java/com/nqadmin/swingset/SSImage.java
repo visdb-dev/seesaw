@@ -48,6 +48,7 @@ import javax.swing.JPopupMenu;
 
 import com.nqadmin.swingset.core.Image;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.ZoomCanvas;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
@@ -57,10 +58,16 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 // TODO: SSImage make all the load/store buttons/capabilities optional.
 @SuppressWarnings("serial")
 public class SSImage extends Image {
+  // Doesn't matter what this is, since there are no zoom controls. Always bestFit.
+  private final ZoomCanvas.ResizeMode resizeMode = ZoomCanvas.ResizeMode.CENTER_PANNING;
+
   /**
    * Construct a default SSImage Object.
    */
-  public SSImage() { super(); }
+  public SSImage() {
+    super();
+    setResizeMode(resizeMode);
+  }
 
   /**
    * Constructs a SSImage Object bound to the specified column in the specified
@@ -70,7 +77,10 @@ public class SSImage extends Image {
    * @param columnName - column in the rowSet to which the component should
    *                         be bound.
    */
-  public SSImage(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
+  public SSImage(RowsModel rowsModel, String columnName) {
+    super(rowsModel, columnName);
+    setResizeMode(resizeMode);
+  }
 
   /**
    * Don't show the zoom controls.
@@ -101,5 +111,6 @@ public class SSImage extends Image {
   @Deprecated
   public SSImage(RowSet rowSet, String columnName) {
     super(findRowsModel(rowSet), columnName);
+    setResizeMode(resizeMode);
   }
 }

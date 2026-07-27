@@ -47,8 +47,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -58,9 +56,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
@@ -73,6 +69,8 @@ import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -101,6 +99,7 @@ import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.nqadmin.swingset.utils.ZoomCanvas;
+import com.nqadmin.swingset.utils.ZoomCanvas.ResizeMode;
 
 import static com.nqadmin.swingset.core.Image.ScrollBarPolicy.*;
 import static com.nqadmin.swingset.utils.JStuff.sf;
@@ -163,7 +162,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
       byte[] bytes = bb.array();
 
       // Verify the bytes are a recognized image
-      BufferedImage bimg = bytes2image(bytes);
+      BufferedImage bimg = ZoomCanvas.bytes2image(bytes);
       if (bimg == null) throw new IOException("Unknown image format");
 
       // Stage the image to the database
@@ -207,7 +206,6 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     //Toolkit.getDefaultToolkit().setDynamicLayout(false);
     addComponents();
     setupImageCanvasInScrollPane();
-    setupScrollPaneCropPadCenterPanListener();
     finishSSCommon();
 
     setColumnReader((rs, cidx, _) -> { return rs.getBytes(cidx); });
@@ -221,6 +219,23 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
       }
     });
   }
+
+  /**
+   * How is resize handled.
+   * @return 
+   */
+  public ResizeMode getResizeMode() {
+    return canvas.getResizeMode();
+  }
+
+  /**
+   * How to handle resize.
+   * @param resizeMode 
+   */
+  public void setResizeMode(ResizeMode resizeMode) {
+    canvas.setResizeMode(resizeMode);
+  }
+
 
   /** @return the scroll pane */
   protected JScrollPane getScrollPane() { return scrollPane; }
@@ -259,12 +274,25 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   private Color nullBackground;
   private Color imageBackground = new Color(35, 35, 40);
+  private class MyZoomCanvas extends ZoomCanvas {
+    private MyZoomCanvas(JScrollPane scrollPane, DoubleSupplier zoomFactor,
+                         Supplier<RenderingQuality> quality) {
+      super(scrollPane, zoomFactor, quality);
+    }
+
+    @Override
+    protected boolean handleResize(ComponentEvent e) {
+      if (keepFit) {
+        bestFit();
+      }
+      return keepFit;
+    }
+  }
+
   private void setupImageCanvasInScrollPane() {
-    canvas = new ZoomCanvas(scrollPane,
-                            ()
-                                -> zoomFactor,
-                            ()
-                                -> zoomSlider.getValueIsAdjusting()
+    canvas = new MyZoomCanvas(scrollPane,
+                              () -> zoomFactor,
+                              () -> zoomSlider.getValueIsAdjusting()
                                        ? ZoomCanvas.RenderingQuality.MEDIUM
                                        : ZoomCanvas.RenderingQuality.HIGH);
     nullBackground = canvas.getBackground();
@@ -273,9 +301,9 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     imagePopup = createImagePopup();
 
     if (imagePopup != null) canvas.setToolTipText("""
-								  <html> Drag to pan image.
-								  <br>Try the context menu.
-								  </html>""");
+        <html> Drag to pan image.
+        <br>Try the context menu.
+        </html>""");
 
     // Panning - click and drag image around.
     // Also used for popup.
@@ -357,7 +385,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   protected JPopupMenu createImagePopup() {
     imagePopup = new JPopupMenu();
     imagePopup.add(menuAction("Center mouse point",
-                              () -> { centerOnCanvasPoint(canvasMouseListener.origin); }));
+                              () -> { canvas.centerViewportOnCanvasPoint(canvasMouseListener.origin); }));
     imagePopup.add(menuAction("Fit image", () -> { bestFit(); }));
     imagePopup.add(menuAction("Zoom factor 1.0", () -> { resetZoom(); }));
     return imagePopup;
@@ -369,41 +397,6 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
         l.run();
       }
     };
-  }
-
-  private Boolean doCenterPanning = Boolean.FALSE; // true for "Other" style.
-  private void setupScrollPaneCropPadCenterPanListener() {
-    scrollPane.addComponentListener(new ComponentAdapter() {
-      private Dimension oldViewportSize = null;
-
-      @Override
-      public void componentResized(ComponentEvent e) {
-        if (keepFit) {
-          bestFit();
-          return;
-        }
-        Dimension newViewportSize = scrollPane.getViewport().getSize();
-
-        // 1. Skip if it's the very first initial layout pass
-        if (oldViewportSize == null) {
-          oldViewportSize = new Dimension(newViewportSize);
-          return;
-        }
-
-        // 2. Only calculate if the window size actually changed
-        if (newViewportSize.width != oldViewportSize.width
-            || newViewportSize.height != oldViewportSize.height) {
-          if (!doCenterPanning) {
-            // top-left pinning, bottom-right crop/pad stability calculation
-            stabilizeImageOnResize(oldViewportSize, newViewportSize);
-          } else {
-            // center-panning calculation
-            recenterViewOnResize(oldViewportSize, newViewportSize);
-          }
-          oldViewportSize = new Dimension(newViewportSize);
-        }
-      }
-    });
   }
 
   /**
@@ -509,18 +502,6 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   /**
-   * @param bytes
-   * @return image for the bytes
-   * @throws IOException
-   */
-  protected BufferedImage bytes2image(byte[] bytes) throws IOException {
-    try (InputStream is = new ByteArrayInputStream(bytes);) {
-      BufferedImage bimg = toCompatibleImage(ImageIO.read(is));
-      return bimg;
-    }
-  }
-
-  /**
    * Updates the value stored and displayed in the SwingSet component based on
    * getColumnText().
    * <p>
@@ -534,7 +515,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
       if (imageData != null) {
         logger.log(DEBUG, () -> sf("%s: Setting non-null image.", getColumnForLog()));
-        image = bytes2image(imageData);
+        image = ZoomCanvas.bytes2image(imageData);
       } else {
         logger.log(DEBUG, () -> sf("%s: Setting null image.", getColumnForLog()));
         image = null;
@@ -654,7 +635,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
         // the padding added because the image is CENTERED
 
         zoomFactorAtClick = zoomFactor;
-        lockedViewportCenter = captureImageAnchorPoint();
+        lockedViewportCenter = canvas.captureImagePointAtViewportCenter();
 
         logger.log(Level.DEBUG, sf("zoomAtClick %.2f, locked %s", zoomFactorAtClick,
                                    lockedViewportCenter.toString()));
@@ -686,124 +667,6 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
         if (zoomSlider.getValueIsAdjusting()) { updateFloatingTooltip(); }
       }
     });
-  }
-
-  /**
-   * For CropPad
-   * Strip away the dynamic JPanel centering padding, targets the raw image bounds,
-   * and forces the scrollpane to match the anchor precisely.
-   * @param oldViewportSize
-   * @param newViewportSize
-   */
-  private void stabilizeImageOnResize(Dimension oldViewportSize, Dimension newViewportSize) {
-    if (canvas == null || canvas.getCurrentImage() == null) return;
-
-    // 1. Get current zoom and image specs
-    double currentZoom = zoomFactor;
-    int imgW = (int) (canvas.getCurrentImage().getWidth() * currentZoom);
-    int imgH = (int) (canvas.getCurrentImage().getHeight() * currentZoom);
-
-    // 2. Calculate the old centering padding offsets that were active BEFORE the layout refreshes
-    int oldLabelWidth = Math.max(oldViewportSize.width, imgW);
-    int oldLabelHeight = Math.max(oldViewportSize.height, imgH);
-    int oldOffsetX = (oldLabelWidth - imgW) / 2;
-    int oldOffsetY = (oldLabelHeight - imgH) / 2;
-
-    // 3. Find the exact position of the view relative to the IMAGE'S top-left pixel (0,0)
-    Point currentScrollPos = scrollPane.getViewport().getViewPosition();
-    int relativeImageX = currentScrollPos.x - oldOffsetX;
-    int relativeImageY = currentScrollPos.y - oldOffsetY;
-
-    // 4. Calculate what the NEW centering padding offsets WILL BE in the new window dimensions
-    int newLabelWidth = Math.max(newViewportSize.width, imgW);
-    int newLabelHeight = Math.max(newViewportSize.height, imgH);
-    int newOffsetX = (newLabelWidth - imgW) / 2;
-    int newOffsetY = (newLabelHeight - imgH) / 2;
-
-    // 5. Reconstruct the absolute target scroll position by mapping the relative coordinate back
-    int targetScrollX = relativeImageX + newOffsetX;
-    int targetScrollY = relativeImageY + newOffsetY;
-
-    // 6. Clamp the scroll parameters so they don't break scrollpane maximum boundaries
-    int maxScrollX = newLabelWidth - newViewportSize.width;
-    int maxScrollY = newLabelHeight - newViewportSize.height;
-
-    if (targetScrollX < 0) targetScrollX = 0;
-    if (targetScrollY < 0) targetScrollY = 0;
-    if (targetScrollX > maxScrollX) targetScrollX = Math.max(0, maxScrollX);
-    if (targetScrollY > maxScrollY) targetScrollY = Math.max(0, maxScrollY);
-
-    // 7. Snap the viewport position instantly
-    Point finalScrollPos = new Point(targetScrollX, targetScrollY);
-    javax.swing.SwingUtilities.invokeLater(
-        () -> { scrollPane.getViewport().setViewPosition(finalScrollPos); });
-  }
-
-  /**
-   * For CenterPanning.
-   * Determines where the viewport's center used to be, tracks how much the
-   * viewable space grew or shrank, and applies the compensation to the scrollbars.
-   * @param oldViewportSize
-   * @param newViewportSize
-   */
-  private void recenterViewOnResize(Dimension oldViewportSize, Dimension newViewportSize) {
-    if (canvas == null || canvas.getCurrentImage() == null) return;
-
-    // 1. Get the current top-left scroll position
-    Point currentScrollPos = scrollPane.getViewport().getViewPosition();
-
-    // 2. Find the absolute pixel coordinate that was dead-center in the old window size
-    int oldCenterX = currentScrollPos.x + (oldViewportSize.width / 2);
-    int oldCenterY = currentScrollPos.y + (oldViewportSize.height / 2);
-
-    // 3. Subtract half of the NEW window size to find the new target scroll position
-    // This calculation shifts the scroll window around the locked center point
-    int targetScrollX = oldCenterX - (newViewportSize.width / 2);
-    int targetScrollY = oldCenterY - (newViewportSize.height / 2);
-
-    // 4. Calculate maximum bounds to prevent scrolling out into empty background space
-    int maxScrollX = canvas.getWidth() - newViewportSize.width;
-    int maxScrollY = canvas.getHeight() - newViewportSize.height;
-
-    // 5. Clamp the values safely within bounds
-    if (targetScrollX < 0) targetScrollX = 0;
-    if (targetScrollY < 0) targetScrollY = 0;
-    if (targetScrollX > maxScrollX) targetScrollX = Math.max(0, maxScrollX);
-    if (targetScrollY > maxScrollY) targetScrollY = Math.max(0, maxScrollY);
-
-    // 6. Update the viewport coordinates immediately
-    Point finalScrollPos = new Point(targetScrollX, targetScrollY);
-    javax.swing.SwingUtilities.invokeLater(
-        () -> { scrollPane.getViewport().setViewPosition(finalScrollPos); });
-  }
-
-  /**
-   * Captures the current visual center point of the viewport,
-   * normalized strictly to the underlying image's pixel grid.
-   */
-  private Point captureImageAnchorPoint() {
-    if (originalImage == null) return new Point(0, 0);
-
-    // 1. Get current physical component sizes
-    int labelWidth = canvas.getWidth();
-    int labelHeight = canvas.getHeight();
-
-    int imgWidth = (int) (originalImage.getWidth() * zoomFactor);
-    int imgHeight = (int) (originalImage.getHeight() * zoomFactor);
-
-    // 2. Find the padding offsets inside the centered JLabel
-    int imageOffsetX = Math.max(0, (labelWidth - imgWidth) / 2);
-    int imageOffsetY = Math.max(0, (labelHeight - imgHeight) / 2);
-
-    // 3. Find the visual center point of what the user sees
-    Point viewPos = scrollPane.getViewport().getViewPosition();
-    Dimension viewSize = scrollPane.getViewport().getSize();
-
-    int viewCenterX = viewPos.x + viewSize.width / 2;
-    int viewCenterY = viewPos.y + viewSize.height / 2;
-
-    // 4. Return the normalized coordinate relative to the photo bounds
-    return new Point(viewCenterX - imageOffsetX, viewCenterY - imageOffsetY);
   }
 
   // If want zoom in/out buttons, flip between buttons and slider
@@ -886,7 +749,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
       Graphics2D g2d = bImage.createGraphics();
       g2d.drawImage(newImage, 0, 0, null);
       g2d.dispose();
-      setBufferedImage(toCompatibleImage(bImage));
+      setBufferedImage(ZoomCanvas.toCompatibleImage(bImage));
     }
 
     // 2. Calculate the optimal "Fit" zoom factor
@@ -895,28 +758,6 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     // we fall back to standard 1.0 (100%) scaling.
 
     bestFit();
-  }
-
-  /**
-   *
-   * @param canvasPoint
-   */
-  protected void centerOnCanvasPoint(Point canvasPoint) {
-    if (originalImage == null) return;
-    JViewport viewport = scrollPane.getViewport();
-    Dimension viewportSize = viewport.getSize();
-
-    // Calculate the target top-left position for the viewport
-    int targetX = canvasPoint.x - (viewportSize.width / 2);
-    int targetY = canvasPoint.y - (viewportSize.height / 2);
-
-    // Bound the values so we don't scroll past the panel borders
-    Dimension canvasSize = canvas.getSize(); // The custom JPanel size
-    targetX = Math.max(0, Math.min(targetX, canvasSize.width - viewportSize.width));
-    targetY = Math.max(0, Math.min(targetY, canvasSize.height - viewportSize.height));
-
-    // Apply the new position to the viewport
-    viewport.setViewPosition(new Point(targetX, targetY));
   }
 
   private void setKeepFit(boolean keepFit) {
@@ -944,10 +785,11 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   private void laterBestFit() {
-    // For best fit, can use the entire area. The scrollBars may still be
-    // present. Waiting for layout to settle, by using invokeLater, may
-    // produce visual artifacts with double draw.
-    // So calculate the viewport area from the scrollPane.
+    // For best fit, use the entire scrollPane area. The scrollBars may still be
+    // present, even though they were turned off in setKeepFit(). To use
+    // scrollPane.getViewport().getSize(), need to wait for layout to settle,
+    // by using invokeLater, but that produces visual artifacts with double draw.
+    // Instead calculate the viewport area from the scrollPane.
 
     Insets insets = scrollPane.getInsets();
     int viewwidth = scrollPane.getSize().width - insets.left - insets.right;
@@ -984,7 +826,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   /**
-   * Executes a localized, one-shot zoom adjustment while anchoring
+   * Executes a one-shot zoom adjustment while anchoring
    * the transformation to the current visual center.
    * @param targetZoom
    */
@@ -993,7 +835,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     setKeepFit(false); // User's zooming.
 
     this.zoomFactorAtClick = this.zoomFactor;
-    this.lockedViewportCenter = captureImageAnchorPoint();
+    this.lockedViewportCenter = canvas.captureImagePointAtViewportCenter();
 
     // Do the zoom, then clear state.
     updateZoom(capZoom(targetZoom));
@@ -1028,7 +870,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     canvas.revalidate();
     canvas.repaint();
 
-    // Process scrollbar locking using the anchor point helper method
+    // Process scrollbar locking using the anchor point
     if (lockedViewportCenter != null && zoomFactorAtClick > 0) {
       double cumulativeScaleChange = zoomFactor / zoomFactorAtClick;
 
@@ -1087,35 +929,6 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
         } else logger.log(DEBUG, "Keep listening for viewport size");
       }
     });
-  }
-
-  /**
-   * When you load your image from a file, convert it into a Hardware-Compatible
-   * Image immediately. This caches the image directly inside VRAM (Video RAM),
-   * making g2d.drawImage() run at hardware speed.
-   * <p>
-   * Usage: When loading the file, wrap it: {@snippet :
-   *     originalImage = toCompatibleImage(ImageIO.read(file));
-   * }
-   *
-   * @param image
-   * @return
-   */
-  public static BufferedImage toCompatibleImage(BufferedImage image) {
-    GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                                   .getDefaultScreenDevice()
-                                   .getDefaultConfiguration();
-
-    // Create a canvas customized exactly for the local GPU layout
-    // NOTE: wonder about the volatile versions of createCompatibleImage?
-    BufferedImage compatibleImage
-        = gc.createCompatibleImage(image.getWidth(), image.getHeight(), image.getTransparency());
-
-    Graphics2D g2d = compatibleImage.createGraphics();
-    g2d.drawImage(image, 0, 0, null);
-    g2d.dispose();
-
-    return compatibleImage;
   }
 
   ////////////////////////////////////////////////////////////////////////////

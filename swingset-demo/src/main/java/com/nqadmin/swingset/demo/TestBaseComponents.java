@@ -116,36 +116,24 @@ import static java.lang.System.Logger.Level.*;
 
 @SuppressWarnings("serial")
 public class TestBaseComponents extends JFrame {
+  // clang-format off
   enum CompID {
-    NAV,
-    PK,
-    CHECK,
-    COMBO,
-    ENUM_COMBO,
-    DB_COMBO,
-    IMAGE,
-    LABEL,
-    LIST,
-    LIST2,
-    SLIDER,
-    TEXT_AREA,
-    TEXT_FIELD,
-    TEXT_FIELD_B,
+    NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
+    LIST, LIST2, SLIDER, TEXT_AREA, TEXT_FIELD, TEXT_FIELD_B,
     DATE_PICKER,
   }
-  ;
+
   enum CompDim {
     //NORMAL, TALL, VERY_TALL
-    H1,
-    H2,
-    H3
+    H1, H2, H3
   }
 
   // Thing in this set will not have their preferred height made smaller.
   private EnumSet<CompID> keepMinHeight = EnumSet.of(
       // H1
       // Commnet out the next line to get original test behavior
-      NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, LABEL, SLIDER, TEXT_FIELD, TEXT_FIELD_B,
+      NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, LABEL, SLIDER,
+      TEXT_FIELD, TEXT_FIELD_B,
       DATE_PICKER
 
       // H2
@@ -175,72 +163,34 @@ public class TestBaseComponents extends JFrame {
   private void populateCompInfo() {
     // Everything in an array
     // This MUST be in the same order as the CompID enum.
-    Object tComps[] = {null,
-                       cmbSSDBComboNav,
-                       lblSSDBComboNav,
-                       H1,
-                       "swingset_base_test_pk",
-                       txtTestPK,
-                       lblTestPK,
-                       H1,
-                       "ss_check_box",
-                       chkSSCheckBox,
-                       lblSSCheckBox,
-                       H1,
-                       "ss_combo_box",
-                       cmbSSComboBox,
-                       lblSSComboBox,
-                       H1,
-                       "ss_combo_box",
-                       cmbEnumSSComboBox,
-                       lblEnumSSComboBox,
-                       H1,
-                       "ss_db_combo_box",
-                       cmbSSDBComboBox,
-                       lblSSDBComboBox,
-                       H1,
-                       "ss_image",
-                       imgImage,
-                       lblImage,
-                       H3,
-                       "ss_label",
-                       lblSSLabel2,
-                       lblSSLabel,
-                       H1,
-                       "ss_list",
-                       lstSSList,
-                       lblSSList,
-                       H2,
-                       "ss_list2",
-                       lstSSList2,
-                       lblSSList2,
-                       H2,
-                       "ss_slider",
-                       sliSSSlider,
-                       lblSSSlider,
-                       H1,
-                       "ss_text_area",
-                       txtSSTextArea,
-                       lblSSTextArea,
-                       H2,
-                       "ss_text_field",
-                       txtSSTextField,
-                       lblSSTextField,
-                       H1,
-                       "ss_text_field",
-                       txtSSTextFieldB,
-                       lblSSTextFieldB,
-                       H1,
-                       "ss_date_field_null",
-                       dpDatePicker,
-                       lblDatePicker,
-                       H1};
+    Object tComps[] = {
+      null,                      cmbSSDBComboNav,     lblSSDBComboNav,     H1,
+      "swingset_base_test_pk",   txtTestPK,           lblTestPK,           H1,
+      "ss_check_box",            chkSSCheckBox,       lblSSCheckBox,       H1,
+      "ss_combo_box",            cmbSSComboBox,       lblSSComboBox,       H1,
+      "ss_combo_box",            cmbEnumSSComboBox,   lblEnumSSComboBox,   H1,
+      "ss_db_combo_box",         cmbSSDBComboBox,     lblSSDBComboBox,     H1,
+      "ss_image",                imgImage,            lblImage,            H3,
+      "ss_label",                lblSSLabel2,         lblSSLabel,          H1,
+      "ss_list",                 lstSSList,           lblSSList,           H2,
+      "ss_list2",                lstSSList2,          lblSSList2,          H2,
+      "ss_slider",               sliSSSlider,         lblSSSlider,         H1,
+      "ss_text_area",            txtSSTextArea,       lblSSTextArea,       H2,
+      "ss_text_field",           txtSSTextField,      lblSSTextField,      H1,
+      "ss_text_field",           txtSSTextFieldB,     lblSSTextFieldB,     H1,
+      "ss_date_field_null",      dpDatePicker,        lblDatePicker,       H1
+    };
     int idx = 0;
     for (CompID compID : CompID.values()) {
-      compInfos.put(compID, new CompInfo((String) tComps[idx++], (JComponent) tComps[idx++],
-                                         (JLabel) tComps[idx++], (CompDim) tComps[idx++], compID));
+      compInfos.put(compID, new CompInfo(
+              (String) tComps[idx++],
+          (JComponent) tComps[idx++],
+              (JLabel) tComps[idx++],
+             (CompDim) tComps[idx++],
+                       compID));
     }
   }
+  // clang-format on
 
   /**
    * Log4j2 Logger
@@ -367,6 +317,8 @@ public class TestBaseComponents extends JFrame {
     // set screen title
     super("SwingSet Base Component Test");
     DemoUtil.initExampleFrame(this, null);
+
+    // imgImage.setResizeMode(ZoomCanvas.ResizeMode.CENTER_PANNING);
 
     // initialize some dynamic information
     hints = _hints;

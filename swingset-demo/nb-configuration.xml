@@ -68,8 +68,6 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DIVISION_5f_BY_5f_ZERO.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DIVISION_5f_BY_5f_ZERO.enabled>
         <netbeans.hint.licensePath>${project.basedir}/LICENSE.ftl</netbeans.hint.licensePath>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.methodDeclBracePlacement>NEW_LINE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.methodDeclBracePlacement>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classDeclBracePlacement>NEW_LINE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classDeclBracePlacement>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantDoWhileBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantDoWhileBraces>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantIfBraces>ELIMINATE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantIfBraces>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantForBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantForBraces>

@@ -108,7 +108,7 @@ public class ZoomCanvasTest {
   testIdenticalSystemOptimization() {
     Point originalPoint = new Point(45, 90);
 
-    Point translatedPoint = canvas.translate(originalPoint, CoordSystem.IMAGE, CoordSystem.IMAGE);
+    Point translatedPoint = canvas.translateCoord(originalPoint, CoordSystem.IMAGE, CoordSystem.IMAGE);
 
     // Values must match
     assertEquals(originalPoint, translatedPoint);
@@ -129,7 +129,7 @@ public class ZoomCanvasTest {
     // Let's click at canvas pixel (150, 150) -> exact center of the canvas
     Point canvasPoint = new Point(150, 150);
 
-    Point imagePoint = canvas.translate(canvasPoint, CoordSystem.CANVAS, CoordSystem.IMAGE);
+    Point imagePoint = canvas.translateCoord(canvasPoint, CoordSystem.CANVAS, CoordSystem.IMAGE);
 
     // (150 / 2.0) - 25 = 75 - 25 = 50
     assertEquals(new Point(50, 50), imagePoint,
@@ -146,10 +146,13 @@ public class ZoomCanvasTest {
     // Panel coordinate becomes: X = 130 + 20 = 150, Y = 140 + 10 = 150
     Point viewportPoint = new Point(130, 140);
 
-    Point imagePoint = canvas.translate(viewportPoint, CoordSystem.VIEWPORT, CoordSystem.IMAGE);
+    Point imagePoint = canvas.translateCoord(viewportPoint, CoordSystem.VIEWPORT, CoordSystem.IMAGE);
 
     // After accounting for the scroll offset, it resolves to panel (150, 150) -> image (50, 50)
     assertEquals(new Point(50, 50), imagePoint);
+
+    // Point v = canvas.translateCoord(new Point(0, 0), CoordSystem.IMAGE, CoordSystem.VIEWPORT);
+    // System.err.println(v.toString());
   }
 
   @Test
@@ -160,7 +163,7 @@ public class ZoomCanvasTest {
     // Target image pixel is the top-left corner (0,0)
     Point imagePoint = new Point(0, 0);
 
-    Point viewportPoint = canvas.translate(imagePoint, CoordSystem.IMAGE, CoordSystem.VIEWPORT);
+    Point viewportPoint = canvas.translateCoord(imagePoint, CoordSystem.IMAGE, CoordSystem.VIEWPORT);
 
     // Math sequence:
     // Image (0,0) -> Scaled Image (25, 25) -> Panel (50, 50)
@@ -169,18 +172,18 @@ public class ZoomCanvasTest {
   }
 
   // /**
-  //  * Test of translate method, of class ZoomCanvas.
+  //  * Test of translateCoord method, of class ZoomCanvas.
   //  */
   // @Test
   // public void testTranslate()
   // {
-  // 	System.out.println("translate");
+  // 	System.out.println("translateCoord");
   // 	Point fromPoint = null;
   // 	ZoomCanvas.CoordSystem fromCoordSystem = null;
   // 	ZoomCanvas.CoordSystem toCoordSystem = null;
   // 	ZoomCanvas instance = null;
   // 	Point expResult = null;
-  // 	Point result = instance.translate(fromPoint, fromCoordSystem, toCoordSystem);
+  // 	Point result = instance.translateCoord(fromPoint, fromCoordSystem, toCoordSystem);
   // 	assertEquals(expResult, result);
   // 	// TODO review the generated test code and remove the default call to fail.
   // 	fail("The test case is a prototype.");
