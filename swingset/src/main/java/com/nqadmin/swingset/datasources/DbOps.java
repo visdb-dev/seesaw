@@ -42,16 +42,22 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
+import java.sql.SQLException;
+
 import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.navigate.DbOpsChangeEvent;
 import com.nqadmin.swingset.navigate.RowsAction;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 /**
  * Interface that provides a set of methods to perform custom operations
- *  before and/or after certain database related operations.
+ * before and/or after certain database related operations. SS requires
+ * that application changes to the database are reflected in the RowSet;
+ * thus the displayed information has the changes that are made.
  * Typically the "Pre" operations operate on
- * SSComponents associated with an app window and the "Post" operations
+ * SSComponents associated with an app window; and the "Post" operations
  * make sure the changes are visible in the RowSet (commonly by re-executing
  * the query).
  * There are also other methods to prevent/allow or assist
@@ -64,20 +70,23 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * for example see {@link SSDataNavigator}
  * <p>
  * This interface has only default methods, none of which do anything; it
- * can be instantiated by doing {@code new CustomizeDbOps() {}}.
+ * can be instantiated by doing {@code new DbOps() {}}.
  * <p>
- * Generally the user will want to use/extend {@link DbOpsCustomizerImpl}
+ * Generally the user will want to <b>use/extend {@link DbOpsBase}</b>
  * <ul>
  * <li> it has an implementation of
- * {@link DbOpsCustomizerImpl#performPreInsertOps() performPreInsertOps()}
+ * {@link DbOps#performPreInsertOps() performPreInsertOps()}
  * that will clear/initialize {@link com.nqadmin.swingset.utils.SSComponent SSComponent}
  * values before editing.
+ * <li> it has implementations of {@link DbOpsBase#performPostInsertOps(com.nqadmin.swingset.navigate.RowsModel) performPostInsertOps(rowsModel)}
+ * and other {@code performPost*Ops} that use metadata to decide if
+ * the RowSet command needs to be re-executed.
  * <li> it handles state info for
  * allow update/insert/delete.
  * </ul>
  */
 // TODO: rename SSDBCustomOps
-public interface DbOpsCustomizer {
+public interface DbOps {
   /** For an event, to specify which field changed. */
   /** The allow Fields. Used in event notification, see {@link DbOpsChangeEvent} */
   public enum Allow {
@@ -139,14 +148,20 @@ public interface DbOpsCustomizer {
    *
    * @param navigationType type of navigation that was done
    */
-  default void performNavigationOps(final Navigation navigationType) {}
+  default void performNavigationOps(Navigation navigationType) {}
 
   /**
    * Method to perform pre-insertion operations by {@link RowsAction#ACT_ADD}
    * after rowSet.moveToInsertRow. Typically initializes all the columns'
-   * {@code SSComponent}s. See {@link DbOpsCustomizerImpl#performPreInsertOps()}.
+   * {@code SSComponent}s. See {@link DbOpsImpl#performPreInsertOps()}.
    */
   default void performPreInsertOps() {}
+
+  /**
+   * @deprecated  use performPostInsertOps(RowsModel)
+   */
+  @Deprecated
+  default void performPostInsertOps() {}
 
   /**
    * Method to perform post-insertion operations during
@@ -156,8 +171,12 @@ public interface DbOpsCustomizer {
    * <p>
    * In addition to this, a listener on the RowSet is
    * notified after the RowSet is modified.
+   * @param rm
+   * @throws java.sql.SQLException
    */
-  default void performPostInsertOps() {}
+  default void performPostInsertOps(RowsModel rm) throws SQLException {
+    performPostInsertOps();
+  }
 
   /**
    * Method to perform pre-deletion operations; it is used for
@@ -166,18 +185,38 @@ public interface DbOpsCustomizer {
   default void performPreDeletionOps() {}
 
   /**
+   * @deprecated use performPostDeleteionOps(RowsModel)
+   */
+  @Deprecated
+  default void performPostDeletionOps() {}
+
+  /**
    * Method to perform post-deletion operations; it is used for
    * {@link RowsAction#ACT_DELETE}, invoked just after rowSet.deleteRow().
    * <p>
    * In addition to this, a listener on the RowSet is
    * notified after the RowSet is modified.
+   * @param rm
+   * @throws java.sql.SQLException
    */
-  default void performPostDeletionOps() {}
+  default void performPostDeletionOps(RowsModel rm) throws SQLException {
+    performPostDeletionOps();
+  }
+
+  /**
+   * @deprecated use performPostUpdateOps(RowsModel)
+   */
+  @Deprecated 
+  default void performPostUpdateOps() {}
 
   /**
    * Method to perform operations at the end of {@link RowsAction#ACT_COMMIT}
    * when the current row is modified, i.e. not on the insert row.
    * It is invoked after rowSet.updateRow().
+   * @param rm
+   * @throws java.sql.SQLException
    */
-  default void performPostUpdateOps() {}
+  default void performPostUpdateOps(RowsModel rm) throws SQLException {
+    performPostUpdateOps();
+  }
 }

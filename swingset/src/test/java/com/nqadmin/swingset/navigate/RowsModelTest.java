@@ -30,8 +30,6 @@
 package com.nqadmin.swingset.navigate;
 
 import java.awt.Container;
-import java.lang.System.Logger.Level;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +45,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.core.TextField;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.datasources.products.DbSupportFactory;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
@@ -99,40 +97,10 @@ public class RowsModelTest {
   BusReceiver oneTestBusReceiver; // Strong Reference
 
   //SSDBNav dbNav = new SSDBNavImpl(this)
-  class DbNav extends DbOpsCustomizerImpl {
-    private final RowsModel rowsModel;
-    @SuppressWarnings("unused")
-    private final Connection connection;
-
+  class DbNav extends DbOpsBase {
     public DbNav(Container container, RowsModel rowsModel)
         throws ClassNotFoundException, SQLException {
       super(container);
-      this.rowsModel = rowsModel;
-      this.connection = H2.getCon();
-    }
-
-    private RowSet getRowSet() { return rowsModel.getRowSet(); }
-
-    /**
-     * Re-query the RowSet following a deletion. This is needed for H2.
-     */
-    @Override
-    public void performPostDeletionOps() {
-      super.performPostDeletionOps();
-      try {
-        getRowSet().execute();
-      } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
-    }
-
-    /**
-     * Requery the rowset following an insertion. This is needed for H2.
-     */
-    @Override
-    public void performPostInsertOps() {
-      super.performPostInsertOps();
-      try {
-        getRowSet().execute();
-      } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
     }
 
     /**
@@ -141,9 +109,8 @@ public class RowsModelTest {
      */
     @Override
     public void performPreInsertOps() {
-      // SSDBNavImpl will clear the component values
+      // DbOpsImpl will clear the component values
       super.performPreInsertOps();
-      // Stuff removed when copied from Example1.java
     }
   };
 

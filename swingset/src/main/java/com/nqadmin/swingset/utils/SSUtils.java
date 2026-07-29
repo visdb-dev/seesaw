@@ -317,6 +317,7 @@ public class SSUtils {
 
     // TODO: just call all the names keys. Buggy if join ...
     List<KeyInfo> ki = SSUtils.dbSupport().runWithConnection(conn -> {
+      // Note: can not use database cache because this is specifically for table.
       DatabaseMetaData dbMetaData = conn.getMetaData();
       // TODO: some versions of Postgress require null catalog
       return getPrimaryKeyInfoForTable(dbMetaData, catalog, schema, table);

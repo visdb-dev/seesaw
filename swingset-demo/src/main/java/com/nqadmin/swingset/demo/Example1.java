@@ -66,7 +66,7 @@ import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.ComponentState;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
@@ -110,7 +110,7 @@ public class Example1 extends JFrame {
   Connection connection;
   SSDataNavigator navigator;
   RowsModel rowsModel;
-  DbOpsCustomizerAllows dbNav;
+  DbOpsAllows dbNav;
 
   static int newBorderSet;
   private void cleanup() {
@@ -303,8 +303,8 @@ public class Example1 extends JFrame {
     frame.setVisible(true);
   }
 
-  class DbOpsCustomizerAllows extends DbOpsCustomizerImpl {
-    DbOpsCustomizerAllows(Container container) { super(container); }
+  class DbOpsAllows extends DbOpsBase {
+    DbOpsAllows(Container container) { super(container); }
 
     @Override
     protected void allowUpdate(boolean allow) {
@@ -322,29 +322,8 @@ public class Example1 extends JFrame {
     }
   }
 
-  private DbOpsCustomizerAllows createDbOps() {
-    return new DbOpsCustomizerAllows(this) {
-      /**
-       * Re-query the RowSet following a deletion. This is needed for H2.
-       */
-      @Override
-      public void performPostDeletionOps() {
-        super.performPostDeletionOps();
-        try {
-          getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
-      }
-
-      /**
-       * Requery the rowset following an insertion. This is needed for H2.
-       */
-      @Override
-      public void performPostInsertOps() {
-        super.performPostInsertOps();
-        try {
-          getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
-      }
+  private DbOpsAllows createDbOps() {
+    return new DbOpsAllows(this) {
 
       /**
        * Obtain and set the PK value for the new record & perform any other

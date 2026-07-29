@@ -27,20 +27,70 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.datasources.products;
 
 import java.awt.Container;
+import java.sql.SQLException;
 
+import javax.sql.RowSet;
+
+import com.nqadmin.swingset.datasources.DbMetaDataCache;
 import com.nqadmin.swingset.datasources.DbOpsImpl;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
- * Compatibility.
+ * Use metadata where applicable.
+ * In particular to decide whether or not to re-execute the RowSset command.
  */
-public class SSDBNavImpl extends DbOpsImpl implements SSDBNav {
+public class DbOpsBase extends DbOpsImpl {
   /**
-   * Constructs a SSDBNavImpl with the specified container.
+   * Constructs a DbOpsBase with the specified container.
    *
-   * @param _container	GUI Container to scan for Swing components to clear/reset
+   * @param container	GUI Container to scan for Swing components to clear/reset
    */
-  public SSDBNavImpl(final Container _container) { super(_container); }
+  public DbOpsBase(Container container) {
+    super(container);
+  }
+  
+  /**
+   * Make sure the RowSet has the inserted row.
+   * It may re-execute the RowSet's command.
+   * @param rm
+   * @throws SQLException 
+   */
+  @Override
+  public void performPostInsertOps(RowsModel rm) throws SQLException {
+    super.performPostInsertOps(rm);
+    RowSet rs = rm.getRowSet();
+    if (!DbMetaDataCache.get().ownInsertsAreVisible(rs.getType()))
+      rs.execute();
+  }
+  
+  /**
+   * Make sure the RowSet has the deleted row.
+   * It may re-execute the RowSet's command.
+   * @param rm
+   * @throws java.sql.SQLException
+   */
+  @Override
+  public void performPostDeletionOps(RowsModel rm) throws SQLException {
+    super.performPostDeletionOps(rm);
+    RowSet rs = rm.getRowSet();
+    if (!DbMetaDataCache.get().ownDeletesAreVisible(rs.getType()))
+      rs.execute();
+  }
+  
+  /**
+   * Make sure the RowSet has the updated row.
+   * It may re-execute the RowSet's command.
+   * @param rm
+   * @throws java.sql.SQLException
+   */
+  @Override
+  public void performPostUpdateOps(RowsModel rm) throws SQLException {
+    super.performPostUpdateOps(rm);
+    RowSet rs = rm.getRowSet();
+    if (!DbMetaDataCache.get().ownUpdatesAreVisible(rs.getType()))
+      rs.execute();
+  }
 }

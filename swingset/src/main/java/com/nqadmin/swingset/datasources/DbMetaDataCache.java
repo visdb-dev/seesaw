@@ -36,65 +36,49 @@ import java.sql.SQLException;
 import com.nqadmin.swingset.utils.SSUtils;
 
 /**
- * Metadata cache.
+ * Metadata cache. Only static and Driver info, capabilities, and limits should
+ * be referenced. Information that is subject to change as the database is
+ * running should not be referenced.
+ * <p>
+ * <b>NOTE:</b> There's only one database, found in SSUtils.dbSupport.getSharedConnection.
+ * 
  */
-public class DbMetadataCache {
+public class DbMetaDataCache {
+
+  private DbMetaDataCache() { }
+
+  //
+  // The databasemetadata is cached, so only the first call connects to
+  // the database. Note: some information is not necessarily safe to cache;
+  // google search: "with jdbc is it safe to cache databasemetadata"
   //
   // Make this a selective cache. In particular Static/Driver info,
   // capabilities/Limits. But not tables & Column details.
   // Then no worry about needing to flush in some cases.
   //
-  // Create: SSDbMetaDataCache.java
+  // TODO: this class could provide methods that are "safe", with exactly
+  //       the same names as used in DatabaseMetaData, and return this
+  //       rather than the metadata itself. Then there would be no chance
+  //       of referencing non-cachable data.
+  //
 
-  //private Map<String, DatabaseMetaData> metaDatas;
-  //Set<Connection> connections
-  //       = Collections.newSetFromMap(new WeakHashMap<Connection, Boolean>());
-  //private Set<Connection> connections; // known connections, have metadata, weakset
+  private static DatabaseMetaData metaData;
 
-  private DatabaseMetaData metaData;
-  private boolean metaDataCacheEnabled;
+  // TODO: flush/refresh/enable, other maintenance methods?
+  // All accesses to metadata could go through here by adding
+  // a "refresh" flag. Is that useful or confusing?
 
   /**
-   * Fetch the databasemetadata for the connection returned by getSharedConnection.
-   * The databasemetadata is cached, so only the first call connects to
-   * the database. Note: some information is not necessarily safe to cache;
-   * google search: "with jdbc is it safe to cache databasemetadata"
-   *
-   * @param conn get metadata for this connection
-   * @param refresh true indicates that the cached metadata should be refreshed from the database
-   * @return metadata or null if can't get metadata, e.g. no connection.
+   * @return the MetaData cache for the default database from getSharedConnection().
    * @throws java.sql.SQLException
    */
-  // TODO: handle any/multiple connections, currently only caching for shared conn
-  // NOTE: If schema changes table/column info changes
-  public DatabaseMetaData getMetaData(Connection conn, boolean refresh) throws SQLException {
-    Connection shconn = getSharedConnection();
-    if (conn != shconn || !metaDataCacheEnabled) return conn.getMetaData();
-    if (refresh || metaData == null) {
-      metaData = null; // in case there's an error/exception
-      if (conn != null) metaData = conn.getMetaData();
+  public static DatabaseMetaData get() throws SQLException {
+    if (metaData == null) {
+      Connection shconn = SSUtils.dbSupport().getSharedConnection();
+      if (shconn == null)
+        return null;
+      metaData = shconn.getMetaData();
     }
     return metaData;
-  }
-
-  /**
-   * Flush any cached metadata for specified connection.
-   * This may only flush table and column details, i.e. things that depend
-   * on the schema.
-   *
-   * @param conn flush metadata for this connection
-   */
-  public void flushMetaData(Connection conn) {
-    Connection shconn = null;
-    try {
-      shconn = getSharedConnection();
-    } catch (SQLException ex) {} // Can't happen with null argument.
-    if (conn != shconn) return;
-    metaData = null;
-  }
-
-  // TODO: cache this
-  private Connection getSharedConnection() throws SQLException {
-    return SSUtils.dbSupport().getSharedConnection();
   }
 }

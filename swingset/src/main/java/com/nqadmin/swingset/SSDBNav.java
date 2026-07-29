@@ -29,9 +29,9 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOps;
 
 /**
  * Compatibility.
  */
-public interface SSDBNav extends DbOpsCustomizer {}
+public interface SSDBNav extends DbOps {}

@@ -29,21 +29,21 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOps;
 
 /**
  * An allow* flag changed in DbOps.
  */
 @SuppressWarnings("serial")
 public class DbOpsChangeEvent extends EventObjectBacktrace {
-  private final DbOpsCustomizer.Allow allow;
+  private final DbOps.Allow allow;
 
   /**
    * the DbOps that changed
    * @param source
    * @param allow
    */
-  public DbOpsChangeEvent(Object source, DbOpsCustomizer.Allow allow) {
+  public DbOpsChangeEvent(Object source, DbOps.Allow allow) {
     super(source);
     this.allow = allow;
   }
@@ -51,12 +51,12 @@ public class DbOpsChangeEvent extends EventObjectBacktrace {
   /**
    * @return the DbOops that changed.
    */
-  public DbOpsCustomizer getDbOps() { return (DbOpsCustomizer) getSource(); }
+  public DbOps getDbOps() { return (DbOps) getSource(); }
 
   /**
    * which permission/allow changed
    *
    * @return
    */
-  public DbOpsCustomizer.Allow getAllow() { return allow; }
+  public DbOps.Allow getAllow() { return allow; }
 }

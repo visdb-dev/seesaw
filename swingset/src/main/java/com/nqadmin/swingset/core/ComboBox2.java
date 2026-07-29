@@ -775,7 +775,7 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     adjustForNullItem();
     if (selectionPending) {
       // Setting to true from false, select the nullItem;
-      // Events are a problem. After DbOpsCustomizerImpl.setSelectionPending
+      // Events are a problem. After DbOpsImpl.setSelectionPending
       // the following ends up in ComboBox2Listener.actionPerformed()
       // then into setColumnText then exception in RowSetOps.updateColumnText.
       // TODO: merge this into adjustForNullItem, to avoid extra unregister/register
@@ -1524,7 +1524,7 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    */
   protected void adjustForNullItem() {
     // 2021-01-20_BP: Slight modification needed to avoid Beep in combo navigator on
-    //   insert row as DbOpsCustomizerImpl calls setSelectionPending(true) and that will fail
+    //   insert row as DbOpsImpl calls setSelectionPending(true) and that will fail
     //   for the combo navigator without this tweak.
     //boolean wantNull = (getAllowNull() || selectionPending) && !isComboBoxNavigator();
     boolean wantNull = getAllowNull() || selectionPending;

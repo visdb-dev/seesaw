@@ -348,7 +348,7 @@ final class RowsActions {
 
           RowSetOps.insertRow(getRowSet());
           setInserting(getRowSet(), false);
-          getNavState().getDbOps().performPostInsertOps();
+          getNavState().getDbOps().performPostInsertOps(rowsModel);
 
           // It's unspecified where the insertRow goes, but
           // performPosInsertOps typically re-executes the query.
@@ -377,6 +377,7 @@ final class RowsActions {
 
           getNavState().freshRow();
           getNavState().updateActionState();
+          getNavState().getDbOps().performPostUpdateOps(rowsModel);
         }
       } catch (final SQLException se) {
         logger.log(ERROR, "SQL Exception.", se);
@@ -633,7 +634,7 @@ final class RowsActions {
         RowSetOps.deleteRow(getRowSet());
 
         // PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
-        getNavState().getDbOps().performPostDeletionOps();
+        getNavState().getDbOps().performPostDeletionOps(rowsModel);
 
         // UPDATE TOTAL ROW COUNT
         getNavState().rowCount = tmpSize;

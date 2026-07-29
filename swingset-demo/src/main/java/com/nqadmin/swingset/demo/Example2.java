@@ -54,8 +54,8 @@ import javax.swing.JLabel;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.DbOps;
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.JStuff;
 
@@ -95,8 +95,6 @@ public class Example2 extends JFrame {
   Connection connection = null;
   SSDataNavigator navigator = null;
   RowsModel rowsModel;
-
-  RowSet getRowSet() { return rowsModel.getRowSet(); }
 
   /**
    * Constructor for Example2
@@ -191,37 +189,16 @@ public class Example2 extends JFrame {
     pack();
   }
 
-  private DbOpsCustomizer createDbNav() {
+  private DbOps createDbNav() {
     /**
      * Various navigator overrides needed to support H2
      * H2 does not fully support updatable rowset so it must be
      * re-queried following insert and delete with rowset.execute()
      */
-    return new DbOpsCustomizerImpl(this) {
+    return new DbOpsBase(this) {
       /**
-       * Requery the rowset following a deletion. This is needed for H2.
-       */
-      @Override
-      public void performPostDeletionOps() {
-        super.performPostDeletionOps();
-        try {
-          getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
-      }
-
-      /**
-       * Requery the rowset following an insertion. This is needed for H2.
-       */
-      @Override
-      public void performPostInsertOps() {
-        super.performPostInsertOps();
-        try {
-          getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
-      }
-
-      /**
-       * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+       * Obtain and set the PK value for the new record and perform any other
+       * actions needed before an insert.
        */
       @Override
       public void performPreInsertOps() {

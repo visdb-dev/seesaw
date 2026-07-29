@@ -31,11 +31,25 @@ SSCommon.checkRowOK doesn't check canModify. Rename verifyCanModifyRow.
 
 Could add "centerImage" popup action.
 Put more code from Image to ZoomCanvas.
+Partition bestFit/updateZoom to move some of it into ZoomCanvas.
 
 ================================================================================
 
 setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
 Something in RowSetOps/SSComponent. Why is it needed? 2026/05
+
+================================================================================
+
+How can getGeneratedKeys work with preInsertOps? Use instead of key stuff?
+Probably some DbSupport...
+
+getGeneratedKeys - search: jdbc getgeneratedkeys
+    The JDBC Statement.getGeneratedKeys() method retrieves automatically generated
+    values (like AUTO_INCREMENT or IDENTITY primary keys) created after executing an
+    INSERT statement. Using this method prevents you from having to make a second,
+    slow query to the database just to find out the ID of a newly added row.
+
+    search has examples
 
 ================================================================================
 
@@ -96,6 +110,7 @@ Could
     - replaceStyle? RemoveStyle
 
 ================================================================================
+
 
 ================================================================================
 

@@ -53,7 +53,7 @@ import javax.swing.event.InternalFrameEvent;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.DbOpsImpl;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
@@ -68,7 +68,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
   /**
    * Implementation of SSDBNav interface.
    */
-  private class FormHelperSSDBNavImpl extends DbOpsCustomizerImpl {
+  private class FormHelperSSDBNavImpl extends DbOpsImpl {
     /**
      * Primary key of record being deleted.
      */

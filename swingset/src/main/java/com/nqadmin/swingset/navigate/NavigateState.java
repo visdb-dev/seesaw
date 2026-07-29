@@ -58,7 +58,7 @@ import javax.swing.SpinnerNumberModel;
 import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.*;
 import com.nqadmin.swingset.core.DBComboBox2;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOps;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
@@ -82,7 +82,7 @@ import static java.lang.System.Logger.Level.*;
 /*
  * External controls
  *     - confirmDeletes
- *     - DbOpsCustomizer
+ *     - DbOps
  *     - allowDelete (enableDeletion, deleteOK)
  *     - allowInsert (enableInsertion, insertOK)
  *     - writeable (writeOK)
@@ -355,7 +355,7 @@ final class NavigateState {
   private int currentRow = 0;
 
   /** Container (frame or internal frame) which contains the navigator. */
-  private DbOpsCustomizer dbOps = new DbOpsCustomizer() {};
+  private DbOps dbOps = new DbOps() {};
 
   /**
    * SSDBComboBox used for navigation if applicable.
@@ -569,7 +569,7 @@ final class NavigateState {
    * <p>
    * If allowWrite==false, then skip the update and return as
    * successful, unless we have an empty rowset.
-   * Checks {@link DbOpsCustomizer#allowUpdate() }.
+   * Checks {@link DbOps#allowUpdate() }.
    *
    * @param performPostUpdateOps true if performPostUpdateOps() should
    * 	be called after successful update, otherwise false
@@ -764,25 +764,25 @@ final class NavigateState {
   boolean hasError(SSComponent comp) { return errorComponents.contains(comp); }
 
   /**
-   * Function that passes the implementation of the DbOpsCustomizer interface. This
+   * Function that passes the implementation of the DbOps interface. This
    * interface can be implemented by the developer to perform custom actions when
    * the insert button is pressed
    *
-   * @param dbOps implementation of the DbOpsCustomizer interface
+   * @param dbOps implementation of the DbOps interface
    */
   //TODO: does this belong here
-  void setDbOps(DbOpsCustomizer dbOps) {
+  void setDbOps(DbOps dbOps) {
     Objects.requireNonNull(dbOps);
     this.dbOps = dbOps;
   }
 
   /**
-   * Returns any custom implementation of the DbOpsCustomizer interface, which is used
-   * when the insert button is pressed to perform custom actions.
+   * Returns any custom implementation of the DbOps interface, which is used
+when the insert button is pressed to perform custom actions.
    *
-   * @return any custom implementation of the DbOpsCustomizer interface
+   * @return any custom implementation of the DbOps interface
    */
-  DbOpsCustomizer getDbOps() { return dbOps; }
+  DbOps getDbOps() { return dbOps; }
 
   // TODO: handle multipble navCombo?
   <K> void setNavCombo(DBComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
@@ -910,7 +910,7 @@ final class NavigateState {
   boolean canNavigate() { return lastCanNavigate; }
 
   private boolean canWrite() {
-    DbOpsCustomizer ops = getDbOps();
+    DbOps ops = getDbOps();
     return getAllowWrite() && (getAllowUpdate() || getAllowInsert() || getAllowDelete())
         && (ops.allowUpdate() || ops.allowInsert() || ops.allowDelete());
   }

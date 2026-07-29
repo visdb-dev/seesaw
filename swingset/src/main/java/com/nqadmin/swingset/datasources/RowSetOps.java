@@ -698,8 +698,9 @@ public class RowSetOps {
     // with the param comp.
     Connection conn = SSUtils.dbSupport().getSharedConnection();
     try (Statement statement
-         = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+         = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
       ResultSet rs = statement.executeQuery(comp.getRowSet().getCommand());
+    ) {
       //ResultSet rs = statement.getResultSet();
       rs.absolute(comp.getRowSet().getRow());
       System.err.printf("FORCE_CONFLICT: %s\n", rs.getObject(comp.getColumnIndex()));

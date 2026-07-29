@@ -58,12 +58,12 @@ import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.core.ComboBox2;
 import com.nqadmin.swingset.core.DBComboBox2;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.datasources.DbOps;
 
 /**
  * This example displays data from the part_data table.
@@ -402,8 +402,8 @@ public class Example4 extends JFrame {
     pack();
   }
 
-  private DbOpsCustomizer createDbNav() {
-    return new DbOpsCustomizerImpl(this) {
+  private DbOps createDbNav() {
+    return new DbOpsBase(this) {
       /**
        * Re-enable DB Navigator following insertion Cancel
        */
@@ -417,11 +417,8 @@ public class Example4 extends JFrame {
        * Requery the rowset following a deletion. This is needed for H2.
        */
       @Override
-      public void performPostDeletionOps() {
-        super.performPostDeletionOps();
-        try {
-          rowsModel.getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+      public void performPostDeletionOps(RowsModel rm) throws SQLException {
+        super.performPostDeletionOps(rm);
         performRefreshOps();
       }
 
@@ -429,12 +426,9 @@ public class Example4 extends JFrame {
        * Re-query the rowset following an insertion. This is needed for H2.
        */
       @Override
-      public void performPostInsertOps() {
-        super.performPostInsertOps();
+      public void performPostInsertOps(RowsModel rm) throws SQLException {
+        super.performPostInsertOps(rm);
         cmbSelectPart.setEnabled(true);
-        try {
-          rowsModel.getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
         performRefreshOps();
       }
 

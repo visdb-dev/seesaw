@@ -80,9 +80,9 @@ import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.core.Image;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.DbOps;
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
+import com.nqadmin.swingset.datasources.products.DbOpsCreator;
 import com.nqadmin.swingset.decorators.ComponentState;
 import com.nqadmin.swingset.decorators.ComponentStateTextDecorator;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
@@ -354,11 +354,11 @@ public class TestBaseComponents extends JFrame {
     // set screen position
     setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
-    // TEST DbOpsCustomizerCreator
-    DbOpsCustomizerCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
+    // TEST DbOpsCreator
+    DbOpsCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
     CentralLookup lkup = CentralLookup.getDefault();
-    DbOpsCustomizerCreator prevCreator = lkup.lookup(DbOpsCustomizerCreator.class);
-    lkup.replace(DbOpsCustomizerCreator.class, creator);
+    DbOpsCreator prevCreator = lkup.lookup(DbOpsCreator.class);
+    lkup.replace(DbOpsCreator.class, creator);
 
     // initialize database connection and components
     try {
@@ -372,7 +372,7 @@ public class TestBaseComponents extends JFrame {
       navigator = new SSDataNavigator(rowsModel, DataNavigator.Lines.TWO);
     } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
     String name = rowsModel.getDbOps().getClass().getSimpleName();
-    if (!name.equals("TestBaseComponentsDbOpsCustomizer")) {
+    if (!name.equals("TestBaseComponentsDbOps")) {
       throw new IllegalStateException(sf("wrong customizer %s", name));
     }
     lkup.remove(creator);
@@ -549,7 +549,7 @@ public class TestBaseComponents extends JFrame {
     TextStyles.loadFromAnyThread(() -> TextStyles.loadStylesFromJson(reader));
   }
 
-  private DbOpsCustomizer createDbNav() { return new TestBaseComponentsDbOpsCustomizer(); }
+  private DbOps createDbNav() { return new TestBaseComponentsDbOps(); }
 
   /**
    * Various navigator overrides needed to support H2
@@ -557,17 +557,14 @@ public class TestBaseComponents extends JFrame {
    * H2 does not fully support updatable rowset so it must be
    * re-queried following insert and delete with rowset.execute()
    */
-  private class TestBaseComponentsDbOpsCustomizer extends DbOpsCustomizerImpl {
-    public TestBaseComponentsDbOpsCustomizer() { super(TestBaseComponents.this); }
+  private class TestBaseComponentsDbOps extends DbOpsBase {
+    public TestBaseComponentsDbOps() { super(TestBaseComponents.this); }
     /**
      * Requery the rowset following a deletion. This is needed for H2.
      */
     @Override
-    public void performPostDeletionOps() {
-      super.performPostDeletionOps();
-      try {
-        getRowSet().execute();
-      } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    public void performPostDeletionOps(RowsModel rm) throws SQLException {
+      super.performPostDeletionOps(rm);
       performRefreshOps();
     }
 
@@ -575,12 +572,9 @@ public class TestBaseComponents extends JFrame {
      * Requery the rowset following an insertion. This is needed for H2.
      */
     @Override
-    public void performPostInsertOps() {
-      super.performPostInsertOps();
+    public void performPostInsertOps(RowsModel rm) throws SQLException {
+      super.performPostInsertOps(rm);
       //TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
-      try {
-        getRowSet().execute();
-      } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
       performRefreshOps();
     }
 
@@ -593,7 +587,7 @@ public class TestBaseComponents extends JFrame {
       // WHERE IS THE PRIMARY KEY SET? See example1
       //
 
-      // SSDBNavImpl will clear the component values
+      // super clears the component values
       super.performPreInsertOps();
 
       setDefaultValues();

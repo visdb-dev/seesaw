@@ -39,7 +39,7 @@ import javax.sql.RowSet;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import com.nqadmin.swingset.demo.Example1.DbOpsCustomizerAllows;
+import com.nqadmin.swingset.demo.Example1.DbOpsAllows;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.JStuff;
@@ -53,7 +53,7 @@ import static com.nqadmin.swingset.utils.JStuff.sf;
 public abstract class RowSetButtons extends JPanel {
   private static final Logger logger = JStuff.getLogger();
 
-  record AppInfo(Logger logger, RowsModel rowsModel, DbOpsCustomizerAllows dbOps) {}
+  record AppInfo(Logger logger, RowsModel rowsModel, DbOpsAllows dbOps) {}
   abstract AppInfo getAppInfo();
 
   /** Override for notification of "next" button press. */
@@ -240,6 +240,7 @@ public abstract class RowSetButtons extends JPanel {
       new Allow("d+ins", ai -> ai.dbOps.allowInsert(true)),
       new Allow("d-del", ai -> ai.dbOps.allowDelete(false)),
       new Allow("d+del", ai -> ai.dbOps.allowDelete(true)));
+  @SuppressWarnings("unused")
   private final List<Allow> allow2 = List.of(
       new Allow("all", null), new Allow("n-upd", ai -> ai.rowsModel.setAllowUpdate(false)),
       new Allow("n-ins", ai -> ai.rowsModel.setAllowInsert(false)),
@@ -266,7 +267,7 @@ public abstract class RowSetButtons extends JPanel {
     }
     // everything should be enabled
     RowsModel rm = ai.rowsModel;
-    DbOpsCustomizerAllows ops = ai.dbOps;
+    DbOpsAllows ops = ai.dbOps;
     if (rm == null || ops == null) return;
     // verify everything enabled
     if (rm.getAllowUpdate() != true) throw new IllegalStateException("n-upd");

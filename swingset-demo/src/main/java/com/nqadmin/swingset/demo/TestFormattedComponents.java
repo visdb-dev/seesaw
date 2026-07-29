@@ -53,8 +53,8 @@ import javax.swing.JLabel;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
-import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
+import com.nqadmin.swingset.datasources.DbOps;
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
 import com.nqadmin.swingset.formatting.SSDateField;
 import com.nqadmin.swingset.formatting.SSFormat;
@@ -139,8 +139,6 @@ public class TestFormattedComponents extends JFrame {
    */
   SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
   SSSyncManager syncManager;
-
-  RowSet getRowSet() { return rowsModel.getRowSet(); }
 
   /**
    * Constructor for Formatted Component Test
@@ -349,14 +347,14 @@ public class TestFormattedComponents extends JFrame {
     pack();
   }
 
-  private DbOpsCustomizer createDbNav() {
+  private DbOps createDbNav() {
     /**
      * Various navigator overrides needed to support H2
      * <p>
      * H2 does not fully support updatable rowset so it must be
      * re-queried following insert and delete with rowset.execute()
      */
-    return new DbOpsCustomizerImpl(this) {
+    return new DbOpsBase(this) {
       /**
        * Re-enable DB Navigator following insertion Cancel
        */
@@ -370,11 +368,8 @@ public class TestFormattedComponents extends JFrame {
        * Requery the rowset following a deletion. This is needed for H2.
        */
       @Override
-      public void performPostDeletionOps() {
-        super.performPostDeletionOps();
-        try {
-          getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+      public void performPostDeletionOps(RowsModel rm) throws SQLException {
+        super.performPostDeletionOps(rm);
         performRefreshOps();
       }
 
@@ -382,21 +377,19 @@ public class TestFormattedComponents extends JFrame {
        * Re-query the rowset following an insertion. This is needed for H2.
        */
       @Override
-      public void performPostInsertOps() {
-        super.performPostInsertOps();
+      public void performPostInsertOps(RowsModel rm) throws SQLException {
+        super.performPostInsertOps(rm);
         //TestFormattedComponents.this.cmbSSDBComboNav.setEnabled(true);
-        try {
-          getRowSet().execute();
-        } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
         performRefreshOps();
       }
 
       /**
-       * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+       * Obtain and set the PK value for the new record  and perform
+       * any other actions needed before an insert.
        */
       @Override
       public void performPreInsertOps() {
-        // SSDBNavImpl will clear the component values
+        // super clears the component values
         super.performPreInsertOps();
 
         setDefaultValues();

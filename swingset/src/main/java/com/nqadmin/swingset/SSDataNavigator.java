@@ -46,11 +46,12 @@ import java.awt.Dimension;
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.DataNavigator;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
+
+import com.nqadmin.swingset.datasources.DbOps;
 
 /**
  * See {@link DataNavigator}.
@@ -155,7 +156,7 @@ public class SSDataNavigator extends DataNavigator {
    * @deprecated use {@linkplain RowsModel#getDbOps()}
    */
   @Deprecated
-  public DbOpsCustomizer getDBNav() {
+  public DbOps getDBNav() {
     return getRowsModel().getDbOps();
   }
 
@@ -256,7 +257,7 @@ public class SSDataNavigator extends DataNavigator {
    * @deprecated use {@linkplain RowsModel#setRowSet(javax.sql.RowSet, com.nqadmin.swingset.SSDBNav) }
    */
   @Deprecated
-  public void setDBNav(final DbOpsCustomizer _dBNav) {
+  public void setDBNav(final DbOps _dBNav) {
     getRowsModel().setDBNav(_dBNav);
   }
 

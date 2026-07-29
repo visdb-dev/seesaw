@@ -51,13 +51,14 @@ import java.util.Queue;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
+
+import com.nqadmin.swingset.datasources.DbOps;
 
 /**
  * TODO: Replace EventBUs with https://dagger.dev/ and RxJava
@@ -101,7 +102,7 @@ public class Utils {
    * @param dbOps
    * @param allow
    */
-  public static void postDbOpsChange(DbOpsCustomizer dbOps, DbOpsCustomizer.Allow allow) {
+  public static void postDbOpsChange(DbOps dbOps, DbOps.Allow allow) {
     postFieldEvent(new DbOpsChangeEvent(dbOps, allow));
   }
 

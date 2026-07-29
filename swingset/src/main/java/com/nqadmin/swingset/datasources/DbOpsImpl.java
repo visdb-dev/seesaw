@@ -45,6 +45,7 @@ package com.nqadmin.swingset.datasources;
 import java.awt.Container;
 import java.lang.System.Logger;
 
+import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.navigate.DbOpsChangeEvent;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -54,19 +55,21 @@ import static com.nqadmin.swingset.navigate.Utils.postDbOpsChange;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * Subclass of DbOpsCustomizer that implements performPreInsertOps() to
- * clear/initialize the various SSComponents on a screen; before the
- * user edits/commits the new record.
- * The DbOpsCustomizer is associated with a RowsModel/RowSet
- * see {@link com.nqadmin.swingset.navigate.RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOpsCustomizer) RowsModel(RowSet, DbOpsCustomizer)}.
+ * Implementation of DbOps that implements performPreInsertOps() to
+ * clear/initialize the various SSComponents on a screen before the
+ * user edits the new record. This class also handles state
+ * for the {@code allow*} methods. <b>Typically {@link DbOpsBase} is extended</b>.
+ * <p>
+ * {@code DbOps} is associated with a RowsModel/RowSet, see
+ * {@link com.nqadmin.swingset.navigate.RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps) RowsModel(RowSet, DbOps)}.
  * {@link #performPreInsertOps()} searches the container provided to the
  * constructor to find the {@link SSComponent}s to clean.
  * <p>
  * When the user requests to insert a new row, typically a button push,
  * performPreInsertOps() is invoked
- * to clear the fields before the user starts editing.
+ *  and it clears the fields before the user starts editing.
  */
-public class DbOpsCustomizerImpl implements DbOpsCustomizer {
+public abstract class DbOpsImpl implements DbOps {
   /**
    * Logger for component
    */
@@ -79,17 +82,11 @@ public class DbOpsCustomizerImpl implements DbOpsCustomizer {
   protected Container container = null;
 
   /**
-   * Constructs a DbOpsCustomizerImpl with the specified container.
+   * Constructs a DbOpsImpl with the specified container.
    *
    * @param container	GUI Container to scan for Swing components to clear/reset
    */
-  public DbOpsCustomizerImpl(final Container container) { this.container = container; }
-
-  // /**
-  //  * Constructs a DbOpsCustomizerImpl with no container.
-  //  */
-  // public DbOpsCustomizerImpl() {
-  // }
+  public DbOpsImpl(final Container container) { this.container = container; }
 
   private boolean allowInsert = true;
   private boolean allowDelete = true;
@@ -170,4 +167,4 @@ public class DbOpsCustomizerImpl implements DbOpsCustomizer {
     if (container == null) return;
     SSUtils.visitSSComponents(container, comp -> comp.cleanField());
   }
-} // end public class DbOpsCustomizerImpl
+} // end public class DbOpsImpl
