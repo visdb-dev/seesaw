@@ -31,12 +31,11 @@ package com.nqadmin.swingset.datasources.products;
 
 import java.sql.Connection;
 
-import com.nqadmin.swingset.datasources.DefaultDbSupport;
 
 /**
  * For H2 metadata DatabaseProductName.
  */
-public class H2DbSupport extends DefaultDbSupport {
+public class H2DbSupport extends DbSupportBase {
   /**
    * For H2.
    * @param sharedConnection

@@ -125,8 +125,7 @@ public interface DbSupport {
   }
 
   /**
-   * Run the function with a connection to the database associated
-   * with the specified {@code RowSet}, return the result.
+   * Run the function using the shared connection, return the result.
    * @param <R>
    * @param func
    * @return

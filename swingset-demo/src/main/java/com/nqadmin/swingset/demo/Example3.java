@@ -53,6 +53,7 @@ import javax.swing.JLabel;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.DbOps;
 import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.formatting.SSDateField;
 import com.nqadmin.swingset.formatting.SSIntegerField;
@@ -61,8 +62,6 @@ import com.nqadmin.swingset.utils.JStuff;
 
 import static com.nqadmin.swingset.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.datasources.DbOps;
 
 /**
  * This example displays data from the supplier_part_data table.

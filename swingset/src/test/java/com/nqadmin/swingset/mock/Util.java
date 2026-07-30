@@ -30,7 +30,7 @@
 package com.nqadmin.swingset.mock;
 
 import com.nqadmin.swingset.datasources.DbSupport;
-import com.nqadmin.swingset.datasources.DefaultDbSupport;
+import com.nqadmin.swingset.datasources.products.DbSupportBase;
 import com.nqadmin.swingset.utils.CentralLookup;
 
 /**
@@ -42,7 +42,7 @@ public class Util {
    */
   public static void initLookup() {
     CentralLookup lkup = CentralLookup.getDefault();
-    lkup.replace(DbSupport.class, new DefaultDbSupport(null));
+    lkup.replace(DbSupport.class, new DbSupportBase(null));
   }
 
   private Util() {}

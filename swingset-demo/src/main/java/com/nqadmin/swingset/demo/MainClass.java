@@ -84,9 +84,9 @@ import javax.swing.SwingUtilities;
 import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.datasources.DbSupport;
-import com.nqadmin.swingset.datasources.products.DbSupportFactory;
-import com.nqadmin.swingset.datasources.DefaultDbSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
+import com.nqadmin.swingset.datasources.products.DbSupportBase;
+import com.nqadmin.swingset.datasources.products.DbSupportFactory;
 import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.navigate.Utils;
@@ -393,7 +393,7 @@ public class MainClass extends JFrame {
     DbSupport supp = DbSupportFactory.addDbSupportToLookup(dbConnection);
     if (supp == null) {
       logger.log(Level.ERROR, sf("No SSDBSupport found for '%s'", databaseID));
-      CentralLookup.getDefault().replace(DbSupport.class, new DefaultDbSupport(dbConnection) {});
+      CentralLookup.getDefault().replace(DbSupport.class, new DbSupportBase(dbConnection) {});
     }
 
     // ADD ACTION LISTENERS FOR BUTTONS

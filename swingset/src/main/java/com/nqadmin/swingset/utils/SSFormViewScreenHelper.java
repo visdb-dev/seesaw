@@ -53,7 +53,7 @@ import javax.swing.event.InternalFrameEvent;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.DbOpsImpl;
+import com.nqadmin.swingset.datasources.products.DbOpsImpl;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 

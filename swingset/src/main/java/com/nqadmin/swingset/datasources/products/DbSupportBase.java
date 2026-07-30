@@ -40,7 +40,9 @@
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package com.nqadmin.swingset.datasources;
+package com.nqadmin.swingset.datasources.products;
+
+import com.nqadmin.swingset.datasources.DbSupport;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -62,7 +64,7 @@ import com.nqadmin.swingset.utils.SSUtils;
  *       could be from different database.
  */
 // TODO: clarify semantics of how many connections are supported
-public class DefaultDbSupport implements DbSupport {
+public class DbSupportBase implements DbSupport {
   private final Connection sharedConnection;
 
   /**
@@ -70,7 +72,7 @@ public class DefaultDbSupport implements DbSupport {
    *
    * @param sharedConnection
    */
-  public DefaultDbSupport(Connection sharedConnection) {
+  public DbSupportBase(Connection sharedConnection) {
     if (!SSUtils.isJunit()) Objects.requireNonNull(sharedConnection);
     this.sharedConnection = sharedConnection;
   }

@@ -31,7 +31,7 @@ package com.nqadmin.swingset;
 
 import java.awt.Container;
 
-import com.nqadmin.swingset.datasources.DbOpsImpl;
+import com.nqadmin.swingset.datasources.products.DbOpsImpl;
 
 /**
  * Compatibility.

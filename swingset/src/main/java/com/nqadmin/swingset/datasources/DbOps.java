@@ -45,7 +45,6 @@ package com.nqadmin.swingset.datasources;
 import java.sql.SQLException;
 
 import com.nqadmin.swingset.SSDataNavigator;
-import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.navigate.DbOpsChangeEvent;
 import com.nqadmin.swingset.navigate.RowsAction;
 import com.nqadmin.swingset.navigate.RowsModel;
@@ -72,13 +71,15 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * This interface has only default methods, none of which do anything; it
  * can be instantiated by doing {@code new DbOps() {}}.
  * <p>
- * Generally the user will want to <b>use/extend {@link DbOpsBase}</b>
+ * Generally the user will want to <b>use/extend
+ * {@link com.nqadmin.swingset.datasources.products.DbOpsBase}</b>
  * <ul>
  * <li> it has an implementation of
  * {@link DbOps#performPreInsertOps() performPreInsertOps()}
  * that will clear/initialize {@link com.nqadmin.swingset.utils.SSComponent SSComponent}
  * values before editing.
- * <li> it has implementations of {@link DbOpsBase#performPostInsertOps(com.nqadmin.swingset.navigate.RowsModel) performPostInsertOps(rowsModel)}
+ * <li> it has implementations of
+ * {@link com.nqadmin.swingset.datasources.products.DbOpsBase#performPostInsertOps(com.nqadmin.swingset.navigate.RowsModel) performPostInsertOps(rowsModel)}
  * and other {@code performPost*Ops} that use metadata to decide if
  * the RowSet command needs to be re-executed.
  * <li> it handles state info for
@@ -153,7 +154,8 @@ public interface DbOps {
   /**
    * Method to perform pre-insertion operations by {@link RowsAction#ACT_ADD}
    * after rowSet.moveToInsertRow. Typically initializes all the columns'
-   * {@code SSComponent}s. See {@link DbOpsImpl#performPreInsertOps()}.
+   * {@code SSComponent}s. See
+   * {@link com.nqadmin.swingset.datasources.products.DbOpsBase#performPreInsertOps()}.
    */
   default void performPreInsertOps() {}
 

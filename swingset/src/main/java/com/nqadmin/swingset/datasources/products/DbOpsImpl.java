@@ -40,25 +40,23 @@
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package com.nqadmin.swingset.datasources;
+package com.nqadmin.swingset.datasources.products;
 
 import java.awt.Container;
 import java.lang.System.Logger;
+import java.util.function.Consumer;
 
-import com.nqadmin.swingset.datasources.products.DbOpsBase;
-import com.nqadmin.swingset.navigate.DbOpsChangeEvent;
+import com.nqadmin.swingset.datasources.DbOps;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.navigate.Utils.postDbOpsChange;
 import static java.lang.System.Logger.Level.*;
 
 /**
  * Implementation of DbOps that implements performPreInsertOps() to
  * clear/initialize the various SSComponents on a screen before the
- * user edits the new record. This class also handles state
- * for the {@code allow*} methods. <b>Typically {@link DbOpsBase} is extended</b>.
+ * user edits the new record.
  * <p>
  * {@code DbOps} is associated with a RowsModel/RowSet, see
  * {@link com.nqadmin.swingset.navigate.RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps) RowsModel(RowSet, DbOps)}.
@@ -68,7 +66,9 @@ import static java.lang.System.Logger.Level.*;
  * When the user requests to insert a new row, typically a button push,
  * performPreInsertOps() is invoked
  *  and it clears the fields before the user starts editing.
+ * @deprecated use {@link DbOpsBase}
  */
+@Deprecated
 public abstract class DbOpsImpl implements DbOps {
   /**
    * Logger for component
@@ -87,58 +87,6 @@ public abstract class DbOpsImpl implements DbOps {
    * @param container	GUI Container to scan for Swing components to clear/reset
    */
   public DbOpsImpl(final Container container) { this.container = container; }
-
-  private boolean allowInsert = true;
-  private boolean allowDelete = true;
-  private boolean allowUpdate = true;
-
-  /**
-   * Sub-classes should use this for proper posting of
-   * {@link DbOpsChangeEvent}.
-   * @param allow
-   */
-  protected void allowInsert(boolean allow) {
-    allowInsert = allow;
-    postDbOpsChange(this, Allow.INSERT);
-  }
-
-  /**
-   * Sub-classes should use this for proper posting of
-   * {@link DbOpsChangeEvent}.
-   * @param allow
-   */
-  protected void allowDelete(boolean allow) {
-    allowDelete = allow;
-    postDbOpsChange(this, Allow.DELETE);
-  }
-
-  /**
-   * Sub-classes should use this for proper posting of
-   * {@link DbOpsChangeEvent}.
-   * @param allow
-   */
-  protected void allowUpdate(boolean allow) {
-    allowUpdate = allow;
-    postDbOpsChange(this, Allow.UPDATE);
-  }
-
-  /** {@inheritDoc } */
-  @Override
-  public boolean allowInsert() {
-    return allowInsert;
-  }
-
-  /** {@inheritDoc } */
-  @Override
-  public boolean allowDelete() {
-    return allowDelete;
-  }
-
-  /** {@inheritDoc } */
-  @Override
-  public boolean allowUpdate() {
-    return allowUpdate;
-  }
 
   /**
    * Performs pre-insertion operations, in particular

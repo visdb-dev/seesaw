@@ -58,12 +58,12 @@ import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.core.ComboBox2;
 import com.nqadmin.swingset.core.DBComboBox2;
+import com.nqadmin.swingset.datasources.DbOps;
 import com.nqadmin.swingset.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.JStuff;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
-import com.nqadmin.swingset.datasources.DbOps;
 
 /**
  * This example displays data from the part_data table.

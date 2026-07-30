@@ -30,26 +30,135 @@
 package com.nqadmin.swingset.datasources.products;
 
 import java.awt.Container;
+import java.lang.System.Logger;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.datasources.DbMetaDataCache;
-import com.nqadmin.swingset.datasources.DbOpsImpl;
+import com.nqadmin.swingset.datasources.DbOps;
+import com.nqadmin.swingset.navigate.DbOpsChangeEvent;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.JStuff;
+import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.navigate.Utils.postDbOpsChange;
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
- * Use metadata where applicable.
- * In particular to decide whether or not to re-execute the RowSset command.
+ * Implementation of DbOps that implements performPreInsertOps() to
+ * clear/initialize the various SSComponents on a screen before the
+ * user edits the new record;
+ * implements the {@code performPost*Ops} methods
+ * to use metadata to decide whether or not to re-execute the RowSset command;
+ * handles state for the {@code allow*} methods.
+ * <p>
+ * {@code DbOps} is associated with a RowsModel/RowSet, see
+ * {@link com.nqadmin.swingset.navigate.RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps) RowsModel(RowSet, DbOps)}.
+ * {@link #performPreInsertOps()} searches the container provided to the
+ * constructor to find the {@link SSComponent}s to clean.
  */
-public class DbOpsBase extends DbOpsImpl {
+public class DbOpsBase implements DbOps {
+  /**
+   * Logger for component
+   */
+  protected static final Logger logger = JStuff.getLogger();
+
+  /**
+   * Screen where components to be cleared are located.
+   */
+  // TODO: find out a way that this is not embedded in the class.
+  protected Container container = null;
+
   /**
    * Constructs a DbOpsBase with the specified container.
    *
    * @param container	GUI Container to scan for Swing components to clear/reset
    */
   public DbOpsBase(Container container) {
-    super(container);
+    this.container = container;
+  }
+
+  private boolean allowInsert = true;
+  private boolean allowDelete = true;
+  private boolean allowUpdate = true;
+
+  /**
+   * Sub-classes should use this for proper posting of
+   * {@link DbOpsChangeEvent}.
+   * @param allow
+   */
+  protected void allowInsert(boolean allow) {
+    allowInsert = allow;
+    postDbOpsChange(this, Allow.INSERT);
+  }
+
+  /**
+   * Sub-classes should use this for proper posting of
+   * {@link DbOpsChangeEvent}.
+   * @param allow
+   */
+  protected void allowDelete(boolean allow) {
+    allowDelete = allow;
+    postDbOpsChange(this, Allow.DELETE);
+  }
+
+  /**
+   * Sub-classes should use this for proper posting of
+   * {@link DbOpsChangeEvent}.
+   * @param allow
+   */
+  protected void allowUpdate(boolean allow) {
+    allowUpdate = allow;
+    postDbOpsChange(this, Allow.UPDATE);
+  }
+
+  /** {@inheritDoc } */
+  @Override
+  public boolean allowInsert() {
+    return allowInsert;
+  }
+
+  /** {@inheritDoc } */
+  @Override
+  public boolean allowDelete() {
+    return allowDelete;
+  }
+
+  /** {@inheritDoc } */
+  @Override
+  public boolean allowUpdate() {
+    return allowUpdate;
+  }
+
+  /**
+   * Performs pre-insertion operations, in particular
+   * {@link #cleanComponents(Container) }.
+   */
+  @Override
+  public void performPreInsertOps() {
+    cleanComponents(container);
+  }
+
+  /**
+   * In the specified container, clear/initialize SSComponents.
+   * Typically done for a new record/row. Uses
+   * {@link SSUtils#visitSSComponents(Container, Consumer) }
+   * to run {@link SSComponent#cleanField() }.
+   * <p>
+   * This is done for all SwingSet components,
+   * for example text fields, and text areas,
+   * recursively looking in to the JTabbedPanes and JPanels inside the given
+   * container as needed.
+   *
+   * @param container container in which to recursively initialize components
+   */
+  protected void cleanComponents(final Container container) {
+    logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
+    if (container == null) return;
+    SSUtils.visitSSComponents(container, comp -> comp.cleanField());
   }
   
   /**
@@ -60,7 +169,6 @@ public class DbOpsBase extends DbOpsImpl {
    */
   @Override
   public void performPostInsertOps(RowsModel rm) throws SQLException {
-    super.performPostInsertOps(rm);
     RowSet rs = rm.getRowSet();
     if (!DbMetaDataCache.get().ownInsertsAreVisible(rs.getType()))
       rs.execute();
@@ -74,7 +182,6 @@ public class DbOpsBase extends DbOpsImpl {
    */
   @Override
   public void performPostDeletionOps(RowsModel rm) throws SQLException {
-    super.performPostDeletionOps(rm);
     RowSet rs = rm.getRowSet();
     if (!DbMetaDataCache.get().ownDeletesAreVisible(rs.getType()))
       rs.execute();
@@ -88,7 +195,6 @@ public class DbOpsBase extends DbOpsImpl {
    */
   @Override
   public void performPostUpdateOps(RowsModel rm) throws SQLException {
-    super.performPostUpdateOps(rm);
     RowSet rs = rm.getRowSet();
     if (!DbMetaDataCache.get().ownUpdatesAreVisible(rs.getType()))
       rs.execute();
