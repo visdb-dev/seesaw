@@ -35,52 +35,68 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset;
-
-import java.io.Serializable;
+package dev.visdb.seesaw.core.table;
 
 /**
- * The SSCellEditing interface specifies the methods the SSTableModel will use
- * to determine whether or not a given cell can be edited or if a user-specified
- * value for a cell is valid or invalid.
+ * This abstract class is provided as a convenience for creating
+ * custom SSDataGridHandler objects. Extend this class to create a
+ * SSDataGridHandler implementation.
+ * <p>
+ * SSDataGridHandlerImpl defines empty functions so that the programmer can define
+ * only the functions desired.
  */
-public interface SSCellEditing extends Serializable {
-  /**
-   * unique serial id
-   */
-  static final long serialVersionUID = -8081589343308592606L;
+// TODO Should this class be named SSDataGridHandlerImpl?
+// TODO Can this be eliminated by making empty default metholds to SSDataGridHandler?
+public abstract class SSDataGridAdapter implements SSDataGridHandler {
 
   /**
-   * This function is called when ever a update to a cell is done but before the
-   * value is updated in the database.<BR>
-   * If the function returns false the update is cancelled, if it returns true the
-   * value will be updated in the database.<BR>
+   * This empty implementation always returns true.
+   * For description about the function look in SSRowDeletion class.
    *
-   * @param _row      the row in which update is taking place.
-   * @param _column   the column at which update is taking place.
-   * @param _oldValue the present value in the cell being edited.
-   * @param _newValue the new value entered in the cell being edited.
-   *
-   * @return returns true if update should be made else false.
+   * @param row    the row number in data grid.
    */
-  default boolean cellUpdateRequested(final int _row, final int _column, final Object _oldValue,
-                                      final Object _newValue) {
+  @Override
+  public boolean allowDeletion(final int row) {
     return true;
   }
 
   /**
-   * Returns true if the cell at row _row and at column _column is editable else
-   * false.
-   * <p>
-   * SSTableModel first looks in to uneditable columns, if the column is not in
-   * the uneditable columns list then this function is called (If SSCellEditing is
-   * implemented).
+   * Method to perform post-deletion operations.
    *
-   * @param _row    the row to which the cell belongs.
-   * @param _column the column to which the cell belongs.
-   *
-   * @return returns true is the cell is editable else false.
+   * @param row the position of deleted row in the data grid.
    */
-  default boolean isCellEditable(final int _row, final int _column) { return true; }
+  @Override
+  public void performPostDeletionOps(final int row) {
+    // do nothing
+  }
 
-} // end public interface SSCellEditing {
+  /**
+   * Method to perform post-insertion operations.
+   *
+   * @param row position of added row in the data grid.
+   */
+  @Override
+  public void performPostInsertOps(final int row) {
+    // do nothing
+  }
+
+  /**
+   * Method to perform pre-deletion operations.
+   *
+   * @param row position of data grid row being deleted.
+   */
+  @Override
+  public void performPreDeletionOps(final int row) {
+    // do nothing
+  }
+
+  /**
+   * Method to perform pre-insertion operations.
+   *
+   * @param row position of new row in the data grid.
+   */
+  @Override
+  public void performPreInsertOps(final int row) {
+    // do nothing
+  }
+}

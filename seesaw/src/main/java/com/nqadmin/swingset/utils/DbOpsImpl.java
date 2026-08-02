@@ -58,14 +58,14 @@ import static java.lang.System.Logger.Level.*;
  * user edits the new record.
  * <p>
  * {@code DbOps} is associated with a RowsModel/RowSet, see
- * {@link com.nqadmin.swingset.navigate.RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps) RowsModel(RowSet, DbOps)}.
+ * {@link dev.visdb.seesaw.navigate.RowsModel#create(javax.sql.RowSet, dev.visdb.seesaw.datasources.DbOps) RowsModel(RowSet, DbOps)}.
  * {@link #performPreInsertOps()} searches the container provided to the
- * constructor to find the {@link SSComponent}s to clean.
+ * constructor to find the {@link dev.visdb.seesaw.utils.SSComponent}s to clean.
  * <p>
  * When the user requests to insert a new row, typically a button push,
  * performPreInsertOps() is invoked
  *  and it clears the fields before the user starts editing.
- * @deprecated use {@link DbOpsBase}
+ * @deprecated use {@link dev.visdb.seesaw.datasources.products.DbOpsBase}
  */
 @Deprecated
 public abstract class DbOpsImpl implements DbOps {
@@ -100,7 +100,7 @@ public abstract class DbOpsImpl implements DbOps {
    * In the specified container, clear/initialize SSComponents.
    * Typically done for a new record/row. Uses
    * {@link SSUtils#visitSSComponents(Container, Consumer) }
-   * to run {@link SSComponent#cleanField() }.
+   * to run {@link dev.visdb.seesaw.utils.SSComponent#cleanField() }.
    * <p>
    * This is done for all SwingSet components,
    * for example text fields, and text areas,

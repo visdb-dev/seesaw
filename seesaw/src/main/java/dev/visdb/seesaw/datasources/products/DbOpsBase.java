@@ -56,7 +56,7 @@ import static java.lang.System.Logger.Level.DEBUG;
  * handles state for the {@code allow*} methods.
  * <p>
  * {@code DbOps} is associated with a RowsModel/RowSet, see
- * {@link com.nqadmin.swingset.navigate.RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps) RowsModel(RowSet, DbOps)}.
+ * {@link dev.visdb.seesaw.navigate.RowsModel#create(javax.sql.RowSet, dev.visdb.seesaw.datasources.DbOps) RowsModel(RowSet, DbOps)}.
  * {@link #performPreInsertOps()} searches the container provided to the
  * constructor to find the {@link SSComponent}s to clean.
  */

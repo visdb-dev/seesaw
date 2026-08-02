@@ -44,8 +44,6 @@ package dev.visdb.seesaw.datasources;
 
 import java.sql.SQLException;
 
-import com.nqadmin.swingset.SSDataNavigator;
-
 import dev.visdb.seesaw.navigate.DbOpsChangeEvent;
 import dev.visdb.seesaw.navigate.RowsAction;
 import dev.visdb.seesaw.navigate.RowsModel;
@@ -67,7 +65,7 @@ import dev.visdb.seesaw.utils.SSEnums.Navigation;
  * enum values which have associated actions. The actions
  * are typically invoked by a <b>navigator button push</b> which invokes the
  * associated action,
- * for example see {@link SSDataNavigator}
+ * for example see {@link dev.visdb.seesaw.utils.DataNavigator}
  * <p>
  * This interface has only default methods, none of which do anything; it
  * can be instantiated by doing {@code new DbOps() {}}.
@@ -80,7 +78,7 @@ import dev.visdb.seesaw.utils.SSEnums.Navigation;
  * that will clear/initialize {@link dev.visdb.seesaw.utils.SSComponent SSComponent}
  * values before editing.
  * <li> it has implementations of
- * {@link com.nqadmin.swingset.datasources.products.DbOpsBase#performPostInsertOps(com.nqadmin.swingset.navigate.RowsModel) performPostInsertOps(rowsModel)}
+ * {@link dev.visdb.seesaw.datasources.products.DbOpsBase#performPostInsertOps(dev.visdb.seesaw.navigate.RowsModel) performPostInsertOps(rowsModel)}
  * and other {@code performPost*Ops} that use metadata to decide if
  * the RowSet command needs to be re-executed.
  * <li> it handles state info for
@@ -117,7 +115,7 @@ public interface DbOps {
    * This functions is called just before doing something that is sensitive
    * to a row being dirty. When it returns true, it is followed by
    * rowSet.updateRow(). Note that the default for {@code AutoCommit} is false.
-   * So the behavior of {@link SSDataNavigator} in conjunction with
+   * So the behavior of {@link dev.visdb.seesaw.utils.DataNavigator} in conjunction with
    * {@link RowsAction} is that when the current row is dirty only
    * commit and undo are enabled.
    *
@@ -156,7 +154,7 @@ public interface DbOps {
    * Method to perform pre-insertion operations by {@link RowsAction#ACT_ADD}
    * after rowSet.moveToInsertRow. Typically initializes all the columns'
    * {@code SSComponent}s. See
-   * {@link com.nqadmin.swingset.datasources.products.DbOpsBase#performPreInsertOps()}.
+   * {@link dev.visdb.seesaw.datasources.products.DbOpsBase#performPreInsertOps()}.
    */
   default void performPreInsertOps() {}
 

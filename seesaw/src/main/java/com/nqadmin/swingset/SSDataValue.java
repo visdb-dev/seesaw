@@ -41,15 +41,5 @@ package com.nqadmin.swingset;
  * The SSDataValue interface specifies methods for SSTableModel to retrieve the
  * value for primary column in JTable.
  */
-public interface SSDataValue {
-  /**
-   * Returns the value for the primary column in the JTable (RowSet used for
-   * building the JTable). When addition of a row is taking place in the JTable,
-   * SSTableModel tries to insert a primary key value in to that row returned by
-   * this function.
-   *
-   * @return the value for the primary key column.
-   */
-  public Object getPrimaryColumnValue();
-
-} // end public interface SSDataValue {
+public interface SSDataValue extends dev.visdb.seesaw.core.table.SSDataValue {
+}

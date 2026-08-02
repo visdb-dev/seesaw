@@ -35,50 +35,50 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
- * ****************************************************************************/
-package dev.visdb.seesaw.models;
-
-import java.sql.Array;
-import java.sql.JDBCType;
-import java.sql.SQLException;
-
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSJDBCArray;
+package dev.visdb.seesaw.core.table;
 
 /**
- * Implementation of SSCollectionModel as an array that uses a database
- * {@code JDBCType.ARRAY} for storage. The order of items is preserved by
- * {@link #readData(dev.visdb.seesaw.utils.SSComponent) readData} and
- * {@link #writeData(dev.visdb.seesaw.utils.SSComponent, java.lang.Object[])
- * writeData}.
- *
- * @since 4.0.0
+ * The SSDataGridHandler interface specifies set of methods that can be used to
+ * determine whether or not a given row can be deleted, and operation to be
+ * performed before and after deletion or insertion of a record.
  */
-public class SSDbArray extends SSAbstractCollection {
+public interface SSDataGridHandler {
   /**
-   * Create SSDbArrayModel
-   * @param jdbcType type of elements in database array
+   * Returns true if the row row can be deleted
+   * <p>
+   * SSTableModel calls this function if the row deletion is requested
+   * (if SSDataGridHandler is implemented).
+   *
+   * @param row    the row number in data grid.
+   * @return returns true is the row can be deleted else false.
    */
-  public SSDbArray(final JDBCType jdbcType) { super(jdbcType); }
+  public boolean allowDeletion(int row);
 
-  /** {@inheritDoc } */
-  @Override
-  public Object readData(SSComponent comp) throws SQLException {
-    Array array = comp.getColumnArray();
-    if (array == null) return null;
-    return array.getArray();
-  }
+  /**
+   * Method to perform post-deletion operations.
+   *
+   * @param row  position of deleted row in the data grid.
+   */
+  public void performPostDeletionOps(int row);
 
-  /** {@inheritDoc } */
-  @Override
-  public void writeData(SSComponent comp, final Object data) throws SQLException {
-    if (!data.getClass().isArray()) throw new IllegalArgumentException("Must be an array");
+  /**
+   * Method to perform post-insertion operations.
+   *
+   * @param row position of added grid row.
+   */
+  public void performPostInsertOps(int row);
 
-    SSJDBCArray array = new SSJDBCArray(data, getJDBCType());
-    comp.setColumnArray(array);
-  }
+  /**
+   * Method to specify any pre-deletion operations.
+   *
+   *  @param row position of data grid row being deleted.
+   */
+  public void performPreDeletionOps(int row);
+
+  /**
+   * Method to perform pre-insertion operations.
+   *
+   * @param row position of new row in the data grid.
+   */
+  public void performPreInsertOps(int row);
 }

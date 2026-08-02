@@ -70,7 +70,7 @@ import static java.lang.System.Logger.Level.*;
  * the 'key' and the display value the 'text' which appears in the combo box.
  * <p>
  * This is sometimes used as a Navigator in conjunction with
- * {@link dev.visdb.seesaw.utils.SSSyncManager}.
+ * {@link dev.visdb.seesaw.utils.SyncManager}.
  * Generally the key represents a foreign key to another
  * table, and the combobox displays the {@code <D>}.
  * <p>

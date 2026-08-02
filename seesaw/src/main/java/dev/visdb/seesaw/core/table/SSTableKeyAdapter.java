@@ -40,7 +40,7 @@
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package dev.visdb.seesaw.core.table;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -52,7 +52,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.System.Logger;
 import java.lang.reflect.Constructor;
 import java.sql.Date;
@@ -61,61 +60,55 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
+import dev.visdb.seesaw.core.DataGrid;
 import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * Key adapter for JTable and SSDataGrid that manages cut and paste functionality
+ * Key adapter for JTable and DataGrid that manages cut and paste functionality
  * between a table and either another table or a spreadsheet.
  */
-public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
-  /**
-   * Log4j Logger for component
-   */
-  private static Logger logger = JStuff.getLogger();
-
-  /**
-   * unique serial id
-   */
-  private static final long serialVersionUID = -2748762202415891694L;
+public class SSTableKeyAdapter extends KeyAdapter {
+  /** Logger for component */
+  private static final Logger logger = JStuff.getLogger();
 
   /**
    * Takes the column number and string value to be set for that column and
    * converts the string in to appropriate class. The class is found by calling
    * the getColumnClass() method of the JTable.
    *
-   * @param _jTable JTable containing target object
-   * @param _column the column number for which new value has to be set.
-   * @param _value  string representation of the new value.
+   * @param jTable JTable containing target object
+   * @param column the column number for which new value has to be set.
+   * @param value  string representation of the new value.
    *
    * @return returns the value as a column class object.
    * @throws Exception catch all exception
    */
-  protected static Object getObjectToSet(final JTable _jTable, final int _column,
-                                         final String _value) throws Exception {
+  protected static Object getObjectToSet(final JTable jTable, final int column,
+                                         final String value) throws Exception {
     // GET THE COLUMN CLASS
-    final Class<?> objectClass = _jTable.getColumnClass(_column);
+    final Class<?> objectClass = jTable.getColumnClass(column);
     Object newValue = null;
     try {
       // CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
-      if (_value != null) {
+      if (value != null) {
         // DATE CLASS DOESN'T HAVE A CONSTRUCTOR THAT TAKES A STRING
         if (objectClass.equals(java.sql.Date.class)) {
-          newValue = Date.valueOf(_value);
+          newValue = Date.valueOf(value);
         } else {
           // GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
           final Constructor<?> constructor
               = objectClass.getConstructor(new Class<?>[] {String.class});
 
           // CREATE AN INSTANCE OF THE OBJECT
-          newValue = constructor.newInstance(new Object[] {_value});
+          newValue = constructor.newInstance(new Object[] {value});
         }
       }
     } catch (final NoSuchMethodException nsme) {
       logger.log(WARNING, "No Such Method Exception. Failed to copy data.", nsme);
-      newValue = _value;
+      newValue = value;
     }
 
     // RETURN THE NEWLY CREATED OBJECT.
@@ -128,7 +121,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
   protected boolean allowInsertion = false;
 
   /**
-   * Indicates row used for insertion in SSDataGrid.
+   * Indicates row used for insertion in DataGrid.
    */
   protected boolean forSSDataGrid = false;
 
@@ -145,18 +138,20 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
   /**
    * Constructs a KeyAdapter for the JTable.
    *
-   * @param _jTable JTable for which copy and paste support should be added.
+   * @param jTable JTable for which copy and paste support should be added.
    */
-  public SSTableKeyAdapter(final JTable _jTable) { init(_jTable); }
+  @SuppressWarnings("OverridableMethodCallInConstructor")
+  public SSTableKeyAdapter(final JTable jTable) { init(jTable); }
 
   /**
    * Adds the key listener for the specified JTable.
-   * @param _jTable table for which listener is to be added
+   * @param jTable table for which listener is to be added
    */
-  protected void init(final JTable _jTable) { _jTable.addKeyListener(this); }
+  protected void init(final JTable jTable) { jTable.addKeyListener(this); }
 
   /**
    * Invoked when a key is released.
+   * @param ke
    */
   @Override
   public void keyReleased(final KeyEvent ke) {
@@ -179,12 +174,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
       // GET COLUMNS INVOLVED
       final int numRows = jTable.getSelectedRowCount();
-      int numColumns = 0;
-      if (jTable instanceof SSDataGrid) {
-        numColumns = ((SSDataGrid) jTable).getSelectedColumnCount();
-      } else {
-        numColumns = jTable.getSelectedColumnCount();
-      }
+      int numColumns = jTable.getSelectedColumnCount();
 
       // CHECK IF THERE IS ATLEAST ONE SELECTED CELL.
       // IF NOT NOTHING TO COPY JUST RETURN.
@@ -192,12 +182,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
       // GET THE ROWS AND COLUMNS SELECTED.
       final int[] selectedRows = jTable.getSelectedRows();
-      int[] selectedColumns = null;
-      if (jTable instanceof SSDataGrid) {
-        selectedColumns = ((SSDataGrid) jTable).getSelectedColumns();
-      } else {
-        selectedColumns = jTable.getSelectedColumns();
-      }
+      int[] selectedColumns = jTable.getSelectedColumns();
 
       // COPY THE DATA IN THE SELECTED ROWS AND COLUMNS
       // APPEND A TAB AFTER EACH CELL AND A NEW LINE CHAR AT END OF EACH ROW.
@@ -232,7 +217,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
       // IF THE CONTENT TYPE SUPPORTS STRING TYPE GET THE DATA.
       if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
         // GET DATA FROM CLIPBOARD
-        String strData = "";
+        String strData;
         try {
           strData = (String) transferable.getTransferData(DataFlavor.stringFlavor);
         } catch (final UnsupportedFlavorException ufe) {
@@ -275,7 +260,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
         int rowCount = jTable.getRowCount();
         final int columnCount = jTable.getColumnCount();
 
-        if (forSSDataGrid || (jTable instanceof SSDataGrid)) { rowCount--; }
+        if (forSSDataGrid || (jTable instanceof DataGrid)) { rowCount--; }
 
         // IF THE NUMBER OF COLUMNS NEEDED TO COPY FROM CLIPBOARD
         // IS MORE THAN THAT IN JTABLE CANCEL COPY
@@ -383,17 +368,17 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
    * Sets allowInsertion indicator. Set true if new rows can be added to JTable
    * via cut/copy and paste - otherwise false. False by default.
    *
-   * @param _allowInsertion true if new rows can be added when pasting data from
+   * @param allowInsertion true if new rows can be added when pasting data from
    *                        clipboard, else false.
    */
-  public void setAllowInsertion(final boolean _allowInsertion) { allowInsertion = _allowInsertion; }
+  public void setAllowInsertion(final boolean allowInsertion) { this.allowInsertion = allowInsertion; }
 
   /**
    * Sets forSSDataGrid indicator. True if the key adapter is used for SSDataGrid
    * -- otherwise false. False by default.
    *
-   * @param _forSSDataGrid - true if this key adapter is used for SSDataGrid, else
-   *                       false.
+   * @param forSSDataGrid - true if this key adapter is used for DataGrid, else
+                      false.
    */
-  public void setForSSDataGrid(final boolean _forSSDataGrid) { forSSDataGrid = _forSSDataGrid; }
+  public void setForSSDataGrid(final boolean forSSDataGrid) { this.forSSDataGrid = forSSDataGrid; }
 }

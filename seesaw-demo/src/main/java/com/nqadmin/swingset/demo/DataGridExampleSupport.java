@@ -78,6 +78,7 @@ class DataGridExampleSupport {
   private final Container uiContainer;
   private final RowSet rowset;
   private final SSDataGrid dataGrid;
+  @SuppressWarnings("NonConstantLogger")
   private final Logger logger;
 
   /** assumes rowset has been set */

@@ -35,50 +35,46 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
- * ****************************************************************************/
-package dev.visdb.seesaw.models;
-
-import java.sql.Array;
-import java.sql.JDBCType;
-import java.sql.SQLException;
-
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSJDBCArray;
+package dev.visdb.seesaw.core.table;
 
 /**
- * Implementation of SSCollectionModel as an array that uses a database
- * {@code JDBCType.ARRAY} for storage. The order of items is preserved by
- * {@link #readData(dev.visdb.seesaw.utils.SSComponent) readData} and
- * {@link #writeData(dev.visdb.seesaw.utils.SSComponent, java.lang.Object[])
- * writeData}.
- *
- * @since 4.0.0
+ * The SSCellEditing interface specifies the methods the SSTableModel will use
+ * to determine whether or not a given cell can be edited or if a user-specified
+ * value for a cell is valid or invalid.
  */
-public class SSDbArray extends SSAbstractCollection {
+public interface SSCellEditing {
+
   /**
-   * Create SSDbArrayModel
-   * @param jdbcType type of elements in database array
+   * This function is called when ever a update to a cell is done but before the
+   * value is updated in the database.<BR>
+   * If the function returns false the update is cancelled, if it returns true the
+   * value will be updated in the database.<BR>
+   *
+   * @param row      the row in which update is taking place.
+   * @param column   the column at which update is taking place.
+   * @param oldValue the present value in the cell being edited.
+   * @param newValue the new value entered in the cell being edited.
+   *
+   * @return returns true if update should be made else false.
    */
-  public SSDbArray(final JDBCType jdbcType) { super(jdbcType); }
-
-  /** {@inheritDoc } */
-  @Override
-  public Object readData(SSComponent comp) throws SQLException {
-    Array array = comp.getColumnArray();
-    if (array == null) return null;
-    return array.getArray();
+  default boolean cellUpdateRequested(final int row, final int column, final Object oldValue,
+                                      final Object newValue) {
+    return true;
   }
 
-  /** {@inheritDoc } */
-  @Override
-  public void writeData(SSComponent comp, final Object data) throws SQLException {
-    if (!data.getClass().isArray()) throw new IllegalArgumentException("Must be an array");
+  /**
+   * Returns true if the cell at row _row and at column _column is editable else
+   * false.
+   * <p>
+   * SSTableModel first looks in to uneditable columns, if the column is not in
+   * the uneditable columns list then this function is called (If SSCellEditing is
+   * implemented).
+   *
+   * @param row    the row to which the cell belongs.
+   * @param column the column to which the cell belongs.
+   *
+   * @return returns true is the cell is editable else false.
+   */
+  default boolean isCellEditable(final int row, final int column) { return true; }
 
-    SSJDBCArray array = new SSJDBCArray(data, getJDBCType());
-    comp.setColumnArray(array);
-  }
-}
+} // end public interface SSCellEditing {

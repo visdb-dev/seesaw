@@ -40,11 +40,11 @@
 /**
  * This package contains components based on {@link javax.swing.JFormattedTextField} and has
  * support/base classes for creating these components. The components interoperate
- * with {@link com.nqadmin.swingset.decorators.Decorator}
+ * with {@link dev.visdb.seesaw.decorators.Decorator}
  * to provide visual feedback as data is entered into the component
- * and {@link com.nqadmin.swingset.decorators.Validator} to detect bogus values
+ * and {@link dev.visdb.seesaw.decorators.Validator} to detect bogus values
  * as early as possible and avoid them getting into the database.
- * The components also respects {@link com.nqadmin.swingset.datasources.RSC#getAllowNull()}.
+ * The components also respects {@link dev.visdb.seesaw.datasources.RSC#getAllowNull()}.
  *
  * Formatters and FormatterFactory
  *

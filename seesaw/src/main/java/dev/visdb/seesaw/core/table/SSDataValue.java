@@ -35,74 +35,21 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset;
-
-import java.io.Serializable;
+package dev.visdb.seesaw.core.table;
 
 /**
- * This abstract class is provided as a convenience for creating
- * custom SSDataGridHandler objects. Extend this class to create a
- * SSDataGridHandler implementation.
- * <p>
- * SSDataGridHandlerImpl defines empty functions so that the programmer can define
- * only the functions desired.
+ * The SSDataValue interface specifies methods for SSTableModel to retrieve the
+ * value for primary column in JTable.
  */
-// TODO Should this class be named SSDataGridHandlerImpl?
-// TODO Can this be eliminated by making empty default metholds to SSDataGridHandler?
-public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializable {
+public interface SSDataValue {
   /**
-   * unique serial id
-   */
-  private static final long serialVersionUID = -6957488891365154999L;
-
-  /**
-   * This empty implementation always returns true.
-   * For description about the function look in SSRowDeletion class.
+   * Returns the value for the primary column in the JTable (RowSet used for
+   * building the JTable). When addition of a row is taking place in the JTable,
+   * SSTableModel tries to insert a primary key value in to that row returned by
+   * this function.
    *
-   * @param _row    the row number in data grid.
+   * @return the value for the primary key column.
    */
-  @Override
-  public boolean allowDeletion(final int _row) {
-    return true;
-  }
+  public Object getPrimaryColumnValue();
 
-  /**
-   * Method to perform post-deletion operations.
-   *
-   * @param _row the position of deleted row in the data grid.
-   */
-  @Override
-  public void performPostDeletionOps(final int _row) {
-    // do nothing
-  }
-
-  /**
-   * Method to perform post-insertion operations.
-   *
-   * @param _row position of added row in the data grid.
-   */
-  @Override
-  public void performPostInsertOps(final int _row) {
-    // do nothing
-  }
-
-  /**
-   * Method to perform pre-deletion operations.
-   *
-   * @param _row position of data grid row being deleted.
-   */
-  @Override
-  public void performPreDeletionOps(final int _row) {
-    // do nothing
-  }
-
-  /**
-   * Method to perform pre-insertion operations.
-   *
-   * @param _row position of new row in the data grid.
-   */
-  @Override
-  public void performPreInsertOps(final int _row) {
-    // do nothing
-  }
-}
+} // end public interface SSDataValue {

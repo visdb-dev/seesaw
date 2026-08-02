@@ -44,7 +44,7 @@
  * </ul>
  * <h2>Database Collection Models</h2>
  * These models abstract away the storage specifics; they all
- * implement {@link com.nqadmin.swingset.models.SSCollection}.
+ * implement {@link dev.visdb.seesaw.models.SSCollection}.
  * they generally read and write to database.
  * There are subclasses that present data
  * as an array or set independent of how it might be stored in a data.
@@ -52,13 +52,13 @@
  * could represent data from a single field or data resulting from a join.
  * <h2>UI support Models</h2>
  * These models, sub-classes of
- * {@link com.nqadmin.swingset.models.AbstractComboBoxListSwingModel},
+ * {@link dev.visdb.seesaw.models.AbstractComboBoxListSwingModel},
  * generally revolve around managing
- * {@link com.nqadmin.swingset.models.SSListItem}s. An {@code SSListItem}
+ * {@link dev.visdb.seesaw.models.SSListItem}s. An {@code SSListItem}
  * is generally the item which is visible in a {@code JComboBox}
  * or {@code JList}. Additionally these classes implement ListModel
  * and MutableComboBoxModel; they can be installed into either.
- * {@link com.nqadmin.swingset.models.GlazedListsKeyDisplayValueInfo}
+ * {@link dev.visdb.seesaw.models.GlazedListsKeyDisplayValueInfo}
  * works with {@code GlazedLists} auto completion.
  *
  * @since 4.0.0

@@ -74,6 +74,9 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.reflect.TypeToken;
 
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.matchers.TextMatcherEditor;
+import ca.odell.glazedlists.swing.AutoCompleteSupport;
 import dev.visdb.seesaw.datasources.JdbcDataTypeConversionTables;
 import dev.visdb.seesaw.models.AbstractComboBoxListSwingModel;
 import dev.visdb.seesaw.models.GlazedListsKeyDisplayValueInfo;
@@ -86,9 +89,6 @@ import dev.visdb.seesaw.navigate.UndoRedo.Change;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SSComponent;
 import dev.visdb.seesaw.utils.SSUtils;
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.matchers.TextMatcherEditor;
-import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import static dev.visdb.seesaw.models.AbstractComboBoxListSwingModel.addEventLogging;
 import static dev.visdb.seesaw.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
@@ -111,7 +111,7 @@ import static java.lang.System.Logger.Level.*;
  * In addition, there are JComboBox models for use with or without glazed lists;
  * these models have static methods for hooking things up to the JComboBox,
  * see {@linkplain ModelType}, which is used with
- * {@link Builder#modelType(com.nqadmin.swingset.core.ComboBox2.ModelType)
+ * {@link Builder#modelType(dev.visdb.seesaw.core.ComboBox2.ModelType)
  * Builder.modelType(modelType)}
  * to select the model type.
  * <p>
@@ -167,7 +167,7 @@ import static java.lang.System.Logger.Level.*;
  <p>
  * Note that if you do not want to use the auto-generated keys, the keys
  * must be set before invoking the
- * {@link com.nqadmin.swingset.navigate.RowsModel#bind(com.nqadmin.swingset.utils.SSComponent, java.lang.String) bind()}
+ * {@link dev.visdb.seesaw.navigate.RowsModel#bind(dev.visdb.seesaw.utils.SSComponent, java.lang.String) bind()}
  * method to associate the combobox to a database column.
  * <p>
  * Initially no D2.
@@ -1131,7 +1131,7 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * handled. If {@code MC_ADD} and a Key is encountered and no DisplayValue
    * was specified, a combobox list entry is created for the Key with null
    * displayValue; a custom message, see
-   * {@link #setListItemFormat(com.nqadmin.swingset.models.SSListItemFormat)},
+   * {@link #setListItemFormat(dev.visdb.seesaw.models.SSListItemFormat)},
    * may be setup for handling these entries for the combobox display.If
    * {@code MC_CLEANUP} then when the combobox navigates away from an entry
    * with a missing displayValue, the automatically created list entry is

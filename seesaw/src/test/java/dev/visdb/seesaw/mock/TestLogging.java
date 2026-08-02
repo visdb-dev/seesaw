@@ -54,7 +54,7 @@ public class TestLogging {
   private TestLogging() {}
 
   /** Not for logging per se, but to configure the handler for test logging. */
-  private static final Logger logger = Logger.getLogger("com.nqadmin.swingset");
+  private static final Logger logger = Logger.getLogger("dev.visdb.seesaw");
 
   /**
    * set up logger with default level INFO.
@@ -136,7 +136,7 @@ public class TestLogging {
      */
     public TestFormatter(String format) { this.format = format; }
 
-    private static final String PREFIX = "com.nqadmin.swingset";
+    private static final String PREFIX = "dev.visdb.seesaw";
 
     /**
      * Format the given LogRecord. TRIM THE SOURCE NAME.

@@ -162,18 +162,21 @@ public class RowSetState {
     }
 
     @Override
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void rowSetChanged(RowSetEvent event) {
       String s = sf("DEBUG: %s: %s", ROW_SET_CHANGED, objectID(event.getSource()));
       System.err.println(s);
     }
 
     @Override
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void rowChanged(RowSetEvent event) {
       String s = sf("DEBUG: %s: %s", ROW_CHANGED, objectID(event.getSource()));
       System.err.println(s);
     }
 
     @Override
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void cursorMoved(RowSetEvent event) {
       String s = sf("DEBUG: %s: %s", CURSOR_MOVED, objectID(event.getSource()));
       System.err.println(s);
@@ -369,7 +372,7 @@ public class RowSetState {
    *
    * A wrapper exception for exceptions that occur while the SS library is
    * accepting changes to a {@link javax.sql.rowset.CachedRowSet},
-   * see {@link com.nqadmin.swingset.navigate.RowSetState#acceptingCachedRowSetChanges}.
+   * see {@link dev.visdb.seesaw.navigate.RowSetState#acceptingCachedRowSetChanges}.
    * This may contain two exceptions; one from {@code crs.acceptChanges()}, the
    * other from {@code runAfterCachedRowSetChanges}
    */

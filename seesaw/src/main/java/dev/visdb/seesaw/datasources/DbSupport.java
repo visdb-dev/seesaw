@@ -49,14 +49,13 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 
 import dev.visdb.seesaw.core.DBComboBox2;
-
 import dev.visdb.seesaw.datasources.RowSetOps.DbUpdate;
 import dev.visdb.seesaw.utils.SSComponent;
 
 /**
  * Database specific operations and access mechanisms.
  * An implementation manages and uses a {@code sharedConnection},
- * See {@link com.nqadmin.swingset.utils.SSUtils#dbSupport()} for best access method.
+ * See {@link dev.visdb.seesaw.utils.SSUtils#dbSupport()} for best access method.
  */
 // This needs work, clean up. It evolved as someplace to put stuff that
 // shouldn't be in mainline code; and it provides a way to find out where those
@@ -90,7 +89,7 @@ public interface DbSupport {
    * Create a query that contains the row number of a non "order by" query.
    * When used in conjunction with a {@link DBComboBox2} which is acting as
    * a combobox navigator, the row number is used to avoid sequential searches
-   * table searches in {@link dev.visdb.seesaw.utils.SSSyncManager}.
+   * table searches in {@link dev.visdb.seesaw.utils.SyncManager}.
    * For example, given {@snippet lang="java":
    * sup.createRownumQuery("part_id, part_name",
    *                       "rown",

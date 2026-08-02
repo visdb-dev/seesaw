@@ -42,43 +42,5 @@ package com.nqadmin.swingset;
  * determine whether or not a given row can be deleted, and operation to be
  * performed before and after deletion or insertion of a record.
  */
-public interface SSDataGridHandler {
-  /**
-   * Returns true if the row _row can be deleted
-   * <p>
-   * SSTableModel calls this function if the row deletion is requested
-   * (if SSDataGridHandler is implemented).
-   *
-   * @param _row    the row number in data grid.
-   * @return returns true is the row can be deleted else false.
-   */
-  public boolean allowDeletion(int _row);
-
-  /**
-   * Method to perform post-deletion operations.
-   *
-   * @param _row  position of deleted row in the data grid.
-   */
-  public void performPostDeletionOps(int _row);
-
-  /**
-   * Method to perform post-insertion operations.
-   *
-   * @param _row position of added grid row.
-   */
-  public void performPostInsertOps(int _row);
-
-  /**
-   * Method to specify any pre-deletion operations.
-   *
-   *  @param _row position of data grid row being deleted.
-   */
-  public void performPreDeletionOps(int _row);
-
-  /**
-   * Method to perform pre-insertion operations.
-   *
-   * @param _row position of new row in the data grid.
-   */
-  public void performPreInsertOps(int _row);
+public interface SSDataGridHandler extends dev.visdb.seesaw.core.table.SSDataGridHandler {
 }
