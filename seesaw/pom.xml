@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dev.visdb.seesaw</groupId>
+		<artifactId>seesaw-parent</artifactId>
+		<version>5.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<snippet_path>
+                        ${project.basedir}/../seesaw-demo/src/main/java/snippet_files
+		</snippet_path>
+        </properties>
+
+	<artifactId>seesaw</artifactId>
+	<packaging>jar</packaging>
+
+	<name>seesaw</name>
+	<description>SeeSaw library</description>
+	<url>https://github.com/errael/visdb</url>
+
+	<licenses>
+		<license>
+			<name>BSD 3-Clause</name>
+			<url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+		</license>
+	</licenses>
+
+        <developers>
+            <developer>
+                <id>errael</id>
+                <name>Ernie R Rael</name>
+                <email>errael@raelity.com</email>
+                <organization>Raelity Engineering</organization>
+                <organizationUrl>http://raelity.com</organizationUrl>
+            </developer>
+            <developer>
+                <name>Prasanth R. Pasala</name>
+                <email>swingset@pangburngroup.com</email>
+                <organization>The Pangburn Group, Inc.</organization>
+                <organizationUrl>https://pangburngroup.com</organizationUrl>
+            </developer>
+            <developer>
+                <name>Brian E. Pangburn</name>
+                <email>brian@pangburngroup.com</email>
+                <organization>The Pangburn Group, Inc.</organization>
+                <organizationUrl>https://pangburngroup.com</organizationUrl>
+            </developer>
+        </developers>
+
+	<scm>
+		<url>https://github.com/bpangburn/swingset</url>
+		<connection>scm:git:git@github.com:bpangburn/swingset.git</connection>
+		<developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
+			<artifactId>glazedlists</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-openide-util-lookup</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-openide-util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.raelity.jdk</groupId>
+			<artifactId>table-sort-header-renderer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.raelity.lib</groupId>
+			<artifactId>weak-event-bus-receiver</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+
+                        <!-- include following for display-variable-value -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-antrun-plugin</artifactId>
+                        </plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!-- Hopefully we can comment this out now that we're requiring Java 11+.
+		<profile>
+			<id>java-9-plus</id>
+			<activation>
+				<jdk>[1.9,)</jdk>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<configuration>
+								<additionalOptions>-html5</additionalOptions>
+								<doclint>all,-missing,-html</doclint>
+								<links>
+									<link>
+										https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
+								</links>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		-->
+	</profiles>
+
+</project>

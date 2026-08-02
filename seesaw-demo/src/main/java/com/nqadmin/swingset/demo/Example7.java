@@ -1,0 +1,183 @@
+/*******************************************************************************
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Contributors:
+ *   Prasanth R. Pasala
+ *   Brian E. Pangburn
+ *   Diego Gil
+ *   Man "Bee" Vo
+ *   Ernie R. Rael
+ ******************************************************************************/
+package com.nqadmin.swingset.demo;
+
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.sql.RowSet;
+import javax.swing.JFrame;
+
+import com.nqadmin.swingset.SSDataGrid;
+
+import dev.visdb.seesaw.navigate.RowsModel;
+import dev.visdb.seesaw.utils.JStuff;
+
+/**
+ * This example demonstrates the use of an SSDataGrid to display a tabular view
+ * of the supplier_part_data table.
+ * <p>
+ * It adds a ComboRenderer with a lookup to the supplier_data table for the supplier name,
+ * and adds a DateRenderer for the ship date column.
+ */
+@SuppressWarnings("serial")
+public class Example7 extends JFrame {
+  /**
+   * Log4j2 Logger
+   */
+  private static final Logger logger = JStuff.getLogger();
+
+  /**
+   * data grid
+   */
+  SSDataGrid dataGrid = null;
+  RowsModel rowsModel;
+
+  /**
+   * database component declarations
+   */
+  Connection connection = null;
+
+  /**
+   * Constructor for Example7
+   * <p>
+   * @param _dbConn - database connection
+   */
+  @SuppressWarnings("LeakingThisInConstructor")
+  public Example7(final Connection _dbConn) {
+    // SET SCREEN TITLE
+    super("Example7");
+    DemoUtil.initExampleFrame(this, null);
+
+    // SET CONNECTION
+    connection = _dbConn;
+
+    // SET SCREEN DIMENSIONS
+    setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+
+    // SET SCREEN POSITION
+    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
+    // INITIALIZE SCREEN & DATAGRID
+    init();
+  }
+
+  /**
+   * Initialize the screen & datagrid
+   */
+  private void init() {
+    // INTERACT WITH DATABASE IN TRY/CATCH BLOCK
+    try {
+      // INITIALIZE DATABASE CONNECTION AND COMPONENTS
+      RowSet rowset = DemoUtil.getNewRowSet(connection);
+      rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM "
+                        + "supplier_part_data ORDER BY supplier_id, part_id;");
+      rowset.execute();
+      rowsModel = RowsModel.create(rowset, null);
+
+      // SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
+      dataGrid = new SSDataGrid();
+      dataGrid.setHeaders(
+          new String[] {"Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date"});
+      dataGrid.setRowsModel(rowsModel);
+      dataGrid.setMessageWindow(this);
+
+      // DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
+      dataGrid.setInsertion(false);
+
+      // MAKE THE SUPPLIER-PART ID UNEDITABLE
+      dataGrid.setUneditableColumns(new String[] {"supplier_part_id"});
+
+      // SET A DATE RENDERER FOR ship_date
+      dataGrid.setDateRenderer("ship_date");
+
+      // BUILD COMBO RENDERERS FOR SUPPLIER AND PART
+      // ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
+      try (Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                       ResultSet.CONCUR_UPDATABLE)) {
+        String[] displayItems;
+        Integer[] underlyingNumbers;
+
+        try (ResultSet rs = stmt.executeQuery(
+                 "SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
+          rs.last();
+          displayItems = new String[rs.getRow()];
+          underlyingNumbers = new Integer[rs.getRow()];
+          rs.beforeFirst();
+
+          for (int i = 0; i < displayItems.length; i++) {
+            rs.next();
+            displayItems[i] = rs.getString("supplier_name");
+            underlyingNumbers[i] = rs.getInt("supplier_id");
+          }
+
+          dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers,
+                                    MainClass.gridColumnWidth);
+        }
+
+        try (ResultSet rs
+             = stmt.executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;")) {
+          rs.last();
+          displayItems = new String[rs.getRow()];
+          underlyingNumbers = new Integer[rs.getRow()];
+          rs.beforeFirst();
+
+          for (int i = 0; i < displayItems.length; i++) {
+            rs.next();
+            displayItems[i] = rs.getString("part_name");
+            underlyingNumbers[i] = rs.getInt("part_id");
+          }
+
+          dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers,
+                                    MainClass.gridColumnWidth);
+        }
+      }
+
+    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+
+    // SETUP THE CONTAINER AND ADD THE DATAGRID
+    getContentPane().add(dataGrid.getComponent());
+
+    // MAKE THE JFRAME VISIBLE
+    setVisible(true);
+  }
+}

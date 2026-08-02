@@ -6,13 +6,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.nqadmin.swingset</groupId>
-	<artifactId>swingset-parent</artifactId>
+	<groupId>dev.visdb.seesaw</groupId>
+	<artifactId>seesaw-parent</artifactId>
 	<version>5.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>swingset-parent</name>
-	<url>https://github.com/bpangburn/swingset</url>
+	<name>seesaw-parent</name>
+	<url>https://github.com/errael/visdb</url>
 
 	<scm>
 		<url>https://github.com/bpangburn/swingset</url>
@@ -27,8 +27,8 @@
 	</issueManagement>
 
 	<modules>
-		<module>swingset</module>
-		<module>swingset-demo</module>
+		<module>seesaw</module>
+		<module>seesaw-demo</module>
 	</modules>
 
 	<properties>
@@ -92,8 +92,8 @@
 		<dependencies>
 			<!-- Internal -->
 			<dependency>
-				<groupId>com.nqadmin.swingset</groupId>
-				<artifactId>swingset</artifactId>
+				<groupId>dev.visdb.seesaw</groupId>
+				<artifactId>seesaw</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
