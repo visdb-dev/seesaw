@@ -116,7 +116,7 @@ public class TextField extends JTextField implements SSComponent {
     // COMPLETE TEXT SHOULD BE SELECTED
     addFocusListener(new FocusAdapter() {
       @Override
-      public void focusGained(final FocusEvent fe) {
+      public void focusGained(FocusEvent fe) {
         // TODO: Turn off any TextDecorator while focused
         TextField.this.selectAll();
       }

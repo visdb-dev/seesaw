@@ -155,7 +155,7 @@ public class SSDbStringCollection extends SSAbstractCollection {
   // TODO: use a common parse String to Object
   // TODO: put into RowSetOps?
   // TODO: toObjArray additional JDBC types: TIME/TIMESTAMP/*_WITH_TIMEZONE/...
-  private Object toArray(final JDBCType jdbcType, final String dbstring) throws SQLException {
+  private Object toArray(JDBCType jdbcType, String dbstring) throws SQLException {
     if (dbstring == null) { return null; }
 
     logger.log(DEBUG, () -> "toArray() contents: " + dbstring);

@@ -191,9 +191,9 @@ public class DataGrid extends JTable {
 
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellEditorComponent(final JTable table, final Object value,
-                                                 final boolean selected, final int row,
-                                                 final int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value,
+                                                 boolean selected, int row,
+                                                 int column) {
       // GET THE COMPONENT RENDERING THE VALUE.
       final JCheckBox checkBox = (JCheckBox) getComponent();
       boolean isSelected = false;
@@ -226,9 +226,9 @@ public class DataGrid extends JTable {
   protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                                   final boolean selected, final boolean hasFocus,
-                                                   final int row, final int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value,
+                                                   boolean selected, boolean hasFocus,
+                                                   int row, int column) {
       boolean isSelected = false;
       switch (value) {
 
@@ -258,7 +258,7 @@ public class DataGrid extends JTable {
      * @param items the combo items
      * @param underlyingValues database values; may be null
      */
-    public ComboEditor(final Object[] items, final Object[] underlyingValues) {
+    public ComboEditor(Object[] items, Object[] underlyingValues) {
       super(new GridComboEditorComboBox());
       // TODO: copy the arrays? Or just agree that they are never modified.
       //		 Could use guava immutable then not worry about it.
@@ -294,7 +294,7 @@ public class DataGrid extends JTable {
      * @param value look for this
      * @return index or -1 if can not find
      */
-    protected int getIndexOf(final Object value) {
+    protected int getIndexOf(Object value) {
       if (underlyingValues == null) {
         // IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
         if (value == null) { return -1; }
@@ -309,9 +309,9 @@ public class DataGrid extends JTable {
 
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellEditorComponent(final JTable table, final Object value,
-                                                 final boolean selected, final int row,
-                                                 final int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value,
+                                                 boolean selected, int row,
+                                                 int column) {
       final JComboBox<?> comboBox = getComponent();
       comboBox.setSelectedIndex(getIndexOf(value));
       return comboBox;
@@ -319,7 +319,7 @@ public class DataGrid extends JTable {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isCellEditable(final EventObject event) {
+    public boolean isCellEditable(EventObject event) {
       if (event instanceof MouseEvent mouseEvent) {
         return mouseEvent.getClickCount() >= tmpClickCountToStart;
       }
@@ -384,7 +384,7 @@ public class DataGrid extends JTable {
      * @param items the combo items
      * @param underlyingValues database values; may be null
      */
-    public ComboRenderer(final Object[] items, final Object[] underlyingValues) {
+    public ComboRenderer(Object[] items, Object[] underlyingValues) {
       this.underlyingValues = underlyingValues;
       this.displayValues = items;
     }
@@ -395,7 +395,7 @@ public class DataGrid extends JTable {
      * @param value look for this
      * @return index
      */
-    protected int getIndexOf(final Object value) {
+    protected int getIndexOf(Object value) {
       if (value == null) { return -1; }
       if (underlyingValues == null) { return ((Integer) value); }
       for (int i = 0; i < underlyingValues.length; i++) {
@@ -406,9 +406,9 @@ public class DataGrid extends JTable {
 
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                                   final boolean selected, final boolean hasFocus,
-                                                   final int row, final int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value,
+                                                   boolean selected, boolean hasFocus,
+                                                   int row, int column) {
       final JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, selected,
                                                                         hasFocus, row, column);
 
@@ -443,9 +443,9 @@ public class DataGrid extends JTable {
     }
 
     @Override
-    public Component getTableCellEditorComponent(final JTable table, final Object value,
-                                                 final boolean isSelected, final int row,
-                                                 final int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value,
+                                                 boolean isSelected, int row,
+                                                 int column) {
       JTextField tf = ((JTextField) getComponent());
       tf.setBorder(new LineBorder(Color.black));
       try {
@@ -493,7 +493,7 @@ public class DataGrid extends JTable {
   // 			int keyPressed = 0;
 
   // 			@Override
-  // 			public void keyPressed(final KeyEvent ke) {
+  // 			public void keyPressed(KeyEvent ke) {
   // 				// changed date key listener to clear date field when a new key is pressed
   // 				if ((ke.getKeyCode() == KeyEvent.VK_UP) || (ke.getKeyCode() == KeyEvent.VK_DOWN)
   // 						|| (ke.getKeyCode() == KeyEvent.VK_LEFT) || (ke.getKeyCode() == KeyEvent.VK_RIGHT)
@@ -505,7 +505,7 @@ public class DataGrid extends JTable {
   // 			}
 
   // 			@Override
-  // 			public void keyReleased(final KeyEvent ke) {
+  // 			public void keyReleased(KeyEvent ke) {
   // 				final JComponent editor = (JComponent) DateEditor.this.getComponent();
   // 				if (editor instanceof JTextField jtf) {
   // 					if (keyPressed == 0) {
@@ -537,8 +537,8 @@ public class DataGrid extends JTable {
   // 	 */
   // 	@Override
   // 	public synchronized Component getTableCellEditorComponent(
-  // 			final JTable table, final Object _value, final boolean isSelected,
-  // 			final int row, final int column) {
+  // 			JTable table, Object _value, boolean isSelected,
+  // 			int row, int column) {
 
   // 		Object value = _value;
   // 		if (value instanceof Date date) {
@@ -558,7 +558,7 @@ public class DataGrid extends JTable {
   // 	 * @return true if editable
   // 	 */
   // 	@Override
-  // 	public boolean isCellEditable(final EventObject event) {
+  // 	public boolean isCellEditable(EventObject event) {
   // 		if (event instanceof MouseEvent mouseEvent) {
   // 			return mouseEvent.getClickCount() >= getClickCountToStart();
   // 		}
@@ -580,7 +580,7 @@ public class DataGrid extends JTable {
      * @param value probably a date
      */
     @Override
-    public void setValue(final Object value) {
+    public void setValue(Object value) {
       if (value instanceof java.sql.Date date) {
         String strDate = getDateTimeText(date, RSC.get(rowsModel, cIdx + 1));
         setHorizontalAlignment(SwingConstants.CENTER);
@@ -605,7 +605,7 @@ public class DataGrid extends JTable {
        * Select all text when focus is gained
        */
       @Override
-      public void focusGained(final FocusEvent fe) {
+      public void focusGained(FocusEvent fe) {
         ((JTextField) getComponent()).selectAll();
       }
 
@@ -613,7 +613,7 @@ public class DataGrid extends JTable {
        * sets the keyPressed variable to zero.
        */
       @Override
-      public void focusLost(final FocusEvent fe) {
+      public void focusLost(FocusEvent fe) {
         // Set the key press tracker to 0 when the field loses focus.
         keyPressed = 0;
       }
@@ -625,7 +625,7 @@ public class DataGrid extends JTable {
        * which triggers the editor. That event is consumed by the JTable.
        */
       @Override
-      public void keyPressed(final KeyEvent ke) {
+      public void keyPressed(KeyEvent ke) {
         if (ke.getKeyCode() != KeyEvent.VK_TAB) { keyPressed++; }
       }
 
@@ -633,7 +633,7 @@ public class DataGrid extends JTable {
        * Based on if this is first key release event the contents will be cleared
        */
       @Override
-      public void keyReleased(final KeyEvent ke) {
+      public void keyReleased(KeyEvent ke) {
         final JComponent editor = (JComponent) DefaultEditor.this.getComponent();
         if (editor instanceof JTextField jtf) {
           if ((keyPressed == 0) && Character.isLetterOrDigit(ke.getKeyChar())) {
@@ -645,7 +645,7 @@ public class DataGrid extends JTable {
       }
 
       @Override
-      public void keyTyped(final KeyEvent ke) {
+      public void keyTyped(KeyEvent ke) {
         // do nothing
       }
     }
@@ -685,9 +685,9 @@ public class DataGrid extends JTable {
 
     @Override
     @SuppressWarnings({"UseSpecificCatch", "BroadCatchBlock", "TooBroadCatch"})
-    public Component getTableCellEditorComponent(final JTable table, final Object value,
-                                                 final boolean isSelected, final int row,
-                                                 final int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value,
+                                                 boolean isSelected, int row,
+                                                 int column) {
       // SET INITIAL VALUE TO NULL.
       this.value = null;
 
@@ -1002,7 +1002,7 @@ public class DataGrid extends JTable {
    * @return returns an object containing the default value for the requested
    *         column.
    */
-  public Object getDefaultValue(final int columnNumber) {
+  public Object getDefaultValue(int columnNumber) {
     return getModel().getDefaultValue(columnNumber);
   }
 
@@ -1020,7 +1020,7 @@ public class DataGrid extends JTable {
    * @throws SQLException is the specified column name is not present in the
    *                      RowSet
    */
-  public Object getDefaultValue(final String columnName) throws SQLException {
+  public Object getDefaultValue(String columnName) throws SQLException {
     //final int columnNumber = rowSet.getColumnIndex(columnName);
     final int columnNumber = RowSetOps.getColumnIndex(rowSet, columnName);
     return getModel().getDefaultValue(columnNumber - 1);
@@ -1188,7 +1188,7 @@ public class DataGrid extends JTable {
   /**
    * @param allowDeletion boolean indicating if deletions are allowed
    */
-  public void setAllowDeletion(final boolean allowDeletion) { this.allowDeletion = allowDeletion; }
+  public void setAllowDeletion(boolean allowDeletion) { this.allowDeletion = allowDeletion; }
 
   /**
    * Sets the callExecute property. If set to true causes the navigator to skip
@@ -1198,7 +1198,7 @@ public class DataGrid extends JTable {
    * @param callExecute true if execute function call has to be skipped else
    *                     false
    */
-  public void setCallExecute(final boolean callExecute) {
+  public void setCallExecute(boolean callExecute) {
     final boolean oldValue = this.callExecute;
     this.callExecute = callExecute;
     firePropertyChange("callExecute", oldValue, this.callExecute);
@@ -1211,7 +1211,7 @@ public class DataGrid extends JTable {
    *
    * @param column - column number for which check box rendering is needed.
    */
-  public void setCheckBoxRenderer(final int column) {
+  public void setCheckBoxRenderer(int column) {
     final TableColumnModel tmpColumnModel = getColumnModel();
     final TableColumn tmpTableColumn = tmpColumnModel.getColumn(column);
     tmpTableColumn.setCellRenderer(new CheckBoxRenderer());
@@ -1226,7 +1226,7 @@ public class DataGrid extends JTable {
    * @param _column - name of the column for which check box rendering is needed.
    * @throws SQLException	SQLException
    */
-  public void setCheckBoxRenderer(final String _column) throws SQLException {
+  public void setCheckBoxRenderer(String _column) throws SQLException {
     //final int column = rowSet.getColumnIndex(_column) - 1;
     final int column = RowSetOps.getColumnIndex(rowSet, _column) - 1;
     setCheckBoxRenderer(column);
@@ -1237,7 +1237,7 @@ public class DataGrid extends JTable {
    *
    * @param columnWidth minimum column width of the each column
    */
-  public void setColumnWidth(final int columnWidth) {
+  public void setColumnWidth(int columnWidth) {
     final int oldValue = this.columnWidth;
     this.columnWidth = columnWidth;
     firePropertyChange("columnWidth", oldValue, this.columnWidth);
@@ -1256,8 +1256,8 @@ public class DataGrid extends JTable {
    * @param underlyingValues the values that have to be written to the database
    *                          when an item in the combo box is selected.
    */
-  public void setComboRenderer(final int column, final Object[] displayItems,
-                               final Object[] underlyingValues) {
+  public void setComboRenderer(int column, Object[] displayItems,
+                               Object[] underlyingValues) {
     setComboRenderer(column, displayItems, underlyingValues, 250);
   }
 
@@ -1275,8 +1275,8 @@ public class DataGrid extends JTable {
    *                          when an item in the combo box is selected.
    * @param columnWidth		minimium width for table column
    */
-  public void setComboRenderer(final int column, final Object[] displayItems,
-                               final Object[] underlyingValues, final int columnWidth) {
+  public void setComboRenderer(int column, Object[] displayItems,
+                               Object[] underlyingValues, int columnWidth) {
     setRowHeight(20);
     final TableColumnModel tmpColumnModel = getColumnModel();
     final TableColumn tmpTableColumn = tmpColumnModel.getColumn(column);
@@ -1299,8 +1299,8 @@ public class DataGrid extends JTable {
    *                          when an item in the combo box is selected.
    * @throws SQLException	SQLException
    */
-  public void setComboRenderer(final String column, final Object[] displayItems,
-                               final Object[] underlyingValues) throws SQLException {
+  public void setComboRenderer(String column, Object[] displayItems,
+                               Object[] underlyingValues) throws SQLException {
     setComboRenderer(column, displayItems, underlyingValues, 250);
   }
 
@@ -1319,8 +1319,8 @@ public class DataGrid extends JTable {
    * @param columnWidth      required minimum width for this column
    * @throws SQLException	SQLException
    */
-  public void setComboRenderer(final String _column, final Object[] displayItems,
-                               final Object[] underlyingValues, final int columnWidth)
+  public void setComboRenderer(String _column, Object[] displayItems,
+                               Object[] underlyingValues, int columnWidth)
       throws SQLException {
     //final int column = rowSet.getColumnIndex(_column) - 1;
     final int column = RowSetOps.getColumnIndex(rowSet, _column) - 1;
@@ -1336,7 +1336,7 @@ public class DataGrid extends JTable {
    *
    * @param column column number for which a date renderer is needed.
    */
-  public void setDateRenderer(final int column) {
+  public void setDateRenderer(int column) {
     final TableColumnModel tmpColumnModel = getColumnModel();
     final TableColumn tmpTableColumn = tmpColumnModel.getColumn(column);
     tmpTableColumn.setCellRenderer(new DateRenderer(column));
@@ -1353,7 +1353,7 @@ public class DataGrid extends JTable {
    * @param column column name for which a date renderer is needed.
    * @throws SQLException	SQLException
    */
-  public void setDateRenderer(final String column) throws SQLException {
+  public void setDateRenderer(String column) throws SQLException {
     setDateRenderer(RowSetOps.getColumnIndex(rowSet, column) - 1);
   }
 
@@ -1372,7 +1372,7 @@ public class DataGrid extends JTable {
                       columnNumbers.
    */
   // TODO: Use List not Array
-  public void setDefaultValues(final int[] columnNumbers, final Object[] values) {
+  public void setDefaultValues(int[] columnNumbers, Object[] values) {
     getModel().setDefaultValues(columnNumbers, values);
   }
 
@@ -1391,7 +1391,7 @@ public class DataGrid extends JTable {
    * @throws SQLException if the specified column name is not present in the RowSet
    */
   // TODO: Use List not Array
-  public void setDefaultValues(final String[] columnNames, final Object[] values)
+  public void setDefaultValues(String[] columnNames, Object[] values)
       throws SQLException {
     int[] columnNumbers = null;
 
@@ -1417,7 +1417,7 @@ public class DataGrid extends JTable {
    *                 column.
    */
   // TODO: Use List not Array
-  public void setHeaders(final String[] headers) { getModel().setHeaders(headers); }
+  public void setHeaders(String[] headers) { getModel().setHeaders(headers); }
 
   /**
    * Sets the column numbers that should be hidden. The SSDataGrid sets the column
@@ -1478,7 +1478,7 @@ public class DataGrid extends JTable {
    *
    * @param insertion true if new rows can be added else false.
    */
-  public void setInsertion(final boolean insertion) {
+  public void setInsertion(boolean insertion) {
     final boolean oldValue = this.insertion;
     this.insertion = insertion;
     if (this.insertion) // remove sorter before events for adding row
@@ -1496,7 +1496,7 @@ public class DataGrid extends JTable {
    * @param messageWindow the component that should be used when displaying error
    *                       messages
    */
-  public void setMessageWindow(final Component messageWindow) {
+  public void setMessageWindow(Component messageWindow) {
     final Component oldValue = this.messageWindow;
     this.messageWindow = messageWindow != null ? messageWindow : this;
     firePropertyChange("messageWindow", oldValue, this.messageWindow);
@@ -1513,7 +1513,7 @@ public class DataGrid extends JTable {
    *
    * @param columnNumber the column which is the primary column.
    */
-  public void setPrimaryColumn(final int columnNumber) {
+  public void setPrimaryColumn(int columnNumber) {
     getModel().setPrimaryColumn(columnNumber);
   }
 
@@ -1528,7 +1528,7 @@ public class DataGrid extends JTable {
    * @param columnName the column which is the primary column.
    * @throws SQLException	SQLException
    */
-  public void setPrimaryColumn(final String columnName) throws SQLException {
+  public void setPrimaryColumn(String columnName) throws SQLException {
     //final int columnNumber = rowSet.getColumnIndex(columnName) - 1;
     final int columnNumber = RowSetOps.getColumnIndex(rowSet, columnName) - 1;
 
@@ -1588,7 +1588,7 @@ public class DataGrid extends JTable {
    *
    * @param cellEditing implementation of SSCellEditable interface.
    */
-  public void setSSCellEditing(final SSCellEditing cellEditing) {
+  public void setSSCellEditing(SSCellEditing cellEditing) {
     getModel().setSSCellEditing(cellEditing);
   }
 
@@ -1600,7 +1600,7 @@ public class DataGrid extends JTable {
    *
    * @param dataValue implementation of SSDataValue
    */
-  public void setSSDataValue(final SSDataValue dataValue) {
+  public void setSSDataValue(SSDataValue dataValue) {
     getModel().setSSDataValue(dataValue);
   }
 
@@ -1615,7 +1615,7 @@ public class DataGrid extends JTable {
    *                       uneditable.
    */
   // TODO: Use List not Array
-  public void setUneditableColumns(final int[] columnNumbers) {
+  public void setUneditableColumns(int[] columnNumbers) {
     getModel().setUneditableColumns(columnNumbers);
   }
 
@@ -1631,7 +1631,7 @@ public class DataGrid extends JTable {
    * @throws SQLException	SQLException
    */
   // TODO: Use List not Array
-  public void setUneditableColumns(final String[] columnNames) throws SQLException {
+  public void setUneditableColumns(String[] columnNames) throws SQLException {
     int[] columnNumbers = null;
     if (columnNames != null) {
       columnNumbers = new int[columnNames.length];

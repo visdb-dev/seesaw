@@ -69,7 +69,7 @@ public class SSNumericField extends NumberField {
    * @param decimals  - number of digits needed for the fraction part of the
    *                   number
    */
-  public SSNumericField(final int precision, final int decimals) {
+  public SSNumericField(int precision, int decimals) {
     this(createFormatterFactory(CUSTOM, precision, decimals));
   }
 

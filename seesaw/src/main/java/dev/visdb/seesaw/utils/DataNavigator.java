@@ -305,7 +305,7 @@ public class DataNavigator extends JPanel {
    *                  else false.
    */
   @Override
-  public void setFocusable(final boolean focusable) {
+  public void setFocusable(boolean focusable) {
     uiButtons.forEach(uiItem -> uiItem.setFocusable(focusable));
     rowNumberSpinner.setFocusable(focusable);
   }
@@ -316,7 +316,7 @@ public class DataNavigator extends JPanel {
    *
    * @param _buttonSize the required dimension of the buttons
    */
-  public void setButtonSize(final Dimension _buttonSize) {
+  public void setButtonSize(Dimension _buttonSize) {
     final Dimension oldValue = buttonSize;
     buttonSize = _buttonSize;
     firePropertyChange("buttonSize", oldValue, buttonSize);

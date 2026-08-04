@@ -214,7 +214,7 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(final ActionEvent ae) {
+    public void actionPerformed(ActionEvent ae) {
       // Return if a combo navigator, SSSyncManager will have it's own
       // listeners. This listener for keeping a bound column in sync.
       if (isComboBoxNavigator()) {

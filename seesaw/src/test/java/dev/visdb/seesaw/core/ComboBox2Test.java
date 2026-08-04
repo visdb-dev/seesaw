@@ -29,11 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.core;
 
-import dev.visdb.seesaw.core.Item2;
-import dev.visdb.seesaw.core.ComboBox2;
-import dev.visdb.seesaw.core.Item1;
-import dev.visdb.seesaw.core.ComboBox1;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

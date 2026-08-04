@@ -50,7 +50,7 @@ public class DbDatePicker extends DatePicker implements SSComponent {
   private class DbDatePickerListener implements EventListener, DateChangeListener {
     /** {@inheritDoc} */
     @Override
-    public void dateChanged(final DateChangeEvent dce) {
+    public void dateChanged(DateChangeEvent dce) {
       try {
         dbChange(() -> setColumnObject(dce.getNewDate()));
       } catch (SQLException ex) { logger.log(Logger.Level.ERROR, (String) null, ex); }

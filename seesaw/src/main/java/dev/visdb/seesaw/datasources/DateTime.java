@@ -409,7 +409,7 @@ public class DateTime {
    * @throws IllegalArgumentException if data conversion fails
    */
   // TODO: check that all callers handle excepted as needed
-  private static Date getSQLDate(final String _strDate) throws IllegalArgumentException {
+  private static Date getSQLDate(String _strDate) throws IllegalArgumentException {
     if (_strDate == null) { return null; }
     String strDate = _strDate.trim();
     if (strDate.isEmpty()) { return null; }

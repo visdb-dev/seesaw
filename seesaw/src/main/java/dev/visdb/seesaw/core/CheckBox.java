@@ -84,7 +84,7 @@ public class CheckBox extends JCheckBox implements SSComponent {
   protected class CheckBoxListener implements ItemListener {
     /** {@inheritDoc} */
     @Override
-    public void itemStateChanged(final ItemEvent ie) {
+    public void itemStateChanged(ItemEvent ie) {
       try {
         dbChange(() -> setColumnObject(isSelected()));
       } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
@@ -107,7 +107,7 @@ public class CheckBox extends JCheckBox implements SSComponent {
    * @param columnName name of the column to which this check box should be
    *                         bound
    */
-  public CheckBox(RowsModel rowsModel, final String columnName) {
+  public CheckBox(RowsModel rowsModel, String columnName) {
     this(null);
     rowsModel.bind(this, columnName);
   }
@@ -117,7 +117,7 @@ public class CheckBox extends JCheckBox implements SSComponent {
    *
    * @param text Checkbox label
    */
-  public CheckBox(final String text) {
+  public CheckBox(String text) {
     super(text);
     logger.log(Level.DEBUG,
                () -> sf("original border: %s", BorderDecorator.asString(getBorder(), this)));

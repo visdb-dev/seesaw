@@ -54,9 +54,9 @@ import org.openide.util.WeakListeners;
 
 import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
+import com.raelity.lib.eventbus.WeakEventBus;
 
 import dev.visdb.seesaw.core.DBComboBox2;
-
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.RowSetOps;
@@ -71,8 +71,6 @@ import dev.visdb.seesaw.utils.LookupDefaults;
 import dev.visdb.seesaw.utils.SSComponent;
 import dev.visdb.seesaw.utils.SSUtils;
 import dev.visdb.seesaw.utils.SyncManager;
-
-import com.raelity.lib.eventbus.WeakEventBus;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.navigate.RowsModelEventHandling.postAsync;
@@ -155,7 +153,7 @@ public final class RowsModel {
    * Find {@link DbOps} for the specified RowSet.
    * Looks for {@link DbOpsCreator} to create it; if not found
    * or its {@code create(rowSet)} method returns null,
-   * returns {@code new DbOps() {}}.
+   * then return {@code new DbOps() {}} which does nothing.
    *
    * @param rs
    * @param rowsModel where the RowSet is going, null if new RowsModel
@@ -932,7 +930,7 @@ public final class RowsModel {
    * @deprecated need to define a new strategy
    */
   @Deprecated
-  public void setCallExecute(final boolean callExecute) {}
+  public void setCallExecute(boolean callExecute) {}
 
   /**
    * This is necessary for ancient MySQL jdbc driver (see FAQ).

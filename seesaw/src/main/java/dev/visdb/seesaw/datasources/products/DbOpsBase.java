@@ -155,7 +155,7 @@ public class DbOpsBase implements DbOps {
    *
    * @param container container in which to recursively initialize components
    */
-  protected void cleanComponents(final Container container) {
+  protected void cleanComponents(Container container) {
     logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
     if (container == null) return;
     SSUtils.visitSSComponents(container, comp -> comp.cleanField());

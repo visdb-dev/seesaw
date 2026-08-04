@@ -281,7 +281,7 @@ final class SSCommon {
   // AND if(!isResotreOnError()). Flag must be controlled in
   // conjunction with SSTextSupport and any other callers
   // to setColumn(DbUpdater
-  private final boolean restoreOnError = false; // easiest/safest?
+  private boolean restoreOnError = false; // easiest/safest?
 
   private boolean beepOnError = true;
   private boolean dialogOnError = true;

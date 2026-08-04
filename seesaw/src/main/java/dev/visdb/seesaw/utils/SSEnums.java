@@ -56,7 +56,7 @@ public class SSEnums {
 
     private final int value;
 
-    Navigation(final int newValue) { value = newValue; }
+    Navigation(int newValue) { value = newValue; }
 
     /**
      * @return integer corresponding to enumerated value

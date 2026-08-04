@@ -56,7 +56,7 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler {
    * @param row    the row number in data grid.
    */
   @Override
-  public boolean allowDeletion(final int row) {
+  public boolean allowDeletion(int row) {
     return true;
   }
 
@@ -66,7 +66,7 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler {
    * @param row the position of deleted row in the data grid.
    */
   @Override
-  public void performPostDeletionOps(final int row) {
+  public void performPostDeletionOps(int row) {
     // do nothing
   }
 
@@ -76,7 +76,7 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler {
    * @param row position of added row in the data grid.
    */
   @Override
-  public void performPostInsertOps(final int row) {
+  public void performPostInsertOps(int row) {
     // do nothing
   }
 
@@ -86,7 +86,7 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler {
    * @param row position of data grid row being deleted.
    */
   @Override
-  public void performPreDeletionOps(final int row) {
+  public void performPreDeletionOps(int row) {
     // do nothing
   }
 
@@ -96,7 +96,7 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler {
    * @param row position of new row in the data grid.
    */
   @Override
-  public void performPreInsertOps(final int row) {
+  public void performPreInsertOps(int row) {
     // do nothing
   }
 }

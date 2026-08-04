@@ -147,7 +147,7 @@ public class TestFormattedComponents extends JFrame {
    * @param _dbConn - database connection
    */
   @SuppressWarnings("LeakingThisInConstructor")
-  public TestFormattedComponents(final Connection _dbConn) {
+  public TestFormattedComponents(Connection _dbConn) {
     // SET SCREEN TITLE
     super("SwingSet Formatted Component Test");
     DemoUtil.initExampleFrame(this, null);

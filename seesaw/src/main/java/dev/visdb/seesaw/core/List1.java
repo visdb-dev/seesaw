@@ -111,7 +111,7 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
   protected class ListListener implements ListSelectionListener {
     /** {@inheritDoc} */
     @Override
-    public void valueChanged(final ListSelectionEvent e) {
+    public void valueChanged(ListSelectionEvent e) {
       // While adjusting don't need to update the database.
       if (e.getValueIsAdjusting()) return;
 

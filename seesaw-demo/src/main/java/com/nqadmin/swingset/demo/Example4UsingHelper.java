@@ -109,7 +109,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
    * @param _dbConn - database connection
    * @param _container parent window/container
    */
-  public Example4UsingHelper(final Connection _dbConn, final Container _container) {
+  public Example4UsingHelper(Connection _dbConn, Container _container) {
     // Parent Constructor
     super("Example 4 Using Helper", _container, _dbConn, pkColumn, null, cmbNavDisplayColumn);
 

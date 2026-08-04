@@ -237,7 +237,7 @@ public class SyncManager<K> {
      * {@inheritDoc}
      */
     @Override
-    public void cursorMoved(final RowSetEvent event) {
+    public void cursorMoved(RowSetEvent event) {
       logger.log(TRACE, "Rowset cursor moved.");
       performUpdates();
     }
@@ -246,7 +246,7 @@ public class SyncManager<K> {
      * {@inheritDoc}
      */
     @Override
-    public void rowChanged(final RowSetEvent rse) {
+    public void rowChanged(RowSetEvent rse) {
       logger.log(TRACE, "Rowset row changed.");
       // Do nothing as there is no navigation involved
       //performUpdates();
@@ -256,7 +256,7 @@ public class SyncManager<K> {
      * {@inheritDoc}
      */
     @Override
-    public void rowSetChanged(final RowSetEvent rse) {
+    public void rowSetChanged(RowSetEvent rse) {
       logger.log(TRACE, "Rowset changed.");
       performUpdates();
     }
@@ -377,7 +377,7 @@ public class SyncManager<K> {
    * @param syncColumnName RowSet column used as basis for synchronization.
    */
   // TODO: put in constructor?
-  public void setSyncColumnName(final String syncColumnName) {
+  public void setSyncColumnName(String syncColumnName) {
     this.syncColumnName = syncColumnName;
   }
 

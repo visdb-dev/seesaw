@@ -426,7 +426,7 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
    *
    * @param dateFormat pattern in which dates have to be displayed
    */
-  public void setDateFormat(final String dateFormat) {
+  public void setDateFormat(String dateFormat) {
     this.dateFormat = dateFormat;
     getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
   }
@@ -465,7 +465,7 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
    *
    * @param d2ColumnName column name whose values populate {@code <D2>}.
    */
-  public void setD2ColumnName(final String d2ColumnName) {
+  public void setD2ColumnName(String d2ColumnName) {
     this.d2ColumnName = d2ColumnName;
     keyVisual.setD2Enabled(hasD2());
   }
@@ -515,7 +515,7 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
    *               box items)
    */
   // TODO: Should this method call execute?
-  public void setQuery(final String query) {
+  public void setQuery(String query) {
     checkString("query", query);
     this.query = query;
   }

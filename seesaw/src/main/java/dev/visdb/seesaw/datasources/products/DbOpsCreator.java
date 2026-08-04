@@ -32,11 +32,17 @@ package dev.visdb.seesaw.datasources.products;
 
 import javax.sql.RowSet;
 
-import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.datasources.DbOps;
+import dev.visdb.seesaw.navigate.RowsModel;
 
 /**
- * Stash one of these into lookup...
+ * Stash one of these into lookup to create a {@link DbOps}. Only used if one
+ * is not provided to
+ * {@link RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps)
+ * RowsModel.create(RowSet, DbOps)}
+ * or
+ * {@link RowsModel#setRowSet(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps)
+ * rowsModel.setRowSet(RowSet, DbOps)}
  */
 public interface DbOpsCreator {
   /**

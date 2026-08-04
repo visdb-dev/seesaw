@@ -29,11 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.navigate;
 
-import dev.visdb.seesaw.navigate.EventObjectBacktrace;
-import dev.visdb.seesaw.navigate.RowsModelEventHandling;
-import dev.visdb.seesaw.navigate.RowsModelNewRowSetEvent;
-import dev.visdb.seesaw.navigate.RowsEvent;
-
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -58,7 +53,7 @@ public class EQ {
   /** x */
   public interface DBRunnable {
     /**
-     * *  @throws SQLException
+     * @throws SQLException
      * @throws java.lang.ClassNotFoundException
      */
     public void run() throws SQLException, ClassNotFoundException;

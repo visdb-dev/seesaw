@@ -57,8 +57,8 @@ public interface SSCellEditing {
    *
    * @return returns true if update should be made else false.
    */
-  default boolean cellUpdateRequested(final int row, final int column, final Object oldValue,
-                                      final Object newValue) {
+  default boolean cellUpdateRequested(int row, int column, Object oldValue,
+                                      Object newValue) {
     return true;
   }
 
@@ -75,6 +75,6 @@ public interface SSCellEditing {
    *
    * @return returns true is the cell is editable else false.
    */
-  default boolean isCellEditable(final int row, final int column) { return true; }
+  default boolean isCellEditable(int row, int column) { return true; }
 
 } // end public interface SSCellEditing {

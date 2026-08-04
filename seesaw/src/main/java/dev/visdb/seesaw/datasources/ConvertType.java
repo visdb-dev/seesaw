@@ -694,7 +694,7 @@ public class ConvertType {
   //  * @throws NumberFormatException conversion error
   //  * @throws SQLException database access error
   //  */
-  // public static Object parseText(final ResultSet _resultSet, final String _columnName, final String _text)
+  // public static Object parseText(ResultSet _resultSet, String _columnName, String _text)
   // throws NumberFormatException, SQLException {
   // 	JDBCType jdbcType = getJDBCColumnType(_resultSet, _columnName);
   // 	if (!textUpdateOK.contains(jdbcType)) {
@@ -712,7 +712,7 @@ public class ConvertType {
   //  * @throws NumberFormatException conversion error
   //  * @throws SQLException database access error
   //  */
-  // public static Object parseText(final ResultSet _resultSet, final int _columnIndex, final String _text)
+  // public static Object parseText(ResultSet _resultSet, int _columnIndex, String _text)
   // throws NumberFormatException, SQLException {
   // 	JDBCType jdbcType = getJDBCColumnType(_resultSet, _columnIndex);
   // 	if (!textUpdateOK.contains(jdbcType)) {
@@ -733,7 +733,7 @@ public class ConvertType {
    * @throws NumberFormatException conversion error
    */
   @SuppressWarnings("unused")
-  private static Object parseText_NOT_USED(final JDBCType _jdbcType, final String _text)
+  private static Object parseText_NOT_USED(JDBCType _jdbcType, String _text)
       throws NumberFormatException {
     // if (!textUpdateOK.contains(_jdbcType)) {
     // 	throw new IllegalArgumentException("Unsupported parseText data type: " + _jdbcType.getName());

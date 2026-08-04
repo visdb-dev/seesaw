@@ -69,13 +69,13 @@ public class SSDateField extends DateTimeField {
    *  Creates a new instance of SSDateField with the specified format.
    *  @param _format - an enum format to be used while the date field is in edit mode
    */
-  public SSDateField(final SSFormat _format) { this(createFormatterFactory(_format)); }
+  public SSDateField(SSFormat _format) { this(createFormatterFactory(_format)); }
 
   /**
    * Creates an object of SSDateField with the specified formatter factory
    * @param factory - formatter factory to be used
    */
-  public SSDateField(final AbstractFormatterFactory factory) { super(factory); }
+  public SSDateField(AbstractFormatterFactory factory) { super(factory); }
 
   /**
    * Create DATE formatter factory with specified format pattern.

@@ -42,8 +42,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.formatting;
 
-import dev.visdb.seesaw.formatting.SSMaskFormatterFactory;
-
 import java.text.ParseException;
 import java.util.List;
 
@@ -101,7 +99,7 @@ public class SSMaskFormatterFactoryTest {
       private String parentParam = "defaultParentParam";
 
       /**
-       * *  @param mask
+       * @param mask
        * @param arg
        */
       public CustomParentBuilder(String mask, String arg) {

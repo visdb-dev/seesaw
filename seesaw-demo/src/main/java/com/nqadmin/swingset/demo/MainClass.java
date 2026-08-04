@@ -158,7 +158,7 @@ public class MainClass extends JFrame {
 
     @SuppressWarnings({"unused", "ResultOfObjectAllocationIgnored"})
     @Override
-    public void actionPerformed(final ActionEvent ae) {
+    public void actionPerformed(ActionEvent ae) {
       final Map<String, Object> hints = new HashMap<>(globalHints);
       Utils.dumpLatestEvents("New Window:");
 
@@ -826,7 +826,7 @@ public class MainClass extends JFrame {
    *              program
    */
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  public static void main(final String[] _args) {
+  public static void main(String[] _args) {
     configureJavaUtilLogger();
     Screens.setPrefGraphicsDev("SWINGSET_PREFERRED_SCREEN");
 

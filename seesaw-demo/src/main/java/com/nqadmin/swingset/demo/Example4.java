@@ -238,7 +238,7 @@ public class Example4 extends JFrame {
    * @param _dbConn - database connection
    */
   @SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
-  public Example4(final Connection _dbConn) {
+  public Example4(Connection _dbConn) {
     // SET SCREEN TITLE
     super("Example4");
     DemoUtil.initExampleFrame(this, null);

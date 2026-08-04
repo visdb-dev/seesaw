@@ -125,7 +125,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
      * @return true if the input is valid, otherwise false
      */
     @Override
-    public boolean verify(final JComponent input) {
+    public boolean verify(JComponent input) {
       // assert input == SSFormattedTextField.this;
       final SSFormattedTextField ftf = (SSFormattedTextField) input;
       Object value = null;
@@ -185,7 +185,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
      * @param pce property change event
      */
     @Override
-    public void propertyChange(final PropertyChangeEvent pce) {
+    public void propertyChange(PropertyChangeEvent pce) {
       if (pce.getPropertyName().equals("value")) handleValuePropertyChange(pce);
     }
   }
@@ -275,7 +275,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
    * TODO: Consider using this() to force all constructors through one method
    * so that any constructor customizations don't have to be duplicated.
    */
-  public SSFormattedTextField(final AbstractFormatter formatter) {
+  public SSFormattedTextField(AbstractFormatter formatter) {
     this(new DefaultFormatterFactory(formatter));
   }
 
@@ -285,7 +285,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
    * @param factory AbstractFormatterFactory used for formatting.
    */
   @SuppressWarnings("OverridableMethodCallInConstructor")
-  public SSFormattedTextField(final AbstractFormatterFactory factory) {
+  public SSFormattedTextField(AbstractFormatterFactory factory) {
     super(factory);
     finishSSCommon();
   }
@@ -382,7 +382,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
     // addFocusListener(this);
     addFocusListener(new FocusAdapter() {
       @Override
-      public void focusGained(final FocusEvent fe) {
+      public void focusGained(FocusEvent fe) {
         // While focused, editing, show regular
         // This assumes that decorate() is not invoked while this has
         // focus, a JFormatterTextField characteristic.

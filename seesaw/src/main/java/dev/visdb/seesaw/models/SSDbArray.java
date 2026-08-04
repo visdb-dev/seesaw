@@ -63,7 +63,7 @@ public class SSDbArray extends SSAbstractCollection {
    * Create SSDbArrayModel
    * @param jdbcType type of elements in database array
    */
-  public SSDbArray(final JDBCType jdbcType) { super(jdbcType); }
+  public SSDbArray(JDBCType jdbcType) { super(jdbcType); }
 
   /** {@inheritDoc } */
   @Override
@@ -75,7 +75,7 @@ public class SSDbArray extends SSAbstractCollection {
 
   /** {@inheritDoc } */
   @Override
-  public void writeData(SSComponent comp, final Object data) throws SQLException {
+  public void writeData(SSComponent comp, Object data) throws SQLException {
     if (!data.getClass().isArray()) throw new IllegalArgumentException("Must be an array");
 
     SSJDBCArray array = new SSJDBCArray(data, getJDBCType());

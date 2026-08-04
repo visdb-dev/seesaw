@@ -16,9 +16,6 @@
  */
 package dev.visdb.seesaw.models;
 
-import dev.visdb.seesaw.models.SSListItem;
-import dev.visdb.seesaw.models.AbstractComboBoxListSwingModel;
-
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;

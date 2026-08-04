@@ -492,7 +492,7 @@ public interface SSComponent extends RSC {
    * @param columnText the value to set in the bound database column
    * @return true if no error
    */
-  default boolean setColumnText(final String columnText) {
+  default boolean setColumnText(String columnText) {
     return getSSCommon().setColumnText(columnText);
   }
 
@@ -504,7 +504,7 @@ public interface SSComponent extends RSC {
    * @param columnObject the value to set in the bound database column
    * @return true if no error
    */
-  default boolean setColumnObject(final Object columnObject) {
+  default boolean setColumnObject(Object columnObject) {
     return getSSCommon().setColumnObject(columnObject);
   }
 
@@ -522,7 +522,7 @@ public interface SSComponent extends RSC {
    * @throws SQLException thrown if there is a problem writing the array to the
    *                      RowSet
    */
-  default boolean setColumnArray(final Array columnArray) throws SQLException {
+  default boolean setColumnArray(Array columnArray) throws SQLException {
     return getSSCommon().setColumnArray(columnArray);
   }
 
@@ -599,7 +599,7 @@ public interface SSComponent extends RSC {
    *
    * @param allowNull flag to indicate if the bound database column can be null
    */
-  default void setAllowNull(final boolean allowNull) { getSSCommon().setAllowNull(allowNull); }
+  default void setAllowNull(boolean allowNull) { getSSCommon().setAllowNull(allowNull); }
 
   /**
    * @return true if this component's value is different from what's in the database
@@ -687,7 +687,7 @@ public interface SSComponent extends RSC {
    * Set the text for log entries which is only used if columnName is null.
    * @param logColumnName show this in log entry if columnName is null
    */
-  default void setLogColumnName(final String logColumnName) {
+  default void setLogColumnName(String logColumnName) {
     getSSCommon().setLogColumnName(logColumnName);
   }
 
@@ -698,7 +698,7 @@ public interface SSComponent extends RSC {
    * @deprecated Use {@link RowsModel#bind(Map) RowsModel.bind(...)}
    */
   @Deprecated
-  default void setBoundColumnName(final String boundColumnName) {
+  default void setBoundColumnName(String boundColumnName) {
     getSSCommon().setBoundColumnName(boundColumnName);
   }
 
@@ -953,12 +953,12 @@ public interface SSComponent extends RSC {
   // default String getBoundColumnText() { return getColumnText(); }
   // default Object getBoundColumnObject() { return getColumnObject(); }
   // default <T> T getBoundColumnObject(Class<T> type) { return getColumnObject(type); }
-  // default void setBoundColumnText(final String boundColumnText) { setColumnText(boundColumnText); }
-  // default void setBoundColumnObject(final Object boundColumnObject) { setColumnObject(boundColumnObject); }
-  // default void setBoundColumnArray(final SSArray boundColumnArray) throws SQLException { setColumnArray(boundColumnArray); }
+  // default void setBoundColumnText(String boundColumnText) { setColumnText(boundColumnText); }
+  // default void setBoundColumnObject(Object boundColumnObject) { setColumnObject(boundColumnObject); }
+  // default void setBoundColumnArray(SSArray boundColumnArray) throws SQLException { setColumnArray(boundColumnArray); }
   // default int getBoundColumnIndex() { return getColumnIndex(); }
   // default String getBoundColumnName() { return getColumnName(); }
   // default JDBCType getBoundColumnJDBCType() { return getColumnJDBCType(); }
   // default int getBoundColumnType() { return getColumnType(); }
-  // default void setBoundColumnName(final String boundColumnName) { setColumnName(boundColumnName); }
+  // default void setBoundColumnName(String boundColumnName) { setColumnName(boundColumnName); }
 }

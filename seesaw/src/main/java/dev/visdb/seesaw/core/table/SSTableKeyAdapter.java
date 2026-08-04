@@ -86,8 +86,8 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @return returns the value as a column class object.
    * @throws Exception catch all exception
    */
-  protected static Object getObjectToSet(final JTable jTable, final int column,
-                                         final String value) throws Exception {
+  protected static Object getObjectToSet(JTable jTable, int column,
+                                         String value) throws Exception {
     // GET THE COLUMN CLASS
     final Class<?> objectClass = jTable.getColumnClass(column);
     Object newValue = null;
@@ -141,20 +141,20 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @param jTable JTable for which copy and paste support should be added.
    */
   @SuppressWarnings("OverridableMethodCallInConstructor")
-  public SSTableKeyAdapter(final JTable jTable) { init(jTable); }
+  public SSTableKeyAdapter(JTable jTable) { init(jTable); }
 
   /**
    * Adds the key listener for the specified JTable.
    * @param jTable table for which listener is to be added
    */
-  protected void init(final JTable jTable) { jTable.addKeyListener(this); }
+  protected void init(JTable jTable) { jTable.addKeyListener(this); }
 
   /**
    * Invoked when a key is released.
    * @param ke
    */
   @Override
-  public void keyReleased(final KeyEvent ke) {
+  public void keyReleased(KeyEvent ke) {
     final StringBuilder strBuf = new StringBuilder();
 
     final JTable jTable = (JTable) ke.getSource();
@@ -371,7 +371,7 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @param allowInsertion true if new rows can be added when pasting data from
    *                        clipboard, else false.
    */
-  public void setAllowInsertion(final boolean allowInsertion) { this.allowInsertion = allowInsertion; }
+  public void setAllowInsertion(boolean allowInsertion) { this.allowInsertion = allowInsertion; }
 
   /**
    * Sets forSSDataGrid indicator. True if the key adapter is used for SSDataGrid
@@ -380,5 +380,5 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @param forSSDataGrid - true if this key adapter is used for DataGrid, else
                       false.
    */
-  public void setForSSDataGrid(final boolean forSSDataGrid) { this.forSSDataGrid = forSSDataGrid; }
+  public void setForSSDataGrid(boolean forSSDataGrid) { this.forSSDataGrid = forSSDataGrid; }
 }

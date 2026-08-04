@@ -160,7 +160,7 @@ public class Example1 extends JFrame {
    * @param _dbConn - database connection
    */
   @SuppressWarnings("LeakingThisInConstructor")
-  public Example1(final Connection _dbConn) {
+  public Example1(Connection _dbConn) {
     // Set screen title.
     super("Example1");
     DemoUtil.initExampleFrame(this, this::cleanup);

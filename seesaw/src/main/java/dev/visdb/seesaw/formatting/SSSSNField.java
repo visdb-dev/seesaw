@@ -60,7 +60,7 @@ public class SSSSNField extends SSFormattedTextField {
    *
    * @param factory - formatter factory to be used
    */
-  public SSSSNField(final AbstractFormatterFactory factory) { super(factory); }
+  public SSSSNField(AbstractFormatterFactory factory) { super(factory); }
 
   /**
    * SSN MaskFormatterFactory.

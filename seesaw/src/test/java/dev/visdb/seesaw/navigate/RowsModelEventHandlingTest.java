@@ -29,10 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.navigate;
 
-import dev.visdb.seesaw.navigate.RowSetState;
-import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.navigate.RowsAction;
-
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
@@ -44,11 +40,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.raelity.lib.eventbus.WeakEventBus;
+
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TinyRS;
 import dev.visdb.seesaw.navigate.EQ.BusReceiver;
-
-import com.raelity.lib.eventbus.WeakEventBus;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.navigate.RowsEvent.OperatorKind.*;

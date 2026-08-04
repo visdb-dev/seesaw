@@ -313,7 +313,7 @@ public class TestBaseComponents extends JFrame {
    * @param _hints dynamic information on collection model, other
    */
   @SuppressWarnings({"LeakingThisInConstructor", "CallToPrintStackTrace"})
-  public TestBaseComponents(final Connection _dbConn, Map<String, Object> _hints) {
+  public TestBaseComponents(Connection _dbConn, Map<String, Object> _hints) {
     // set screen title
     super("SwingSet Base Component Test");
     DemoUtil.initExampleFrame(this, null);

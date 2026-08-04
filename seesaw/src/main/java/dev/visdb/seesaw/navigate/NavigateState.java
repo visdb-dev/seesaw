@@ -394,7 +394,7 @@ final class NavigateState {
   // TODO: create actions on demand; could have a supplier in RowsAction enum
   //
   @SuppressWarnings("LeakingThisInConstructor")
-  private NavigateState(final RowSet rowSet) {
+  private NavigateState(RowSet rowSet) {
     v3Buttons = V3_BUTTONS_DEFAULT;
     autoCommit = AUTO_COMMIT_DEFAULT;
 

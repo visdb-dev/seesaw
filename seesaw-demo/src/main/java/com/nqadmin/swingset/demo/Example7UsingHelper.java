@@ -95,10 +95,10 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
    * @param _dbConn - database connection
    * @param _container parent window/container
    */
-  public Example7UsingHelper(final Connection _dbConn, final Container _container) {
+  public Example7UsingHelper(Connection _dbConn, Container _container) {
     // Parent Constructor
-    //		public SSDataGridScreenHelper(final String _title, final Container _parentContainer, final Connection _connection,
-    //				final String _pkColumn, final Long _parentID) {
+    //		public SSDataGridScreenHelper(String _title, Container _parentContainer, Connection _connection,
+    //				String _pkColumn, Long _parentID) {
     super("Example 7 Using Helper", _container, _dbConn, "supplier_part_id", null);
 
     // Hide the frame since we're putting the JInternalFrame in its own JFrame for the demo

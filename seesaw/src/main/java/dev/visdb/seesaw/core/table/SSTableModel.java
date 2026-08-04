@@ -172,7 +172,7 @@ public class SSTableModel extends AbstractTableModel {
   // TODO: If this constructor is used
   //		 then it is unclear how this model
   //		 and the rowset get hookup up to an SSDataGrid.
-  public SSTableModel(final RowSet rowset) {
+  public SSTableModel(RowSet rowset) {
     this();
     this.rowset = rowset;
     init(true);
@@ -186,7 +186,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @return returns true on succesful deletion else false.
    */
-  public boolean deleteRow(final int row) {
+  public boolean deleteRow(int row) {
     if (dataGridHandler != null) { dataGridHandler.performPreDeletionOps(row); }
     if (row < rowCount) {
       try {
@@ -216,7 +216,7 @@ public class SSTableModel extends AbstractTableModel {
    * @return type for the specified column (first column is 0)
    */
   @Override
-  public Class<?> getColumnClass(final int column) {
+  public Class<?> getColumnClass(int column) {
     try {
       return RowSetOps.getClassColumnType(rowset, column+1);
     } catch (final SQLException se) {
@@ -246,7 +246,7 @@ public class SSTableModel extends AbstractTableModel {
    *         where column numbering begins at 0
    */
   @Override
-  public String getColumnName(final int columnNumber) {
+  public String getColumnName(int columnNumber) {
     if (headers != null) {
       if (columnNumber < headers.length) {
         logger.log(DEBUG, () -> "Sending header " + headers[columnNumber]);
@@ -266,7 +266,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @return returns a object representing the default value.
    */
-  public Object getDefaultValue(final int columnNumber) {
+  public Object getDefaultValue(int columnNumber) {
     Object value = null;
     if (defaultValuesMap != null) { value = defaultValuesMap.get(columnNumber); }
     return value;
@@ -296,7 +296,7 @@ public class SSTableModel extends AbstractTableModel {
    * @return value at the requested cell.
    */
   @Override
-  public Object getValueAt(final int row, final int column) {
+  public Object getValueAt(int row, int column) {
     Object value = null;
     if (row == rowCount) {
       value = getDefaultValue(column);
@@ -384,7 +384,7 @@ public class SSTableModel extends AbstractTableModel {
    * @param value  value entererd of a column
    * @param column the column number for which the value is entered.
    */
-  protected void insertRow(final Object value, final int column) {
+  protected void insertRow(Object value, int column) {
     if (value == null) { return; }
     if (dataGridHandler != null) { dataGridHandler.performPreInsertOps(rowCount); }
 
@@ -446,7 +446,7 @@ public class SSTableModel extends AbstractTableModel {
    * @return editable indicator for cell at row and column specified
    */
   @Override
-  public boolean isCellEditable(final int row, final int column) {
+  public boolean isCellEditable(int row, int column) {
     if (uneditableColumns != null) {
       for (int i = 0; i < uneditableColumns.length; i++) {
         if (column == uneditableColumns[i]) { return false; }
@@ -496,7 +496,7 @@ public class SSTableModel extends AbstractTableModel {
    * @param values        the values for all the columns specified in first
    *                       argument
    */
-  public void setDefaultValues(final int[] columnNumbers, final Object[] values) {
+  public void setDefaultValues(int[] columnNumbers, Object[] values) {
     if ((columnNumbers == null) || (values == null)) { defaultValuesMap = null; }
 
     if (defaultValuesMap == null) {
@@ -518,7 +518,7 @@ public class SSTableModel extends AbstractTableModel {
    * @param headers array of string objects representing the header for each
    *                 column.
    */
-  public void setHeaders(final String[] headers) {
+  public void setHeaders(String[] headers) {
     this.headers = Arrays.copyOf(headers, headers.length);
   }
 
@@ -529,7 +529,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param insert true if user can insert new rows, else false.
    */
-  public void setInsertion(final boolean insert) {
+  public void setInsertion(boolean insert) {
     boolean change = allowInsertion != insert;
     allowInsertion = insert;
     // rowCount is the JTABLE index of the row after the database rows
@@ -545,7 +545,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param component the component that should be used for message dialogs.
    */
-  public void setMessageWindow(final Component component) { this.component = component; }
+  public void setMessageWindow(Component component) { this.component = component; }
 
   /**
    * Updates the primary key column based on the SSDataValue implementation
@@ -572,7 +572,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param columnNumber the column which is the primary column.
    */
-  public void setPrimaryColumn(final int columnNumber) { primaryColumn = columnNumber; }
+  public void setPrimaryColumn(int columnNumber) { primaryColumn = columnNumber; }
 
   /**
    * Sets the RowSet for SSTableModel to the given RowSet. This RowSet will
@@ -594,7 +594,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param cellEditing implementation of SSCellEditing interface.
    */
-  public void setSSCellEditing(final SSCellEditing cellEditing) { this.cellEditing = cellEditing; }
+  public void setSSCellEditing(SSCellEditing cellEditing) { this.cellEditing = cellEditing; }
 
   /**
    * Used to set an implementation of SSDataGridHandler interface which can be
@@ -603,7 +603,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param dataGridHandler implementation of SSDataGridHandler interface.
    */
-  public void setSSDataGridHandler(final SSDataGridHandler dataGridHandler) {
+  public void setSSDataGridHandler(SSDataGridHandler dataGridHandler) {
     this.dataGridHandler = dataGridHandler;
   }
 
@@ -613,7 +613,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param dataValue implementation of SSDataValue for determining PK
    */
-  public void setSSDataValue(final SSDataValue dataValue) { this.dataValue = dataValue; }
+  public void setSSDataValue(SSDataValue dataValue) { this.dataValue = dataValue; }
 
   /**
    * Sets the uneditable columns. The columns specified as uneditable will not be
@@ -622,7 +622,7 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param columnNumbers array specifying the column numbers which should be uneditable.
    */
-  public void setUneditableColumns(final int[] columnNumbers) {
+  public void setUneditableColumns(int[] columnNumbers) {
     uneditableColumns = Arrays.copyOf(columnNumbers, columnNumbers.length);
   }
 
@@ -634,7 +634,7 @@ public class SSTableModel extends AbstractTableModel {
    * @param column the column whose value is to be changed
    */
   @Override
-  public void setValueAt(final Object value, final int row, final int column) {
+  public void setValueAt(Object value, int row, int column) {
     // MAKE LOCAL COPY OF OBJECT FOR DATE MANIPULATIONS
     Object valueCopy = value;
 

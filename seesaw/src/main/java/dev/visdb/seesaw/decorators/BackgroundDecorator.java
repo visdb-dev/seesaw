@@ -106,7 +106,7 @@ public class BackgroundDecorator extends FocusDecorator {
   /**
    * @param focusBackgroundColor the new background color to use
    */
-  public void setFocusBackgroundColor(final Color focusBackgroundColor) {
+  public void setFocusBackgroundColor(Color focusBackgroundColor) {
     this.focusBackgroundColor = focusBackgroundColor;
   }
 

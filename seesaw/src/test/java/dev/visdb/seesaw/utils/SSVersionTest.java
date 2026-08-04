@@ -37,8 +37,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
-import dev.visdb.seesaw.utils.SSVersion;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

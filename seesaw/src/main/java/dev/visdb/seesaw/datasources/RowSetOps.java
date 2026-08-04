@@ -255,7 +255,7 @@ public class RowSetOps {
    * @return the number of columns
    * @throws SQLException - if a database access error occurs
    */
-  public static int getColumnCount(final ResultSet resultSet) throws SQLException {
+  public static int getColumnCount(ResultSet resultSet) throws SQLException {
     return resultSet.getMetaData().getColumnCount();
   }
 
@@ -269,7 +269,7 @@ public class RowSetOps {
    *
    * @throws SQLException - if a database access error occurs
    */
-  public static int getColumnIndex(final ResultSet resultSet, final String columnName)
+  public static int getColumnIndex(ResultSet resultSet, String columnName)
       throws SQLException {
     return resultSet.findColumn(columnName);
   }
@@ -284,7 +284,7 @@ public class RowSetOps {
    *
    * @throws SQLException - if a database access error occurs
    */
-  public static String getColumnName(final ResultSet resultSet, final int columnIndex)
+  public static String getColumnName(ResultSet resultSet, int columnIndex)
       throws SQLException {
     return resultSet.getMetaData().getColumnName(columnIndex);
   }
@@ -296,7 +296,7 @@ public class RowSetOps {
    * @param columnIndex column index
    * @return Optional of true if nullable, empty Optional if unknown.
    */
-  public static Optional<Boolean> isNullable(final ResultSet resultSet, final int columnIndex) {
+  public static Optional<Boolean> isNullable(ResultSet resultSet, int columnIndex) {
     try {
       int nullable = resultSet.getMetaData().isNullable(columnIndex);
       return nullable == ResultSetMetaData.columnNullableUnknown
@@ -315,7 +315,7 @@ public class RowSetOps {
    * @param columnName column name
    * @return Optional of true if nullable, empty Optional if unknown.
    */
-  public static Optional<Boolean> isNullable(final ResultSet resultSet, final String columnName) {
+  public static Optional<Boolean> isNullable(ResultSet resultSet, String columnName) {
     try {
       return isNullable(resultSet, getColumnIndex(resultSet, columnName));
     } catch (SQLException ex) {
@@ -337,7 +337,7 @@ public class RowSetOps {
    *
    * @throws SQLException - if a database access error occurs
    */
-  public static int getColumnType(final ResultSet resultSet, final int columnIndex)
+  public static int getColumnType(ResultSet resultSet, int columnIndex)
       throws SQLException {
     return resultSet.getMetaData().getColumnType(columnIndex);
   }
@@ -355,7 +355,7 @@ public class RowSetOps {
    *
    * @throws SQLException - if a database access error occurs
    */
-  public static JDBCType getJDBCColumnType(final ResultSet resultSet, final int columnIndex)
+  public static JDBCType getJDBCColumnType(ResultSet resultSet, int columnIndex)
       throws SQLException {
     return getJDBCType(getColumnType(resultSet, columnIndex));
   }
@@ -405,7 +405,7 @@ public class RowSetOps {
    * @return
    * @throws SQLException
    */
-  public static Class<?> getClassColumnType(final ResultSet resultSet, final String columnName)
+  public static Class<?> getClassColumnType(ResultSet resultSet, String columnName)
       throws SQLException {
     return getClassColumnType(resultSet, getColumnIndex(resultSet, columnName));
   }
@@ -420,7 +420,7 @@ public class RowSetOps {
    * @return
    * @throws SQLException
    */
-  public static Class<?> getClassColumnType(final ResultSet resultSet, final int columnIndex)
+  public static Class<?> getClassColumnType(ResultSet resultSet, int columnIndex)
       throws SQLException {
     JDBCType type = RowSetOps.getJDBCColumnType(resultSet, columnIndex);
     return findJavaTypeClass(type);
@@ -922,7 +922,7 @@ public class RowSetOps {
    * @throws SSSQLNullException thrown if null is not allowed
    * @throws SQLException  thrown if a database error is encountered
    */
-  public static DbUpdate updateColumnArray(final SSComponent comp, final Array updatedValue)
+  public static DbUpdate updateColumnArray(SSComponent comp, Array updatedValue)
       throws SSSQLNullException, SQLException {
     return updateColumnArray(comp, comp.getRowSet(), updatedValue, comp.getColumnName(),
                              comp.getAllowNull());

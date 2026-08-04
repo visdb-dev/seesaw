@@ -80,7 +80,7 @@ public class Example5 extends JFrame {
    * @param _dbConn - database connection
    */
   @SuppressWarnings("LeakingThisInConstructor")
-  public Example5(final Connection _dbConn) {
+  public Example5(Connection _dbConn) {
     // SET SCREEN TITLE
     super("Example5");
     DemoUtil.initExampleFrame(this, null);

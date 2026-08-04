@@ -76,7 +76,7 @@ public class SSTimeField extends DateTimeField {
    * Creates an object of SSTimeField with the specified formatter factory
    * @param factory - formatter factory to be used
    */
-  public SSTimeField(final AbstractFormatterFactory factory) {
+  public SSTimeField(AbstractFormatterFactory factory) {
     super(factory);
     setValue(new java.util.Date());
   }

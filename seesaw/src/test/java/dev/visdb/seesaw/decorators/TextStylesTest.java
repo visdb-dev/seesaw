@@ -29,8 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.decorators.TextStyles;
-
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.io.IOException;

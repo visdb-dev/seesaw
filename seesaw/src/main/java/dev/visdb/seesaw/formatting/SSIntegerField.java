@@ -79,7 +79,7 @@ public class SSIntegerField extends NumberField {
    * {@inheritDoc }
    */
   @Override
-  public void setDecimals(final int decimals) {}
+  public void setDecimals(int decimals) {}
 
   /**
    * Create a FormatterFactory.

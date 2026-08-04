@@ -29,12 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.navigate;
 
-import dev.visdb.seesaw.navigate.RowSetState;
-import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.navigate.RowsModelNewRowSetEvent;
-import dev.visdb.seesaw.navigate.RowsEvent;
-import dev.visdb.seesaw.navigate.RowsAction;
-
 import java.awt.Container;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -50,17 +44,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import dev.visdb.seesaw.core.TextField;
+import com.raelity.lib.eventbus.WeakEventBus;
 
+import dev.visdb.seesaw.core.TextField;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
-
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
 import dev.visdb.seesaw.mock.TinyRS;
 import dev.visdb.seesaw.navigate.EQ.BusReceiver;
-
-import com.raelity.lib.eventbus.WeakEventBus;
 
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.getLoggerName;

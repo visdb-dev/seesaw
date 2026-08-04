@@ -29,8 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
-import dev.visdb.seesaw.utils.ZoomCanvas;
-
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
@@ -95,6 +93,7 @@ public class ZoomCanvasTest {
     mockScrollPane.getViewport().setViewPosition(new Point(20, 10));
   }
 
+  /** x */
   @AfterEach
   public void tearDown() {}
 

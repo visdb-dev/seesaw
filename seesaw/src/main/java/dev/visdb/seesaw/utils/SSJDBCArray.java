@@ -74,7 +74,7 @@ public class SSJDBCArray implements Array {
    * @param data     object array of SSArray
    * @param baseType Array elements database type
    */
-  public SSJDBCArray(final Object data, final JDBCType baseType) {
+  public SSJDBCArray(Object data, JDBCType baseType) {
     Objects.requireNonNull(data);
     if (!data.getClass().isArray()) throw new IllegalArgumentException("Must be an array");
     this.data = data;
@@ -98,7 +98,7 @@ public class SSJDBCArray implements Array {
    * {@inheritDoc }
    */
   @Override
-  public Object getArray(final long index, final int count) throws SQLException {
+  public Object getArray(long index, int count) throws SQLException {
     throw new UnsupportedOperationException();
   }
 
@@ -107,7 +107,7 @@ public class SSJDBCArray implements Array {
    * {@inheritDoc }
    */
   @Override
-  public Object getArray(final long index, final int count, final Map<String, Class<?>> map)
+  public Object getArray(long index, int count, Map<String, Class<?>> map)
       throws SQLException {
     throw new UnsupportedOperationException();
   }
@@ -117,7 +117,7 @@ public class SSJDBCArray implements Array {
    * {@inheritDoc }
    */
   @Override
-  public Object getArray(final Map<String, Class<?>> map) throws SQLException {
+  public Object getArray(Map<String, Class<?>> map) throws SQLException {
     throw new UnsupportedOperationException();
   }
 
@@ -147,7 +147,7 @@ public class SSJDBCArray implements Array {
    * {@inheritDoc }
    */
   @Override
-  public ResultSet getResultSet(final long index, final int count) throws SQLException {
+  public ResultSet getResultSet(long index, int count) throws SQLException {
     throw new UnsupportedOperationException();
   }
 
@@ -156,7 +156,7 @@ public class SSJDBCArray implements Array {
    * {@inheritDoc }
    */
   @Override
-  public ResultSet getResultSet(final long index, final int count, final Map<String, Class<?>> map)
+  public ResultSet getResultSet(long index, int count, Map<String, Class<?>> map)
       throws SQLException {
     throw new UnsupportedOperationException();
   }
@@ -166,7 +166,7 @@ public class SSJDBCArray implements Array {
    * {@inheritDoc }
    */
   @Override
-  public ResultSet getResultSet(final Map<String, Class<?>> map) throws SQLException {
+  public ResultSet getResultSet(Map<String, Class<?>> map) throws SQLException {
     throw new UnsupportedOperationException();
   }
 

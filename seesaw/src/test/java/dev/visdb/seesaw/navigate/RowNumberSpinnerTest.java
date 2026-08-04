@@ -29,11 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.navigate;
 
-import dev.visdb.seesaw.navigate.RowNumberSpinner;
-import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.navigate.RowsActions;
-import dev.visdb.seesaw.navigate.RowsAction;
-
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
@@ -45,12 +40,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.raelity.lib.eventbus.WeakEventBus;
+
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
 import dev.visdb.seesaw.mock.TinyRS;
 import dev.visdb.seesaw.navigate.EQ.BusReceiver;
-
-import com.raelity.lib.eventbus.WeakEventBus;
 
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.getLoggerName;

@@ -29,8 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.core;
 
-import dev.visdb.seesaw.core.List1;
-
 import java.sql.JDBCType;
 import java.util.Collections;
 import java.util.List;

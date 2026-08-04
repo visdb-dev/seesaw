@@ -29,12 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.formatting;
 
-import dev.visdb.seesaw.formatting.SSPercentField;
-import dev.visdb.seesaw.formatting.SSNumericField;
-import dev.visdb.seesaw.formatting.SSIntegerField;
-import dev.visdb.seesaw.formatting.SSCurrencyField;
-import dev.visdb.seesaw.formatting.NumberField;
-
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.junit.jupiter.api.AfterAll;

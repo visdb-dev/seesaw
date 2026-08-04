@@ -33,7 +33,7 @@ import dev.visdb.seesaw.utils.SSComponent;
 public class MyCheckBox extends JCheckBox implements SSComponent {
   class MyCheckBoxListener implements ItemListener {
     @Override
-    public void itemStateChanged(final ItemEvent ie) {
+    public void itemStateChanged(ItemEvent ie) {
       // update the database with the new value
       try {
         dbChange(

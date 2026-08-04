@@ -132,7 +132,7 @@ public class SSTextSupport {
      * {@inheritDoc}
      */
     @Override
-    public void changedUpdate(final DocumentEvent de) {
+    public void changedUpdate(DocumentEvent de) {
       lastChange++;
       logger.log(TRACE,
                  ()
@@ -152,14 +152,14 @@ public class SSTextSupport {
 
     /** {@inheritDoc} */
     @Override
-    public void insertUpdate(final DocumentEvent de) {
+    public void insertUpdate(DocumentEvent de) {
       logger.log(TRACE, () -> sf("%s - insertUpdate().", ssCommon.getColumnForLog()));
       changedUpdate(de);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void removeUpdate(final DocumentEvent de) {
+    public void removeUpdate(DocumentEvent de) {
       logger.log(TRACE, () -> sf("%s - removeUpdate().", ssCommon.getColumnForLog()));
       changedUpdate(de);
     }
@@ -279,7 +279,7 @@ public class SSTextSupport {
 
     /** {@inheritDoc} */
     @Override
-    public void changedUpdate(final DocumentEvent de) {
+    public void changedUpdate(DocumentEvent de) {
       lastChange++;
       logger.log(TRACE,
                  ()
@@ -352,14 +352,14 @@ public class SSTextSupport {
 
     /** {@inheritDoc} */
     @Override
-    public void insertUpdate(final DocumentEvent de) {
+    public void insertUpdate(DocumentEvent de) {
       logger.log(TRACE, () -> sf("%s - insertUpdate().", ssCommon.getColumnForLog()));
       changedUpdate(de);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void removeUpdate(final DocumentEvent de) {
+    public void removeUpdate(DocumentEvent de) {
       logger.log(TRACE, () -> sf("%s - removeUpdate().", ssCommon.getColumnForLog()));
       changedUpdate(de);
     }

@@ -42,10 +42,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.models;
 
-import dev.visdb.seesaw.models.SSListItem;
-import dev.visdb.seesaw.models.SSListItemFormat;
-import dev.visdb.seesaw.models.AbstractComboBoxListSwingModel;
-
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.Time;
@@ -98,6 +94,7 @@ public class SSListItemFormatTest {
     List<SSListItem> itemList = new ArrayList<>();
 
     // 5 items in listItem
+    @SuppressWarnings("unused")
     LI listInfo = new LI(5, itemList);
   }
 
