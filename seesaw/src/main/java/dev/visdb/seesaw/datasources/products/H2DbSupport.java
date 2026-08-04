@@ -30,6 +30,9 @@
 package dev.visdb.seesaw.datasources.products;
 
 import java.sql.Connection;
+import java.sql.JDBCType;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 
 /**
@@ -42,7 +45,22 @@ public class H2DbSupport extends DbSupportBase {
    */
   public H2DbSupport(Connection sharedConnection) { super(sharedConnection); }
 
-  /** {@inheritDoc } */
+  /**
+   * Create a query that contains the row number of a non "order by" query.
+   * The {@code H2} {@code DbSupport} uses the the {@code H2} builtin
+   * function {@code ROWNUM()}.
+   * It returns a string like {@snippet :
+   * SELECT part_id, part_name, ROWNUM() AS rown
+   * FROM part_data
+   * ORDER BY part_name;
+   * }
+   * 
+   * @param selectColumns
+   * @param rownumberColumn
+   * @param tableName
+   * @param trailingClause
+   * @return 
+   */
   @Override
   public String createRownumQuery(String selectColumns, String rownumberColumn, String tableName,
                                   String trailingClause) {
@@ -55,5 +73,25 @@ public class H2DbSupport extends DbSupportBase {
                        .replace("{tableName}", tableName)
                        .replace("{trailingClause}", trailingClause);
     return query;
+  }
+
+  /**
+   * H2 specific. Should also work with HSQLDB, DuckDB.
+   * <p>
+   * Works with typeNames like "INTEGER ARRAY".
+   * {@snippet lang="java":
+   *     String typeName = rmd.getColumnTypeName(columnIndex);
+   *     JDBCType elemtype = JDBCType.valueOf(typeName.split(" ")[0]);
+   * }
+   */
+  @Override
+  public JDBCType resolveArrayElementType(ResultSetMetaData rmd, int columnIndex) throws SQLException {
+    JDBCType columnType = JDBCType.valueOf(rmd.getColumnType(columnIndex));
+    if (columnType != JDBCType.ARRAY)
+      throw new IllegalArgumentException("Column must be JDBCType.ARRAY, not " + columnType);
+    // Assumes first word of column type is element type, eg "INTEGER ARRAY".
+    String typeName = rmd.getColumnTypeName(columnIndex);
+    JDBCType elemtype = JDBCType.valueOf(typeName.split(" ")[0]);
+    return elemtype;
   }
 }

@@ -43,6 +43,7 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Multimaps;
 
 import static java.sql.JDBCType.*;
+import static java.util.Map.entry;
 
 /**
  * Data Type Conversion Tables;
@@ -249,6 +250,69 @@ public class JdbcDataTypeConversionTables {
             .put(java.time.OffsetTime.class, TIME_WITH_TIMEZONE)
             .put(java.time.OffsetDateTime.class, TIMESTAMP_WITH_TIMEZONE)
             .build();
+
+  private static Map<String, JDBCType> arrayTypeMap;
+  /**
+   * Map of vendor-specific primitive typenames to standard JDBCType.
+   * Thanks to Google AI.
+   * The AI claims this works with PostgreSQL, H2, HSQLDB, ClickHouse, MySQL/TiDB,
+   * Oracle, DuckDB, and SQL Server.
+   * See {@link dev.visdb.seesaw.datasources.DbSupport#resolveArrayElementType(java.sql.ResultSetMetaData, int) resolveArrayElementType(ResultSetMetaData, int)}
+   * @return 
+  */
+  public static Map<String, JDBCType> vendorTypeMap() {
+    if (arrayTypeMap == null ) {
+      arrayTypeMap = Map.ofEntries(
+        entry("INT", JDBCType.INTEGER),
+        entry("INT4", JDBCType.INTEGER),
+        entry("INT32", JDBCType.INTEGER),
+        entry("INTEGER", JDBCType.INTEGER),
+        entry("MEDIUMINT", JDBCType.INTEGER),
+        entry("BIGINT", JDBCType.BIGINT),
+        entry("INT8", JDBCType.BIGINT),
+        entry("INT64", JDBCType.BIGINT),
+        entry("SMALLINT", JDBCType.SMALLINT),
+        entry("INT2", JDBCType.SMALLINT),
+        entry("TINYINT", JDBCType.TINYINT),
+        entry("INT1", JDBCType.TINYINT),
+
+        // String / Character variants
+        entry("VARCHAR", JDBCType.VARCHAR),
+        entry("VARCHAR2", JDBCType.VARCHAR),
+        entry("TEXT", JDBCType.VARCHAR),
+        entry("CHAR", JDBCType.CHAR),
+        entry("BPCHAR", JDBCType.CHAR), // PostgreSQL Blank Padded Char
+        entry("NVARCHAR", JDBCType.NVARCHAR),
+
+        // Floating point numbers
+        entry("FLOAT", JDBCType.FLOAT),
+        entry("FLOAT4", JDBCType.REAL),
+        entry("REAL", JDBCType.REAL),
+        entry("DOUBLE", JDBCType.DOUBLE),
+        entry("DOUBLE PRECISION", JDBCType.DOUBLE),
+        entry("FLOAT8", JDBCType.DOUBLE),
+
+        // Numeric / Exact Decimals
+        entry("NUMERIC", JDBCType.NUMERIC),
+        entry("DECIMAL", JDBCType.DECIMAL),
+
+        // Boolean variants
+        entry("BOOL", JDBCType.BOOLEAN),
+        entry("BOOLEAN", JDBCType.BOOLEAN),
+
+        // Date and Time
+        entry("DATE", JDBCType.DATE),
+        entry("TIME", JDBCType.TIME),
+        entry("TIMESTAMP", JDBCType.TIMESTAMP),
+        entry("TIMESTAMPTZ", JDBCType.TIMESTAMP_WITH_TIMEZONE),
+
+        // Binary fields
+        entry("BYTEA", JDBCType.VARBINARY),
+        entry("BLOB", JDBCType.BLOB)
+      );
+    }
+    return arrayTypeMap;
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   //

@@ -56,7 +56,6 @@ import java.util.Objects;
  */
 
 public class SSJDBCArray implements Array {
-  // TODO May be able to eliminate. Only reference is in com.nqadmin.swingset.SSList.
 
   /**
    * Underlying database type name for array elements

@@ -57,7 +57,6 @@ import javax.swing.SwingUtilities;
 import com.nqadmin.swingset.SSDBComboBox;
 
 import dev.visdb.seesaw.core.DBComboBox2;
-
 import dev.visdb.seesaw.datasources.ConvertType;
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.navigate.RowsModel;
@@ -75,7 +74,7 @@ import static java.lang.System.Logger.Level.*;
  * records and in the same order; if not, the SSSyncManager will spend a lot of
  * time looping through records to match.
  *
- * @param <K> type of key same as {@literal <K>} in DBComboBox2.
+ * @param <K> java type of RowSet's key; same as {@literal <K>} in associated DBComboBox2
  */
 public class SyncManager<K> {
   /**

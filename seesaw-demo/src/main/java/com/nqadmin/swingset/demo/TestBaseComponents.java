@@ -295,12 +295,11 @@ public class TestBaseComponents extends JFrame {
   final SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
   final SSSyncManager syncManager;
 
-  RowSet getRowSet() { return rowsModel.getRowSet(); }
-
   /**
    * Method to obtain proper data structure/model for SSList based on database used
    * @return collection model to use for lists based on underlying database
    */
+  @SuppressWarnings("unused")
   private SSCollection getCollectionModel() {
     @SuppressWarnings("unchecked")
     Supplier<SSCollection> supl = (Supplier<SSCollection>) hints.get("collectionModel");
@@ -325,7 +324,7 @@ public class TestBaseComponents extends JFrame {
     hints = _hints;
 
     lstSSList = new SSList(getCollectionModel());
-    // lstSSList = new SSList(JDBCType.INTEGER);
+    //lstSSList = new SSList(JDBCType.INTEGER); // SSCollection.getSuitableDbCollection()
 
     // lstSSList2 = new SSList(new SSDbStringCollection(
     // 		JDBCType.INTEGER, SSDbStringCollection.COMMA_SEP));

@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Objects;
 
 import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SSUtils;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 
@@ -111,20 +112,14 @@ public interface SSCollection {
     JDBCType columnType = JDBCType.valueOf(columnTyp);
     dbCollection = switch (columnType) {
       case ARRAY -> {
-        // May not be any rows, so only use metadata to determine elemtype
-        // if (Utils.hasActiveRow(this)) {
-        // 	Array array = this.getColumnArray();
-        // 	elemtype = JDBCType.valueOf(array.getBaseType());
-        // }
+      // May not be any rows, so only use metadata to determine elemtype
+      JDBCType elemType = SSUtils.dbSupport().resolveArrayElementType(md, comp.getColumnIndex());
 
-        // First word of column type is element type, eg "INTEGER ARRAY".
-        String typnam = md.getColumnTypeName(comp.getColumnIndex());
-        JDBCType elemtype = JDBCType.valueOf(typnam.split(" ")[0]);
-        if (collectionType != elemtype) {
-          String s = sf("collection type '%s' != ARRAY type '%s'", jdbcType, elemtype);
+        if (collectionType != elemType) {
+          String s = sf("collection type '%s' != ARRAY type '%s'", jdbcType, elemType);
           throw new IllegalArgumentException(s);
         }
-        yield new SSDbArray(elemtype);
+        yield new SSDbArray(elemType);
       }
       case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> {
         // TODO: have plugin specify default Delim
