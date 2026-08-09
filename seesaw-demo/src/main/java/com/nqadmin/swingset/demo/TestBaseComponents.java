@@ -534,19 +534,22 @@ public class TestBaseComponents extends JFrame {
   @SuppressWarnings("CallToPrintStackTrace")
   private void setupOurTextStyles() throws IOException {
     if (TextStyles.getStyle("testComponents_componentStateError") != null) return;
-    StringReader reader = new StringReader("""
-                "testComponents_componentStateError": {
-                  "fontSize": 14,
-                  "italic": false,
-                  "strikethrough": true
-                },
-                "testComponents_componentStateModified": {
-                  "fontSize": "default",
-                  "italic": true,
-                  "strikethrough": false
-                }
-                """);
-    TextStyles.loadFromAnyThread(() -> TextStyles.loadStylesFromJson(reader));
+    StringReader reader = new StringReader(
+        """
+        {
+          "testComponents_componentStateError": {
+            "fontSize": 14,
+            "italic": false,
+            "strikethrough": true
+          },
+          "testComponents_componentStateModified": {
+            "fontSize": "default",
+            "italic": true,
+            "strikethrough": false
+          }
+        }
+        """);
+    TextStyles.loadFromAnyThread(() -> TextStyles.loadStylesFromJson(reader, "TestBaseComponents"));
   }
 
   private DbOps createDbNav() { return new TestBaseComponentsDbOps(); }

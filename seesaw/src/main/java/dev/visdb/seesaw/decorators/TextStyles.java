@@ -23,9 +23,11 @@ import java.awt.Font;
 import java.awt.font.TextAttribute;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.System.Logger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -48,6 +50,16 @@ import javax.swing.*;
 import javax.swing.text.*;
 
 import dev.visdb.seesaw.utils.JStuff;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.type.TypeFactory;
+import tools.jackson.dataformat.javaprop.JavaPropsMapper;
+import tools.jackson.dataformat.javaprop.JavaPropsSchema;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
@@ -164,25 +176,25 @@ import static java.lang.System.Logger.Level.*;
  * formats for specifying styles, json and properties.
  *
  * <pre>
- * {
- *   "default": {
- *     "foreground": "#333333",                default.foreground=#333333
- *     "background": "#FFFFFF",                default.background=#FFFFFF
- *     "fontFamily": "Monospaced",             default.fontFamily=Monospaced
- *     "fontSize": 16,                         default.fontSize=16
- *     "alignment": "left"                     default.alignment=left
- *   },
- *   "warning": {
- *     "inherits": "default",                  warning.inherits=default
- *     "background": "#FFF3CD",                warning.background=#FFF3CD
- *     "alignment": "center"                   warning.alignment=center
- *   },
- *   "criticalError": {
- *     "inherits": "warning",                  criticalError.inherits=warning
- *     "alignment": "right",                   criticalError.alignment=right
- *     "foreground": "#721C24",                criticalError.foreground=#721C24
- *   }
- * }
+ * {                                      |
+ *   "default": {                         |
+ *     "foreground": "#333333",           |      default.foreground=#333333
+ *     "background": "#FFFFFF",           |      default.background=#FFFFFF
+ *     "fontFamily": "Monospaced",        |      default.fontFamily=Monospaced
+ *     "fontSize": 16,                    |      default.fontSize=16
+ *     "alignment": "left"                |      default.alignment=left
+ *   },                                   |      
+ *   "warning": {                         |      
+ *     "inherits": "default",             |      warning.inherits=default
+ *     "background": "#FFF3CD",           |      warning.background=#FFF3CD
+ *     "alignment": "center"              |      warning.alignment=center
+ *   },                                   |      
+ *   "criticalError": {                   |      
+ *     "inherits": "warning",             |      criticalError.inherits=warning
+ *     "alignment": "right",              |      criticalError.alignment=right
+ *     "foreground": "#721C24",           |      criticalError.foreground=#721C24
+ *   }                                    |
+ * }                                      |
  * </pre>
  * Each produces, as displayed by {@link #generateDiagnosticTrees(StringBuilder) }:
  * <pre>
@@ -248,6 +260,28 @@ public class TextStyles {
   //		the weird background.
 
   private TextStyles() {}
+
+  @SuppressWarnings("serial")
+  static class TextStylesException extends RuntimeException {
+    private String fName;
+
+    public TextStylesException(String message) {
+      super(message);
+      if (currentLoadFileName != null)
+        fName = currentLoadFileName;
+    }
+
+    public TextStylesException(String message, Throwable cause) {
+      super(message, cause);
+      if (currentLoadFileName != null)
+        fName = currentLoadFileName;
+    }
+
+    @Override
+    public String getMessage() {
+      return (fName != null ? sf("File: %s: ", fName) : "") + super.getMessage();
+    }
+  }
 
   /**
    * Get a Set of all the StyleNames.
@@ -384,7 +418,7 @@ public class TextStyles {
 
       try {
         checkCircularReference(child, new HashSet<>());
-      } catch (IllegalStateException e) {
+      } catch (TextStylesException e) {
         sb.append("[VALIDATION ERROR] ").append(e.getMessage()).append("\n");
         systemHealthy = false;
         circularLoopFailures++;
@@ -529,7 +563,7 @@ public class TextStyles {
   private static void checkCircularReference(String current, Set<String> visited) {
     logger.log(DEBUG, () -> sf("checkCircularReference: %s: %s", current, visited.toString()));
     if (visited.contains(current)) {
-      throw new IllegalStateException(
+      throw new TextStylesException(
           "Circular inheritance path detected: " + String.join(" -> ", visited) + " -> " + current);
     }
     visited.add(current);
@@ -558,7 +592,7 @@ public class TextStyles {
   private static AttributeSet getResolvedStyleHelper(String currentName, Set<String> visited) {
     logger.log(DEBUG, sf("resolveChainHierarchyHelper: %s: %s", currentName, visited.toString()));
     if (visited.contains(currentName)) {
-      throw new IllegalStateException(
+      throw new TextStylesException(
           "resolveChainHierarchyHelper: Circular inheritance path detected: "
           + String.join(" -> ", visited) + " -> " + currentName);
     }
@@ -575,7 +609,7 @@ public class TextStyles {
       if (currentParentStyle != null && parentStyle != currentParentStyle) {
         String s = sf("%s old/new parent: %s != %s", parentName, parentStyle, currentParentStyle);
         logger.log(ERROR, s);
-        throw new IllegalStateException(s);
+        throw new TextStylesException(s);
       }
       if (parentStyle != null) {
         currentStyle.setResolveParent(parentStyle);
@@ -597,6 +631,8 @@ public class TextStyles {
    */
   public record LoadStatus(boolean ok, String diagnostics, String trees) {}
 
+  private static String currentLoadFileName;
+
   /**
    * Load styles from a file.
    * If an exception occurs while processing, any changes
@@ -614,19 +650,19 @@ public class TextStyles {
     } else if (lowerPath.endsWith(".properties")) {
       return loadStylesFromProperties(path);
     } else {
-      throw new IllegalArgumentException("Unsupported file extension.");
+      throw new IllegalArgumentException(sf("Unsupported file extension on '%s'", path.toString()));
     }
   }
 
+  // Set up initial state before load, so can back out any changes if errors.
   private static void loadStylesStarting() {
     initialStyleNames.clear();
     newStyleNames.clear();
     initialStyleNames.addAll(registry.keySet());
   }
 
+  // If not a cleanFinish or diagnostics fail, then back out any changes made by load.
   private static LoadStatus loadStylesCompleted(boolean cleanFinish) {
-    // If not a cleanFinish or diagnostics fail, then back out any changes.
-
     LoadStatus status = executeFullStyleDiagnostics(false);
     if (!(cleanFinish && status.ok)) {
       newStyleNames.stream().forEach(item -> {
@@ -641,62 +677,199 @@ public class TextStyles {
     return status;
   }
 
+  private interface BiFunctionIO<T, U, R> {
+    R apply(T t, U u) throws IOException;
+  }
+
+  /**
+   * All load methods go through here
+   * @param parseToMap parses either json or properties.
+   */
+  private static LoadStatus loadStyles(Reader reader, String fName,
+      BiFunctionIO<Reader, String, Map<String, Map<String, String>>> parseToMap)
+      throws IOException {
+
+    verifyNotEDT();
+    boolean cleanFinish = false;
+    LoadStatus status;
+    loadStylesStarting();
+    currentLoadFileName = fName;
+    try {
+      Map<String, Map<String, String>> styles = parseToMap.apply(reader, fName);
+      loadStylesFromMaps(styles);
+      cleanFinish = true;
+    } finally {
+      currentLoadFileName = null;
+      status = loadStylesCompleted(cleanFinish);
+    }
+    return status;
+  }
+
+  private static void loadStylesFromMaps(Map<String, Map<String, String>> styles) {
+    for (Map.Entry<String, Map<String, String>> styleEntry : styles.entrySet()) {
+      String styleName = styleEntry.getKey();
+      Map<String,String> attrs = styleEntry.getValue();
+
+      // validate the new styleName, and register it
+      if (initialStyleNames.contains(styleName))
+        throw new TextStylesException("StyleName already exists");
+      newStyleNames.add(styleName); // happens before registry changed
+      // allocate an AttributeSet for the style and set its name
+      registry.computeIfAbsent(styleName, k -> {
+        SimpleAttributeSet attrSet = new SimpleAttributeSet();
+        attrSet.addAttribute(StyleConstants.NameAttribute, styleName);
+        return attrSet;
+      });
+
+      // for the styleName add each attribute to the AttributeSet
+      for (Map.Entry<String, String> attr : attrs.entrySet()) {
+        String propertyName = attr.getKey();
+        String value = attr.getValue();
+        
+        if ("inherits".equalsIgnoreCase(propertyName)) {
+          inheritanceMap.put(styleName, value.trim());
+        } else {
+          SimpleAttributeSet attributeSet = registry.get(styleName);
+          mapPropertyToAttributeSet(attributeSet, propertyName, value);
+        }
+      }
+    }
+  }
+
+  // https://javadoc.io/doc/tools.jackson.core/jackson-core/3.2.1/index.html
+  // https://javadoc.io/doc/tools.jackson.dataformat/jackson-dataformat-properties/3.2.1/index.html
+  /**
+   * Input is parsed to a Map indexed by style name, and the value of each
+   * style name entry is a Map of attributes.
+   * For Jackson construct the
+   * {@code Map<String, Map<String, String>>} structural type dynamically.
+   */
+  private static JavaType stylesNestedMapType(ObjectMapper mapper) {
+    TypeFactory typeFactory = mapper.getTypeFactory();
+    JavaType mapType = typeFactory.constructMapType(
+        Map.class,
+        typeFactory.constructType(String.class),
+        typeFactory.constructMapType(Map.class, String.class, String.class)
+    );
+    return mapType;
+  }
+
   private static LoadStatus loadStylesFromProperties(Path path) throws IOException {
-    try (BufferedReader reader = Files.newBufferedReader(path)) {
-      return loadStylesFromProperties(reader);
+    // props.load wraps the reader in it's own buffered reader, so do least here
+    try (InputStreamReader reader = new InputStreamReader(
+        Files.newInputStream(path), StandardCharsets.UTF_8)) {
+      return loadStylesFromProperties(reader, path.toString());
     }
   }
 
   /**
    * Load styles in properties format.
+   * Performance note: the reader is used by {@code Properties.load(reader)},
+   * so passing in a buffered reader just adds extra overhead.
    * If an exception occurs while processing, any changes
    * made up to the exception are backed out.
    * @param reader
+   * @param fName
    * @return
    * @throws IOException
    */
-  public static synchronized LoadStatus loadStylesFromProperties(Reader reader) throws IOException {
-    verifyNotEDT();
-    Properties props = new Properties();
-    try (reader) {
+  public static synchronized LoadStatus loadStylesFromProperties(Reader reader, String fName)
+      throws IOException {
+    return loadStyles(reader, fName, (aReader, name) -> {
+      Properties props = new StrictProperties();
       props.load(reader);
-    }
-    return loadStylesFromProperties(props);
+      return parseProperties(props);
+    });
   }
 
-  private static LoadStatus loadStylesFromProperties(Properties props) throws IOException {
-    boolean cleanFinish = false;
-    loadStylesStarting();
-    LoadStatus status;
-    try {
-      for (String key : props.stringPropertyNames()) {
-        int firstDot = key.indexOf('.');
-        if (firstDot == -1) continue;
-        String configName = key.substring(0, firstDot);
-        String propertyName = key.substring(firstDot + 1);
-        String value = props.getProperty(key);
-
-        if (initialStyleNames.contains(configName))
-          throw new IllegalArgumentException("StyleName already exists");
-        newStyleNames.add(configName); // happens before registry changed
-        if ("inherits".equalsIgnoreCase(propertyName)) {
-          inheritanceMap.put(configName, value.trim());
-        } else {
-          SimpleAttributeSet attributeSet = registry.computeIfAbsent(configName, k -> {
-            SimpleAttributeSet attrSet = new SimpleAttributeSet();
-            attrSet.addAttribute(StyleConstants.NameAttribute, configName);
-            return attrSet;
-          });
-          mapPropertyToAttributeSet(attributeSet, propertyName, value);
-        }
+  // Detect duplicate keys instead of over-writing previous value.
+  @SuppressWarnings("serial")
+  private static class StrictProperties extends Properties {
+    @Override
+    public synchronized Object put(Object key, Object value) {
+      if (containsKey(key)) {
+        throw new TextStylesException(sf("Duplicate key found: %s=%s", key, value));
       }
-      cleanFinish = true;
-    } finally { status = loadStylesCompleted(cleanFinish); }
-    return status;
+      return super.put(key, value);
+    }
+  }
+
+  // Parse the properties into a map.
+  private static Map<String, Map<String, String>> parseProperties(Properties props) throws IOException {
+    JavaPropsMapper mapper = JavaPropsMapper.builder().build();
+    JavaPropsSchema schemaWithDots = JavaPropsSchema.emptySchema().withPathSeparator(".");
+    Map<String, Map<String, String>> styles
+        = mapper.readPropertiesAs(props, schemaWithDots, stylesNestedMapType(mapper));
+    return styles;
   }
 
   private static LoadStatus loadStylesFromJson(Path path) throws IOException {
-    return loadStylesFromJson(Files.readString(path));
+    try (BufferedReader reader = Files.newBufferedReader(path)) {
+      return loadStylesFromJson(reader, path.toString());
+    }
+  }
+
+  /**
+   * Load styles in json format.
+   * Performance note: use a buffered reader.
+   * If an exception occurs while processing, any changes
+   * made up to the exception are backed out.
+   *
+   * @param reader
+   * @param fName for messages, typically a file name
+   * @return
+   * @throws IOException
+   */
+  public static synchronized LoadStatus loadStylesFromJson(Reader reader, String fName) throws IOException {
+    return loadStyles(reader, fName, (aReader, name) -> {
+      return parseJson(aReader, name);
+    });
+  }
+
+  private static Map<String, Map<String, String>> parseJson(Reader reader, String fName) throws IOException {
+    ObjectMapper mapper = JsonMapper.builder()
+        // .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+        .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+        .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+        .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+        .enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
+        .build();
+
+    try {
+      // Use TypeReference to cleanly parse directly into nested maps
+      Map<String, Map<String, String>> styles = mapper.readValue(
+          reader,
+          //new TypeReference<Map<String, Map<String, String>>>() {}
+          stylesNestedMapType(mapper)
+      );
+      return styles;
+    } catch (JacksonException ex) {
+      System.err.println(ex.getMessage());
+      // TODO: parse exception
+      if (fName == null) {
+        logger.log(ERROR, ex.getMessage());
+        throw ex;
+      }
+      // Reproduce the error message,
+      // but put the filename in the loc, instead of something like "(StringReader)"
+      String loc = ex.getLocation().toString();
+      loc = loc.replace(ex.getLocation().sourceDescription(), fName);
+      String newMsg = sf("%s\nat %s (through reference chain: %s)",
+          ex.getOriginalMessage(), loc, ex.getPathReference());
+      logger.log(ERROR, newMsg);
+      JacksonException je = new JacksonException(newMsg, ex) {
+        @Override
+        public String getMessage() {
+          return newMsg;
+        }
+      };
+      throw je;
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private static LoadStatus loadStylesFromJsonRegEx(Path path) throws IOException {
+    return loadStylesFromJsonRegEx(Files.readString(path));
   }
 
   /**
@@ -708,18 +881,20 @@ public class TextStyles {
    * @return
    * @throws IOException
    */
-  public static synchronized LoadStatus loadStylesFromJson(Reader reader) throws IOException {
+  @SuppressWarnings("unused")
+  private static synchronized LoadStatus loadStylesFromJsonRegex(Reader reader) throws IOException {
     verifyNotEDT();
     StringWriter sw = new StringWriter(700);
     reader.transferTo(sw);
-    return loadStylesFromJson(sw.toString());
+    return loadStylesFromJsonRegEx(sw.toString());
 
     //
     // TODO: use a JSON library. Jackson/
     //
   }
 
-  private static LoadStatus loadStylesFromJson(String _content) throws IOException {
+  @SuppressWarnings("unused")
+  private static LoadStatus loadStylesFromJsonRegEx(String _content) throws IOException {
     boolean cleanFinish = false;
     loadStylesStarting();
     LoadStatus status;
@@ -735,10 +910,10 @@ public class TextStyles {
         String configName = blockMatcher.group(1);
         String body = blockMatcher.group(2);
         if (initialStyleNames.contains(configName))
-          throw new IllegalArgumentException(sf("StyleName '%s' already exists", configName));
+          throw new TextStylesException(sf("StyleName '%s' already exists", configName));
         newStyleNames.add(configName); // happens before registry changed
         if (registry.containsKey(configName))
-          throw new IllegalArgumentException(
+          throw new TextStylesException(
               sf("StyleName '%s' already defined in this load", configName));
 
         SimpleAttributeSet attributeSet = registry.computeIfAbsent(configName, k -> {
@@ -829,13 +1004,13 @@ public class TextStyles {
       case "wordwrap" -> WORD_WRAP_KEY;
       case "scrollbars" -> SCROLLBARS_KEY;
       case "autoscroll" -> AUTOSCROLL_KEY;
-      default -> throw new IllegalArgumentException(sf("Unhandled style attribute name '%s'", key));
+      default -> throw new TextStylesException(sf("Unhandled style attribute name '%s'", key));
     };
     return attrName;
   }
 
   /**
-   * keep: mean do not modify existing value;<br>
+   * keep: means do not modify existing value;<br>
    * useDflt: if value is null;<br>
    * dflt: null means special handling.
    */
@@ -907,7 +1082,7 @@ public class TextStyles {
         dflt = null;
         yield AUTOSCROLL_KEY;
       }
-      default -> throw new IllegalArgumentException(sf("Unhandled style attribute name '%s'", key));
+      default -> throw new TextStylesException(sf("Unhandled style attribute name '%s'", key));
     };
 
     return new ValueDefault(attrSet.getAttribute(attrName), dflt);
@@ -923,7 +1098,7 @@ public class TextStyles {
       String msg = sf("AttrName '%s' already set in '%s'", key,
                       attrSet.getAttribute(StyleConstants.NameAttribute));
       logger.log(WARNING, msg);
-      throw new IllegalArgumentException(msg);
+      throw new TextStylesException(msg);
     }
     if (value.equals("keep")) {
       attrSet.addAttribute(attrName, "keep");
@@ -943,7 +1118,7 @@ public class TextStyles {
           case "right" -> StyleConstants.ALIGN_RIGHT;
           case "left" -> StyleConstants.ALIGN_LEFT;
           default -> {
-            throw new IllegalArgumentException(sf("'%s' not for '%s'", cleanAlign, key));
+            throw new TextStylesException(sf("'%s' not for '%s'", cleanAlign, key));
           }
         };
         StyleConstants.setAlignment(attrSet, alignValue);
@@ -971,8 +1146,9 @@ public class TextStyles {
           case "horizontal", "vertical", "both", "none", "asneeded" -> {
           }
           default -> {
-            throw new IllegalArgumentException(sf("'%s' not for '%s'", val, key));
+            throw new TextStylesException(sf("'%s' not for '%s'", val, key));
           }
+
         }
         attrSet.addAttribute(SCROLLBARS_KEY, val);
       }
@@ -980,7 +1156,7 @@ public class TextStyles {
     }
     // Something should always gets set.
     if (!attrSet.isDefined(attrName))
-      throw new IllegalStateException(sf("Nothing was set for %s", attrName));
+      throw new TextStylesException(sf("Nothing was set for %s", attrName));
   }
 
   /**
@@ -989,7 +1165,11 @@ public class TextStyles {
    * ignoring any underscores (e.g., "dark_GRAY", "darkGray", "black").
    */
   private static Color parseColor(String value) {
-    if (value == null) return Color.BLACK;
+    if (value == null) {
+      // Think this is impossible
+      logger.log(ERROR, () -> sf("NULL colore"));
+      throw new TextStylesException(sf("NULL color"));
+    }
 
     String val = value.trim();
 
@@ -1036,15 +1216,13 @@ public class TextStyles {
     } catch (IllegalAccessException | IllegalArgumentException e) {
       String msg = sf("Reflection failed for color property: %s", val);
       logger.log(ERROR, msg, e);
-      RuntimeException ex = e instanceof IllegalAccessException
-                                ? new IllegalArgumentException(msg, e)
-                                : (RuntimeException) e;
-      throw ex;
+      throw new TextStylesException(msg, e);
     }
 
-    // 3. Ultimate safe fallback baseline
-    logger.log(WARNING, () -> sf("Color '%s' unrecognized. Defaulting to BLACK.", val));
-    return Color.BLACK;
+    logger.log(ERROR, () -> sf("Color '%s' unrecognized.", val));
+    throw new TextStylesException(sf("Unrecognized color: '%s'", cleanValue));
+    // logger.log(WARNING, () -> sf("Color '%s' unrecognized. Defaulting to BLACK.", val));
+    // return Color.BLACK;
   }
 
   // This is probably good enough...

@@ -43,6 +43,8 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -61,6 +63,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.javaprop.JavaPropsMapper;
+import tools.jackson.dataformat.javaprop.JavaPropsSchema;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static org.junit.jupiter.api.Assertions.*;
@@ -354,6 +364,98 @@ public class TextStylesTest {
   }
 
   /**
+   * PLAY WITH JACKSON FOR PROPERTIES.
+   * @throws java.lang.Exception
+   */
+  // @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testLoadStylesWithJacksonProperties() throws Exception {
+    System.out.println("loadStylesFromJson_Reader");
+    // https://jenkov.com/tutorials/java-json/jackson-objectmapper.html
+    
+    // Create a Strict Properties bucket that intercept duplicates
+    Properties strictProps = new Properties() {
+      @Override
+      public synchronized Object put(Object key, Object value) {
+        if (containsKey(key)) {
+          throw new IllegalArgumentException(
+              sf("Duplicate key found: %s=%s", key, value));
+        }
+        return super.put(key, value);
+      }
+    };
+    
+    String properties = """
+        default.alignment=left
+        default.foreground=#333333
+        default.background=#FFFFFF
+        default.foreground=green
+      """;
+    Reader reader = new StringReader(properties);
+    //Path path = createToRandomFileName(null, ".properties", properties);
+
+    strictProps.load(reader);
+
+    JavaPropsMapper mapper = JavaPropsMapper.builder()
+        // .configure(...) configure features here if needed
+        .build();
+
+    // 3. Build a Schema explicitly stating that dots ('.') separate nested paths
+    JavaPropsSchema schemaWithDots = JavaPropsSchema.emptySchema()
+        .withPathSeparator(".")
+        ;
+    
+    // Construct the Map<String, Map<String, String>> structural type dynamically
+    JavaType mapType = mapper.getTypeFactory().constructMapType(
+        Map.class,
+        mapper.getTypeFactory().constructType(String.class),
+        mapper.getTypeFactory().constructMapType(Map.class, String.class, String.class)
+    );
+    
+    Map<String, Map<String, String>> configMap;
+    
+    // 4. Bind the validated flat object directly into your deep nested Map structure
+    configMap = mapper.readPropertiesAs(
+        strictProps,
+        schemaWithDots,
+        mapType
+    );
+    
+    System.err.println(configMap == null ? "null" : "not null");
+  }
+
+  /**
+   * PLAY WITH JACKSON FOR JSON.
+   * @throws java.lang.Exception
+   */
+  // @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testLoadStylesWithJackson() throws Exception {
+    System.out.println("loadStylesFromJson_Reader");
+    // https://jenkov.com/tutorials/java-json/jackson-objectmapper.html
+    String json = """
+      {
+        "configA": { "timeout": 5000, "enabled": true },
+        "configB": { "url": "https://example.com" }
+      }
+      """;
+    Reader reader = new StringReader(json);
+    
+    ObjectMapper mapper = JsonMapper.builder()
+        .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+        .build();
+    
+    // Use TypeReference to cleanly parse directly into nested maps
+    @SuppressWarnings("unused")
+    Map<String, Map<String, String>> configMap = mapper.readValue(
+        reader,
+        new TypeReference<Map<String, Map<String, String>>>() {}
+    );
+    
+    System.err.println("");
+  }
+
+  /**
    * Test of getStyleNames method, of class TextStyles.
    * @throws java.io.IOException
    */
@@ -363,7 +465,7 @@ public class TextStylesTest {
     System.out.println("getStyleNames");
 
     Reader reader = new StringReader(json_ok);
-    TextStyles.loadStylesFromJson(reader);
+    TextStyles.loadStylesFromJson(reader, null);
 
     Set<String> expect
         = Set.of("default", "warning", "criticalError", "default_2", "criticalError_2");
@@ -381,7 +483,7 @@ public class TextStylesTest {
     System.out.println("getStyle");
 
     Reader reader = new StringReader(json_ok);
-    TextStyles.loadStylesFromJson(reader);
+    TextStyles.loadStylesFromJson(reader, null);
 
     AttributeSet result = TextStyles.getStyle("foo");
     assertEquals(null, result);
@@ -429,7 +531,8 @@ public class TextStylesTest {
 		{
 		    "criticalError_2": {
 		        "inherits": "warning",
-		        "foreground": "#010203",
+		        "foreground": "#010203"//,
+                  //"one": "two"
 		    }
 		}
 		""";
@@ -448,7 +551,7 @@ public class TextStylesTest {
 
 			""";
     Reader reader = new StringReader(json);
-    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
+    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader, "testLoadStyles-1");
     assertTrue(status.ok());
     assertEquals(expect, status.diagnostics());
 
@@ -460,7 +563,7 @@ public class TextStylesTest {
 			    }
 			}
 			""");
-    assertThrows(IllegalArgumentException.class, () -> { TextStyles.loadStylesFromJson(reader2); });
+    assertThrows(TextStyles.TextStylesException.class, () -> { TextStyles.loadStylesFromJson(reader2, "testLoadStyles-2"); });
     // Problem stuff discarded, should still be ok
     StringBuilder sb = new StringBuilder();
     sb.setLength(0);
@@ -484,7 +587,7 @@ public class TextStylesTest {
 			    }
 			}
 			""");
-    assertThrows(IllegalArgumentException.class, () -> { TextStyles.loadStylesFromJson(reader3); });
+    assertThrows(TextStyles.TextStylesException.class, () -> { TextStyles.loadStylesFromJson(reader3, "testLoadStyles-3"); });
     sb.setLength(0);
     ok = TextStyles.runDiagnostics(sb);
     assertTrue(ok);
@@ -507,7 +610,7 @@ public class TextStylesTest {
     // File has no errors. Use the Reader.
 
     Reader reader = new StringReader(json_ok);
-    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
+    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader, "testLoadStylesFromJson_Reader");
     assertTrue(status.ok());
     assertEquals(expect_json_ok, status.diagnostics());
     assertEquals(expect_json_ok_trees, status.trees());
@@ -528,7 +631,7 @@ public class TextStylesTest {
     // Read a configuration with errors
 
     Reader reader = new StringReader(json_errors);
-    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader);
+    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader, null);
     assertFalse(status.ok());
     assertEquals(expect_json_errors, status.diagnostics());
 
@@ -552,7 +655,7 @@ also a test of memento.
     System.out.println("applyStyle");
 
     Reader reader = new StringReader(json_ok);
-    TextStyles.loadStylesFromJson(reader);
+    TextStyles.loadStylesFromJson(reader, null);
 
     EventQueue.invokeAndWait(() -> {
       JTextField textField = new JTextField();
@@ -586,7 +689,7 @@ also a test of memento.
     System.out.println("applyStyle keep");
 
     Reader reader = new StringReader(keep_json);
-    TextStyles.loadStylesFromJson(reader);
+    TextStyles.loadStylesFromJson(reader, null);
 
     EventQueue.invokeAndWait(() -> {
       JTextField textField = new JTextField();

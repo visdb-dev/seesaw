@@ -151,7 +151,7 @@ public class LookupDefaults {
 
     Reader reader = new StringReader(DEFAULT_STYLES_JSON);
     try {
-      TextStyles.loadStylesFromJson(reader);
+      TextStyles.loadStylesFromJson(reader, "LookupDefaults");
     } catch (IOException ex) { logger.log(Level.ERROR, (String) null, ex); }
     initializedStyles = true;
   }

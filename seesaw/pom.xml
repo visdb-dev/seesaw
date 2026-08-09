@@ -82,10 +82,22 @@
 			<groupId>com.raelity.jdk</groupId>
 			<artifactId>table-sort-header-renderer</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.raelity.lib</groupId>
-			<artifactId>weak-event-bus-receiver</artifactId>
-		</dependency>
+                <dependency>
+                    <groupId>com.raelity.lib</groupId>
+                    <artifactId>weak-event-bus-receiver</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>tools.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>tools.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>tools.jackson.dataformat</groupId>
+                  <artifactId>jackson-dataformat-properties</artifactId>
+                </dependency>
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
