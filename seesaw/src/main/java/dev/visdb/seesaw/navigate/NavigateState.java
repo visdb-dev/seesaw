@@ -56,10 +56,10 @@ import javax.swing.ButtonModel;
 import javax.swing.SpinnerNumberModel;
 
 import com.google.common.collect.MapMaker;
-import com.nqadmin.swingset.*;
+import com.raelity.lib.eventbus.WeakEventBus;
+import com.raelity.lib.eventbus.WeakSubscribe;
 
 import dev.visdb.seesaw.core.DBComboBox2;
-
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.RowSetOps;
@@ -70,9 +70,6 @@ import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SSComponent;
 import dev.visdb.seesaw.utils.SSUtils;
 import dev.visdb.seesaw.utils.SyncManager;
-
-import com.raelity.lib.eventbus.WeakEventBus;
-import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
@@ -238,7 +235,7 @@ final class NavigateState {
     WeakEventBus.register(busReceiver, getGlobalEventBus());
   }
 
-  //Weak Subscriber notes: {@link com.nqadmin.swingset.navigate.Utils}.
+  //Weak Subscriber notes: {@link dev.visdb.seesaw.navigate.Utils}.
 
   /**
    * Listener(s) for the underlying RowSet used to update the bound SwingSet
@@ -560,9 +557,9 @@ final class NavigateState {
   private final SpinnerNumberModel rowNumberModel;
   SpinnerNumberModel getRowNumberModel() { return rowNumberModel; }
 
-  /*RowsActions*/ boolean autoCommitUpdateRowToDatabase() throws SQLException {
+  /*RowsActions*/ boolean autoCommitUpdateRowToDatabase(RowsModel rowsModel) throws SQLException {
     if (!undoRow.isDirty()) return true; // all is OK
-    return commitUpdateRowToDatabase();
+    return commitUpdateRowToDatabase(rowsModel);
   }
 
   /**
@@ -580,11 +577,13 @@ final class NavigateState {
    * @return true unless there are no records OR dbOps.allowUpdate() returns false
    * @throws SQLException SQL Exception if rowset call to updateRow() fails
    */
-  /*RowsActions*/ boolean commitUpdateRowToDatabase() throws SQLException {
+  /*RowsActions*/ boolean commitUpdateRowToDatabase(RowsModel rowsModel) throws SQLException {
     // check for an empty rowset
     if (getRowSet().getRow() == 0) {
       return false; // weird state
     }
+    if (getRowSet() != rowsModel.getRowSet())
+      throw new IllegalArgumentException("commit: rowSet mismatch");
 
     boolean updateOK = true;
 
@@ -606,7 +605,7 @@ final class NavigateState {
 
     if (updateOK && canUpdate()) {
       RowSetOps.updateRow(getRowSet());
-      getDbOps().performPostUpdateOps();
+      getDbOps().performPostUpdateOps(rowsModel);
     } else updateOK = false; // can't update, so return false
 
     return updateOK;

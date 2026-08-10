@@ -61,14 +61,10 @@ import static java.lang.System.Logger.Level.DEBUG;
  * constructor to find the {@link SSComponent}s to clean.
  */
 public class DbOpsBase implements DbOps {
-  /**
-   * Logger for component
-   */
+  /** Logger for component */
   protected static final Logger logger = JStuff.getLogger();
 
-  /**
-   * Screen where components to be cleared are located.
-   */
+  /** Screen where components to be cleared are located. */
   // TODO: find out a way that this is not embedded in the class.
   protected Container container = null;
 
@@ -141,6 +137,45 @@ public class DbOpsBase implements DbOps {
   public void performPreInsertOps() {
     cleanComponents(container);
   }
+  
+  /**
+   * Make sure the RowSet has the inserted row.
+   * It may re-execute the RowSet's command, depending on DatabaseMetaData.
+   * @param rm
+   * @throws SQLException 
+   */
+  @Override
+  public void performPostInsertOps(RowsModel rm) throws SQLException {
+    RowSet rs = rm.getRowSet();
+    if (!DbMetaDataCache.get().ownInsertsAreVisible(rs.getType()))
+      rs.execute();
+  }
+  
+  /**
+   * Make sure the RowSet has the deleted row.
+   * It may re-execute the RowSet's command, depending on DatabaseMetaData.
+   * @param rm
+   * @throws java.sql.SQLException
+   */
+  @Override
+  public void performPostDeletionOps(RowsModel rm) throws SQLException {
+    RowSet rs = rm.getRowSet();
+    if (!DbMetaDataCache.get().ownDeletesAreVisible(rs.getType()))
+      rs.execute();
+  }
+  
+  /**
+   * Make sure the RowSet has the updated row.
+   * It may re-execute the RowSet's command, depending on DatabaseMetaData.
+   * @param rm
+   * @throws java.sql.SQLException
+   */
+  @Override
+  public void performPostUpdateOps(RowsModel rm) throws SQLException {
+    RowSet rs = rm.getRowSet();
+    if (!DbMetaDataCache.get().ownUpdatesAreVisible(rs.getType()))
+      rs.execute();
+  }
 
   /**
    * In the specified container, clear/initialize SSComponents.
@@ -159,44 +194,5 @@ public class DbOpsBase implements DbOps {
     logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
     if (container == null) return;
     SSUtils.visitSSComponents(container, comp -> comp.cleanField());
-  }
-  
-  /**
-   * Make sure the RowSet has the inserted row.
-   * It may re-execute the RowSet's command.
-   * @param rm
-   * @throws SQLException 
-   */
-  @Override
-  public void performPostInsertOps(RowsModel rm) throws SQLException {
-    RowSet rs = rm.getRowSet();
-    if (!DbMetaDataCache.get().ownInsertsAreVisible(rs.getType()))
-      rs.execute();
-  }
-  
-  /**
-   * Make sure the RowSet has the deleted row.
-   * It may re-execute the RowSet's command.
-   * @param rm
-   * @throws java.sql.SQLException
-   */
-  @Override
-  public void performPostDeletionOps(RowsModel rm) throws SQLException {
-    RowSet rs = rm.getRowSet();
-    if (!DbMetaDataCache.get().ownDeletesAreVisible(rs.getType()))
-      rs.execute();
-  }
-  
-  /**
-   * Make sure the RowSet has the updated row.
-   * It may re-execute the RowSet's command.
-   * @param rm
-   * @throws java.sql.SQLException
-   */
-  @Override
-  public void performPostUpdateOps(RowsModel rm) throws SQLException {
-    RowSet rs = rm.getRowSet();
-    if (!DbMetaDataCache.get().ownUpdatesAreVisible(rs.getType()))
-      rs.execute();
   }
 }

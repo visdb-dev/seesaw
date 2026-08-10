@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
 
-//package com.nqadmin.swingset.formatting;
+//package dev.visdb.seesaw.formatting;
 
 // TODO: THIS NEEDS LOTS OF WORK.
 //

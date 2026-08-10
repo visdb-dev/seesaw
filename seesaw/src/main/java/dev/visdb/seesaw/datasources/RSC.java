@@ -53,7 +53,7 @@ import dev.visdb.seesaw.navigate.RowsModel;
 /**
  * This interface is an accessor to a {@linkplain RowSet} and one of its
  * columns; it is extended by {@link dev.visdb.seesaw.utils.SSComponent}.
- * Some components, in particular {@linkplain com.nqadmin.swingset.SSDataGrid},
+ * Some components, in particular {@linkplain dev.visdb.seesaw.core.DataGrid},
  * have multiple columns; this
  * interface allows a lightweight object to provide row set access for
  * a specified column. Many

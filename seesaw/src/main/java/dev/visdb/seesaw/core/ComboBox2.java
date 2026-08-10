@@ -580,6 +580,30 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     displayValueTypeToken = builder.typeTokenD;
     d2TypeToken = builder.typeTokenD2;
   }
+
+  /**
+   * Create BaseComboBox, uses {@link ModelType#SWING}.
+   */
+  // Keep a default contructor publicly available.
+  // TODO: this fails because "K" is not concrete.
+  public ComboBox2() { this(new Builder<>(){}); }
+
+  /**
+   * Create BaseComboBox.
+   * @param modelType whether to use SWING or GLAZED combo model
+   */
+  @SuppressWarnings("LeakingThisInConstructor")
+  private ComboBox2(ModelType modelType) {
+    addItemListener(new ComboBox2ItemListener());
+    finishSSCommon();
+
+    keyVisual = switch (modelType) {
+      case GLAZED -> BaseGlazedModel.install(this);
+      case SWING -> BaseModel.install(this);
+    };
+    keyVisual.setListItemFormat(new ShowKeyIfNullDisplayValue());
+  }
+
   /**
    * Verify that the {@code typeToken } captured a concrete type.
    * @param typeToken
@@ -629,28 +653,6 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     }
     // Base case: Not a parameterized type, but is a concrete class
     return type instanceof Class;
-  }
-
-  /**
-   * Create BaseComboBox, uses {@link ModelType#SWING}.
-   */
-  // Keep a default contructor publicly available.
-  public ComboBox2() { this(new Builder<>()); }
-
-  /**
-   * Create BaseComboBox.
-   * @param modelType whether to use SWING or GLAZED combo model
-   */
-  @SuppressWarnings("LeakingThisInConstructor")
-  private ComboBox2(ModelType modelType) {
-    addItemListener(new ComboBox2ItemListener());
-    finishSSCommon();
-
-    keyVisual = switch (modelType) {
-      case GLAZED -> BaseGlazedModel.install(this);
-      case SWING -> BaseModel.install(this);
-    };
-    keyVisual.setListItemFormat(new ShowKeyIfNullDisplayValue());
   }
 
   private boolean hasD2;

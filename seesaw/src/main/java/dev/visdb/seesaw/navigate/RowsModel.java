@@ -278,7 +278,7 @@ public final class RowsModel {
   /**
    * Change the RowSet associated with this model.
    * If _dbOps is null, find the default navigator with
-   * {@link #findDbOps(javax.sql.RowSet, com.nqadmin.swingset.navigate.RowsModel) }.
+   * {@link #findDbOps(javax.sql.RowSet, dev.visdb.seesaw.navigate.RowsModel) }.
    * @param rs new RowSet for this model
    * @param _dbOps
    * @return false if abort and rowSet not set/changed
@@ -917,7 +917,7 @@ public final class RowsModel {
    *
    * @param dBNav implementation of the SSDBNav interface
    * @deprecated use {@linkplain #setRowSet(javax.sql.RowSet,
-   * com.nqadmin.swingset.datasources.DbOps) }
+   * dev.visdb.seesaw.datasources.DbOps) }
    */
   @Deprecated
   public void setDBNav(DbOps dBNav) {

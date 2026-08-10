@@ -86,7 +86,7 @@ import static java.lang.System.Logger.Level.*;
  * it's method {@link #createListItem(java.lang.Object...) }
  * is a factory that creates SSListItem objects. It does not have public
  * methods to modify the list; getRemodel and sub-classes provide that.
- * Using {@link #install(javax.swing.JComponent, com.nqadmin.swingset.models.AbstractComboBoxListSwingModel, javax.swing.ListCellRenderer)} a proxy that delegates
+ * Using {@link #install(javax.swing.JComponent, dev.visdb.seesaw.models.AbstractComboBoxListSwingModel, javax.swing.ListCellRenderer)} a proxy that delegates
  * to this class is installed into a JList or JComboBox.
  * <p>
  * Where possible, this class and subclasses name methods

@@ -29,6 +29,7 @@
 	<modules>
 		<module>seesaw</module>
 		<module>seesaw-demo</module>
+		<module>swingset-demo</module>
 	</modules>
 
 	<properties>

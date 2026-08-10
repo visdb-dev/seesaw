@@ -129,7 +129,7 @@ public class DateTime {
 
   /**
    * Check if the component is a valid date/time. To avoid exceptions, first
-   * use {@link #isHandledDateTimeComp(com.nqadmin.swingset.utils.SSComponentInterface)}.
+   * use {@link #isHandledDateTimeComp(dev.visdb.seesaw.utils.SSComponentInterface)}.
    * @param text The text to validate
    * @param comp The component that the text is derived from
    * @return

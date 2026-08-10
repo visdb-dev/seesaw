@@ -38,10 +38,10 @@ import dev.visdb.seesaw.navigate.RowsModel;
 /**
  * Stash one of these into lookup to create a {@link DbOps}. Only used if one
  * is not provided to
- * {@link RowsModel#create(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps)
+ * {@link RowsModel#create(javax.sql.RowSet, dev.visdb.seesaw.datasources.DbOps)
  * RowsModel.create(RowSet, DbOps)}
  * or
- * {@link RowsModel#setRowSet(javax.sql.RowSet, com.nqadmin.swingset.datasources.DbOps)
+ * {@link RowsModel#setRowSet(javax.sql.RowSet, dev.visdb.seesaw.datasources.DbOps)
  * rowsModel.setRowSet(RowSet, DbOps)}
  */
 public interface DbOpsCreator {

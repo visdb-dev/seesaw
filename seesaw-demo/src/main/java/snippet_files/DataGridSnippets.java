@@ -22,8 +22,7 @@ import java.util.List;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 
-import com.nqadmin.swingset.SSDataGrid;
-
+import dev.visdb.seesaw.core.DataGrid;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 /**
@@ -31,7 +30,7 @@ import dev.visdb.seesaw.navigate.RowsModel;
  */
 @SuppressWarnings("serial")
 public class DataGridSnippets extends JFrame {
-  SSDataGrid dataGrid;
+  DataGrid dataGrid;
   RowSet rowSet;
   RowsModel rowsModel;
 
@@ -41,7 +40,7 @@ public class DataGridSnippets extends JFrame {
    * @param dataGrid initialize this data grid
    * @throws SQLException
    */
-  void init(SSDataGrid dataGrid) throws SQLException {
+  void init(DataGrid dataGrid) throws SQLException {
     // Set the header before setting the RowsModel.
     dataGrid.setHeaders(new String[] {"Part Name", "Color Code", " Weight", "City"});
     dataGrid.setRowsModel(rowsModel);

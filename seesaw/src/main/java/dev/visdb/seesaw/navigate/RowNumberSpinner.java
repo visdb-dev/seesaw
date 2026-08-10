@@ -56,11 +56,11 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
-import dev.visdb.seesaw.navigate.RowsActions.NavGotoRowAction;
-import dev.visdb.seesaw.utils.JStuff;
-
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
+
+import dev.visdb.seesaw.navigate.RowsActions.NavGotoRowAction;
+import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -82,7 +82,7 @@ import static javax.swing.KeyStroke.getKeyStroke;
  * <li>{@link #setWindowUpDownKeysEnable(boolean) }
  * <li>{@link #setUpDownKeysEnable(boolean) }
  * </ul>
- * These methods are accessible through {@link com.nqadmin.swingset.SSDataNavigator} methods.
+ * These methods are accessible through {@link dev.visdb.seesaw.utils.DataNavigator} methods.
  * <p>
  * There's a Spinner API tweak such that {@code setModel()}
  * sends a {@code ChangeEvent}. This is convenient when considering the spinner

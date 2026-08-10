@@ -75,6 +75,7 @@ public class ComboBox1<K, D> extends ComboBox2<K, D, Object> {
    * Creates an object of ComboBox with type params of Object.
    * Default: see {@link ComboBox2}.
    */
+  // TODO: this fails because "K" is not concrete.
   public ComboBox1() {
     this(new ComboBox1.Builder<>() {});
   }

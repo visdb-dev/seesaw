@@ -54,8 +54,6 @@ import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
-import com.nqadmin.swingset.SSDBComboBox;
-
 import dev.visdb.seesaw.core.DBComboBox2;
 import dev.visdb.seesaw.datasources.ConvertType;
 import dev.visdb.seesaw.datasources.DbSupport;
@@ -68,9 +66,9 @@ import static java.lang.System.Logger.Level.*;
  * Used to synchronize a data navigator and a navigation ComboBox.
  * The combobox may contain the original row number, see
  * {@link DbSupport#createRownumQuery(String, String, String, String) },
- * {@link SSDBComboBox#setD2ColumnName(String)}
+ * {@link DBComboBox2#setD2ColumnName(String)}
  * and {@link #setComboHasRowNum(boolean)}<br>
- * <b>Otherwise</b>: The SSDBComboBox and the RowSet queries should select the same
+ * <b>Otherwise</b>: The DBComboBox2 and the RowSet queries should select the same
  * records and in the same order; if not, the SSSyncManager will spend a lot of
  * time looping through records to match.
  *
@@ -174,9 +172,9 @@ public class SyncManager<K> {
           final int tcount = count;
           logger.log(WARNING,
                      ()
-                         -> "SSSyncManager RowSet and SSDBComboBox values "
+                         -> "SSSyncManager RowSet and DBComboBox2 values "
                                 + "do not match for the same index. This can be caused by "
-                                + "SSDBComboBox and RowSet queries not selecting the same "
+                                + "DBComboBox2 and RowSet queries not selecting the same "
                                 + "records in the same order. Looping through each record "
                                 + "for a match. Check # " + tcount + ".");
 
@@ -321,17 +319,17 @@ public class SyncManager<K> {
 
   /**
    * # of records to step back if doing a sequential search because
-   * SSDBComboBox and RowSet results don't match.
+   * DBComboBox2 and RowSet results don't match.
    */
   private static final int OFFSET_TO_CHECK = 7;
 
   /**
-   * # of records of overlap to check if SSDBComboBox and RowSet results
+   * # of records of overlap to check if DBComboBox2 and RowSet results
    * don't match due to record additions/deletions.
    */
   private static final int OVERLAP_TO_CHECK = 7;
 
-  /** SSDBComboBox used for record navigation. */
+  /** DBComboBox2 used for record navigation. */
   private DBComboBox2<K, ?, ?> comboBox;
 
   /** Listener on combo box to detect combo-based navigations. */
@@ -357,8 +355,8 @@ public class SyncManager<K> {
   /**
    * Creates a SSSyncManager with the specified combo box and data navigator.
    *
-   * @param comboBox   SSDBComboBox used for record navigation
-   * @param rowsModel  RowsModel to be synchronized with navigation combo box
+   * @param comboBox   DBComboBox2 used for record navigation
+   * @param rowsModel  RowsModel to synchronize with navigation combo box
    */
   @SuppressWarnings("deprecation")
   public SyncManager(DBComboBox2<K, ?, ?> comboBox, RowsModel rowsModel) {

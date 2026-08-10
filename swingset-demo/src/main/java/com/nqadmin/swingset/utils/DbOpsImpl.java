@@ -21,7 +21,7 @@
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * CONSEQUENTIAL DAMAGES (INCLUING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
@@ -85,7 +85,7 @@ public abstract class DbOpsImpl implements DbOps {
    *
    * @param container	GUI Container to scan for Swing components to clear/reset
    */
-  public DbOpsImpl(final Container container) { this.container = container; }
+  public DbOpsImpl(Container container) { this.container = container; }
 
   /**
    * Performs pre-insertion operations, in particular
@@ -109,9 +109,27 @@ public abstract class DbOpsImpl implements DbOps {
    *
    * @param container container in which to recursively initialize components
    */
-  protected void cleanComponents(final Container container) {
+  protected void cleanComponents(Container container) {
     logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
     if (container == null) return;
     SSUtils.visitSSComponents(container, comp -> comp.cleanField());
   }
+
+  /**
+   * @deprecated  use performPostInsertOps(RowsModel)
+   */
+  @Deprecated
+  public void performPostInsertOps() {}
+
+  /**
+   * @deprecated use performPostDeleteionOps(RowsModel)
+   */
+  @Deprecated
+  public void performPostDeletionOps() {}
+
+  /**
+   * @deprecated use performPostUpdateOps(RowsModel)
+   */
+  @Deprecated 
+  public void performPostUpdateOps() {}
 } // end public class DbOpsImpl

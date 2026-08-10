@@ -159,12 +159,6 @@ public interface DbOps {
   default void performPreInsertOps() {}
 
   /**
-   * @deprecated  use performPostInsertOps(RowsModel)
-   */
-  @Deprecated
-  default void performPostInsertOps() {}
-
-  /**
    * Method to perform post-insertion operations during
    * {@link RowsAction#ACT_COMMIT} after rowSet.insertRow.
    * If the insert is aborted, {@link RowsAction#ACT_REVERT} cancelling
@@ -175,21 +169,13 @@ public interface DbOps {
    * @param rm
    * @throws java.sql.SQLException
    */
-  default void performPostInsertOps(RowsModel rm) throws SQLException {
-    performPostInsertOps();
-  }
+  default void performPostInsertOps(RowsModel rm) throws SQLException { }
 
   /**
    * Method to perform pre-deletion operations; it is used for
    * {@link RowsAction#ACT_DELETE}, invoked just before rowSet.deleteRow().
    */
   default void performPreDeletionOps() {}
-
-  /**
-   * @deprecated use performPostDeleteionOps(RowsModel)
-   */
-  @Deprecated
-  default void performPostDeletionOps() {}
 
   /**
    * Method to perform post-deletion operations; it is used for
@@ -200,15 +186,7 @@ public interface DbOps {
    * @param rm
    * @throws java.sql.SQLException
    */
-  default void performPostDeletionOps(RowsModel rm) throws SQLException {
-    performPostDeletionOps();
-  }
-
-  /**
-   * @deprecated use performPostUpdateOps(RowsModel)
-   */
-  @Deprecated 
-  default void performPostUpdateOps() {}
+  default void performPostDeletionOps(RowsModel rm) throws SQLException { }
 
   /**
    * Method to perform operations at the end of {@link RowsAction#ACT_COMMIT}
@@ -217,7 +195,5 @@ public interface DbOps {
    * @param rm
    * @throws java.sql.SQLException
    */
-  default void performPostUpdateOps(RowsModel rm) throws SQLException {
-    performPostUpdateOps();
-  }
+  default void performPostUpdateOps(RowsModel rm) throws SQLException { }
 }

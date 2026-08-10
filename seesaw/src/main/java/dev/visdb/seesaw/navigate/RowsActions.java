@@ -158,7 +158,7 @@ final class RowsActions {
       startNavigationAction(ACT_FIRST);
       try {
         if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase()) return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
 
         getRowSet().first();
 
@@ -204,7 +204,7 @@ final class RowsActions {
       startNavigationAction(ACT_PREVIOUS);
       try {
         if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase()) return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
 
         if ((getRowSet().getRow() != 0) && !getRowSet().previous()) { getRowSet().first(); }
 
@@ -245,7 +245,7 @@ final class RowsActions {
       startNavigationAction(ACT_NEXT);
       try {
         if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase()) return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
 
         getRowSet().next();
 
@@ -286,7 +286,7 @@ final class RowsActions {
       startNavigationAction(ACT_LAST);
       try {
         if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase()) return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
 
         getRowSet().last();
 
@@ -366,7 +366,7 @@ final class RowsActions {
           getNavState().updateNavigatorRowAndCount();
         } else {
           // ELSE update the database based on the present row values.
-          if (!getNavState().commitUpdateRowToDatabase()) return;
+          if (!getNavState().commitUpdateRowToDatabase(rowsModel)) return;
 
           // commit, resultSet.updateRow(), does not generate an event.
           // ... getRowSet().absolute(getRowSet().getRow()) ...
@@ -526,7 +526,7 @@ final class RowsActions {
         if (!verifyEnabled(this)) return;
         // Commit changes for current row to database
         // Ignore return since doesn't matter if there's nothing to do.
-        getNavState().autoCommitUpdateRowToDatabase();
+        getNavState().autoCommitUpdateRowToDatabase(rowsModel);
 
         // Move to insert row, update status, and update combo navigator (if applicable)
         getRowSet().moveToInsertRow();
@@ -702,7 +702,7 @@ final class RowsActions {
         if ((row <= getNavState().rowCount) && (row > 0)
             && !(getRowSet().getRow() == row && e != null
                  && RowsAction.OK_SKIP_CURSOR_MOVE.equals(e.getActionCommand()))) {
-          if (!getNavState().autoCommitUpdateRowToDatabase()) return;
+          if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
           getRowSet().absolute(row);
           getNavState().freshRow(); // only do this if row changed and commit
         } else logger.log(WARNING, "skipping commit and cursor move");

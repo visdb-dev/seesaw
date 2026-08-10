@@ -10,11 +10,11 @@
     </Appenders>
 
     <Loggers>
-        <logger name="com.nqadmin.swingset" additivity="false" level="DEBUG">
+        <logger name="dev.visdb.seesaw" additivity="false" level="DEBUG">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </logger>
-        <logger name="com.nqadmin.swingset.demo" additivity="false" level="DEBUG">
+        <logger name="dev.visdb.seesaw.demo" additivity="false" level="DEBUG">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </logger>

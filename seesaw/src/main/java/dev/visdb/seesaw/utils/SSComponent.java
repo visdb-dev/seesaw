@@ -54,7 +54,6 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import dev.visdb.seesaw.core.CheckBox;
-
 import dev.visdb.seesaw.datasources.DbSupport.DbReader;
 import dev.visdb.seesaw.datasources.DbSupport.DbUpdater;
 import dev.visdb.seesaw.datasources.DbSupport.RunnableSQL;
@@ -486,7 +485,7 @@ public interface SSComponent extends RSC {
    * Updates the value of the bound database column;
    * method used by SwingSet component listeners to update the underlying RowSet.
    * The real action, like null handling and conversion checking, happens
-   * in {@link RowSetOps#updateColumnText(com.nqadmin.swingset.utils.SSComponent, java.lang.String) }.
+   * in {@link RowSetOps#updateColumnText(dev.visdb.seesaw.utils.SSComponent, java.lang.String) }.
    * Does not commit the update row.
    *
    * @param columnText the value to set in the bound database column
@@ -849,7 +848,7 @@ public interface SSComponent extends RSC {
    *
    * @return false for error in data, otherwise true
    */
-  //{@link #setPluginValidator(com.nqadmin.swingset.decorators.Validator) }; those are check after baseValidate.
+  //{@link #setPluginValidator(dev.visdb.seesaw.decorators.Validator) }; those are check after baseValidate.
   default boolean baseValidate() { return true; }
 
   /**
@@ -894,7 +893,8 @@ public interface SSComponent extends RSC {
   /**
    * Create and return the default {@link Decorator}
    * setup during construction. The default is generally good for
-   * a single {@linkplain JComponent}, for example a {@linkplain com.nqadmin.swingset.SSTextField}.
+   * a single {@linkplain JComponent},
+   * for example a {@linkplain dev.visdb.seesaw.core.TextField}.
    * When a visual component is made up of multiple components a custom
    * decorator may be required.
    *

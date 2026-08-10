@@ -70,10 +70,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
-import com.nqadmin.swingset.SSTextField;
+import com.raelity.lib.eventbus.WeakEventBus;
+import com.raelity.lib.eventbus.WeakSubscribe;
 
 import dev.visdb.seesaw.core.DBComboBox2;
-
+import dev.visdb.seesaw.core.TextField;
 import dev.visdb.seesaw.datasources.ConvertType;
 import dev.visdb.seesaw.datasources.DbSupport.DbReader;
 import dev.visdb.seesaw.datasources.DbSupport.DbUpdater;
@@ -99,9 +100,6 @@ import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.navigate.RowsModelNewRowSetEvent;
 import dev.visdb.seesaw.navigate.UndoRedo;
 import dev.visdb.seesaw.navigate.UndoRedo.Change;
-
-import com.raelity.lib.eventbus.WeakEventBus;
-import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static dev.visdb.seesaw.navigate.RowSetState.isAcceptingCachedRowSetChanges;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
@@ -164,7 +162,7 @@ final class SSCommon {
    * in the constructor.
    * <p>
    * Assert if a non null partialSSCommon doesn't match the ssComponent.
-   * See {@link SSTextField#getSSCommon() } for example usage.
+   * See {@link TextField#getSSCommon() } for example usage.
    *
    * @param ssComponent SwingSet component to attach to this SSCommon.
    * @param partialSSCommon if non null return it
@@ -178,7 +176,7 @@ final class SSCommon {
    * Doing "SSCommon.createFinish(this, null)" is equivalent to "new SSCommon(this)".
    * <p>
    * Assert if a non null partialSSCommon doesn't match the ssComponent.
-   * See {@link SSTextField#SSTextField(javax.sql.RowSet, java.lang.String) }
+   * See {@link TextField#TextField(javax.sql.RowSet, java.lang.String) }
    * for example usage.
    *
    * @param ssComponent SwingSet component to attach to this SSCommon.
@@ -281,7 +279,7 @@ final class SSCommon {
   // AND if(!isResotreOnError()). Flag must be controlled in
   // conjunction with SSTextSupport and any other callers
   // to setColumn(DbUpdater
-  private boolean restoreOnError = false; // easiest/safest?
+  private final boolean restoreOnError = false; // easiest/safest?
 
   private boolean beepOnError = true;
   private boolean dialogOnError = true;
@@ -359,7 +357,7 @@ final class SSCommon {
    * When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
    * extra steps involved which require the listener to ignore some events, see
    * {@link RowsModel#addRowSetEvent(
-   * com.nqadmin.swingset.navigate.NavigationRowSetEvent.RowSetEventType,
+   * dev.visdb.seesaw.navigate.NavigationRowSetEvent.RowSetEventType,
    * javax.sql.RowSetEvent)} and
    * {@link RowSetState#acceptCachedRowSetChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable)}.
    */
@@ -894,7 +892,7 @@ final class SSCommon {
   private SSFormat ssFormat;
   /**
    * @param ssFormat
-   * @see SSComponent#setFormat(com.nqadmin.swingset.formatting.SSFormat)
+   * @see SSComponent#setFormat(dev.visdb.seesaw.formatting.SSFormat)
    */
   void setSSFormat(SSFormat ssFormat) { this.ssFormat = ssFormat; }
 

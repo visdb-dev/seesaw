@@ -478,7 +478,7 @@ public class SSUtils {
    */
   public static boolean isJunitPrint() {
     if (!isJunit()) return false;
-    java.util.logging.Logger juLog = LogManager.getLogManager().getLogger("com.nqadmin.swingset");
+    java.util.logging.Logger juLog = LogManager.getLogManager().getLogger("dev.visdb.seesaw");
     if (juLog != null) {
       Handler[] handlers = juLog.getHandlers();
       if (handlers.length > 0 && handlers[0].getFormatter() instanceof TestFormatterBase)

@@ -647,7 +647,7 @@ public class RowSetOps {
    * DEBUG ASSIST: Use this to force "n" acceptChanges conflicts after
    * modifying a character column in the database.
    * Only works with CachedRowSet and after
-   * {@linkplain #updateColumnText(com.nqadmin.swingset.utils.SSComponent, java.lang.String)}.
+   * {@linkplain #updateColumnText(dev.visdb.seesaw.utils.SSComponent, java.lang.String)}.
    */
   public static class ForceConflict {
     /** Atomic just in case */
