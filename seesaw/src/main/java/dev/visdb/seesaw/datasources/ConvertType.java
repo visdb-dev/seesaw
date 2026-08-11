@@ -220,6 +220,8 @@ public class ConvertType {
       Clazz source = getClazz(sourceType);
 
       if (targetJDBC != null && source != null) {
+        if (targetJDBC == source)
+          return true;
         if (targetJDBC.isDateTime() && source.isDateTime()) {
           return checkConvertToJdbcDateType(targetJDBC, source);
         }
