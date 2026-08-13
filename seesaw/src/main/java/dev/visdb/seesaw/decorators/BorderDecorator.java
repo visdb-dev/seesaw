@@ -157,10 +157,9 @@ public class BorderDecorator extends FocusDecorator {
   public boolean decorate() {
     final ValidationResult valid = getSSComponent().allValidate();
     logger.log(TRACE,
-               ()
-                   -> String.format("%s focus: %s, compValid %s, allValid: %s",
-                                    decoComp().getClass().getSimpleName(),
-                                    focusComp().isFocusOwner(), valid.comp(), valid.all()));
+               () -> String.format("%s focus: %s, compValid %s, allValid: %s",
+                                   decoComp().getClass().getSimpleName(),
+                                   focusComp().isFocusOwner(), valid.comp(), valid.all()));
     Border b;
     ComponentState borderState = ComponentState.getComponentState(getSSComponent(), valid);
     //debugCheck(borderState);

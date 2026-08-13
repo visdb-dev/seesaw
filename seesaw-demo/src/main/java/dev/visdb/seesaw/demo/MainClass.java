@@ -495,11 +495,9 @@ public class MainClass extends JFrame {
       if (RUN_DEMO_SQL_SCRIPTS) {
         inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
         if (inStreamDemo == null) {
-          logger.log(Level.ERROR,
-                     ()
-                         -> "Please add the file " + DATABASE_SCRIPT_DEMO
-                                + " to the classpath, package "
-                                + getClass().getPackage().getName());
+          logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_DEMO
+                                        + " to the classpath, package "
+                                        + getClass().getPackage().getName());
           has_startup_error = true;
         }
       }
@@ -507,11 +505,10 @@ public class MainClass extends JFrame {
       if (RUN_TEST_SQL_SCRIPTS) {
         inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
         if (inStreamTest == null) {
-          logger.log(Level.ERROR,
-                     ()
-                         -> "Please add the file " + DATABASE_SCRIPT_TEST + " and "
-                                + DATABASE_SCRIPT_TEST_IMAGES + " to the classpath, package "
-                                + getClass().getPackage().getName());
+          logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_TEST + " and "
+                                        + DATABASE_SCRIPT_TEST_IMAGES
+                                        + " to the classpath, package "
+                                        + getClass().getPackage().getName());
           has_startup_error = true;
         }
       }
@@ -519,11 +516,9 @@ public class MainClass extends JFrame {
       if (RUN_DEBUG_SQL_SCRIPTS) {
         inStreamDebug = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEBUG);
         if (inStreamDebug == null) {
-          logger.log(Level.ERROR,
-                     ()
-                         -> "Please add the file " + DATABASE_SCRIPT_DEBUG
-                                + " to the classpath, package "
-                                + getClass().getPackage().getName());
+          logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_DEBUG
+                                        + " to the classpath, package "
+                                        + getClass().getPackage().getName());
           has_startup_error = true;
         }
       }

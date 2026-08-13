@@ -525,9 +525,8 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
       Object[] objArray = convertArrayToObjectList(array).toArray();
       setChosenKeys(objArray);
       logger.log(DEBUG,
-                 ()
-                     -> sf("%s: Updating component with array of %s.", getColumnForLog(),
-                           Arrays.toString(
+                 () -> sf("%s: Updating component with array of %s.", getColumnForLog(),
+                          Arrays.toString(
                                Arrays.copyOfRange(objArray, 0, Math.min(5, objArray.length)))));
     } catch (IllegalArgumentException | SQLDataException ex) {
       logger.log(Level.ERROR, ex.getMessage(), ex);

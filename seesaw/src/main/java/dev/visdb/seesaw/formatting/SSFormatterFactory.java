@@ -84,10 +84,8 @@ public class SSFormatterFactory extends FormatterFactory {
     ftf.setValue(fa.stringToValue(stringValue));
     if (logger.isLoggable(TRACE)) {
       Object v = ftf.getValue();
-      logger.log(TRACE,
-                 ()
-                     -> sf("switch: '%s' to %s %s", stringValue,
-                           v != null ? v.getClass().getSimpleName() : null, v));
+      logger.log(TRACE, () -> sf("switch: '%s' to %s %s", stringValue,
+                                 v != null ? v.getClass().getSimpleName() : null, v));
     }
   }
 
@@ -160,20 +158,16 @@ public class SSFormatterFactory extends FormatterFactory {
             continue;
           if (ctor.getParameterTypes()[0].isInstance(dispFormat)) {
             builder.defaultFormatter = (AbstractFormatter) ctor.newInstance(dispFormat);
-            logger.log(DEBUG,
-                       ()
-                           -> sf("Creating defaultFormatter %s for %s",
-                                 builder.defaultFormatter.getClass().getSimpleName(),
-                                 dispFormat.getClass().getSimpleName()));
+            logger.log(DEBUG, () -> sf("Creating defaultFormatter %s for %s",
+                                       builder.defaultFormatter.getClass().getSimpleName(),
+                                       dispFormat.getClass().getSimpleName()));
             break;
           }
         }
       } catch (SecurityException | InstantiationException | IllegalAccessException
                | IllegalArgumentException | InvocationTargetException ex) {
-        logger.log(
-            WARNING,
-            ()
-                -> sf("Creating defaultFormatter for %s", dispFormat.getClass().getSimpleName()),
+        logger.log(WARNING, () -> sf("Creating defaultFormatter for %s",
+                                     dispFormat.getClass().getSimpleName()),
             ex);
       }
     }

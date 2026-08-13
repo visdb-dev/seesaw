@@ -345,9 +345,8 @@ final class NavigateState {
     else
       errorComponents.remove(rsc);
     logger.log(TRACE,
-               ()
-                   -> sf("{%s} %s error: %b, sz: %d -> %d", JStuff.getCaller(4),
-                         rsc.getColumnForLog(), isError, sz, errorComponents.size()));
+               () -> sf("{%s} %s error: %b, sz: %d -> %d", JStuff.getCaller(4),
+                        rsc.getColumnForLog(), isError, sz, errorComponents.size()));
 
     boolean compsChange = sz != errorComponents.size();
     if (compsChange) {
@@ -911,8 +910,7 @@ when the insert button is pressed to perform custom actions.
         Action act = rowsModel.getAction(navAction);
         if (act.isEnabled() != enableFlag)
           logger.log(ERROR,
-                     ()
-                         -> sf("Wrong enable state for %s, expect %b", navAction, enableFlag),
+                     () -> sf("Wrong enable state for %s, expect %b", navAction, enableFlag),
                      new IllegalStateException());
       }
     }

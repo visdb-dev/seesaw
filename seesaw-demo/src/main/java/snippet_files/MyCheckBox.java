@@ -36,18 +36,15 @@ public class MyCheckBox extends JCheckBox implements SSComponent {
     public void itemStateChanged(ItemEvent ie) {
       // update the database with the new value
       try {
-        dbChange(
-            ()
-                -> setColumnObject(
-                    isSelected())); // @link substring="setColumnObject" target="SSComponent#setColumnObject" @link substring="dbChange" target="SSComponent#dbChange"
+        dbChange(() -> setColumnObject( isSelected())); // @link substring="setColumnObject" target="SSComponent#setColumnObject" @link substring="dbChange" target="SSComponent#dbChange"
       } catch (SQLException ex) {
         log(xxx);
       } // @replace regex='xxx' replacement="..."
     }
   }
   MyCheckBox() {
-    finishSSCommon();
-  } // @link substring="finishSSCommon" target="SSComponent#finishSSCommon"
+    finishSSCommon(); // @link substring="finishSSCommon" target="SSComponent#finishSSCommon"
+  }
   @Override
   public void cleanField() {
     setSelected(false);

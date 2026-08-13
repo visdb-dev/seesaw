@@ -255,10 +255,8 @@ public class SSMaskFormatterFactory extends FormatterFactory {
     ftf.setValue(stringValue);
     if (logger.isLoggable(TRACE)) {
       Object v = ftf.getValue();
-      logger.log(TRACE,
-                 ()
-                     -> sf("switch: '%s' to %s %s", stringValue,
-                           v != null ? v.getClass().getSimpleName() : null, v));
+      logger.log(TRACE, () -> sf("switch: '%s' to %s %s", stringValue,
+                                 v != null ? v.getClass().getSimpleName() : null, v));
     }
   }
 

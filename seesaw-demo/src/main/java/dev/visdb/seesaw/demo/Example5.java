@@ -141,14 +141,8 @@ public class Example5 extends JFrame {
       getContentPane().add(dataGrid.getComponent(), BorderLayout.CENTER);
 
       DataGridExampleSupport.setup(logger, getContentPane(), rowset, dataGrid, 0,
-                                   ()
-                                       -> getNewPrimaryKey(),
-                                   new String[] {
-                                       "part_name",
-                                       "color_code",
-                                       "weight",
-                                       "city",
-                                   },
+                                   () -> getNewPrimaryKey(),
+                                   new String[] { "part_name", "color_code", "weight", "city", },
                                    new Object[] {null, 0, 1, "New Roads"});
 
     } catch (final SQLException se) {

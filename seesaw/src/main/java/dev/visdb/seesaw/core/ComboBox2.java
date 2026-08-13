@@ -1005,10 +1005,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
       final int index = remodel.getKeys().indexOf(key);
       if (index >= 0) {
         logger.log(WARNING,
-                   ()
-                       -> sf("%s: Key of [%s] already exists. Creating duplicate Key with "
+                   () -> sf("%s: Key of [%s] already exists. Creating duplicate Key with "
                                  + "DisplayValue of '%s'.",
-                             getColumnForLog(), key, displayValue));
+                            getColumnForLog(), key, displayValue));
       }
       remodel.add(key, displayValue, d2);
     } catch (final Exception e) {
@@ -1092,9 +1091,8 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    */
   public K getChosenKey() {
     logger.log(TRACE,
-               ()
-                   -> sf("%s: getChosenKey(), idx:map %d:%s.", getColumnForLog(),
-                         getSelectedIndex(), getSelectedItem()));
+               () -> sf("%s: getChosenKey(), idx:map %d:%s.", getColumnForLog(),
+                        getSelectedIndex(), getSelectedItem()));
 
     K result = null;
 
@@ -1251,9 +1249,8 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
         // setChosenKey() should succeed.
         if (SSUtils.isSSComponentListenerAddedDebug(this)) {
           logger.log(Level.ERROR,
-                     ()
-                         -> sf("%s: No key for %s in combobox, setSelectedItem(null)",
-                               getColumnForLog(), key));
+                     () -> sf("%s: No key for %s in combobox, setSelectedItem(null)",
+                              getColumnForLog(), key));
         }
       }
       setSelectedItem(item);
@@ -1262,9 +1259,8 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
           TRACE,
           () -> sf("%s: eventList - [%s].", getColumnForLog(), remodel.getItemList().toString()));
       logger.log(TRACE,
-                 ()
-                     -> sf("%s: displayvalues - [%s].", getColumnForLog(),
-                           remodel.getDisplayValues().toString()));
+                 () -> sf("%s: displayvalues - [%s].", getColumnForLog(),
+                          remodel.getDisplayValues().toString()));
       logger.log(TRACE,
                  () -> sf("%s: keys - [%s].", getColumnForLog(), remodel.getKeys().toString()));
     }
@@ -1342,9 +1338,8 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
         // Didn't find it in the list, so just use it as is.
         item = displayValue != null ? displayValue : nullItem;
         logger.log(WARNING,
-                   ()
-                       -> sf("%s: displayValue %s not in combobox, do setSelectedItem.",
-                             getColumnForLog(), displayValue));
+                   () -> sf("%s: displayValue %s not in combobox, do setSelectedItem.",
+                            getColumnForLog(), displayValue));
       }
 
       setSelectedItem(item);

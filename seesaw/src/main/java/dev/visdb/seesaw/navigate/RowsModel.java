@@ -298,9 +298,8 @@ public final class RowsModel {
   public boolean setRowSet(RowSet rs, DbOps _dbOps) {
     DbOps dbOps = _dbOps == null ? findDbOps(rs, this) : _dbOps;
     logger.log(Level.INFO,
-               ()
-                   -> sf("RowsModel %s change rowSet from %s to %s", objectID(this),
-                         objectID(getRowSet()), objectID(rs)));
+               () -> sf("RowsModel %s change rowSet from %s to %s", objectID(this),
+                        objectID(getRowSet()), objectID(rs)));
 
     if (isDirty()) {
       //throw new IllegalStateException("oldRS dirty"); ???

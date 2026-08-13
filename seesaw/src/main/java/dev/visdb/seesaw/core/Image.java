@@ -308,10 +308,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   private void setupImageCanvasInScrollPane() {
     canvas = new MyZoomCanvas(scrollPane,
-                              ()
-                                  -> zoomFactor,
-                              ()
-                                  -> zoomSlider.getValueIsAdjusting()
+                              () -> zoomFactor,
+                              () -> zoomSlider.getValueIsAdjusting()
                                          ? ZoomCanvas.RenderingQuality.MEDIUM
                                          : ZoomCanvas.RenderingQuality.HIGH);
     nullBackground = canvas.getBackground();

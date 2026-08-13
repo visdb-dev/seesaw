@@ -133,9 +133,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
       AbstractFormatter formatter = ftf.getFormatter();
 
       logger.log((formatter == null || formattedText == null) ? Level.ERROR : DEBUG,
-                 ()
-                     -> sf("FormattedText %s, Formatter %s", getColumnForLog(),
-                           formatter == null ? null : formatter.getClass().getSimpleName()));
+                 () -> sf("FormattedText %s, Formatter %s", getColumnForLog(),
+                          formatter == null ? null : formatter.getClass().getSimpleName()));
       if (formatter == null || formattedText == null)
         return true; // Impossible. Just get out and let focus change.
 
@@ -151,10 +150,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
         } catch (ParseException pe) {
           // Generally bad user input.
           String finalFormattedText = formattedText;
-          logger.log(DEBUG,
-                     ()
-                         -> sf("%s: '%s' Parse Exception offset %s.", getColumnForLog(),
-                               finalFormattedText, pe.getErrorOffset()));
+          logger.log(DEBUG, () -> sf("%s: '%s' Parse Exception offset %s.", getColumnForLog(),
+                                     finalFormattedText, pe.getErrorOffset()));
           ok = false;
         }
 
@@ -236,9 +233,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
     final Object currentValue = ftf.getValue();
 
     logger.log(DEBUG,
-               ()
-                   -> sf("%s: to database '%s' type %s.", getColumnForLog(), currentValue,
-                         currentValue == null ? null : currentValue.getClass().getName()));
+               () -> sf("%s: to database '%s' type %s.", getColumnForLog(), currentValue,
+                        currentValue == null ? null : currentValue.getClass().getName()));
 
     // TODO:  Should "postRowSetModifiedError be covered by dbChange()?
 
@@ -507,9 +503,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
         final JDBCType jdbcType = getColumnJDBCType();
         if (!(checkConvertToJdbcType(jdbcType, dbValue.getClass(), null)))
           logger.log(Level.ERROR,
-                     ()
-                         -> sf("%s CAN'T CONVERT %s to %s", getColumnForLog(), jdbcType,
-                               dbValue.getClass().getName()));
+                     () -> sf("%s CAN'T CONVERT %s to %s", getColumnForLog(), jdbcType,
+                              dbValue.getClass().getName()));
 
         // NOTE: H2's "rx.updateObject(idx, obj)" converts Date
         //		 to sql.Timestamp which is converted on commit (I guess)

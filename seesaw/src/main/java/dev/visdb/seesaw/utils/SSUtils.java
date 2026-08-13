@@ -402,9 +402,8 @@ public class SSUtils {
                                  Exception ex) {
     String pathName = path != null ? path.toAbsolutePath().toString() : "";
     logger.log(Level.ERROR,
-               ()
-                   -> sf("%s: IO Exception %s: file %s: %s", comp.getColumnForLog(),
-                         ex.getClass().getSimpleName(), pathName, ex.getMessage()));
+               () -> sf("%s: IO Exception %s: file %s: %s", comp.getColumnForLog(),
+                        ex.getClass().getSimpleName(), pathName, ex.getMessage()));
 
     // TODO: Alter message according to parameters.
     //		 For example, if path is null, leave out "file: 'xxx'"

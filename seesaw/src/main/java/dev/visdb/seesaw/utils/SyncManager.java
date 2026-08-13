@@ -152,9 +152,8 @@ public class SyncManager<K> {
         final int guessRowNumber = comboHasRowNum ? ((Long) comboBox.getChosenD2()).intValue()
                                                   : comboBox.getKeys().indexOf(comboPK) + 1;
         logger.log(DEBUG,
-                   ()
-                       -> sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
-                             rowsetPK, comboPK, guessRowNumber));
+                   () -> sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
+                            rowsetPK, comboPK, guessRowNumber));
 
         getRowSet().absolute(guessRowNumber);
 
@@ -175,8 +174,7 @@ public class SyncManager<K> {
 
           final int tcount = count;
           logger.log(WARNING,
-                     ()
-                         -> "SSSyncManager RowSet and DBComboBox2 values "
+                     () -> "SSSyncManager RowSet and DBComboBox2 values "
                                 + "do not match for the same index. This can be caused by "
                                 + "DBComboBox2 and RowSet queries not selecting the same "
                                 + "records in the same order. Looping through each record "
@@ -210,10 +208,9 @@ public class SyncManager<K> {
             // TODO: is this needed?
             comboBox.repaint();
             logger.log(WARNING,
-                       ()
-                           -> sf("SSSyncManager unable to find a record matching"
+                       () -> sf("SSSyncManager unable to find a record matching"
                                      + " the selection in the dropdown list: %s.",
-                                 comboBox.getSelectedStringValue()));
+                                comboBox.getSelectedStringValue()));
             // JOptionPane.showInternalMessageDialog(comboBox,
             // 		"Record deleted. Info the admin about this",
             // 		"Row not found",JOptionPane.OK_OPTION);
@@ -270,9 +267,8 @@ public class SyncManager<K> {
     private void performUpdates() {
       lastChange++;
       logger.log(TRACE,
-                 ()
-                     -> sf("performUpdates(): lastChange=%s, lastNotifiedChange=%s", lastChange,
-                           lastNotifiedChange));
+                 () -> sf("performUpdates(): lastChange=%s, lastNotifiedChange=%s", lastChange,
+                          lastNotifiedChange));
 
       // Delay execution of logic until all listener methods are called for current event
       // Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield

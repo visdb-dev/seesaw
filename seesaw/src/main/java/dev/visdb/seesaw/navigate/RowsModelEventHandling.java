@@ -256,9 +256,8 @@ public class RowsModelEventHandling {
           logger.log(ERROR, "WRONG ROW SET");
         if (!isJunitPrint())
           logger.log(WARNING,
-                     ()
-                         -> sf("Different RowSet: orig %s, new %s", eventSource.rowSet,
-                               rs)); //, new Throwable());
+                     () -> sf("Different RowSet: orig %s, new %s", eventSource.rowSet,
+                              rs)); //, new Throwable());
 
         flushPendingEvent(eventSource);
 

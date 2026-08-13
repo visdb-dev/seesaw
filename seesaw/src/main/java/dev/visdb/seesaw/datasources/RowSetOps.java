@@ -787,17 +787,14 @@ public class RowSetOps {
       throws SSSQLNullException, SQLException, NumberFormatException {
     int row = logger.isLoggable(DEBUG) ? rowSet.getRow() : -1;
     logger.log(DEBUG,
-               ()
-                   -> sf("[%s] row %d. Update to: %s. Allow null? [%s]", comp.getColumnForLog(),
-                         row, updatedValue, allowNull));
+               () -> sf("[%s] row %d. Update to: %s. Allow null? [%s]", comp.getColumnForLog(),
+                        row, updatedValue, allowNull));
 
     JDBCType jdbcType = getJDBCType(getColumnType(rowSet, columnIndex));
 
     if (!textUpdateOK.contains(jdbcType)) {
       // TODO: internal error exception?
-      logger.log(ERROR,
-                 ()
-                     -> "Unsupported data type of " + jdbcType.getName() + " for column "
+      logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column "
                             + comp.getColumnForLog() + ".");
       throw new SSSQLUnhandledTypeException(sf("'%s' can't be used as text", jdbcType));
     }
@@ -897,10 +894,8 @@ public class RowSetOps {
     final RowSet rowSet = comp.getRowSet();
     final int columnIndex = comp.getColumnIndex();
     boolean allowNull = comp.getAllowNull();
-    logger.log(DEBUG,
-               ()
-                   -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? ["
-                          + allowNull + "]");
+    logger.log(DEBUG, () -> comp.getColumnForLog() + " Update to: " + updatedValue
+                            + ". Allow null? [" + allowNull + "]");
 
     Object dbValue;
     // On insert row, write null and do not perform other checks.

@@ -139,9 +139,8 @@ public class SSTextSupport {
     public void changedUpdate(DocumentEvent de) {
       lastChange++;
       logger.log(TRACE,
-                 ()
-                     -> sf("%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
-                           ssCommon.getColumnForLog(), lastChange, lastNotifiedChange));
+                 () -> sf("%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
+                          ssCommon.getColumnForLog(), lastChange, lastNotifiedChange));
       // Delay updateTextComponent until all Document listeners inovked for event.
       // See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
       SwingUtilities.invokeLater(() -> {
@@ -291,10 +290,8 @@ public class SSTextSupport {
     @Override
     public void changedUpdate(DocumentEvent de) {
       lastChange++;
-      logger.log(TRACE,
-                 ()
-                     -> sf("%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
-                           ssCommon.getColumnForLog(), lastChange, lastNotifiedChange));
+      logger.log(TRACE, () -> sf("%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
+                                 ssCommon.getColumnForLog(), lastChange, lastNotifiedChange));
       // Delay updateTextComponent until all Document listeners inovked for event.
       // See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
       SwingUtilities.invokeLater(() -> {
@@ -343,10 +340,8 @@ public class SSTextSupport {
                 listenerNeedsRestoration = true;
               }
               try {
-                logger.log(DEBUG,
-                           ()
-                               -> sf("%s: restoring previous value '%s'",
-                                     ssCommon.getColumnForLog(), previousValue));
+                logger.log(DEBUG, () -> sf("%s: restoring previous value '%s'",
+                                           ssCommon.getColumnForLog(), previousValue));
                 ((JTextComponent) ssCommon.getSSComponent()).setText(previousValue);
               } finally {
                 if (listenerNeedsRestoration) {

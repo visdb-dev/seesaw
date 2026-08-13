@@ -163,9 +163,8 @@ public class SSTableKeyAdapter extends KeyAdapter {
     final JTable jTable = (JTable) ke.getSource();
 
     logger.log(DEBUG,
-               ()
-                   -> sf("Key Released on SSDataGrid. Key Released: %s %s.", ke.getKeyCode(),
-                         ((ke.getModifiersEx() & (onMask | offMask)) == onMask)));
+               () -> sf("Key Released on SSDataGrid. Key Released: %s %s.", ke.getKeyCode(),
+                        ((ke.getModifiersEx() & (onMask | offMask)) == onMask)));
 
     if (((ke.getModifiersEx() & (onMask | offMask)) == onMask)
         && (ke.getKeyCode() == KeyEvent.VK_C)) {

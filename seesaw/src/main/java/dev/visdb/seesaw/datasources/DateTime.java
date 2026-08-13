@@ -271,9 +271,8 @@ public class DateTime {
       } catch (DateTimeParseException ex) {
         logger.log(
             DEBUG,
-            ()
-                -> sf("%s at '%s', %s' fails for '%s' index %d", comp.getColumnForLog(),
-                      text.substring(ex.getErrorIndex()), formatter, text, ex.getErrorIndex()));
+            () -> sf("%s at '%s', %s' fails for '%s' index %d", comp.getColumnForLog(),
+                     text.substring(ex.getErrorIndex()), formatter, text, ex.getErrorIndex()));
         tex = ex;
       }
     }

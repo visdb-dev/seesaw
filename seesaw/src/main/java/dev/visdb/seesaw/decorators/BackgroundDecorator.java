@@ -70,10 +70,9 @@ public class BackgroundDecorator extends FocusDecorator {
   public boolean decorate() {
     final ValidationResult valid = getSSComponent().allValidate();
     logger.log(TRACE,
-               ()
-                   -> String.format("%s focus: %s, compValid %s, allValid: %s",
-                                    decoComp().getClass().getSimpleName(),
-                                    focusComp().isFocusOwner(), valid.comp(), valid.all()));
+               () -> String.format("%s focus: %s, compValid %s, allValid: %s",
+                                   decoComp().getClass().getSimpleName(),
+                                   focusComp().isFocusOwner(), valid.comp(), valid.all()));
 
     ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
     Color color = state.isError()      ? errorBackgroundColor

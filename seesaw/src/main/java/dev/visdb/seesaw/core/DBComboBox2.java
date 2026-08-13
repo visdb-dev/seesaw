@@ -546,9 +546,8 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
     }
     if (!result) {
       logger.log(WARNING,
-                 ()
-                     -> sf("%s: Unable to update Keys of [%s] with DisplayValue of '%s'.",
-                           getColumnForLog(), key, displayValue));
+                 () -> sf("%s: Unable to update Keys of [%s] with DisplayValue of '%s'.",
+                          getColumnForLog(), key, displayValue));
     }
 
     return result;

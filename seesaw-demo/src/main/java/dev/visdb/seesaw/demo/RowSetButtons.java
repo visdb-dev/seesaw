@@ -112,10 +112,8 @@ public abstract class RowSetButtons extends JPanel {
   }
 
   private void outStuff() {
-    logger.log(Level.INFO,
-               ()
-                   -> sf("Active: RSState %d, NavState %d, RModel %d", RowSetState.count(),
-                         RowsModel.navCount(), RowsModel.count()));
+    logger.log(Level.INFO, () -> sf("Active: RSState %d, NavState %d, RModel %d",
+                                    RowSetState.count(), RowsModel.navCount(), RowsModel.count()));
   }
 
   private void init() {
@@ -197,10 +195,8 @@ public abstract class RowSetButtons extends JPanel {
   private void createTableLoopRowSet() throws SQLException, ClassNotFoundException {
     DemoExtraDB.createSimpleSupplierData(tableLoopBase + tableLoopIndex,
                                          tableLoopRowCountBase + tableLoopIndex);
-    logger.log(Level.INFO,
-               ()
-                   -> sf("Creating tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
-                         tableLoopRowCountBase + tableLoopIndex));
+    logger.log(Level.INFO, () -> sf("Creating tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
+                                    tableLoopRowCountBase + tableLoopIndex));
   }
 
   /**
@@ -209,10 +205,8 @@ public abstract class RowSetButtons extends JPanel {
   RowSet getTableLoopRowSet() throws SQLException, ClassNotFoundException {
     RowSet rs = DemoExtraDB.findSimpleSupplierData(tableLoopBase + tableLoopIndex,
                                                    tableLoopRowCountBase + tableLoopIndex);
-    logger.log(Level.INFO,
-               ()
-                   -> sf("Using tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
-                         tableLoopRowCountBase + tableLoopIndex));
+    logger.log(Level.INFO, () -> sf("Using tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
+                                    tableLoopRowCountBase + tableLoopIndex));
     return rs;
   }
 

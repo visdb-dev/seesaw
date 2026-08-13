@@ -600,9 +600,8 @@ final class SSCommon {
       isNullable = RowSetOps.isNullable(getRowSet(), columnName);
       logger.log(TRACE, () -> sf("Column isNullable: %s.", isNullable));
       logger.log(TRACE,
-                 ()
-                     -> sf("Column bind succeeded: name=%s %s.", columnName,
-                           getRowSet() == null ? ", rowset=null" : ""));
+                 () -> sf("Column bind succeeded: name=%s %s.", columnName,
+                          getRowSet() == null ? ", rowset=null" : ""));
 
       ssComponent.metadataChange();
       fullyBound = true;
