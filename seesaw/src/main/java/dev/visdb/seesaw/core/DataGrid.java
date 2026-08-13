@@ -800,7 +800,15 @@ public class DataGrid extends JTable {
     return new SSTableModel();
   }
 
-  /** {@inheritDoc } */
+  /**
+   * {@inheritDoc }
+   * <p>
+   * This override installs a JTableHeader with a configurable
+   * TableCellRender,
+   * <a href="https://github.com/errael/jdk-assist#table-sort-header-renderer">
+   * TableSortHeaderRenderer</a>,
+   * for displaying arrows for multikey soriting.
+   */
   @Override
   protected JTableHeader createDefaultTableHeader() {
     return new JTableHeader(columnModel) {
@@ -966,7 +974,8 @@ public class DataGrid extends JTable {
   public boolean getCallExecute() { return callExecute; }
 
   /**
-   * Return the enumeration of {@linkplain #getColumnModel()}.{@linkplain TableColumnModel#getColumns()}
+   * Return the enumeration of
+   * {@linkplain #getColumnModel()}.{@linkplain TableColumnModel#getColumns()}
    * as a List.
    * @return the List
    */

@@ -74,6 +74,7 @@ import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
@@ -82,7 +83,6 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
-import dev.visdb.seesaw.core.Image;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
@@ -254,7 +254,7 @@ public class TestBaseComponents extends JFrame {
   JLabel lblSSComboBox = new JLabel("SSComboBox");
   JLabel lblEnumSSComboBox = new JLabel("enumSSComboBox");
   JLabel lblSSDBComboBox = new JLabel("SSDBComboBox");
-  JLabel lblImage = new JLabel("Image");
+  JLabel lblImage = new JLabel("SSImage");
   JLabel lblSSLabel = new JLabel("SSLabel");
   JLabel lblSSList = new JLabel("SSList");
   JLabel lblSSList2 = new JLabel("SSList String");
@@ -272,7 +272,7 @@ public class TestBaseComponents extends JFrame {
   SSComboBox cmbSSComboBox = new SSComboBox();
   SSComboBox cmbEnumSSComboBox = new SSComboBox();
   SSDBComboBox cmbSSDBComboBox;
-  Image imgImage = new Image(); // SSImage() works here as well.
+  SSImage imgImage = new SSImage(); // Image() works here as well.
   SSLabel lblSSLabel2 = new SSLabel();
   final SSList lstSSList;
   final SSList lstSSList2;

@@ -109,7 +109,20 @@ import static java.sql.JDBCType.*;
 
 /**
  * Used to load, store, and display images stored in a database.
- * There are controls for zooming the image.
+ * When an image is loaded it is {@link #bestFit() } and stays
+ * that way if the image is resized;
+ * zooming takes it out of best fit mode.
+ * There are controls available for zooming the image and support for an
+ * image popup menu. A subset may be partially/fully displayed by a subclass.
+ * See {@link #imageControls() } and {@link #createImagePopup() }.
+ * Available controls are
+ * {@link #getUpdateButton() },
+ * {@link #getZoomSlider() },
+ * {@link #getZoomResetButton() },
+ * {@link #getCurrentZoomLabel() }.
+ * 
+ * <p>
+ * Though not visible in the API, there's a {@link ZoomCanvas} in the scroll pane.
  */
 // TODO: Image make all the load/store buttons/capabilities optional.
 @SuppressWarnings("serial")
@@ -298,9 +311,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     nullBackground = canvas.getBackground();
     scrollPane.getViewport().setView(canvas);
 
-    imagePopup = createImagePopup();
-
-    if (imagePopup != null) canvas.setToolTipText("""
+    setImageToolTipText("""
         <html> Drag to pan image.
         <br>Try the context menu.
         </html>""");
@@ -367,11 +378,11 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   private CanvasMouseListener canvasMouseListener;
-  private JPopupMenu imagePopup;
 
   /** @return true if a popupTrigger */
   private boolean tryPopup(MouseEvent e) {
     if (!e.isPopupTrigger()) return false;
+    JPopupMenu imagePopup = createImagePopup();
     if (imagePopup != null) {
       Point pos = e.getPoint();
       imagePopup.show(e.getComponent(), pos.x, pos.y);
@@ -380,10 +391,19 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   /**
+   * The image's tooltip may be set during construction by the code that provides
+   * the popup menu or it can be dynamic.
+   * @param txt 
+   */
+  protected void setImageToolTipText(String txt) {
+    canvas.setToolTipText(txt);
+  }
+
+  /**
    * @return popup menu for the image
    */
   protected JPopupMenu createImagePopup() {
-    imagePopup = new JPopupMenu();
+    JPopupMenu imagePopup = new JPopupMenu();
     imagePopup.add(menuAction("Center mouse point",
                               () -> { canvas.centerViewportOnCanvasPoint(canvasMouseListener.origin); }));
     imagePopup.add(menuAction("Fit image", () -> { bestFit(); }));
@@ -400,21 +420,22 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   /**
-   * Create controls; return goes SOUTH of a BoarderLayout.
+   * Create a panel with buttons/status to control the image.
+   * Returned component goes in the SOUTH of a BoarderLayout.
    * Override to customize features and layout.
    * @return panel with buttons.
    */
   protected JComponent imageControls() {
-    getButtonnUpdate().setText("Upd");
-    getSliderReset().setText("Rst");
+    getUpdateButton().setText("Upd");
+    getZoomResetButton().setText("Rst");
 
     //Box controls = new Box(BoxLayout.Y_AXIS);
     Box controls = Box.createVerticalBox();
     controls.add(getZoomSlider());
     JPanel buttons = new JPanel();
-    buttons.add(getButtonnUpdate());
-    buttons.add(getSliderReset());
-    buttons.add(getCurrentZoom());
+    buttons.add(getUpdateButton());
+    buttons.add(getZoomResetButton());
+    buttons.add(getCurrentZoomLabel());
     controls.add(buttons);
     return controls;
   }
@@ -454,8 +475,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   /** Adds the label and button to the panel */
   protected void addComponents() {
     buildZoomControls();
-    trimHeight(getButtonnUpdate(), 20);
-    trimHeight(getSliderReset(), 20);
+    trimHeight(getUpdateButton(), 20);
+    trimHeight(getZoomResetButton(), 20);
     //trimHeight(currentZoomLabel, 20);
 
     setLayout(new BorderLayout());
@@ -477,11 +498,11 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   /**
-   * Returns the button that indicates a new image has been selected and accepted.
+   * Returns the button that starts the process to load a new image.
    *
    * @return button that indicates a new image has been selected and accepted
    */
-  protected JButton getButtonnUpdate() { return btnUpdateImage; }
+  protected JButton getUpdateButton() { return btnUpdateImage; }
 
   /** @return current zoom factor */
   protected double getZoomFactor() { return zoomFactor; }
@@ -490,10 +511,10 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   protected JSlider getZoomSlider() { return zoomSlider; }
 
   /** @return component that display the current zoom */
-  protected JLabel getCurrentZoom() { return currentZoomLabel; }
+  protected JLabel getCurrentZoomLabel() { return currentZoomLabel; }
 
   /** @return component button that resets the zoom */
-  protected JButton getSliderReset() { return sliderResetButton; }
+  protected JButton getZoomResetButton() { return sliderResetButton; }
 
   /** {@inheritDoc } */
   @Override
@@ -568,13 +589,13 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
         /** {@inheritDoc } */
         @Override
         protected void addSSComponentListener(EventListener eventListener) {
-          getButtonnUpdate().addActionListener((ActionListener) eventListener);
+          getUpdateButton().addActionListener((ActionListener) eventListener);
         }
 
         /** {@inheritDoc } */
         @Override
         protected void removeSSComponentListener(EventListener eventListener) {
-          getButtonnUpdate().removeActionListener((ActionListener) eventListener);
+          getUpdateButton().removeActionListener((ActionListener) eventListener);
         }
       };
     return hook;
@@ -789,7 +810,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     // present, even though they were turned off in setKeepFit(). To use
     // scrollPane.getViewport().getSize(), need to wait for layout to settle,
     // by using invokeLater, but that produces visual artifacts with double draw.
-    // Instead calculate the viewport area from the scrollPane.
+    //
+    // Instead manually calculate the viewport area from the scrollPane.
 
     Insets insets = scrollPane.getInsets();
     int viewwidth = scrollPane.getSize().width - insets.left - insets.right;

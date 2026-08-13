@@ -47,7 +47,6 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 
 import dev.visdb.seesaw.core.Image;
-
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.ZoomCanvas;
 
@@ -66,8 +65,8 @@ public class SSImage extends Image {
    * Construct a default SSImage Object.
    */
   public SSImage() {
-    super();
     setResizeMode(resizeMode);
+    setImageToolTipText(null);
   }
 
   /**
@@ -78,18 +77,19 @@ public class SSImage extends Image {
    * @param columnName - column in the rowSet to which the component should
    *                         be bound.
    */
+  @SuppressWarnings("LeakingThisInConstructor")
   public SSImage(RowsModel rowsModel, String columnName) {
-    super(rowsModel, columnName);
-    setResizeMode(resizeMode);
+    this();
+    rowsModel.bind(this, columnName);
   }
 
   /**
-   * Don't show the zoom controls.
+   * Only show the update button, don't show the zoom controls.
    * @return the "Update" button
    */
   @Override
   protected JComponent imageControls() {
-    return getButtonnUpdate();
+    return getUpdateButton();
   }
 
   /**
@@ -111,7 +111,6 @@ public class SSImage extends Image {
    */
   @Deprecated
   public SSImage(RowSet rowSet, String columnName) {
-    super(findRowsModel(rowSet), columnName);
-    setResizeMode(resizeMode);
+    this(findRowsModel(rowSet), columnName);
   }
 }

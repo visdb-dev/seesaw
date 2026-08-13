@@ -13,7 +13,6 @@ import com.google.common.reflect.TypeToken;
 import dev.visdb.seesaw.core.ComboBox1;
 import dev.visdb.seesaw.core.DBComboBox2;
 import dev.visdb.seesaw.core.Item1;
-
 import dev.visdb.seesaw.navigate.RowsModel;
 
 /**
@@ -101,13 +100,13 @@ public class ComboBoxSnippets extends JFrame {
   // @end region=ExtendableDbComboBox
   void useExCombo() {
     // @start region=ExtendableDbComboBoxExample
-    DbComboBox2Extra<Double, List<Double>> cbExtra = new DbComboBox2Extra
-                                                         .Builder<Double, List<Double>>() {}
-                                                         // <- "{ }" NEEDED
-                                                         .primaryKeyColumnName("aaa")
-                                                         .displayColumnName("bbb")
-                                                         .d3Data(new ArrayList<>())
-                                                         .build();
+    DbComboBox2Extra<Double, List<Double>> cbExtra
+        = new DbComboBox2Extra
+              .Builder<Double, List<Double>>() {} // <- "{ }" NEEDED
+              .primaryKeyColumnName("aaa")
+              .displayColumnName("bbb")
+              .d3Data(new ArrayList<>())
+              .build();
     cbExtra.getD3().addAll(List.of(7D, 6D, 5D));
     System.out.println("" + cbExtra.getKeyType());
     System.out.println("" + cbExtra.getDisplayValueType());

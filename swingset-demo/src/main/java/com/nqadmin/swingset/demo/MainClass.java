@@ -83,6 +83,8 @@ import javax.swing.SwingUtilities;
 
 import org.h2.tools.RunScript;
 
+import com.raelity.lib.ui.Screens;
+
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.RowSetOps.ForceConflict;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
@@ -95,9 +97,6 @@ import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.LookupDefaults;
 import dev.visdb.seesaw.utils.SSUtils;
 import dev.visdb.seesaw.utils.SSVersion;
-
-import com.raelity.lib.ui.Screens;
-
 import gnu.getopt.Getopt;
 
 import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
@@ -356,7 +355,7 @@ public class MainClass extends JFrame {
   @SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
   public MainClass() {
     // SETUP WINDOW
-    super("SwingSet Demo");
+    super("SeeSaw SwingSet Demo");
     setSize(300, 300);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     addWindowListener(new WindowAdapter() {

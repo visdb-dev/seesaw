@@ -404,6 +404,7 @@ public class RowSetOps {
    * @param resultSet ResultSet on which to operate
    * @return
    * @throws SQLException
+   * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
    */
   public static Class<?> getClassColumnType(ResultSet resultSet, String columnName)
       throws SQLException {
@@ -419,6 +420,7 @@ public class RowSetOps {
    * @param resultSet ResultSet on which to operate
    * @return
    * @throws SQLException
+   * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
    */
   public static Class<?> getClassColumnType(ResultSet resultSet, int columnIndex)
       throws SQLException {

@@ -129,9 +129,9 @@ import static java.lang.System.Logger.Level.*;
  * not something that is based on {@code getSelectedIndex()}.
  * Change the current/selected combo box item with methods
  * such as
- * {@link ComboBox2#setChosenKey(java.lang.Object) setChosenKey(Integer)}
+ * {@link ComboBox2#setChosenKey(java.lang.Object) setChosenKey(K)}
  * and
- * {@link ComboBox2#setChosenDisplayValue(java.lang.Object) setChosenDisplayValue(String)}.
+ * {@link ComboBox2#setChosenDisplayValue(java.lang.Object) setChosenDisplayValue(D)}.
  * Use the methods {@link ComboBox2#hasItems() hasItems() } and
  * {@link ComboBox2#hasSelection() hasSelection() } which take into account
  * {@code getAllowNull()}.
