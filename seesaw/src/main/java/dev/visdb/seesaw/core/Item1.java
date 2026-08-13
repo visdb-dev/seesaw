@@ -43,11 +43,15 @@ public class Item1<K, D> extends Item2<K, D, Object> {
    * @param key
    * @param displayValue
    */
-  public Item1(K key, D displayValue) { super(key, displayValue); }
+  public Item1(K key, D displayValue) {
+    super(key, displayValue);
+  }
 
   /**
    * Create immutable item based on SSListItem.
    * @param listItem
    */
-  public Item1(SSListItem listItem) { super(listItem, false); }
+  public Item1(SSListItem listItem) {
+    super(listItem, false);
+  }
 }

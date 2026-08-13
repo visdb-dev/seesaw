@@ -195,7 +195,9 @@ public class RowsModelTest {
     DbNav _dbNav = null;
     try {
       _dbNav = new DbNav(tf, rowsModel);
-    } catch (ClassNotFoundException | SQLException ex) { exs.add(ex); }
+    } catch (ClassNotFoundException | SQLException ex) {
+      exs.add(ex);
+    }
     assertTrue(exs.isEmpty());
     DbNav dbNav = _dbNav;
 
@@ -272,7 +274,9 @@ public class RowsModelTest {
     DbNav _dbNav = null;
     try {
       _dbNav = new DbNav(tf, rowsModel);
-    } catch (ClassNotFoundException | SQLException ex) { exs.add(ex); }
+    } catch (ClassNotFoundException | SQLException ex) {
+      exs.add(ex);
+    }
     assertTrue(exs.isEmpty());
     DbNav dbNav = _dbNav;
 
@@ -312,7 +316,9 @@ public class RowsModelTest {
     _dbNav = null;
     try {
       _dbNav = new DbNav(tfNN, rowsModelNN);
-    } catch (ClassNotFoundException | SQLException ex) { exs.add(ex); }
+    } catch (ClassNotFoundException | SQLException ex) {
+      exs.add(ex);
+    }
     assertTrue(exs.isEmpty());
     DbNav dbNavNN = _dbNav;
 
@@ -358,7 +364,9 @@ public class RowsModelTest {
     DbNav _dbNav = null;
     try {
       _dbNav = new DbNav(jpanel, rowsModel);
-    } catch (ClassNotFoundException | SQLException ex) { exs.add(ex); }
+    } catch (ClassNotFoundException | SQLException ex) {
+      exs.add(ex);
+    }
     assertTrue(exs.isEmpty());
     DbNav dbNav = _dbNav;
 

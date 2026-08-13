@@ -75,7 +75,9 @@ public class JStuff {
    * @param loggerName name
    * @return logger
    */
-  public static Logger getLogger(String loggerName) { return System.getLogger(loggerName); }
+  public static Logger getLogger(String loggerName) {
+    return System.getLogger(loggerName);
+  }
 
   /**
    * Get a "class.method" name from the call stack.

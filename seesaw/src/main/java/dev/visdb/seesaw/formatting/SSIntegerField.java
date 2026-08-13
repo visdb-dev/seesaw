@@ -57,21 +57,27 @@ public class SSIntegerField extends NumberField {
   /**
    * Creates a new instance of SSIntegerField
    */
-  public SSIntegerField() { this(createFormatterFactory(CUSTOM, null)); }
+  public SSIntegerField() {
+    this(createFormatterFactory(CUSTOM, null));
+  }
 
   /**
    * Creates an object of SSIntegerField with the specified number of digits.
    *
    * @param precision - number of digits needed
    */
-  public SSIntegerField(int precision) { this(createFormatterFactory(CUSTOM, precision)); }
+  public SSIntegerField(int precision) {
+    this(createFormatterFactory(CUSTOM, precision));
+  }
 
   /**
    * Creates an object of SSIntegerField with the specified formatter factory
    *
    * @param factory - formatter factory to be used
    */
-  public SSIntegerField(AbstractFormatterFactory factory) { super(factory); }
+  public SSIntegerField(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   /**
    * This class should throw a run-time exception if this method is used;

@@ -229,7 +229,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
       K key = getChosenKey();
       try {
         dbChange(() -> setColumnObject(key));
-      } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
+      } catch (SQLException ex) {
+        logger.log(Level.ERROR, (String) null, ex);
+      }
     }
   }
 
@@ -355,17 +357,23 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
   /**
    * @return the key index in an SSListItem
    */
-  public int getKeyFormatIndex() { return keyVisual.getKeyListItemElemIndex(); }
+  public int getKeyFormatIndex() {
+    return keyVisual.getKeyListItemElemIndex();
+  }
 
   /**
    * @return the displayValue index in an SSListItem
    */
-  public int getDisplayValueFormatIndex() { return keyVisual.getDisplayValueListItemElemIndex(); }
+  public int getDisplayValueFormatIndex() {
+    return keyVisual.getDisplayValueListItemElemIndex();
+  }
 
   /**
    * @return the d2 index in an SSListItem
    */
-  public int getD2FormatIndex() { return keyVisual.getD2ListItemElemIndex(); }
+  public int getD2FormatIndex() {
+    return keyVisual.getD2ListItemElemIndex();
+  }
 
   /**
    * A list item formatter that displays the key if the displayValue is null.
@@ -586,7 +594,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    */
   // Keep a default contructor publicly available.
   // TODO: this fails because "K" is not concrete.
-  public ComboBox2() { this(new Builder<>(){}); }
+  public ComboBox2() {
+    this(new Builder<>() {});
+  }
 
   /**
    * Create BaseComboBox.
@@ -612,7 +622,8 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    */
   protected static final void verifyTypeClass(TypeToken<?> typeToken, Class<?> builderClass)
       throws IllegalArgumentException {
-    if (isConcrete(typeToken)) return;
+    if (isConcrete(typeToken))
+      return;
 
     // This might be handy, if "xxx.yyy.zzz$1", following give "xxx.yyy.zzz"
     // builderClass.getEnclosingClass();
@@ -628,7 +639,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
 
     Matcher matcher = Pattern.compile("(\\w+)[.$](\\w+)$").matcher(className);
     String msgName = "Some.Builder";
-    if (matcher.find()) { msgName = isDollar ? matcher.group(1) + ".Builder" : matcher.group(); }
+    if (matcher.find()) {
+      msgName = isDollar ? matcher.group(1) + ".Builder" : matcher.group();
+    }
 
     throw new IllegalArgumentException(sf("'%s' unresolved, non generic subclass required,"
                                               + " See DBComboBox2 javadoc,"
@@ -647,7 +660,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     if (type instanceof ParameterizedType pType) {
       for (Type arg : pType.getActualTypeArguments()) {
         // If any argument is still a generic TypeVariable or WildcardType, it's not concrete
-        if (!(arg instanceof Class)) { return false; }
+        if (!(arg instanceof Class)) {
+          return false;
+        }
       }
       return true;
     }
@@ -661,7 +676,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * This returns whether or not {@code <D2>} is populated.
    * @return
    */
-  public boolean hasD2() { return hasD2; }
+  public boolean hasD2() {
+    return hasD2;
+  }
 
   private boolean d2DisplayEnabled;
 
@@ -669,7 +686,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * Should {@code <D2>} values be displayed.
    * @return
    */
-  public boolean getD2DisplayEnabled() { return d2DisplayEnabled; }
+  public boolean getD2DisplayEnabled() {
+    return d2DisplayEnabled;
+  }
 
   /**
    * Set the flag controlling whether or not to display {@code <D2>}.
@@ -695,14 +714,17 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     // from ListItem to a String with the old value.
     // If the combo editor held the selected item before,
     // then it should hold the selected item after.
-    if (keep) getEditor().setItem(selectedItem);
+    if (keep)
+      getEditor().setItem(selectedItem);
   }
 
   /**
    * Return the listItemFormat associated with this combobox.
    * @return the associated listItemFormat
    */
-  public final SSListItemFormat getListItemFormat() { return keyVisual.getListItemFormat(); }
+  public final SSListItemFormat getListItemFormat() {
+    return keyVisual.getListItemFormat();
+  }
 
   /**
    * This is called after the combobox is populated with items.
@@ -737,7 +759,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    *
    * @return true if there are displayValues/key
    */
-  public boolean hasItems() { return keyVisual.getItemList().size() != (getAllowNull() ? 1 : 0); }
+  public boolean hasItems() {
+    return keyVisual.getItemList().size() != (getAllowNull() ? 1 : 0);
+  }
 
   /**
    * Determine if the combo box has a selection, either an item that
@@ -760,7 +784,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * it is as though getAlowNull() is temporarily true.
    * @return true if waiting for not nullItem
    */
-  public boolean isSelectionPending() { return selectionPending; }
+  public boolean isSelectionPending() {
+    return selectionPending;
+  }
 
   /**
    * Control whether or not waiting for pending user selection.
@@ -771,7 +797,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * @param selectionPending true selects a possibly tempory nullItem
    */
   public void setSelectionPending(boolean selectionPending) {
-    if (this.selectionPending == selectionPending) { return; }
+    if (this.selectionPending == selectionPending) {
+      return;
+    }
     this.selectionPending = selectionPending;
 
     adjustForNullItem();
@@ -791,7 +819,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
       final ActionListener[] listeners = unregisterAllActionListeners(this);
       try {
         super.setSelectedItem(nullItem);
-      } finally { registerAllActionListeners(this, listeners); }
+      } finally {
+        registerAllActionListeners(this, listeners);
+      }
     }
   }
 
@@ -801,7 +831,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    *
    * @param displayValues the list of displayValues that you want to appear in the combo box.
    */
-  public void setDisplayValues(List<D> displayValues) { setDisplayValues(displayValues, null); }
+  public void setDisplayValues(List<D> displayValues) {
+    setDisplayValues(displayValues, null);
+  }
 
   /**
    * Sets the displayValues to be displayed in the list box along with their
@@ -841,7 +873,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    *
    * @return returns the items displayed in the combo box
    */
-  public List<D> getDisplayValues() { return keyVisual.getDisplayValues(); }
+  public List<D> getDisplayValues() {
+    return keyVisual.getDisplayValues();
+  }
 
   /**
    * when true, keys were autoGenerated
@@ -853,7 +887,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * @return true if keys are autoGenerated
    */
   // TODO: public? Get rid of the field
-  protected boolean isAutoGeneratedKeys() { return autoGeneratedKeys; }
+  protected boolean isAutoGeneratedKeys() {
+    return autoGeneratedKeys;
+  }
 
   /**
    * Set up the specified keys/displayValues.
@@ -914,7 +950,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * <b>When getAllowNull() is true, the first list item is null/""</b>
    * @return the keys
    */
-  public List<K> getKeys() { return keyVisual.getKeys(); }
+  public List<K> getKeys() {
+    return keyVisual.getKeys();
+  }
 
   /**
    * Removes an item from the combobox's item list where the
@@ -938,7 +976,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
         remodel.remove(index);
         result = true;
       }
-    } catch (final Exception e) { logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e); }
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
+    }
 
     return result;
   }
@@ -949,7 +989,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * @param displayValue item that should be displayed in the combobox
    * @param key  key of displayValue, commonly a primary key
    */
-  public void addDisplayValue(D displayValue, K key) { addDisplayValue(displayValue, null, key); }
+  public void addDisplayValue(D displayValue, K key) {
+    addDisplayValue(displayValue, null, key);
+  }
 
   /**
    * Adds an item to the existing list of items in the combo box.
@@ -965,11 +1007,13 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
         logger.log(WARNING,
                    ()
                        -> sf("%s: Key of [%s] already exists. Creating duplicate Key with "
-                             + "DisplayValue of '%s'.",
+                                 + "DisplayValue of '%s'.",
                              getColumnForLog(), key, displayValue));
       }
       remodel.add(key, displayValue, d2);
-    } catch (final Exception e) { logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e); }
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
+    }
   }
 
   /**
@@ -1056,7 +1100,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
 
     try (Model.Remodel remodel = keyVisual.getRemodel()) {
       Object item = getSelectedItem();
-      if (item instanceof SSListItem lItem) { result = remodel.getKey(lItem); }
+      if (item instanceof SSListItem lItem) {
+        result = remodel.getKey(lItem);
+      }
     }
 
     return result;
@@ -1081,7 +1127,8 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * then remove any created missingKeyDisplayValues from list.
    */
   private void cleanupMissingKeyVisuals() {
-    if (!SwingUtilities.isEventDispatchThread()) throw new IllegalStateException("Must be EDT.");
+    if (!SwingUtilities.isEventDispatchThread())
+      throw new IllegalStateException("Must be EDT.");
     if (generatedKeyVisuals.isEmpty()
         || !missingDisplayValueControl.contains(MissingDisplayValueControl.MC_CLEANUP))
       return;
@@ -1092,7 +1139,8 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
         K missingKeyVisual = it.next();
         // Sequential records might have different missing displayValues;
         // never remove a missing displayValue for the current selected key.
-        if (Objects.equals(missingKeyVisual, getChosenKey())) continue;
+        if (Objects.equals(missingKeyVisual, getChosenKey()))
+          continue;
         int index = remodel.getKeys().indexOf(missingKeyVisual);
         if (index != -1) {
           SSListItem removed = remodel.remove(index);
@@ -1176,7 +1224,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
       }
 
       // only need to proceed if there is a change.
-      if (Objects.equals(key, getChosenKey())) { return; }
+      if (Objects.equals(key, getChosenKey())) {
+        return;
+      }
 
       int index = remodel.getKeys().indexOf(key);
       SSListItem item;
@@ -1231,7 +1281,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     D result = null;
     try (Model.Remodel remodel = keyVisual.getRemodel()) {
       Object item = getSelectedItem();
-      if (item instanceof SSListItem lItem) { result = remodel.getDisplayValue(lItem); }
+      if (item instanceof SSListItem lItem) {
+        result = remodel.getDisplayValue(lItem);
+      }
     }
     return result;
   }
@@ -1247,7 +1299,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     D2 result = null;
     try (Model.Remodel remodel = keyVisual.getRemodel()) {
       Object item = getSelectedItem();
-      if (item instanceof SSListItem lItem) { result = remodel.getD2(lItem); }
+      if (item instanceof SSListItem lItem) {
+        result = remodel.getD2(lItem);
+      }
     }
     return result;
   }
@@ -1274,7 +1328,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
           = tItem instanceof SSListItem ? remodel.getDisplayValue((SSListItem) tItem) : tItem;
 
       // only need to proceed if there is a change.
-      if (Objects.equals(displayValue, chosenDisplayValue)) { return; }
+      if (Objects.equals(displayValue, chosenDisplayValue)) {
+        return;
+      }
 
       // find the first matching displayValue in the list
       final int index = remodel.getDisplayValues().indexOf(displayValue);
@@ -1345,7 +1401,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * @return the enum class
    */
   // TODO: public? Get rid of the field
-  protected Class<?> getEnumDisplayValue() { return enumVisual; }
+  protected Class<?> getEnumDisplayValue() {
+    return enumVisual;
+  }
 
   /**
    * Finds the listItem that matches the specified enum and make it the selected
@@ -1355,7 +1413,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * @throws ClassCastException if displayValue is wrong enum type
    */
   public void setChosenEnum(Enum<?> displayValue) {
-    if (enumVisual == null) { throw new IllegalStateException("SSComboBox values not an enum."); }
+    if (enumVisual == null) {
+      throw new IllegalStateException("SSComboBox values not an enum.");
+    }
     Objects.requireNonNull(displayValue, "Enum to be selected cannnot be null.");
 
     // Verify the enum of of the correct type.
@@ -1373,9 +1433,11 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * @throws IllegalStateException if not an enum.
    */
   public Enum<?> getChosenEnum() {
-    if (enumVisual == null) throw new IllegalStateException("SSComboBox values not an enum");
+    if (enumVisual == null)
+      throw new IllegalStateException("SSComboBox values not an enum");
     K key = getChosenKey();
-    if (key == null) return null;
+    if (key == null)
+      return null;
     int enumIdx = ((Number) key).intValue();
     return (Enum<?>) enumVisual.getEnumConstants()[enumIdx];
   }
@@ -1466,7 +1528,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     adjustForNullItem();
   }
 
-  private static Object nullElement(Class<?> clazz) { return clazz == String.class ? "" : null; }
+  private static Object nullElement(Class<?> clazz) {
+    return clazz == String.class ? "" : null;
+  }
 
   /**
    * Create a null item for the itemList.
@@ -1489,14 +1553,18 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    * Return this ComboBox's nullItem.
    * @return the nullItem
    */
-  public SSListItem getNullItem() { return nullItem; }
+  public SSListItem getNullItem() {
+    return nullItem;
+  }
 
   /**
    * A combobox used as a navigator has some restriction; for example,
    * it can not have nullItem. Override this as needed.
    * @return true if this ComboBox is a navigator
    */
-  protected boolean isComboBoxNavigator() { return false; }
+  protected boolean isComboBoxNavigator() {
+    return false;
+  }
 
   /**
    * After this, make some adjustments.
@@ -1565,9 +1633,15 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
       if (selectNull || selectNone) {
         final ActionListener[] listeners = unregisterAllActionListeners(this);
         try {
-          if (selectNull) { super.setSelectedItem(nullItem); }
-          if (selectNone) { super.setSelectedItem(null); }
-        } finally { registerAllActionListeners(this, listeners); }
+          if (selectNull) {
+            super.setSelectedItem(nullItem);
+          }
+          if (selectNone) {
+            super.setSelectedItem(null);
+          }
+        } finally {
+          registerAllActionListeners(this, listeners);
+        }
       }
     }
   }
@@ -1582,7 +1656,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     try {
       // If initialization is taking place then there won't be any
       // keys so don't try to update anything yet.
-      if (!hasItems()) { return; }
+      if (!hasItems()) {
+        return;
+      }
 
       // Maybe insures blank in case of later exception.
       setSelectionPending(true);
@@ -1596,7 +1672,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
 
       // Update component.
       setChosenKey(targetValue);
-    } finally { cleanupMissingKeyVisuals(); }
+    } finally {
+      cleanupMissingKeyVisuals();
+    }
   }
 
   /** {@inheritDoc } */
@@ -1658,7 +1736,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
   // TODO: Consider passing in ComboBox2 and identifying ComboBox2Listener
   static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
     final ActionListener[] listeners = comboBox.getActionListeners();
-    for (ActionListener listener : listeners) { comboBox.removeActionListener(listener); }
+    for (ActionListener listener : listeners) {
+      comboBox.removeActionListener(listener);
+    }
 
     return listeners;
   }
@@ -1677,7 +1757,9 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
    */
   // TODO: Consider passing in ComboBox2 and identifying ComboBox2Listener
   static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
-    for (ActionListener listener : listeners) { comboBox.addActionListener(listener); }
+    for (ActionListener listener : listeners) {
+      comboBox.addActionListener(listener);
+    }
   }
 
   /** {@inheritDoc} */

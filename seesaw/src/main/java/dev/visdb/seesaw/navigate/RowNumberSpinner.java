@@ -113,9 +113,12 @@ public class RowNumberSpinner extends JSpinner {
     @WeakSubscribe
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void handleNewRowSetEvent(RowsModelNewRowSetEvent ev) {
-      if (ev.getRowsModel() != rowsModel) return;
-      if (isJunitPrint()) System.err.printf("RowNumberSpinner: %s\n", ev.toString());
-      else logger.log(DEBUG, () -> sf("Change spinner rowSet/model %s", ev.toString()));
+      if (ev.getRowsModel() != rowsModel)
+        return;
+      if (isJunitPrint())
+        System.err.printf("RowNumberSpinner: %s\n", ev.toString());
+      else
+        logger.log(DEBUG, () -> sf("Change spinner rowSet/model %s", ev.toString()));
       internalChangeSpinnerModel();
     }
   }
@@ -134,18 +137,21 @@ public class RowNumberSpinner extends JSpinner {
    */
   @Override
   public void setModel(SpinnerModel model) {
-    if (!actionSetModel) throw new IllegalCallerException("Can not change the model");
+    if (!actionSetModel)
+      throw new IllegalCallerException("Can not change the model");
     super.setModel(model);
   }
 
   /** Use this to track enabled. */
   private final PropertyChangeListener pclEnableDisableAction = (evt) -> {
-    if ("enabled".equals(evt.getPropertyName())) setEnabled((boolean) evt.getNewValue());
+    if ("enabled".equals(evt.getPropertyName()))
+      setEnabled((boolean) evt.getNewValue());
   };
 
   /** forward spinner events to goto row action */
   private final ChangeListener changeListener = (evt) -> {
-    if (rowsModel.getRowSet() == null) return;
+    if (rowsModel.getRowSet() == null)
+      return;
     // This has problems with Example 4, nav combo not updating fields.
     // rowsModel.getAction(RowsAction.ACT_GOTOROW)
     // 		.actionPerformed(new ActionEvent(RowNumberSpinner.this,
@@ -162,10 +168,14 @@ public class RowNumberSpinner extends JSpinner {
     // an exception is thrown.
     actionSetModel = true;
     try {
-      if (rowsModel.getRowSet() == null) setModel(new SpinnerNumberModel());
-      else setModel(rowsModel.getRowNumberModel());
+      if (rowsModel.getRowSet() == null)
+        setModel(new SpinnerNumberModel());
+      else
+        setModel(rowsModel.getRowNumberModel());
       fireStateChanged(); // Treat a model change as a state change
-    } finally { actionSetModel = false; }
+    } finally {
+      actionSetModel = false;
+    }
   }
 
   /**

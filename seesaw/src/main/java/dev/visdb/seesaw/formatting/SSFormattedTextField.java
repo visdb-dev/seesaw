@@ -143,7 +143,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
       // Suppress "value" property change event if a call is made to setValue()
       verifyingText = true;
       try {
-        if (formattedText.isBlank()) logger.log(DEBUG, "formattedText is blank");
+        if (formattedText.isBlank())
+          logger.log(DEBUG, "formattedText is blank");
         try {
           // Convert the text looking for ParseError. Not like commitEdit().
           value = formatter.stringToValue(formattedText);
@@ -158,11 +159,14 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
         }
 
         // Perform component and custom validation.
-        if (ok) ok = allValidate().all();
+        if (ok)
+          ok = allValidate().all();
         // If ok with null, make sure to use the null formatter. Needed?
-        if (ok && value == null) ftf.setValue(null); // Note: "verifyingText" skips pce.
+        if (ok && value == null)
+          ftf.setValue(null); // Note: "verifyingText" skips pce.
         // Update text decoration, e.g. red for negative.
-        if (ok) decorateText();
+        if (ok)
+          decorateText();
       } catch (final Exception e) {
         // TODO: Not right. What runtime exceptions should be looked for?
         logger.log(Level.ERROR, () -> getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
@@ -186,7 +190,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
      */
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
-      if (pce.getPropertyName().equals("value")) handleValuePropertyChange(pce);
+      if (pce.getPropertyName().equals("value"))
+        handleValuePropertyChange(pce);
     }
   }
 
@@ -203,7 +208,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
     //		 then "value" property fires even when both are null.
 
     // Ignore event if triggered by FormattedTextFieldVerifier.
-    if (verifyingText) return;
+    if (verifyingText)
+      return;
 
     // TODO: listener's bombarded when getting focus and null involved.
     //		 Use a document listener for doing "checkRowOK()";
@@ -242,9 +248,12 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
       try {
         dbChange(() -> setColumnObject(currentValue));
         someError = false;
-      } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
+      } catch (SQLException ex) {
+        logger.log(Level.ERROR, (String) null, ex);
+      }
     }
-    if (someError) postColumnChangeStartError(ftf, currentValue);
+    if (someError)
+      postColumnChangeStartError(ftf, currentValue);
   }
 
   /**
@@ -295,11 +304,14 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
    *
    * @param format Format used to look up an AbstractFormatter
    */
-  public SSFormattedTextField(SSFormat format) { this(lookupAbstractFormatter(format)); }
+  public SSFormattedTextField(SSFormat format) {
+    this(lookupAbstractFormatter(format));
+  }
   private static AbstractFormatter lookupAbstractFormatter(@SuppressWarnings("unused")
                                                            SSFormat format) {
     // For this to work need a way to register/lookup AbstractFormatter
-    if (Boolean.TRUE) throw new IllegalCallerException("Not implemented");
+    if (Boolean.TRUE)
+      throw new IllegalCallerException("Not implemented");
     return null;
   }
 
@@ -342,7 +354,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
         }
 
         private void modified() {
-          if (ftf == null) return;
+          if (ftf == null)
+            return;
           Utils.postColumnChangeStart(ftf, ftf.getText());
         }
       };
@@ -355,7 +368,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
   @Override
   public void setFormatterFactory(AbstractFormatterFactory factory) {
     super.setFormatterFactory(factory);
-    if (getFormatterFactory() instanceof FormatterFactory ff) { setSSFormat(ff.getSSFormat()); }
+    if (getFormatterFactory() instanceof FormatterFactory ff) {
+      setSSFormat(ff.getSSFormat());
+    }
     adjustFont();
   }
 
@@ -546,7 +561,8 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
   static class NegativeNumberTextDecorator extends BaseTextDecorator {
     @Override
     public void decorateText() {
-      if (!(getSSComponent() instanceof SSFormattedTextField ftf)) return;
+      if (!(getSSComponent() instanceof SSFormattedTextField ftf))
+        return;
 
       // TODO: if SSFormattedTextField not focus locked,
       //       something special needed?
@@ -637,7 +653,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSCompo
     checkNeedsNullFormatter();
   }
 
-  private void checkNeedsNullFormatter() { FormatterAssist.adjustNullFormatter(this); }
+  private void checkNeedsNullFormatter() {
+    FormatterAssist.adjustNullFormatter(this);
+  }
 
   /** {@inheritDoc} */
   @Override

@@ -109,7 +109,8 @@ public class DemoUtil {
     frame.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosed(WindowEvent e) {
-        if (runOnClose != null) runOnClose.run();
+        if (runOnClose != null)
+          runOnClose.run();
       }
     });
   }
@@ -154,18 +155,24 @@ public class DemoUtil {
    * is created by {@linkplain #getNewRowSet(java.sql.Connection) }.
    * @return default type of RowSet
    */
-  public static RowSetSource getWhichRowSetDefault() { return whichRowSetDefault; }
+  public static RowSetSource getWhichRowSetDefault() {
+    return whichRowSetDefault;
+  }
 
   /**
    * Establish the default for how a RowSet is created.
    * @param _whichRowSetDefault default
    */
   public static void setWhichRowSetDefault(RowSetSource _whichRowSetDefault) {
-    if (_whichRowSetDefault != null) { whichRowSetDefault = _whichRowSetDefault; }
+    if (_whichRowSetDefault != null) {
+      whichRowSetDefault = _whichRowSetDefault;
+    }
   }
 
   private static void rowSetSourceInit(RowSetSource whichRowSet) throws SQLException {
-    if (whichRowSet == RowSetSource.NQADMIN || rsFactory != null) { return; }
+    if (whichRowSet == RowSetSource.NQADMIN || rsFactory != null) {
+      return;
+    }
 
     String factory = TrivialCtxFactory.class.getName();
     logger.log(INFO, () -> "Initializing naming factory: " + factory);
@@ -175,7 +182,9 @@ public class DemoUtil {
       // Create and bind the Pool
       ctx.bind(DataSourcePool.DATA_SOURCE_NAME, DataSourcePool.getDataSource());
       initialContext = ctx;
-    } catch (NamingException ex) { throw new RuntimeException(ex); }
+    } catch (NamingException ex) {
+      throw new RuntimeException(ex);
+    }
 
     rsFactory = RowSetProvider.newFactory();
 
@@ -208,9 +217,13 @@ public class DemoUtil {
       throws SQLException {
     rowSetSourceInit(whichRowSet);
 
-    if (whichRowSet != RowSetSource.POOL_CACHED) { Objects.requireNonNull(connection); }
+    if (whichRowSet != RowSetSource.POOL_CACHED) {
+      Objects.requireNonNull(connection);
+    }
 
-    if (connection != null) { connMap.putIfAbsent(connection, null); }
+    if (connection != null) {
+      connMap.putIfAbsent(connection, null);
+    }
 
     RowSet rs;
     switch (whichRowSet) {
@@ -259,7 +272,9 @@ public class DemoUtil {
       logger.log(INFO, () -> "Creating new DataSourceShareConnection: " + finalDsName);
       try {
         initialContext.bind(dsName, DataSourceShareConnection.getDataSource(conn));
-      } catch (NamingException ex) { throw new RuntimeException(ex); }
+      } catch (NamingException ex) {
+        throw new RuntimeException(ex);
+      }
       return dsName;
     });
   }
@@ -282,11 +297,15 @@ public class DemoUtil {
       rs1.close();
       rs2.close();
       rs3.close();
-    } catch (SQLException | NamingException ex) { ex.printStackTrace(); }
+    } catch (SQLException | NamingException ex) {
+      ex.printStackTrace();
+    }
   }
 
   private static boolean isUtilLogging;
-  static boolean isUtilLogging() { return isUtilLogging; }
+  static boolean isUtilLogging() {
+    return isUtilLogging;
+  }
   /** This does nothing if java.util.logging is not used */
   private static final java.util.logging.Logger swingsetLogger
       = java.util.logging.Logger.getLogger("com.nqadmin.swingset");
@@ -298,12 +317,15 @@ public class DemoUtil {
     Class<?> jpl = null;
     try {
       jpl = Class.forName("org.apache.logging.log4j.jpl.Log4jSystemLogger");
-    } catch (ClassNotFoundException ex) {}
-    if (jpl != null) return;
+    } catch (ClassNotFoundException ex) {
+    }
+    if (jpl != null)
+      return;
 
     // TODO: take the following values from a config file
     try (InputStream is = MainClass.class.getResourceAsStream("/util.logging.properties");) {
-      if (is == null) return;
+      if (is == null)
+        return;
       is.mark(0x20000); // 2*64K
       Properties props = new Properties();
       try {
@@ -335,10 +357,14 @@ public class DemoUtil {
       // Give the action the hook to display
       LogManAction.setModel(logTree);
       isUtilLogging = true;
-    } catch (IOException ex) { Exceptions.printStackTrace(ex); }
+    } catch (IOException ex) {
+      Exceptions.printStackTrace(ex);
+    }
   }
 
-  static Action getLogManAction() { return LogManAction.get("Display and configure logging tree"); }
+  static Action getLogManAction() {
+    return LogManAction.get("Display and configure logging tree");
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   //
@@ -390,17 +416,21 @@ public class DemoUtil {
     private static SwingLogTree logTree;
 
     static void setModel(SwingLogTree logTree) {
-      if (LogManAction.logTree != null) throw new IllegalStateException("logTree already set");
+      if (LogManAction.logTree != null)
+        throw new IllegalStateException("logTree already set");
       LogManAction.logTree = logTree;
       INSTANCE = null;
     }
 
     static LogManAction get(String name) {
-      if (LogManAction.logTree == null) throw new IllegalStateException("logTree not set");
+      if (LogManAction.logTree == null)
+        throw new IllegalStateException("logTree not set");
       return new LogManAction(name);
     }
 
-    private LogManAction(String name) { super(name); }
+    private LogManAction(String name) {
+      super(name);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -420,8 +450,11 @@ public class DemoUtil {
         // doesn't seem to operate during shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
           SwingLogTree lt = null;
-          if (refLogTree != null) lt = refLogTree.get();
-          if (INSTANCE != null && lt != null) { exitCleanup(); }
+          if (refLogTree != null)
+            lt = refLogTree.get();
+          if (INSTANCE != null && lt != null) {
+            exitCleanup();
+          }
         }));
         INSTANCE = dialog;
         Screens.translateToPrefScreen(dialog);
@@ -457,13 +490,17 @@ public class DemoUtil {
 
     private final String url;
 
-    private DemoDriver(String url) { this.url = url; }
+    private DemoDriver(String url) {
+      this.url = url;
+    }
 
     /**
      * x
      * @return
      */
-    public String url() { return url; }
+    public String url() {
+      return url;
+    }
   }
 
   /**
@@ -476,7 +513,8 @@ public class DemoUtil {
     Object driver = null;
     try {
       driver = DriverManager.getDriver(url);
-    } catch (SQLException ex) {}
+    } catch (SQLException ex) {
+    }
     return driver != null;
   }
 
@@ -493,7 +531,9 @@ public class DemoUtil {
     Connection conn = null;
     try {
       conn = DriverManager.getConnection(url, props);
-    } catch (SQLException ex) { logger.log(ERROR, () -> "SQL Exception. " + ex.getMessage()); }
+    } catch (SQLException ex) {
+      logger.log(ERROR, () -> "SQL Exception. " + ex.getMessage());
+    }
     return conn;
   }
 
@@ -533,7 +573,9 @@ public class DemoUtil {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static boolean runSqlStatements(Connection _conn, String _resource, boolean _verbose) {
     boolean ok;
-    if (_verbose) { System.err.println("===== Executing sql script: " + _resource); }
+    if (_verbose) {
+      System.err.println("===== Executing sql script: " + _resource);
+    }
     try (InputStream stream = MainClass.class.getResourceAsStream(_resource)) {
       if (stream == null) {
         System.err.println("Script '" + _resource + "' not found. Exiting.");
@@ -542,7 +584,9 @@ public class DemoUtil {
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         ok = DemoUtil.runSqlStatements(_conn, br, _verbose);
       }
-    } catch (IOException ex) { ok = false; }
+    } catch (IOException ex) {
+      ok = false;
+    }
     return ok;
   }
 
@@ -563,15 +607,21 @@ public class DemoUtil {
       // Parse the sql
       List<String> queries = extractStatements(_br);
 
-      for (String sql : queries) { runS(statement, sql, _verbose); }
+      for (String sql : queries) {
+        runS(statement, sql, _verbose);
+      }
       ok = true;
-    } catch (SQLException ex) { logger.log(ERROR, "SQL Exception.", ex); }
+    } catch (SQLException ex) {
+      logger.log(ERROR, "SQL Exception.", ex);
+    }
     return ok;
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private static void runS(Statement statement, String sql, boolean verbose) throws SQLException {
-    if (verbose) { System.err.println("===== Executing sql statement:\n" + sql); }
+    if (verbose) {
+      System.err.println("===== Executing sql statement:\n" + sql);
+    }
     statement.execute(sql);
   }
 
@@ -603,7 +653,9 @@ public class DemoUtil {
       //read the file line by line
       while ((line = lr.getNext()) != null) {
         // first stip out comments surrounded by /* */
-        if (line.contains("/*")) { line = removeSlashStarComments(line, lr); }
+        if (line.contains("/*")) {
+          line = removeSlashStarComments(line, lr);
+        }
 
         // ignore comments beginning with #
         if ((indexOfCommentSign = line.indexOf('#')) != -1) {
@@ -626,7 +678,9 @@ public class DemoUtil {
       }
 
       // make one big string, preserve new lines
-      for (String l : listOfLines) { sBuffer.append(l).append('\n'); }
+      for (String l : listOfLines) {
+        sBuffer.append(l).append('\n');
+      }
 
       // Use ";" as a delimiter for each statement.
       String[] splitQueries = sBuffer.toString().split(";");
@@ -634,11 +688,14 @@ public class DemoUtil {
       // filter out empty statements
       for (String query : splitQueries) {
         query = query.trim();
-        if (!query.isEmpty() && !query.equals("\t")) listOfQueries.add(query);
+        if (!query.isEmpty() && !query.equals("\t"))
+          listOfQueries.add(query);
       }
     } catch (Exception e) {
-      if (lr == null) logger.log(ERROR, "initialization error");
-      else logger.log(ERROR, "*** Line " + lr.getLineNumber(), e);
+      if (lr == null)
+        logger.log(ERROR, "initialization error");
+      else
+        logger.log(ERROR, "*** Line " + lr.getLineNumber(), e);
     }
     return listOfQueries;
   }
@@ -647,7 +704,9 @@ public class DemoUtil {
     private final BufferedReader br;
     private int lino;
 
-    private LineReader(BufferedReader _br) { br = _br; }
+    private LineReader(BufferedReader _br) {
+      br = _br;
+    }
 
     String getNext() throws IOException {
       String s = br.readLine();
@@ -655,7 +714,9 @@ public class DemoUtil {
       return s;
     }
 
-    int getLineNumber() { return lino; }
+    int getLineNumber() {
+      return lino;
+    }
   }
 
   private static String removeSlashStarComments(String firstLine, LineReader lr)
@@ -667,10 +728,12 @@ public class DemoUtil {
     while (true) {
       String t = removeSlashStarCommentsOnLine(line, inCom, endComment);
       sb.append(t);
-      if (endComment[0]) break;
+      if (endComment[0])
+        break;
       inCom = true;
       line = lr.getNext();
-      if (line == null) break;
+      if (line == null)
+        break;
     }
     line = sb.toString();
     return line;
@@ -740,7 +803,8 @@ public class DemoUtil {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static boolean loadBinaries(Connection conn, String resourceName, String sql,
                                      boolean verbose) {
-    if (defLookup(MainClass.LoadDemoImages.class) == null) return false;
+    if (defLookup(MainClass.LoadDemoImages.class) == null)
+      return false;
     boolean ok = false;
 
     try (InputStream stream = MainClass.class.getResourceAsStream(resourceName)) {
@@ -753,7 +817,9 @@ public class DemoUtil {
       try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
         for (String l : lines) {
           String[] w = l.split("\\s+");
-          if (verbose) { System.err.println("===== Loading image: '" + w[0] + "'"); }
+          if (verbose) {
+            System.err.println("===== Loading image: '" + w[0] + "'");
+          }
           try (InputStream img = MainClass.class.getResourceAsStream(w[0])) {
             pstmt.setBinaryStream(1, img);
             pstmt.setObject(2, w[1]);
@@ -761,8 +827,12 @@ public class DemoUtil {
           }
         }
         ok = true;
-      } catch (SQLException ex) { logger.log(ERROR, "SQL exception", ex); }
-    } catch (IOException ex) { ok = false; }
+      } catch (SQLException ex) {
+        logger.log(ERROR, "SQL exception", ex);
+      }
+    } catch (IOException ex) {
+      ok = false;
+    }
 
     return ok;
   }

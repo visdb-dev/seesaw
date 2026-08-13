@@ -100,7 +100,8 @@ public class RowSetOps {
    */
   public static void insertRow(ResultSet resultSet) throws SQLException {
     resultSet.insertRow();
-    if (!(resultSet instanceof CachedRowSet crs)) return;
+    if (!(resultSet instanceof CachedRowSet crs))
+      return;
 
     logger.log(DEBUG, "using CachedRowSet");
     resultSet.moveToCurrentRow();
@@ -125,7 +126,8 @@ public class RowSetOps {
 
     static void doit(ResultSet rs, int targetRow, boolean mayThrow) throws SQLException {
       ResetRowPosition rrp = new ResetRowPosition(rs, targetRow);
-      if (mayThrow && rrp.ex != null) throw rrp.ex;
+      if (mayThrow && rrp.ex != null)
+        throw rrp.ex;
     }
 
     ResetRowPosition(ResultSet rs, int targetRow) {
@@ -147,7 +149,8 @@ public class RowSetOps {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void updateRow(ResultSet resultSet) throws SQLException {
     resultSet.updateRow();
-    if (!(resultSet instanceof CachedRowSet crs)) return;
+    if (!(resultSet instanceof CachedRowSet crs))
+      return;
 
     final int maxTry = 2;
     List<ConflictRow> conflictRows = null;
@@ -218,15 +221,18 @@ public class RowSetOps {
         //
 
         ResetRowPosition rrp = new ResetRowPosition(resultSet, currentRow);
-        if (persistDB) throw new SQLException("These value not persisted");
-        if (rrp.ex != null) throw rrp.ex;
+        if (persistDB)
+          throw new SQLException("These value not persisted");
+        if (rrp.ex != null)
+          throw rrp.ex;
         break;
       }
       // if AfterChanges...:w
       // if AfterChanges...:w
     }
 
-    if (tryCount > maxTry && srEx != null) throw srEx;
+    if (tryCount > maxTry && srEx != null)
+      throw srEx;
   }
 
   /**
@@ -237,7 +243,8 @@ public class RowSetOps {
    */
   public static void deleteRow(ResultSet resultSet) throws SQLException {
     resultSet.deleteRow();
-    if (!(resultSet instanceof CachedRowSet crs)) return;
+    if (!(resultSet instanceof CachedRowSet crs))
+      return;
 
     logger.log(DEBUG, "using CachedRowSet");
     try {
@@ -269,8 +276,7 @@ public class RowSetOps {
    *
    * @throws SQLException - if a database access error occurs
    */
-  public static int getColumnIndex(ResultSet resultSet, String columnName)
-      throws SQLException {
+  public static int getColumnIndex(ResultSet resultSet, String columnName) throws SQLException {
     return resultSet.findColumn(columnName);
   }
 
@@ -284,8 +290,7 @@ public class RowSetOps {
    *
    * @throws SQLException - if a database access error occurs
    */
-  public static String getColumnName(ResultSet resultSet, int columnIndex)
-      throws SQLException {
+  public static String getColumnName(ResultSet resultSet, int columnIndex) throws SQLException {
     return resultSet.getMetaData().getColumnName(columnIndex);
   }
 
@@ -337,8 +342,7 @@ public class RowSetOps {
    *
    * @throws SQLException - if a database access error occurs
    */
-  public static int getColumnType(ResultSet resultSet, int columnIndex)
-      throws SQLException {
+  public static int getColumnType(ResultSet resultSet, int columnIndex) throws SQLException {
     return resultSet.getMetaData().getColumnType(columnIndex);
   }
 
@@ -469,7 +473,7 @@ public class RowSetOps {
       JDBCType.LONGNVARCHAR
   );
   // clang-format on
-  
+
   /**
    * Fetch the current raw value from the database, the undo/redo stack is
    * not referenced; use columnReader if available.
@@ -509,14 +513,18 @@ public class RowSetOps {
     String value = null;
     try {
       // IF THE COLUMN IS NULL SO RETURN NULL
-      if (getColumnCount(rowSet) == 0) { return null; }
+      if (getColumnCount(rowSet) == 0) {
+        return null;
+      }
 
       Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
                                ? UndoRedo.fetchCurrentChange(comp).value()
                                : comp.getRowSet().getObject(comp.getColumnIndex());
-      if (objectValue == null) return null;
+      if (objectValue == null)
+        return null;
 
-      if (objectValue instanceof String s) return s;
+      if (objectValue instanceof String s)
+        return s;
 
       final JDBCType jdbcType = getJDBCType(getColumnType(rowSet, columnName));
 
@@ -581,13 +589,15 @@ public class RowSetOps {
    */
   public static <T> T getColumnObject(RSC comp, Class<T> type) throws SQLException {
     // If there are no columns, return null.
-    if (getColumnCount(comp.getRowSet()) == 0) return null;
+    if (getColumnCount(comp.getRowSet()) == 0)
+      return null;
 
     if (Boolean.TRUE) {
       //return getColumnObject1(comp, type); // undo/redo,convert
       Object objectValue = getColumnObject(comp);
       return convertToType(objectValue, type);
-    } else return RowSetOps_NOT_USED.getColumnObject2(comp, type); // getObject direct
+    } else
+      return RowSetOps_NOT_USED.getColumnObject2(comp, type); // getObject direct
   }
 
   // /**
@@ -615,7 +625,8 @@ public class RowSetOps {
    */
   public static Array getColumnArray(SSComponent comp) {
     try {
-      if (getColumnCount(comp.getRowSet()) == 0) return null;
+      if (getColumnCount(comp.getRowSet()) == 0)
+        return null;
       return (UndoRedo.isUndoRedoEnabled(comp) ? (Array) UndoRedo.fetchCurrentChange(comp).value()
                                                : comp.getRowSet().getArray(comp.getColumnIndex()));
     } catch (SQLException ex) {
@@ -659,14 +670,17 @@ public class RowSetOps {
      * Argument is number of conflicts to create.
      * @param n
      */
-    public ForceConflict(int n) { nForce = new AtomicInteger(n); }
+    public ForceConflict(int n) {
+      nForce = new AtomicInteger(n);
+    }
 
     /**
      * Argument is number of conflicts to add.
      * @param n
      */
     public void force(int n) {
-      if (n < 0) throw new IllegalArgumentException();
+      if (n < 0)
+        throw new IllegalArgumentException();
       nForce.getAndAdd(n);
     }
     /**
@@ -691,18 +705,19 @@ public class RowSetOps {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void checkForceConflict(SSComponent comp, String updatedValue) throws SQLException {
     // Only do this for strings.
-    if (jdbcTypeToClass(comp.getColumnJDBCType()) != String.class) return;
+    if (jdbcTypeToClass(comp.getColumnJDBCType()) != String.class)
+      return;
 
     ForceConflict fc = defLookup(ForceConflict.class);
-    if (fc == null || !fc.doForce()) return;
+    if (fc == null || !fc.doForce())
+      return;
 
     // Get a resultSet that is probably the same as the RowSet associated
     // with the param comp.
     Connection conn = SSUtils.dbSupport().getSharedConnection();
     try (Statement statement
          = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-      ResultSet rs = statement.executeQuery(comp.getRowSet().getCommand());
-    ) {
+         ResultSet rs = statement.executeQuery(comp.getRowSet().getCommand());) {
       //ResultSet rs = statement.getResultSet();
       rs.absolute(comp.getRowSet().getRow());
       System.err.printf("FORCE_CONFLICT: %s\n", rs.getObject(comp.getColumnIndex()));
@@ -772,7 +787,8 @@ public class RowSetOps {
       throws SSSQLNullException, SQLException, NumberFormatException {
     int row = logger.isLoggable(DEBUG) ? rowSet.getRow() : -1;
     logger.log(DEBUG,
-               () -> sf("[%s] row %d. Update to: %s. Allow null? [%s]", comp.getColumnForLog(),
+               ()
+                   -> sf("[%s] row %d. Update to: %s. Allow null? [%s]", comp.getColumnForLog(),
                          row, updatedValue, allowNull));
 
     JDBCType jdbcType = getJDBCType(getColumnType(rowSet, columnIndex));
@@ -839,7 +855,7 @@ public class RowSetOps {
      * SECOND - update non-null values based on string conversions
      */
     switch (jdbcType) {
-      // clang-format off
+        // clang-format off
       case INTEGER, SMALLINT, TINYINT, BIGINT,
           REAL, DOUBLE, FLOAT, DECIMAL, NUMERIC,
           BOOLEAN, BIT,
@@ -882,8 +898,9 @@ public class RowSetOps {
     final int columnIndex = comp.getColumnIndex();
     boolean allowNull = comp.getAllowNull();
     logger.log(DEBUG,
-               () -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? ["
-                   + allowNull + "]");
+               ()
+                   -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? ["
+                          + allowNull + "]");
 
     Object dbValue;
     // On insert row, write null and do not perform other checks.
@@ -891,7 +908,8 @@ public class RowSetOps {
       if (RowSetState.isInserting(rowSet) || allowNull) {
         rowSet.updateNull(columnIndex);
         return UPDATE_NULL;
-      } else throw new SSSQLNullException("NULL not allowed for this field.");
+      } else
+        throw new SSSQLNullException("NULL not allowed for this field.");
     }
 
     //_rowSet.updateObject(_columnIndex, _updatedValue);
@@ -965,7 +983,8 @@ public class RowSetOps {
       if (allowNull) {
         rowSet.updateNull(columnName);
         return UPDATE_NULL;
-      } else throw new SSSQLNullException("NULL not allowed for this field.");
+      } else
+        throw new SSSQLNullException("NULL not allowed for this field.");
     }
 
     rowSet.updateArray(columnName, dbValue);
@@ -1002,8 +1021,10 @@ public class RowSetOps {
    * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
    */
   public static Object getColumnObjectDirect(RSC comp) throws SQLException {
-    if (Boolean.TRUE) return comp.getRowSet().getObject(comp.getColumnIndex());
-    else return RowSetOps_NOT_USED.getColumnObject2(comp);
+    if (Boolean.TRUE)
+      return comp.getRowSet().getObject(comp.getColumnIndex());
+    else
+      return RowSetOps_NOT_USED.getColumnObject2(comp);
   }
 
   // 2024/01/08
@@ -1025,8 +1046,10 @@ public class RowSetOps {
    */
   private static void updateColumnObjectDirect(RowSet rowSet, int columnIndex, Object value,
                                                JDBCType type) throws SQLException {
-    if (Boolean.TRUE) rowSet.updateObject(columnIndex, value);
-    else RowSetOps_NOT_USED.updateColumnObject2(rowSet, columnIndex, value, type);
+    if (Boolean.TRUE)
+      rowSet.updateObject(columnIndex, value);
+    else
+      RowSetOps_NOT_USED.updateColumnObject2(rowSet, columnIndex, value, type);
   }
 
   /**
@@ -1045,7 +1068,8 @@ public class RowSetOps {
    */
   public static void updateColumnObjectDirect(RowSet rowSet, int columnIndex, Object value)
       throws SQLException {
-    if (Boolean.TRUE) rowSet.updateObject(columnIndex, value);
+    if (Boolean.TRUE)
+      rowSet.updateObject(columnIndex, value);
     else
       RowSetOps_NOT_USED.updateColumnObject2(rowSet, columnIndex, value,
                                              getJDBCColumnType(rowSet, columnIndex));

@@ -161,7 +161,7 @@ public class SSTableModel extends AbstractTableModel {
    * setRowSet() method has to be used to set the RowSet before constructing
    * the JTable.
    */
-  public SSTableModel() { }
+  public SSTableModel() {}
 
   /**
    * Constructs a SSTableModel object with the given RowSet. This will call the
@@ -187,14 +187,20 @@ public class SSTableModel extends AbstractTableModel {
    * @return returns true on succesful deletion else false.
    */
   public boolean deleteRow(int row) {
-    if (dataGridHandler != null) { dataGridHandler.performPreDeletionOps(row); }
+    if (dataGridHandler != null) {
+      dataGridHandler.performPreDeletionOps(row);
+    }
     if (row < rowCount) {
       try {
-        if ((dataGridHandler != null) && !dataGridHandler.allowDeletion(row)) { return false; }
+        if ((dataGridHandler != null) && !dataGridHandler.allowDeletion(row)) {
+          return false;
+        }
         rowset.absolute(row + 1);
         RowSetOps.deleteRow(rowset);
         rowCount--;
-        if (dataGridHandler != null) { dataGridHandler.performPostDeletionOps(row); }
+        if (dataGridHandler != null) {
+          dataGridHandler.performPostDeletionOps(row);
+        }
         fireTableRowsDeleted(row, row);
         return true;
       } catch (final SQLException se) {
@@ -218,7 +224,7 @@ public class SSTableModel extends AbstractTableModel {
   @Override
   public Class<?> getColumnClass(int column) {
     try {
-      return RowSetOps.getClassColumnType(rowset, column+1);
+      return RowSetOps.getClassColumnType(rowset, column + 1);
     } catch (final SQLException se) {
       logger.log(DEBUG, "SQL Exception.", se);
       return super.getColumnClass(column);
@@ -268,7 +274,9 @@ public class SSTableModel extends AbstractTableModel {
    */
   public Object getDefaultValue(int columnNumber) {
     Object value = null;
-    if (defaultValuesMap != null) { value = defaultValuesMap.get(columnNumber); }
+    if (defaultValuesMap != null) {
+      value = defaultValuesMap.get(columnNumber);
+    }
     return value;
   }
 
@@ -282,7 +290,9 @@ public class SSTableModel extends AbstractTableModel {
   public int getRowCount() {
     // RETURN THE NUMBER OF ROWS AS ONE GREATER THAN THOSE IN DATABASE
     // ITS USED FOR INSERTING NEW ROWS
-    if (allowInsertion) { return rowCount + 1; }
+    if (allowInsertion) {
+      return rowCount + 1;
+    }
     // IF INSERTION IS NOT ALLOWED THEN RETURN THE ACTUAL ROW COUNT
     return rowCount;
   }
@@ -309,7 +319,9 @@ public class SSTableModel extends AbstractTableModel {
       rowset.absolute(row + 1);
 
       // IF IT IS NULL RETURN NULL
-      if (rowset.getObject(column + 1) == null) { return null; }
+      if (rowset.getObject(column + 1) == null) {
+        return null;
+      }
 
       // Column numbers in ssrowset start from 1 where as column numbering
       // for jtable start from 0.
@@ -373,7 +385,9 @@ public class SSTableModel extends AbstractTableModel {
         // *** End addition
       }
 
-    } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception.", se);
+    }
   }
 
   /**
@@ -385,8 +399,12 @@ public class SSTableModel extends AbstractTableModel {
    * @param column the column number for which the value is entered.
    */
   protected void insertRow(Object value, int column) {
-    if (value == null) { return; }
-    if (dataGridHandler != null) { dataGridHandler.performPreInsertOps(rowCount); }
+    if (value == null) {
+      return;
+    }
+    if (dataGridHandler != null) {
+      dataGridHandler.performPreInsertOps(rowCount);
+    }
 
     try {
       // IF NOT ON INSERT ROW MOVE TO INSERT ROW.
@@ -396,7 +414,9 @@ public class SSTableModel extends AbstractTableModel {
         setDefaults();
         inInsertRow = true;
         // IS SSDATAVALUE IS PROVIDED SET PRIMARY KEY VALUE
-        if (dataValue != null) { setPrimaryColumn(); }
+        if (dataValue != null) {
+          setPrimaryColumn();
+        }
       }
 
       updateColumnObjectDirect(rowset, column + 1, value);
@@ -412,14 +432,18 @@ public class SSTableModel extends AbstractTableModel {
       Supplier<String> text = () -> {
         try {
           return String.valueOf(rowset.getRow());
-        } catch (SQLException e) { return "*** getRow() threw an SQLException ***"; }
+        } catch (SQLException e) {
+          return "*** getRow() threw an SQLException ***";
+        }
       };
       logger.log(DEBUG, () -> sf("Row number of inserted row : %s", text.get()));
 
       inInsertRow = false;
       rowCount++;
 
-      if (dataGridHandler != null) { dataGridHandler.performPostInsertOps(rowCount - 1); }
+      if (dataGridHandler != null) {
+        dataGridHandler.performPostInsertOps(rowCount - 1);
+      }
       // If allowInsertion then add another empty insert row.
       int newRow = allowInsertion ? rowCount : rowCount - 1;
       fireTableRowsInserted(newRow, newRow);
@@ -433,7 +457,6 @@ public class SSTableModel extends AbstractTableModel {
     }
 
     logger.log(DEBUG, "Successfully added row.");
-
   }
 
   /**
@@ -449,21 +472,26 @@ public class SSTableModel extends AbstractTableModel {
   public boolean isCellEditable(int row, int column) {
     if (uneditableColumns != null) {
       for (int i = 0; i < uneditableColumns.length; i++) {
-        if (column == uneditableColumns[i]) { return false; }
+        if (column == uneditableColumns[i]) {
+          return false;
+        }
       }
     }
 
-    if (cellEditing != null) { return cellEditing.isCellEditable(row, column); }
+    if (cellEditing != null) {
+      return cellEditing.isCellEditable(row, column);
+    }
 
     return true;
-
   }
 
   /**
    * This function sets the default values for the present row.
    */
   protected void setDefaults() {
-    if (defaultValuesMap == null) { return; }
+    if (defaultValuesMap == null) {
+      return;
+    }
 
     final Set<Integer> keySet = defaultValuesMap.keySet();
     final Iterator<?> iterator = keySet.iterator();
@@ -497,7 +525,9 @@ public class SSTableModel extends AbstractTableModel {
    *                       argument
    */
   public void setDefaultValues(int[] columnNumbers, Object[] values) {
-    if ((columnNumbers == null) || (values == null)) { defaultValuesMap = null; }
+    if ((columnNumbers == null) || (values == null)) {
+      defaultValuesMap = null;
+    }
 
     if (defaultValuesMap == null) {
       defaultValuesMap = new HashMap<>();
@@ -534,8 +564,10 @@ public class SSTableModel extends AbstractTableModel {
     allowInsertion = insert;
     // rowCount is the JTABLE index of the row after the database rows
     if (change) {
-      if (insert) fireTableRowsInserted(rowCount, rowCount);
-      else fireTableRowsDeleted(rowCount, rowCount);
+      if (insert)
+        fireTableRowsInserted(rowCount, rowCount);
+      else
+        fireTableRowsDeleted(rowCount, rowCount);
     }
   }
 
@@ -545,7 +577,9 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param component the component that should be used for message dialogs.
    */
-  public void setMessageWindow(Component component) { this.component = component; }
+  public void setMessageWindow(Component component) {
+    this.component = component;
+  }
 
   /**
    * Updates the primary key column based on the SSDataValue implementation
@@ -572,7 +606,9 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param columnNumber the column which is the primary column.
    */
-  public void setPrimaryColumn(int columnNumber) { primaryColumn = columnNumber; }
+  public void setPrimaryColumn(int columnNumber) {
+    primaryColumn = columnNumber;
+  }
 
   /**
    * Sets the RowSet for SSTableModel to the given RowSet. This RowSet will
@@ -594,7 +630,9 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param cellEditing implementation of SSCellEditing interface.
    */
-  public void setSSCellEditing(SSCellEditing cellEditing) { this.cellEditing = cellEditing; }
+  public void setSSCellEditing(SSCellEditing cellEditing) {
+    this.cellEditing = cellEditing;
+  }
 
   /**
    * Used to set an implementation of SSDataGridHandler interface which can be
@@ -613,7 +651,9 @@ public class SSTableModel extends AbstractTableModel {
    *
    * @param dataValue implementation of SSDataValue for determining PK
    */
-  public void setSSDataValue(SSDataValue dataValue) { this.dataValue = dataValue; }
+  public void setSSDataValue(SSDataValue dataValue) {
+    this.dataValue = dataValue;
+  }
 
   /**
    * Sets the uneditable columns. The columns specified as uneditable will not be
@@ -675,7 +715,9 @@ public class SSTableModel extends AbstractTableModel {
 
       // IF THE USER DOES NOT PERMIT THE UPDATE RETURN ELSE GO AHEAD AND UPDATE THE
       // DATABASE.
-      if (!allowEdit) { return; }
+      if (!allowEdit) {
+        return;
+      }
     }
 
     // IF CHANGE IS MADE IN INSERT ROW ADD ROW TO THE DATABASE
@@ -690,7 +732,9 @@ public class SSTableModel extends AbstractTableModel {
 
     try {
       // YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
-      if (rowset.getRow() != (row + 1)) { rowset.absolute(row + 1); }
+      if (rowset.getRow() != (row + 1)) {
+        rowset.absolute(row + 1);
+      }
       if (valueCopy == null) {
         rowset.updateNull(column + 1);
         return;
@@ -707,6 +751,5 @@ public class SSTableModel extends AbstractTableModel {
         JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
       }
     }
-
   }
 }

@@ -85,7 +85,9 @@ public abstract class DbOpsImpl implements DbOps {
    *
    * @param container	GUI Container to scan for Swing components to clear/reset
    */
-  public DbOpsImpl(Container container) { this.container = container; }
+  public DbOpsImpl(Container container) {
+    this.container = container;
+  }
 
   /**
    * Performs pre-insertion operations, in particular
@@ -111,7 +113,8 @@ public abstract class DbOpsImpl implements DbOps {
    */
   protected void cleanComponents(Container container) {
     logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
-    if (container == null) return;
+    if (container == null)
+      return;
     SSUtils.visitSSComponents(container, comp -> comp.cleanField());
   }
 
@@ -130,6 +133,6 @@ public abstract class DbOpsImpl implements DbOps {
   /**
    * @deprecated use performPostUpdateOps(RowsModel)
    */
-  @Deprecated 
+  @Deprecated
   public void performPostUpdateOps() {}
 } // end public class DbOpsImpl

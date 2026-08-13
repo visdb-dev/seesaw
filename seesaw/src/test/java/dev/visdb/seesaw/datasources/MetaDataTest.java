@@ -108,7 +108,8 @@ public class MetaDataTest {
           has_no_convert = true;
         }
       }
-      if (!has_no_convert) System.out.printf("\tconverts ANYTHING\n");
+      if (!has_no_convert)
+        System.out.printf("\tconverts ANYTHING\n");
     }
   }
 

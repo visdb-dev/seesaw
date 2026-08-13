@@ -137,7 +137,9 @@ public class SSFormatterFactory extends FormatterFactory {
      * create the factory
      * @return the factory
      */
-    public SSFormatterFactory build() { return new SSFormatterFactory(this); }
+    public SSFormatterFactory build() {
+      return new SSFormatterFactory(this);
+    }
   }
 
   /**
@@ -154,7 +156,8 @@ public class SSFormatterFactory extends FormatterFactory {
       try {
         Constructor<?>[] ctors = builder.displayFormatter.getClass().getDeclaredConstructors();
         for (Constructor<?> ctor : ctors) {
-          if (ctor.getParameterCount() != 1) continue;
+          if (ctor.getParameterCount() != 1)
+            continue;
           if (ctor.getParameterTypes()[0].isInstance(dispFormat)) {
             builder.defaultFormatter = (AbstractFormatter) ctor.newInstance(dispFormat);
             logger.log(DEBUG,

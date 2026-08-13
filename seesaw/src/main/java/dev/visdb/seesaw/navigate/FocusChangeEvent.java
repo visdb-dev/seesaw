@@ -54,11 +54,15 @@ public class FocusChangeEvent {
    * Broadcast event for focus change.
    * @param pce pce
    */
-  public FocusChangeEvent(PropertyChangeEvent pce) { this.pce = pce; }
+  public FocusChangeEvent(PropertyChangeEvent pce) {
+    this.pce = pce;
+  }
 
   /**
    * The change event.
    * @return event
    */
-  public PropertyChangeEvent getPce() { return pce; }
+  public PropertyChangeEvent getPce() {
+    return pce;
+  }
 }

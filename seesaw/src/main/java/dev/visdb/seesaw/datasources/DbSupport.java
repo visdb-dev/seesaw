@@ -141,11 +141,11 @@ public interface DbSupport {
    * This default implementation is based on Google search AI. The AI claims
    * this works with PostgreSQL, H2, HSQLDB, ClickHouse, MySQL/TiDB, Oracle,
    * DuckDB, and SQL Server.
-   * 
+   *
    * @param rmd
    * @param columnIndex
    * @return
-   * @throws SQLException 
+   * @throws SQLException
    */
   default JDBCType resolveArrayElementType(ResultSetMetaData rmd, int columnIndex)
       throws SQLException {
@@ -154,13 +154,13 @@ public interface DbSupport {
       throw new IllegalArgumentException("Column must be JDBCType.ARRAY, not " + columnType);
 
     String typeName = getVendorTypeNameForArray(rmd, columnIndex);
-    
+
     // Lookup metadata type identifier in cross-vendor dictionary mapping
     JDBCType standardType = vendorTypeMap().get(typeName);
     if (standardType != null) {
       return standardType;
     }
-    
+
     // Fallback strategy:
     // Try to directly instantiate from matching standard JDBCType enum value name.
     try {
@@ -340,34 +340,34 @@ public interface DbSupport {
    * @param metaData
    * @param columnIndex
    * @return
-   * @throws SQLException 
+   * @throws SQLException
    */
-  private static String getVendorTypeNameForArray(ResultSetMetaData metaData, int columnIndex) throws SQLException {
+  private static String getVendorTypeNameForArray(ResultSetMetaData metaData, int columnIndex)
+      throws SQLException {
     String rawTypeName = metaData.getColumnTypeName(columnIndex);
     if (rawTypeName == null) {
       return null;
     }
-    
+
     // Standardize string layout: uppercase, trimmed, and strip parameterized sizes like (255)
-    String cleanName = rawTypeName.toUpperCase(Locale.ROOT)
-        .replaceAll("\\(\\d+(?:,\\s*\\d+)?\\)", "")
-        .trim();
-    
+    String cleanName
+        = rawTypeName.toUpperCase(Locale.ROOT).replaceAll("\\(\\d+(?:,\\s*\\d+)?\\)", "").trim();
+
     // 1. Handle "INTEGER ARRAY" / "VARCHAR ARRAY" formats (H2, HSQLDB, DuckDB)
     if (cleanName.endsWith(" ARRAY")) {
       cleanName = cleanName.substring(0, cleanName.indexOf(" ARRAY")).trim();
     }
-    
+
     // 2. Handle standard suffix arrays like "varchar[]" or "int4[]"
     if (cleanName.endsWith("[]")) {
       cleanName = cleanName.substring(0, cleanName.length() - 2).trim();
     }
-    
+
     // 3. Handle PostgreSQL legacy array prefix representation ("_int4", "_text")
     if (cleanName.startsWith("_")) {
       cleanName = cleanName.substring(1).trim();
     }
-    
+
     // 4. Handle functional notation wrapper syntax like ClickHouse "Array(Int32)"
     if (cleanName.startsWith("ARRAY(") && cleanName.endsWith(")")) {
       cleanName = cleanName.substring(6, cleanName.length() - 1).trim();

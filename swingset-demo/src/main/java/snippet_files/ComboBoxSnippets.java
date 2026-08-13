@@ -42,7 +42,9 @@ public class ComboBoxSnippets extends JFrame {
         return new MyDbComboBox(this);
       }
     }
-    private MyDbComboBox(Builder builder) { super(builder); }
+    private MyDbComboBox(Builder builder) {
+      super(builder);
+    }
   }
 
   MyDbComboBox dbCombo = new MyDbComboBox
@@ -95,8 +97,12 @@ public class ComboBoxSnippets extends JFrame {
       d3TypeToken = builder.d3TypeToken;
     }
 
-    public D3 getD3() { return d3Value; }
-    public TypeToken<D3> getD3TypeToken() { return d3TypeToken; }
+    public D3 getD3() {
+      return d3Value;
+    }
+    public TypeToken<D3> getD3TypeToken() {
+      return d3TypeToken;
+    }
   }
   // @end region=ExtendableDbComboBox
   void useExCombo() {
@@ -196,7 +202,9 @@ public class ComboBoxSnippets extends JFrame {
   // @start region=chosen_item
   public class ComboBoxIntString extends ComboBox1<Integer, String> {
     public static class Item extends Item1<Integer, String> {
-      public Item(Integer getKey, String getDisplayValue) { super(getKey, getDisplayValue); }
+      public Item(Integer getKey, String getDisplayValue) {
+        super(getKey, getDisplayValue);
+      }
     }
     @Override
     public Item getChosenItem() {

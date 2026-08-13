@@ -97,7 +97,9 @@ public class RowSetOpsTest {
   @AfterEach
   public void tearDown() {}
 
-  private RowsModel getRowsModel(RowSet rs) { return RowsModel.create(rs, null); }
+  private RowsModel getRowsModel(RowSet rs) {
+    return RowsModel.create(rs, null);
+  }
 
   /**
    * Check out that we can use an embedded H2 for our tests.
@@ -150,7 +152,9 @@ public class RowSetOpsTest {
     fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 2));
     assertEquals(t2, fetch);
 
-    if (Boolean.FALSE) { rowsModel.setRow(2); }
+    if (Boolean.FALSE) {
+      rowsModel.setRow(2);
+    }
 
     Timestamp ts = (Timestamp) rs.getObject(3);
     LocalDateTime ldt = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 3), LocalDateTime.class);
@@ -192,8 +196,10 @@ public class RowSetOpsTest {
     g_rm.getAction(RowsAction.ACT_COMMIT).actionPerformed(null);
     Object co = RowSetOps.getColumnObject(comp);
     //assertTrue(co.getClass() == val.getClass());
-    if (val instanceof BigDecimal bd) assertEquals(bd.compareTo((BigDecimal) co), 0);
-    else assertEquals(val, co);
+    if (val instanceof BigDecimal bd)
+      assertEquals(bd.compareTo((BigDecimal) co), 0);
+    else
+      assertEquals(val, co);
   }
 
   /**
@@ -267,7 +273,9 @@ public class RowSetOpsTest {
         updateColumnText("c_char", "one", "one");
         updateColumnText("c_varchar", "two", "two");
         updateColumnText("c_nchar", "three", "three");
-      } catch (Exception ex) { logger.log(ERROR, ex.getMessage(), ex); }
+      } catch (Exception ex) {
+        logger.log(ERROR, ex.getMessage(), ex);
+      }
     });
     g_rm.setVerifyEnabledFlag_DEBUG(true);
 

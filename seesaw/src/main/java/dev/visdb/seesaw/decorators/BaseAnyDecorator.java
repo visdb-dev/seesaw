@@ -75,7 +75,9 @@ public abstract class BaseAnyDecorator implements AnyDecorator {
    *
    * @return the SSComponent as a JComponent
    */
-  protected final JComponent jComp() { return (JComponent) getSSComponent(); }
+  protected final JComponent jComp() {
+    return (JComponent) getSSComponent();
+  }
 
   /**
    * Return the JComponent that gets decorated and TextDecorated.
@@ -83,5 +85,7 @@ public abstract class BaseAnyDecorator implements AnyDecorator {
    *
    * @return the JComponent
    */
-  protected final JComponent decoComp() { return getSSComponent().getDecorateTarget(); }
+  protected final JComponent decoComp() {
+    return getSSComponent().getDecorateTarget();
+  }
 }

@@ -68,13 +68,17 @@ public class RowsModelNewRowSetEvent extends EventObjectBacktrace implements Row
    * The old {@linkplain RowSet}.
    * @return previous for this model
    */
-  public RowSet getNewRowSet() { return newRowSet; }
+  public RowSet getNewRowSet() {
+    return newRowSet;
+  }
 
   /**
    * The old {@linkplain RowSet}.
    * @return previous for this model
    */
-  public RowSet getOldRowSet() { return oldRowSet; }
+  public RowSet getOldRowSet() {
+    return oldRowSet;
+  }
 
   /** {@inheritDoc} */
   @Override

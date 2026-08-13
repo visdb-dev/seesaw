@@ -67,7 +67,9 @@ public class SSTextArea extends TextArea {
    * @param _rows    {@literal the number of rows >= 0}
    * @param _columns {@literal the number of columns >= 0}
    */
-  public SSTextArea(final int _rows, final int _columns) { super(_rows, _columns); }
+  public SSTextArea(final int _rows, final int _columns) {
+    super(_rows, _columns);
+  }
 
   /**
    * Creates a multi-line text box and binds it to the specified RowSet column.
@@ -76,7 +78,9 @@ public class SSTextArea extends TextArea {
    * @param columnName name of the column to which this text area should be
    *                         bound
    */
-  public SSTextArea(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
+  public SSTextArea(RowsModel rowsModel, String columnName) {
+    super(rowsModel, columnName);
+  }
 
   /**
    * Creates a multi-line text box and binds it to the specified RowSet column.

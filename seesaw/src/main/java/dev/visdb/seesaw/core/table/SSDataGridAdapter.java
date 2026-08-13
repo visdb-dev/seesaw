@@ -48,7 +48,6 @@ package dev.visdb.seesaw.core.table;
 // TODO Should this class be named SSDataGridHandlerImpl?
 // TODO Can this be eliminated by making empty default metholds to SSDataGridHandler?
 public abstract class SSDataGridAdapter implements SSDataGridHandler {
-
   /**
    * This empty implementation always returns true.
    * For description about the function look in SSRowDeletion class.

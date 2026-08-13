@@ -56,5 +56,7 @@ public class SSSyncManager extends SyncManager<Long> {
    * @param comboBox
    * @param rowsModel
    */
-  public SSSyncManager(SSDBComboBox comboBox, RowsModel rowsModel) { super(comboBox, rowsModel); }
+  public SSSyncManager(SSDBComboBox comboBox, RowsModel rowsModel) {
+    super(comboBox, rowsModel);
+  }
 }

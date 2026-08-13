@@ -80,7 +80,9 @@ public interface RSC {
     //
     try {
       return new SimpleRSC(rowsModel, columnIndex);
-    } catch (SQLException ex) { throw new SSSQLRuntimeException(ex); }
+    } catch (SQLException ex) {
+      throw new SSSQLRuntimeException(ex);
+    }
   }
 
   /**
@@ -156,7 +158,9 @@ public interface RSC {
    * A component may have a display/parse format.
    * @return The format for this component
    */
-  default SSFormat getSSFormat() { return null; }
+  default SSFormat getSSFormat() {
+    return null;
+  }
 
   /**
    * @return Does the column allow null?

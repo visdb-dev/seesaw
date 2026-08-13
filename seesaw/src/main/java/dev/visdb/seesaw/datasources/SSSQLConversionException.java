@@ -51,7 +51,9 @@ public class SSSQLConversionException extends SSSQLException {
    * Type conversion error.
    * @param reason
    */
-  public SSSQLConversionException(String reason) { super(reason); }
+  public SSSQLConversionException(String reason) {
+    super(reason);
+  }
 
   /**
    * Type conversion error.
@@ -62,12 +64,16 @@ public class SSSQLConversionException extends SSSQLException {
    * Type conversion error.
    * @param cause
    */
-  public SSSQLConversionException(Throwable cause) { super(cause); }
+  public SSSQLConversionException(Throwable cause) {
+    super(cause);
+  }
 
   /**
    * Type conversion error.
    * @param reason
    * @param cause
    */
-  public SSSQLConversionException(String reason, Throwable cause) { super(reason, cause); }
+  public SSSQLConversionException(String reason, Throwable cause) {
+    super(reason, cause);
+  }
 }

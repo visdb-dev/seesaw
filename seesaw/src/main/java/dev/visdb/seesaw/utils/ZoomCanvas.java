@@ -109,11 +109,13 @@ public class ZoomCanvas extends JPanel {
    * Gets the active image currently being displayed.
    * @return
    */
-  public BufferedImage getCurrentImage() { return this.image; }
+  public BufferedImage getCurrentImage() {
+    return this.image;
+  }
 
   /**
    * How is resize handled.
-   * @return 
+   * @return
    */
   public ResizeMode getResizeMode() {
     return resizeMode;
@@ -121,7 +123,7 @@ public class ZoomCanvas extends JPanel {
 
   /**
    * How to handle resize.
-   * @param resizeMode 
+   * @param resizeMode
    */
   public void setResizeMode(ResizeMode resizeMode) {
     this.resizeMode = resizeMode;
@@ -135,7 +137,9 @@ public class ZoomCanvas extends JPanel {
     Dimension viewSize = scrollPane.getViewport().getSize();
 
     // If there's no image, fill the viewport space completely
-    if (image == null) { return viewSize; }
+    if (image == null) {
+      return viewSize;
+    }
 
     double currentZoom = zoomFactor.getAsDouble();
     int w = (int) (image.getWidth() * currentZoom);
@@ -214,7 +218,7 @@ public class ZoomCanvas extends JPanel {
   /**
    * The returned image is a "compatible" image,
    * {@link GraphicsConfiguration#createCompatibleImage(int, int, int) }
-   * 
+   *
    * @param bytes
    * @return image for the bytes
    * @throws IOException
@@ -260,7 +264,8 @@ public class ZoomCanvas extends JPanel {
    * @param canvasPoint
    */
   public void centerViewportOnCanvasPoint(Point canvasPoint) {
-    if (image == null) return;
+    if (image == null)
+      return;
 
     JViewport viewport = scrollPane.getViewport();
     Dimension viewportSize = viewport.getSize();
@@ -284,7 +289,8 @@ public class ZoomCanvas extends JPanel {
    * @return the image point that is centered in the viewport.
    */
   public Point captureImagePointAtViewportCenter() {
-    if (image == null) return new Point(0, 0);
+    if (image == null)
+      return new Point(0, 0);
 
     // 1. Get current physical component sizes
     int canvasWidth = getWidth();
@@ -329,7 +335,7 @@ public class ZoomCanvas extends JPanel {
               && newViewportSize.height == oldViewportSize.height) {
             return;
           }
-          
+
           switch (resizeMode) {
             // center-panning calculation
             case CENTER_PANNING -> recenterViewOnResize(oldViewportSize, newViewportSize);
@@ -360,7 +366,8 @@ public class ZoomCanvas extends JPanel {
    * @param oldViewportSize
    */
   private void stabilizeImageOnResize(Dimension oldViewportSize, Dimension newViewportSize) {
-    if (image == null) return;
+    if (image == null)
+      return;
 
     // 1. Get current zoom and image specs
     double currentZoom = zoomFactor.getAsDouble();
@@ -394,10 +401,14 @@ public class ZoomCanvas extends JPanel {
     int maxScrollX = newCanvasWidth - newViewportSize.width;
     int maxScrollY = newCanvasHeight - newViewportSize.height;
 
-    if (targetScrollX < 0) targetScrollX = 0;
-    if (targetScrollY < 0) targetScrollY = 0;
-    if (targetScrollX > maxScrollX) targetScrollX = Math.max(0, maxScrollX);
-    if (targetScrollY > maxScrollY) targetScrollY = Math.max(0, maxScrollY);
+    if (targetScrollX < 0)
+      targetScrollX = 0;
+    if (targetScrollY < 0)
+      targetScrollY = 0;
+    if (targetScrollX > maxScrollX)
+      targetScrollX = Math.max(0, maxScrollX);
+    if (targetScrollY > maxScrollY)
+      targetScrollY = Math.max(0, maxScrollY);
 
     // 7. Snap the viewport position instantly
     Point finalScrollPos = new Point(targetScrollX, targetScrollY);
@@ -412,7 +423,8 @@ public class ZoomCanvas extends JPanel {
    * @param oldViewportSize
    */
   private void recenterViewOnResize(Dimension oldViewportSize, Dimension newViewportSize) {
-    if (image == null) return;
+    if (image == null)
+      return;
 
     // 1. Get the current top-left scroll position
     Point currentScrollPos = scrollPane.getViewport().getViewPosition();
@@ -431,10 +443,14 @@ public class ZoomCanvas extends JPanel {
     int maxScrollY = getHeight() - newViewportSize.height;
 
     // 5. Clamp the values safely within bounds
-    if (targetScrollX < 0) targetScrollX = 0;
-    if (targetScrollY < 0) targetScrollY = 0;
-    if (targetScrollX > maxScrollX) targetScrollX = Math.max(0, maxScrollX);
-    if (targetScrollY > maxScrollY) targetScrollY = Math.max(0, maxScrollY);
+    if (targetScrollX < 0)
+      targetScrollX = 0;
+    if (targetScrollY < 0)
+      targetScrollY = 0;
+    if (targetScrollX > maxScrollX)
+      targetScrollX = Math.max(0, maxScrollX);
+    if (targetScrollY > maxScrollY)
+      targetScrollY = Math.max(0, maxScrollY);
 
     // 6. Update the viewport coordinates immediately
     Point finalScrollPos = new Point(targetScrollX, targetScrollY);
@@ -480,9 +496,12 @@ public class ZoomCanvas extends JPanel {
    * @param toCoordSystem
    * @return coordinates of the position in the target coordinate system
    */
-  public Point translateCoord(Point fromPoint, CoordSystem fromCoordSystem, CoordSystem toCoordSystem) {
+  public Point translateCoord(Point fromPoint, CoordSystem fromCoordSystem,
+                              CoordSystem toCoordSystem) {
     // If the systems match, avoid all math.
-    if (fromCoordSystem == toCoordSystem) { return new Point(fromPoint); }
+    if (fromCoordSystem == toCoordSystem) {
+      return new Point(fromPoint);
+    }
 
     JPanel panel = this;
     double currentZoom = zoomFactor.getAsDouble();

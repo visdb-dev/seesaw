@@ -81,7 +81,8 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
   @Override
   public void install(SSComponent comp) {
     super.install(comp);
-    if (!comp.isComposite()) focusComp().addFocusListener(this);
+    if (!comp.isComposite())
+      focusComp().addFocusListener(this);
     else {
       logger().log(Level.DEBUG, sf("Composite component %s", objectID(comp)));
       busReceiver = new BusReceiver();
@@ -106,12 +107,15 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
    *
    * @return focus target
    */
-  protected Component focusComp() { return getSSComponent().getFocusTarget(); }
+  protected Component focusComp() {
+    return getSSComponent().getFocusTarget();
+  }
 
   @SuppressWarnings("NonConstantLogger")
   private static Logger lazyLogger;
   private Logger logger() {
-    if (lazyLogger == null) lazyLogger = JStuff.getLogger(getClass().getName());
+    if (lazyLogger == null)
+      lazyLogger = JStuff.getLogger(getClass().getName());
     return lazyLogger;
   }
 
@@ -139,9 +143,12 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
                                    objectID(getSSComponent())));
       return;
     }
-    if (logger().isLoggable(Level.DEBUG)) dumpCheckFocusInfo(c);
+    if (logger().isLoggable(Level.DEBUG))
+      dumpCheckFocusInfo(c);
 
-    if (c != null && isDescendingFrom(c, (Component) getSSComponent())) { decorate(); }
+    if (c != null && isDescendingFrom(c, (Component) getSSComponent())) {
+      decorate();
+    }
   }
 
   @SuppressWarnings({"UseOfSystemOutOrSystemErr", "unused"})
@@ -149,7 +156,8 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
     String nam = "";
     if (c != null) {
       nam = c.getClass().getSimpleName();
-      if (nam.isBlank()) nam = c.getClass().getName();
+      if (nam.isBlank())
+        nam = c.getClass().getName();
     }
     logger().log(Level.TRACE, sf("focused %s, SSComp %s", c == null ? "null" : nam,
                                  getSSComponent().getClass().getSimpleName()));

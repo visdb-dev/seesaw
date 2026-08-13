@@ -59,7 +59,9 @@ public class SSNumericField extends NumberField {
   /**
    * Creates a new instance of SSNumericField
    */
-  public SSNumericField() { this(createFormatterFactory(CUSTOM, null, null)); }
+  public SSNumericField() {
+    this(createFormatterFactory(CUSTOM, null, null));
+  }
 
   /**
    * Creates an instance of SSNumericField with the specified number of integer and
@@ -78,7 +80,9 @@ public class SSNumericField extends NumberField {
    *
    * @param factory - formatter factory to be used
    */
-  public SSNumericField(AbstractFormatterFactory factory) { super(factory); }
+  public SSNumericField(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   /**
    * Create a FormatterFactory.

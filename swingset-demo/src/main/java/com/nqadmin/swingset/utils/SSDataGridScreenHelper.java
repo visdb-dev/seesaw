@@ -158,7 +158,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
                 cellEditor.cancelCellEditing();
               }
             }
-          } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+          } catch (final Exception e) {
+            logger.log(Level.ERROR, "Exception.", e);
+          }
         }
       }
     });
@@ -208,7 +210,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
                 try {
                   Runtime.getRuntime().exec(new String[] {ssProps.getProperty("Browser"),
                                                           _urlPrefixesForColumns[i] + columnValue});
-                } catch (final IOException ioe) { logger.log(Level.ERROR, "IO Exception.", ioe); }
+                } catch (final IOException ioe) {
+                  logger.log(Level.ERROR, "IO Exception.", ioe);
+                }
                 lastTimestamp = ae.getWhen();
               }
               break;
@@ -224,7 +228,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
             final String url = _urlPrefixesForColumns[column] + columnValue;
             try {
               Runtime.getRuntime().exec(new String[] {ssProps.getProperty("Browser"), url});
-            } catch (final IOException ioe) { logger.log(Level.ERROR, "IO Exception.", ioe); }
+            } catch (final IOException ioe) {
+              logger.log(Level.ERROR, "IO Exception.", ioe);
+            }
           }
           lastTimestamp = ae.getWhen();
         }

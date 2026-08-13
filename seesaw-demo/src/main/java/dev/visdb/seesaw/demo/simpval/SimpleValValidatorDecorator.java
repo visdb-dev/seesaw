@@ -74,7 +74,9 @@ public class SimpleValValidatorDecorator extends BaseDecorator {
    * TODO: Note that this does decoration as well.
    * @return
    */
-  public Validator getValidator() { return validator; }
+  public Validator getValidator() {
+    return validator;
+  }
 
   /**
    * SimpleValidatorDecorator style

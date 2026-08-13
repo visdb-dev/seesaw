@@ -40,7 +40,9 @@ public class SSSQLException extends SQLException {
    * SSException
    * @param reason reason
    */
-  public SSSQLException(String reason) { super(reason); }
+  public SSSQLException(String reason) {
+    super(reason);
+  }
 
   /**
    * SSException
@@ -51,12 +53,16 @@ public class SSSQLException extends SQLException {
    * SSException
    * @param cause cause
    */
-  public SSSQLException(Throwable cause) { super(cause); }
+  public SSSQLException(Throwable cause) {
+    super(cause);
+  }
 
   /**
    * SSException
    * @param reason reason
    * @param cause cause
    */
-  public SSSQLException(String reason, Throwable cause) { super(reason, cause); }
+  public SSSQLException(String reason, Throwable cause) {
+    super(reason, cause);
+  }
 }

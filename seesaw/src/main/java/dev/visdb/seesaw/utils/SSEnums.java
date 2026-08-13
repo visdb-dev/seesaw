@@ -56,11 +56,15 @@ public class SSEnums {
 
     private final int value;
 
-    Navigation(int newValue) { value = newValue; }
+    Navigation(int newValue) {
+      value = newValue;
+    }
 
     /**
      * @return integer corresponding to enumerated value
      */
-    public int getValue() { return value; }
+    public int getValue() {
+      return value;
+    }
   }
 }

@@ -88,13 +88,17 @@ public abstract class TextComponentValidator implements Validator {
    * Return the component associated with this validator
    * @return the component
    */
-  public SSComponent getComponent() { return component; }
+  public SSComponent getComponent() {
+    return component;
+  }
 
   /**
    * Return the SSComponent as a JComponent.
    * @return the SSComponent
    */
-  protected final JTextComponent jc() { return (JTextComponent) component; }
+  protected final JTextComponent jc() {
+    return (JTextComponent) component;
+  }
 
   private static class TextComponentValidatorFunction extends TextComponentValidator {
     private final Function<String, Boolean> validator;

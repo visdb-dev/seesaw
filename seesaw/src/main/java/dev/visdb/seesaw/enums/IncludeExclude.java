@@ -52,7 +52,9 @@ public enum IncludeExclude {
 
   private final String displayValue;
 
-  private IncludeExclude(String _displayValue) { displayValue = _displayValue; }
+  private IncludeExclude(String _displayValue) {
+    displayValue = _displayValue;
+  }
 
   /**
    * Generate user visible display string.

@@ -68,13 +68,17 @@ public enum ComponentState {
    * modified?
    * @return
    */
-  public boolean isModified() { return this == MODIFIED || this == FOCUSED_MODIFIED; }
+  public boolean isModified() {
+    return this == MODIFIED || this == FOCUSED_MODIFIED;
+  }
 
   /**
    * focused?
    * @return
    */
-  public boolean isError() { return this == ERROR || this == FOCUSED_ERROR; }
+  public boolean isError() {
+    return this == ERROR || this == FOCUSED_ERROR;
+  }
 
   /**
    * Determine the state of the component about focus/clean/dirty/error.
@@ -85,8 +89,10 @@ public enum ComponentState {
   public static ComponentState getComponentState(SSComponent comp,
                                                  SSComponent.ValidationResult valid) {
     ComponentState borderState;
-    if (valid.all()) borderState = comp.isDirty() ? MODIFIED : CLEAN;
-    else borderState = ERROR;
+    if (valid.all())
+      borderState = comp.isDirty() ? MODIFIED : CLEAN;
+    else
+      borderState = ERROR;
     Component f = Utils.getKFM().getFocusOwner();
     if (f != null && SwingUtilities.isDescendingFrom(f, (Component) comp))
       borderState = switch (borderState) {

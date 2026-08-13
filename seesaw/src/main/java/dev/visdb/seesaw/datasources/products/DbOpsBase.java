@@ -137,12 +137,12 @@ public class DbOpsBase implements DbOps {
   public void performPreInsertOps() {
     cleanComponents(container);
   }
-  
+
   /**
    * Make sure the RowSet has the inserted row.
    * It may re-execute the RowSet's command, depending on DatabaseMetaData.
    * @param rm
-   * @throws SQLException 
+   * @throws SQLException
    */
   @Override
   public void performPostInsertOps(RowsModel rm) throws SQLException {
@@ -150,7 +150,7 @@ public class DbOpsBase implements DbOps {
     if (!DbMetaDataCache.get().ownInsertsAreVisible(rs.getType()))
       rs.execute();
   }
-  
+
   /**
    * Make sure the RowSet has the deleted row.
    * It may re-execute the RowSet's command, depending on DatabaseMetaData.
@@ -163,7 +163,7 @@ public class DbOpsBase implements DbOps {
     if (!DbMetaDataCache.get().ownDeletesAreVisible(rs.getType()))
       rs.execute();
   }
-  
+
   /**
    * Make sure the RowSet has the updated row.
    * It may re-execute the RowSet's command, depending on DatabaseMetaData.
@@ -192,7 +192,8 @@ public class DbOpsBase implements DbOps {
    */
   protected void cleanComponents(Container container) {
     logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
-    if (container == null) return;
+    if (container == null)
+      return;
     SSUtils.visitSSComponents(container, comp -> comp.cleanField());
   }
 }

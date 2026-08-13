@@ -210,7 +210,9 @@ public abstract class AbstractComboBoxListSwingModel {
    */
   protected AbstractComboBoxListSwingModel(int itemNumElems) {
     this(itemNumElems, null);
-    if (Boolean.FALSE) { Objects.isNull(sliceInfo(null)); }
+    if (Boolean.FALSE) {
+      Objects.isNull(sliceInfo(null));
+    }
   }
 
   /**
@@ -248,13 +250,19 @@ public abstract class AbstractComboBoxListSwingModel {
     comboBoxModel = isCombo;
   }
 
-  /*package-test*/ boolean isComboBoxModel() { return comboBoxModel; }
+  /*package-test*/ boolean isComboBoxModel() {
+    return comboBoxModel;
+  }
 
-  /*package-test*/ ComboBoxModelProxy getProxyJunitTextOnly() { return modelProxy; }
+  /*package-test*/ ComboBoxModelProxy getProxyJunitTextOnly() {
+    return modelProxy;
+  }
 
   static class EventLoggingDataListener implements ListDataListener {
     private final ListModel<?> model;
-    public EventLoggingDataListener(ListModel<?> model) { this.model = model; }
+    public EventLoggingDataListener(ListModel<?> model) {
+      this.model = model;
+    }
 
     private String getMsg(ListDataEvent e) {
       int t = e.getType();
@@ -291,9 +299,15 @@ public abstract class AbstractComboBoxListSwingModel {
   // TODO: refine method for adding a model; maybe custom String tag.
   public static void addEventLogging(ListModel<?> model) {
     Objects.requireNonNull(model);
-    if (!eventLogger.isLoggable(TRACE)) { return; }
-    if (weakModelSet == null) { weakModelSet = Collections.newSetFromMap(new WeakHashMap<>()); }
-    if (weakModelSet.contains(model)) { return; }
+    if (!eventLogger.isLoggable(TRACE)) {
+      return;
+    }
+    if (weakModelSet == null) {
+      weakModelSet = Collections.newSetFromMap(new WeakHashMap<>());
+    }
+    if (weakModelSet.contains(model)) {
+      return;
+    }
     weakModelSet.add(model);
     model.addListDataListener(new EventLoggingDataListener(model));
   }
@@ -316,7 +330,9 @@ public abstract class AbstractComboBoxListSwingModel {
    */
   protected static <T> MutableComboBoxModel<T> getSimpleComboBoxModel(
       AbstractComboBoxListSwingModel model) {
-    if (model.installed) { throw new IllegalStateException("model already installed"); }
+    if (model.installed) {
+      throw new IllegalStateException("model already installed");
+    }
     model.installed = true;
     model.comboBoxModel = true;
     @SuppressWarnings("unchecked")
@@ -331,7 +347,9 @@ public abstract class AbstractComboBoxListSwingModel {
    * @return the model
    */
   protected static <T> ListModel<T> getSimpleListModel(AbstractComboBoxListSwingModel model) {
-    if (model.installed) { throw new IllegalStateException("model already installed"); }
+    if (model.installed) {
+      throw new IllegalStateException("model already installed");
+    }
     model.installed = true;
     model.comboBoxModel = false;
     @SuppressWarnings("unchecked")
@@ -371,7 +389,9 @@ public abstract class AbstractComboBoxListSwingModel {
                              ListCellRenderer<?> render) {
     Objects.requireNonNull(jc);
     Objects.requireNonNull(model);
-    if (model.installed) { throw new IllegalStateException("model already installed"); }
+    if (model.installed) {
+      throw new IllegalStateException("model already installed");
+    }
 
     model.installed = true;
 
@@ -423,7 +443,9 @@ public abstract class AbstractComboBoxListSwingModel {
    * Delegates formatting on the fly.
    * @return Format to install in the model
    */
-  protected Format getListItemFormatDelegate() { return listItemFormatDelegate; }
+  protected Format getListItemFormatDelegate() {
+    return listItemFormatDelegate;
+  }
 
   /**
    * Set the format to use with this model.
@@ -564,7 +586,8 @@ public abstract class AbstractComboBoxListSwingModel {
     public SSListItem getElementAt(int index) {
       if (comboBoxModel) {
         // The DefaultComboBoxModel never throws an exception.
-        if (index >= 0 && index < itemList.size()) return itemList.get(index);
+        if (index >= 0 && index < itemList.size())
+          return itemList.get(index);
         return null;
       }
       // DefaultListModel might throw an exception
@@ -691,7 +714,9 @@ public abstract class AbstractComboBoxListSwingModel {
       if (oldSize == 0) {
         if (itemList.size() >= 1 && modelProxy.selectedObject == null) {
           SSListItem item = itemList.get(0);
-          if (item != null) { modelProxy.setSelectedItem(item); }
+          if (item != null) {
+            modelProxy.setSelectedItem(item);
+          }
         }
       }
     }
@@ -779,7 +804,9 @@ public abstract class AbstractComboBoxListSwingModel {
          iterator.hasNext();) {
       WeakReference<ItemElementSlice> elRef = iterator.next();
       ItemElementSlice el = elRef.get();
-      if (el == null) { iterator.remove(); }
+      if (el == null) {
+        iterator.remove();
+      }
     }
     return createdLists.size();
   }
@@ -827,12 +854,16 @@ public abstract class AbstractComboBoxListSwingModel {
    * Note this is not locked.
    * @return the item list
    */
-  public List<SSListItem> getItemList() { return readOnlyItemList; }
+  public List<SSListItem> getItemList() {
+    return readOnlyItemList;
+  }
 
   /**
    * @return number of elements in an SSListItem
    */
-  public int getItemNumElems() { return itemNumElems; }
+  public int getItemNumElems() {
+    return itemNumElems;
+  }
 
   /**
    * Configure the number of elements contained in an SSListItem.
@@ -961,7 +992,9 @@ public abstract class AbstractComboBoxListSwingModel {
 
   private boolean remove(Object listItem) {
     int index = itemList.indexOf(listItem);
-    if (index < 0) { return false; }
+    if (index < 0) {
+      return false;
+    }
     // following fires event
     remove(index);
     return true;
@@ -991,7 +1024,8 @@ public abstract class AbstractComboBoxListSwingModel {
     ListItemWrite0 listItem = (ListItemWrite0) itemList.get(listItemIndex);
     try {
       listItem = (ListItemWrite0) listItem.clone();
-    } catch (CloneNotSupportedException ex) {}
+    } catch (CloneNotSupportedException ex) {
+    }
     Object oldElem = listItem.getElem(elemIndex);
     listItem.setElem(elemIndex, newElem);
     itemList.set(listItemIndex, listItem);
@@ -1007,7 +1041,8 @@ public abstract class AbstractComboBoxListSwingModel {
   SSListItem getClone(SSListItem listItem) {
     try {
       return (SSListItem) ((ListItemWrite0) listItem).clone();
-    } catch (CloneNotSupportedException ex) {}
+    } catch (CloneNotSupportedException ex) {
+    }
     return null;
   }
 
@@ -1050,7 +1085,9 @@ public abstract class AbstractComboBoxListSwingModel {
     @Override
     public Object set(int index, Object element) {
       checkValid();
-      if (isReadOnly) { return super.set(index, element); }
+      if (isReadOnly) {
+        return super.set(index, element);
+      }
       return setElem(index, elemIndex, element);
     }
 
@@ -1075,7 +1112,9 @@ public abstract class AbstractComboBoxListSwingModel {
    * @return list of elements at the specified position
    */
   protected <T> List<T> createElementSlice(int elemIndex) {
-    if (elemIndex < 0) { throw new IllegalArgumentException("elemIndex must be positive"); }
+    if (elemIndex < 0) {
+      throw new IllegalArgumentException("elemIndex must be positive");
+    }
     ItemElementSlice el = new ItemElementSlice(elemIndex);
     createdLists.add(new WeakReference<>(el));
     @SuppressWarnings("unchecked")
@@ -1094,7 +1133,9 @@ public abstract class AbstractComboBoxListSwingModel {
    * @return true if the specified list is backed by this
    */
   public boolean hasShadow(List<?> list) {
-    if (list instanceof ItemElementSlice slice) { return slice.isShadow(this); }
+    if (list instanceof ItemElementSlice slice) {
+      return slice.isShadow(this);
+    }
     return false;
   }
 
@@ -1206,7 +1247,9 @@ public abstract class AbstractComboBoxListSwingModel {
     // protected boolean isModifiedLength = false;
 
     /** a Remodel */
-    protected Remodel() { remodelTakeWriteLock(); }
+    protected Remodel() {
+      remodelTakeWriteLock();
+    }
 
     /**
      * First statement of each method. Prevents use after close/unlock.
@@ -1214,7 +1257,9 @@ public abstract class AbstractComboBoxListSwingModel {
      * @throws IllegalStateException if this Remodel is closed
      */
     protected void verifyOpened() {
-      if (isClosed) { throw new IllegalStateException("Remodel completed; can not reuse"); }
+      if (isClosed) {
+        throw new IllegalStateException("Remodel completed; can not reuse");
+      }
       checkState();
     }
 
@@ -1497,9 +1542,15 @@ public abstract class AbstractComboBoxListSwingModel {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) { return true; }
-      if (obj == null) { return false; }
-      if (getClass() != obj.getClass()) { return false; }
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
       final ListItem1 other = (ListItem1) obj;
       return Objects.equals(this.arg0, other.arg0);
     }
@@ -1540,8 +1591,10 @@ public abstract class AbstractComboBoxListSwingModel {
     @Override
     public void setElem(int index, Object object) {
       checkIndex(index);
-      if (index == 0) arg0 = object;
-      else arg1 = object;
+      if (index == 0)
+        arg0 = object;
+      else
+        arg1 = object;
     }
 
     @Override
@@ -1559,11 +1612,19 @@ public abstract class AbstractComboBoxListSwingModel {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) { return true; }
-      if (obj == null) { return false; }
-      if (getClass() != obj.getClass()) { return false; }
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
       final ListItem2 other = (ListItem2) obj;
-      if (!Objects.equals(this.arg0, other.arg0)) { return false; }
+      if (!Objects.equals(this.arg0, other.arg0)) {
+        return false;
+      }
       return Objects.equals(this.arg1, other.arg1);
     }
 
@@ -1628,12 +1689,22 @@ public abstract class AbstractComboBoxListSwingModel {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) { return true; }
-      if (obj == null) { return false; }
-      if (getClass() != obj.getClass()) { return false; }
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
       final ListItem3 other = (ListItem3) obj;
-      if (!Objects.equals(this.arg0, other.arg0)) { return false; }
-      if (!Objects.equals(this.arg1, other.arg1)) { return false; }
+      if (!Objects.equals(this.arg0, other.arg0)) {
+        return false;
+      }
+      if (!Objects.equals(this.arg1, other.arg1)) {
+        return false;
+      }
       return Objects.equals(this.arg2, other.arg2);
     }
 
@@ -1678,9 +1749,15 @@ public abstract class AbstractComboBoxListSwingModel {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) { return true; }
-      if (obj == null) { return false; }
-      if (getClass() != obj.getClass()) { return false; }
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
       final ListItemAsArray other = (ListItemAsArray) obj;
       return Arrays.deepEquals(elems, other.elems);
     }

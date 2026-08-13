@@ -174,7 +174,9 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
         }
       }
 
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     //	// SETUP THE CONTAINER AND ADD THE DATAGRID
     //		getContentPane().add(dataGrid.getComponent());
@@ -247,7 +249,8 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
     super.setUI(
         _ui); // this gets called internally when updating the ui and makes the northPane reappear
     BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
-    if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
+    if (frameUI != null)
+      frameUI.setNorthPane(null); // lets get rid of it
   }
 
   @Override

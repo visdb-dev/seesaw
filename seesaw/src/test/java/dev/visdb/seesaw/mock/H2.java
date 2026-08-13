@@ -86,11 +86,14 @@ public class H2 {
   }
 
   public static Connection getCon() throws ClassNotFoundException, SQLException {
-    if (conn == null) conn = create();
+    if (conn == null)
+      conn = create();
     return conn;
   }
 
-  public static String dbUrl() { return "jdbc:h2:mem:" + DB_NAME; }
+  public static String dbUrl() {
+    return "jdbc:h2:mem:" + DB_NAME;
+  }
 
   private static void execute(String sql) throws SQLException, ClassNotFoundException {
     RunScript.execute(getCon(), new StringReader(sql));

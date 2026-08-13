@@ -75,7 +75,9 @@ public class TextArea extends JTextArea implements SSComponent {
   /**
    * Empty constructor needed for deserialization.
    */
-  public TextArea() { finishSSCommon(); }
+  public TextArea() {
+    finishSSCommon();
+  }
 
   /**
    * Constructs a new empty TextArea with the specified number of rows and

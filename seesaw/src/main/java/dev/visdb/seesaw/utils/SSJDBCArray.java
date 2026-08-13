@@ -56,7 +56,6 @@ import java.util.Objects;
  */
 
 public class SSJDBCArray implements Array {
-
   /**
    * Underlying database type name for array elements
    */
@@ -76,7 +75,8 @@ public class SSJDBCArray implements Array {
    */
   public SSJDBCArray(Object data, JDBCType baseType) {
     Objects.requireNonNull(data);
-    if (!data.getClass().isArray()) throw new IllegalArgumentException("Must be an array");
+    if (!data.getClass().isArray())
+      throw new IllegalArgumentException("Must be an array");
     this.data = data;
     this.baseType = baseType;
   }
@@ -107,8 +107,7 @@ public class SSJDBCArray implements Array {
    * {@inheritDoc }
    */
   @Override
-  public Object getArray(long index, int count, Map<String, Class<?>> map)
-      throws SQLException {
+  public Object getArray(long index, int count, Map<String, Class<?>> map) throws SQLException {
     throw new UnsupportedOperationException();
   }
 

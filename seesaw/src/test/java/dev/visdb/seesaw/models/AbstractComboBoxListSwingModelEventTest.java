@@ -70,7 +70,9 @@ public class AbstractComboBoxListSwingModelEventTest {
       proxy = getProxyJunitTextOnly();
     }
 
-    public LI(int itemNumElems) { this(itemNumElems, false); }
+    public LI(int itemNumElems) {
+      this(itemNumElems, false);
+    }
 
     @Override
     protected void checkState() {}
@@ -157,7 +159,9 @@ public class AbstractComboBoxListSwingModelEventTest {
 
   List<SSListItem> liCreateMany(int n, LI listInfo) {
     List<SSListItem> items = new ArrayList<>();
-    for (int i = 0; i < l1.size(); i++) { items.add(listInfo.createListItem(liCreateArray(n, i))); }
+    for (int i = 0; i < l1.size(); i++) {
+      items.add(listInfo.createListItem(liCreateArray(n, i)));
+    }
     return items;
   }
 
@@ -203,7 +207,9 @@ public class AbstractComboBoxListSwingModelEventTest {
 
   static List<SSListItem> getItemList(LI li) {
     List<SSListItem> list = new ArrayList<>();
-    for (int i = 0, n = li.proxy.getSize(); i < n; i++) { list.add(li.proxy.getElementAt(i)); }
+    for (int i = 0, n = li.proxy.getSize(); i < n; i++) {
+      list.add(li.proxy.getElementAt(i));
+    }
     return list;
   }
 
@@ -278,7 +284,9 @@ public class AbstractComboBoxListSwingModelEventTest {
     li.proxy.addAll(items);
     expectEvent(ADDED, 0, 4);
     // after adding to an empty combo, first item gets selected
-    if (li.isComboBoxModel()) { expectEvent(CHANGED, -1, -1); }
+    if (li.isComboBoxModel()) {
+      expectEvent(CHANGED, -1, -1);
+    }
     assertTrue(events.isEmpty());
 
     List<SSListItem> items2 = liCreateMany(li.getItemNumElems(), li);
@@ -299,7 +307,9 @@ public class AbstractComboBoxListSwingModelEventTest {
 
     // set/get item 2
     li.proxy.setSelectedItem(item);
-    if (li.isComboBoxModel()) { expectEvent(CHANGED, -1, -1); }
+    if (li.isComboBoxModel()) {
+      expectEvent(CHANGED, -1, -1);
+    }
     assertTrue(events.isEmpty());
 
     SSListItem selectedItem = li.proxy.getSelectedItem();

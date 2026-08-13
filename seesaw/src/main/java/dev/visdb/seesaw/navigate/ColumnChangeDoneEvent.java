@@ -39,5 +39,7 @@ public class ColumnChangeDoneEvent extends ColumnChangeEvent {
    *
    * @param ev the event that started the modification
    */
-  public ColumnChangeDoneEvent(ChangeEventData ev) { super(ev); }
+  public ColumnChangeDoneEvent(ChangeEventData ev) {
+    super(ev);
+  }
 }

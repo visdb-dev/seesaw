@@ -92,7 +92,9 @@ public class BackgroundDecorator extends FocusDecorator {
   private static Color getDefaultBackgroundColor() {
     if (defaultBackgroundColor == null) {
       defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
-      if (defaultBackgroundColor == null) { defaultBackgroundColor = Color.WHITE; }
+      if (defaultBackgroundColor == null) {
+        defaultBackgroundColor = Color.WHITE;
+      }
     }
     return defaultBackgroundColor;
   }
@@ -101,7 +103,9 @@ public class BackgroundDecorator extends FocusDecorator {
 
   // Implement the get/setFocusBackgroundColor since SSFormattedTextField...
   /** @return the background color */
-  public Color getFocusBackgroundColor() { return focusBackgroundColor; }
+  public Color getFocusBackgroundColor() {
+    return focusBackgroundColor;
+  }
 
   /**
    * @param focusBackgroundColor the new background color to use

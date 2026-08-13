@@ -51,5 +51,7 @@ public class EventObjectBacktrace extends EventObject {
   /**
    * @return where the event was created, may be null.
    */
-  Throwable getEventBacktrace() { return backtrace; }
+  Throwable getEventBacktrace() {
+    return backtrace;
+  }
 }

@@ -66,14 +66,18 @@ public class SSComboBox extends ComboBox1<Integer, String> {
   }
 
   /** @param builder */
-  private SSComboBox(Builder builder) { super(builder); }
+  private SSComboBox(Builder builder) {
+    super(builder);
+  }
 
   /**
    * Creates an SSComboBox.
    * GlazedLists is configured strict.
    * Use {@link #getAutoComplete() } to change its configuration.
    */
-  public SSComboBox() { this(ModelType.GLAZED); }
+  public SSComboBox() {
+    this(ModelType.GLAZED);
+  }
 
   /**
    * Creates an object of SSComboBox.
@@ -83,5 +87,7 @@ public class SSComboBox extends ComboBox1<Integer, String> {
    *
    * @param modelType whether to use SWING or GLAZED combo model
    */
-  public SSComboBox(ModelType modelType) { this(new Builder().modelType(modelType)); }
+  public SSComboBox(ModelType modelType) {
+    this(new Builder().modelType(modelType));
+  }
 } // end public class SSComboBox extends JComboBox {

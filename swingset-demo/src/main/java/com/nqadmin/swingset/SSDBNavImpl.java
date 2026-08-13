@@ -33,7 +33,6 @@ import java.awt.Container;
 
 import com.nqadmin.swingset.utils.DbOpsImpl;
 
-
 /**
  * Compatibility.
  */
@@ -43,5 +42,7 @@ public class SSDBNavImpl extends DbOpsImpl implements SSDBNav {
    *
    * @param _container	GUI Container to scan for Swing components to clear/reset
    */
-  public SSDBNavImpl(final Container _container) { super(_container); }
+  public SSDBNavImpl(final Container _container) {
+    super(_container);
+  }
 }

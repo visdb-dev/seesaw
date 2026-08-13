@@ -179,7 +179,9 @@ public interface SSComponent extends RSC {
      * Create.
      * @param ssComponent
      */
-    protected Hook(SSComponent ssComponent) { this.ssComponent = ssComponent; }
+    protected Hook(SSComponent ssComponent) {
+      this.ssComponent = ssComponent;
+    }
 
     /**
      * Updates the value stored and displayed in the SwingSet component
@@ -241,7 +243,8 @@ public interface SSComponent extends RSC {
      * @return common SwingSet component data and methods
      */
     final SSCommon getSSCommon() {
-      if (ssCommon == null) ssCommon = SSCommon.createStart(ssComponent);
+      if (ssCommon == null)
+        ssCommon = SSCommon.createStart(ssComponent);
       return ssCommon;
     }
 
@@ -255,7 +258,9 @@ public interface SSComponent extends RSC {
       // construct a 2nd SSCommon.
       getSSCommon();
       SSCommon ssCommon2 = SSCommon.createFinish(ssComponent, ssCommon);
-      if (ssCommon != ssCommon2) { throw new IllegalStateException("Multiple SSCommon created"); }
+      if (ssCommon != ssCommon2) {
+        throw new IllegalStateException("Multiple SSCommon created");
+      }
     }
   }
 
@@ -297,7 +302,9 @@ public interface SSComponent extends RSC {
    */
   // isComposite component usually has
   // comp != comp.getFocusTarget() || comp != comp.getDecorateTarget()
-  default boolean isComposite() { return false; }
+  default boolean isComposite() {
+    return false;
+  }
 
   /**
    * Override this method for notification of a change in metadata.
@@ -313,7 +320,8 @@ public interface SSComponent extends RSC {
   // TODO: currently called once per column, only needed once per RowSet?
   default void finishBind() {
     // Primary keys for SyncResolver, joins
-    if (getRowSet() instanceof CachedRowSet) SSUtils.setupDefaultPrimaryKeys(this);
+    if (getRowSet() instanceof CachedRowSet)
+      SSUtils.setupDefaultPrimaryKeys(this);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -339,7 +347,9 @@ public interface SSComponent extends RSC {
    * This should be invoked as the last statement
    * in the SSComponent's constructor, but before bind.
    */
-  default void finishSSCommon() { getSSComponentHook().finishSSCommon(); }
+  default void finishSSCommon() {
+    getSSComponentHook().finishSSCommon();
+  }
 
   /**
    * Sets the RowsModel and column name to which the component is to be bound.
@@ -363,7 +373,9 @@ public interface SSComponent extends RSC {
    * for example jdbc column type and isNullable.
    * @return true if fullyBound
    */
-  default boolean isFullyBound() { return getSSCommon().isFullyBound(); }
+  default boolean isFullyBound() {
+    return getSSCommon().isFullyBound();
+  }
 
   /**
    * Transition support.
@@ -380,7 +392,9 @@ public interface SSComponent extends RSC {
    * Setup additional focus transfer keys.
    * Typically invoke super if override.
    */
-  default void configureTraversalKeys() { SSCommon.configureTraversalKeys((JComponent) this); }
+  default void configureTraversalKeys() {
+    SSCommon.configureTraversalKeys((JComponent) this);
+  }
 
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////
@@ -408,7 +422,9 @@ public interface SSComponent extends RSC {
    * @return the value to display in the SSComponent, may be from undo/redo stack.
    */
   // TODO: put this in RSC?
-  default Object getColumnObject() { return getSSCommon().getColumnObject(); }
+  default Object getColumnObject() {
+    return getSSCommon().getColumnObject();
+  }
 
   /** {@inheritDoc } */
   @Override
@@ -422,7 +438,9 @@ public interface SSComponent extends RSC {
    * <p>
    * @return the value to display in the SSComponent, may be from undo/redo stack.
    */
-  default Array getColumnArray() { return getSSCommon().getColumnArray(); }
+  default Array getColumnArray() {
+    return getSSCommon().getColumnArray();
+  }
 
   /**
    * Return the value of the bound database column using the SSComponent's
@@ -433,7 +451,9 @@ public interface SSComponent extends RSC {
    * @return the value to display in the SSComponent, may be from undo/redo stack.
    * @throws java.sql.SQLException
    */
-  default Object getColumn() throws SQLException { return getSSCommon().getColumn(); }
+  default Object getColumn() throws SQLException {
+    return getSSCommon().getColumn();
+  }
 
   /**
    * Get the columnReader used by {@link #getColumn()} and internally,
@@ -479,7 +499,9 @@ public interface SSComponent extends RSC {
    * @param r code that changes the database
    * @throws java.sql.SQLException
    */
-  default void dbChange(RunnableSQL r) throws SQLException { getSSCommon().dbChange(r); }
+  default void dbChange(RunnableSQL r) throws SQLException {
+    getSSCommon().dbChange(r);
+  }
 
   /**
    * Updates the value of the bound database column;
@@ -537,7 +559,9 @@ public interface SSComponent extends RSC {
    * @param value to write to the database, may write to the undo/redo stack.
    * @return true if no error
    */
-  default boolean setColumn(Object value) { return getSSCommon().setColumn(value); }
+  default boolean setColumn(Object value) {
+    return getSSCommon().setColumn(value);
+  }
 
   /**
    * Get the columnUpdater used by {@link #setColumn(Object)}.
@@ -598,19 +622,25 @@ public interface SSComponent extends RSC {
    *
    * @param allowNull flag to indicate if the bound database column can be null
    */
-  default void setAllowNull(boolean allowNull) { getSSCommon().setAllowNull(allowNull); }
+  default void setAllowNull(boolean allowNull) {
+    getSSCommon().setAllowNull(allowNull);
+  }
 
   /**
    * @return true if this component's value is different from what's in the database
    */
-  default boolean isDirty() { return getRowsModel() != null && getRowsModel().isDirty(this); }
+  default boolean isDirty() {
+    return getRowsModel() != null && getRowsModel().isDirty(this);
+  }
 
   /**
    * A component may have a display/parse format. Especially used in
    * conjunction with, but not limited to, {@linkplain SSFormattedTextField}.
    * @param format format for this component
    */
-  default void setSSFormat(SSFormat format) { getSSCommon().setSSFormat(format); }
+  default void setSSFormat(SSFormat format) {
+    getSSCommon().setSSFormat(format);
+  }
 
   /**
    * {@inheritDoc }
@@ -680,7 +710,9 @@ public interface SSComponent extends RSC {
    *
    * @return text for log entries, null if never set
    */
-  default String getLogColumnName() { return getSSCommon().getLogColumnName(); }
+  default String getLogColumnName() {
+    return getSSCommon().getLogColumnName();
+  }
 
   /**
    * Set the text for log entries which is only used if columnName is null.
@@ -735,7 +767,9 @@ public interface SSComponent extends RSC {
    * @return true if there's a row
    */
   // TODO: move to Utils or SSUtils. Around onActiveRow.
-  default boolean checkRowOK() { return getSSCommon().checkRowOK(); }
+  default boolean checkRowOK() {
+    return getSSCommon().checkRowOK();
+  }
 
   /**
    * Determine if there's a row that can be modified; optionally dialog if not.
@@ -759,7 +793,9 @@ public interface SSComponent extends RSC {
   /**
    * Setup action bindings for undo/redo.
    */
-  default void setupUndoRedoKeys() { SSCommon.setupUndoRedoKeys(this); }
+  default void setupUndoRedoKeys() {
+    SSCommon.setupUndoRedoKeys(this);
+  }
 
   /**
    * Add a change to this components undo/redo stack.
@@ -795,7 +831,9 @@ public interface SSComponent extends RSC {
    * other component may be the the focused component.
    * @return the component that gets focus when this component is active
    */
-  default Component getFocusTarget() { return getSSCommon().getFocusTarget(); }
+  default Component getFocusTarget() {
+    return getSSCommon().getFocusTarget();
+  }
 
   /**
    * Typically an SSComponent is both the decorate component and focus component
@@ -804,7 +842,9 @@ public interface SSComponent extends RSC {
    * other component may be the the focused component.
    * @param focusTarget
    */
-  default void setFocusTarget(Component focusTarget) { getSSCommon().setFocusTarget(focusTarget); }
+  default void setFocusTarget(Component focusTarget) {
+    getSSCommon().setFocusTarget(focusTarget);
+  }
 
   /**
    * Typically an SSComponent is both the decorate component and focus component
@@ -813,7 +853,9 @@ public interface SSComponent extends RSC {
    * other component may be the the focused component.
    * @return the component that is decorate decorated
    */
-  default JComponent getDecorateTarget() { return getSSCommon().getDecorateTarget(); }
+  default JComponent getDecorateTarget() {
+    return getSSCommon().getDecorateTarget();
+  }
 
   /**
    * Typically an SSComponent is both the decorate component and focus component
@@ -849,13 +891,17 @@ public interface SSComponent extends RSC {
    * @return false for error in data, otherwise true
    */
   //{@link #setPluginValidator(dev.visdb.seesaw.decorators.Validator) }; those are check after baseValidate.
-  default boolean baseValidate() { return true; }
+  default boolean baseValidate() {
+    return true;
+  }
 
   /**
    * This has component specific validation, it is called after baseValidate.
    * @return true if successful validation for the type of component
    */
-  default boolean componentValidate() { return true; }
+  default boolean componentValidate() {
+    return true;
+  }
 
   /**
    * The results of doing SSComponent validations.
@@ -900,25 +946,33 @@ public interface SSComponent extends RSC {
    *
    * @return decorator
    */
-  default Decorator createDefaultDecorator() { return SSCommon.createDefaultDecorator(); }
+  default Decorator createDefaultDecorator() {
+    return SSCommon.createDefaultDecorator();
+  }
 
   /**
    * Return the decorator used by this component.
    * @return the decorator
    */
-  default Decorator getDecorator() { return getSSCommon().getDecorator(); }
+  default Decorator getDecorator() {
+    return getSSCommon().getDecorator();
+  }
 
   /**
    * Install the given decorator.
    * @param deco decorator to install
    */
-  default void setDecorator(Decorator deco) { getSSCommon().setDecorator(deco); }
+  default void setDecorator(Decorator deco) {
+    getSSCommon().setDecorator(deco);
+  }
 
   /**
    * Run the decorator.
    * @return true if component data valid
    */
-  default boolean decorate() { return getSSCommon().decorate(); }
+  default boolean decorate() {
+    return getSSCommon().decorate();
+  }
 
   /**
    * Create and return this components {@link TextDecorator};
@@ -935,7 +989,9 @@ public interface SSComponent extends RSC {
    * Return the text decorator used by this component.
    * @return the textDecorator
    */
-  default TextDecorator getTextDecorator() { return getSSCommon().getTextDecorator(); }
+  default TextDecorator getTextDecorator() {
+    return getSSCommon().getTextDecorator();
+  }
 
   /**
    * Install the specified text decorator.
@@ -946,7 +1002,9 @@ public interface SSComponent extends RSC {
   }
 
   /** Run the decorator */
-  default void decorateText() { getSSCommon().decorateText(); }
+  default void decorateText() {
+    getSSCommon().decorateText();
+  }
 
   // Methods that have the word Bound in them
   // :g/Bound.*{/

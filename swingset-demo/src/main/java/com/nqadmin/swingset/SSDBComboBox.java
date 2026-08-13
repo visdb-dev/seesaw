@@ -56,7 +56,9 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object> {
    */
   public static class Builder extends DBComboBox2.AbstractBuilder<Long, Object, Object, Builder> {
     /** defaults to ModelTYpe.GLAZED */
-    public Builder() { modelType(ModelType.GLAZED); }
+    public Builder() {
+      modelType(ModelType.GLAZED);
+    }
 
     /** self type idiom */
     @Override
@@ -71,14 +73,18 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object> {
     }
   }
   /** @param builder */
-  private SSDBComboBox(Builder builder) { super(builder); }
+  private SSDBComboBox(Builder builder) {
+    super(builder);
+  }
 
   /**
    * Create SSDBComboBox with GlazedLists.
    * GlazedLists is configured strict.
    * Use {@link #getAutoComplete() } to change its configuration.
    */
-  public SSDBComboBox() { this(new Builder()); }
+  public SSDBComboBox() {
+    this(new Builder());
+  }
 
   /**
    * Create SSDBComboBox with GlazedLists.
@@ -120,5 +126,7 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object> {
     super.setD2ColumnName(secondDisplayColumnName);
   }
 
-  public void setSeparator(final String separator) { getListItemFormat().setSeparator(separator); }
+  public void setSeparator(final String separator) {
+    getListItemFormat().setSeparator(separator);
+  }
 }

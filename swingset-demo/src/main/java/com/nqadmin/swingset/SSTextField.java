@@ -58,13 +58,17 @@ public class SSTextField extends TextField {
   /**
    * Constructs a new, empty text field.
    */
-  public SSTextField() { super(); }
+  public SSTextField() {
+    super();
+  }
 
   /**
    * Constructs a new text field with the given text.
    * @param _text initial text
    */
-  public SSTextField(String _text) { super(_text); }
+  public SSTextField(String _text) {
+    super(_text);
+  }
 
   /**
    * Creates a SSTextField instance and binds it to the specified RowSet column.
@@ -72,7 +76,9 @@ public class SSTextField extends TextField {
    * @param rowsModel          datasource to be used
    * @param columnName name of the column to which this label should be bound
    */
-  public SSTextField(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
+  public SSTextField(RowsModel rowsModel, String columnName) {
+    super(rowsModel, columnName);
+  }
 
   /**
    * Creates a SSTextField instance and binds it to the specified RowSet column.

@@ -68,7 +68,8 @@ public class DbSupportFactory {
    */
   public static DbSupport addDbSupportToLookup(Connection sharedConnection) {
     DbSupport dbSupport = createDbSupport(sharedConnection);
-    if (dbSupport != null) CentralLookup.getDefault().replace(DbSupport.class, dbSupport);
+    if (dbSupport != null)
+      CentralLookup.getDefault().replace(DbSupport.class, dbSupport);
     return dbSupport;
   }
 
@@ -93,11 +94,13 @@ public class DbSupportFactory {
     logger.log(Level.INFO, () -> "Creating DbSupport for " + productName);
     Collection<? extends DbSupportCreator> creators
         = Lookups.forPath("SS/DbSupport/" + productName).lookupAll(DbSupportCreator.class);
-    if (creators.isEmpty()) logger.log(ERROR, () -> "No DbSupportCreator for " + productName);
+    if (creators.isEmpty())
+      logger.log(ERROR, () -> "No DbSupportCreator for " + productName);
 
     DbSupport dbSupport = null;
     for (DbSupportCreator creator : creators) {
-      if ((dbSupport = creator.create(sharedConnection, dbMeta)) != null) break;
+      if ((dbSupport = creator.create(sharedConnection, dbMeta)) != null)
+        break;
     }
     if (dbSupport == null) {
       logger.log(ERROR, () -> "Failed to create DbSupport for " + productName);

@@ -109,7 +109,8 @@ public class ZoomCanvasTest {
   testIdenticalSystemOptimization() {
     Point originalPoint = new Point(45, 90);
 
-    Point translatedPoint = canvas.translateCoord(originalPoint, CoordSystem.IMAGE, CoordSystem.IMAGE);
+    Point translatedPoint
+        = canvas.translateCoord(originalPoint, CoordSystem.IMAGE, CoordSystem.IMAGE);
 
     // Values must match
     assertEquals(originalPoint, translatedPoint);
@@ -147,7 +148,8 @@ public class ZoomCanvasTest {
     // Panel coordinate becomes: X = 130 + 20 = 150, Y = 140 + 10 = 150
     Point viewportPoint = new Point(130, 140);
 
-    Point imagePoint = canvas.translateCoord(viewportPoint, CoordSystem.VIEWPORT, CoordSystem.IMAGE);
+    Point imagePoint
+        = canvas.translateCoord(viewportPoint, CoordSystem.VIEWPORT, CoordSystem.IMAGE);
 
     // After accounting for the scroll offset, it resolves to panel (150, 150) -> image (50, 50)
     assertEquals(new Point(50, 50), imagePoint);
@@ -164,7 +166,8 @@ public class ZoomCanvasTest {
     // Target image pixel is the top-left corner (0,0)
     Point imagePoint = new Point(0, 0);
 
-    Point viewportPoint = canvas.translateCoord(imagePoint, CoordSystem.IMAGE, CoordSystem.VIEWPORT);
+    Point viewportPoint
+        = canvas.translateCoord(imagePoint, CoordSystem.IMAGE, CoordSystem.VIEWPORT);
 
     // Math sequence:
     // Image (0,0) -> Scaled Image (25, 25) -> Panel (50, 50)

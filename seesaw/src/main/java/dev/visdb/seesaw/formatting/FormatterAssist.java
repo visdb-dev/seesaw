@@ -58,7 +58,9 @@ interface FormatterAssist {
    */
   SSFormat getSSFormat();
 
-  default AbstractFormatter getConverter() { return null; }
+  default AbstractFormatter getConverter() {
+    return null;
+  }
 
   /**
    * @see AbstractFormatter#stringToValue(java.lang.String)
@@ -75,7 +77,9 @@ interface FormatterAssist {
    * For a mask this probably includes mask literals and placeholder characters.
    * @return characters not input by the user
    */
-  default String getFormatLiterals() { return ""; }
+  default String getFormatLiterals() {
+    return "";
+  }
 
   /**
    * This method is invoked by the formatter when it is almost done.
@@ -88,8 +92,12 @@ interface FormatterAssist {
     // If empty and allows null, flip to NullFormatter
     if (ftf instanceof SSFormattedTextField ssftf) {
       // If doesn't allow null, don't even consider switching value
-      if (!ssftf.getAllowNull()) { return; }
-      if (ssftf.containsUserText()) { return; }
+      if (!ssftf.getAllowNull()) {
+        return;
+      }
+      if (ssftf.containsUserText()) {
+        return;
+      }
       ftf.setValue(null);
     }
   }
@@ -171,7 +179,8 @@ interface FormatterAssist {
       if (Character.isHighSurrogate(c))
         throw new IllegalArgumentException(
             sf("mask '%s' contains Unicode supplementary characters", mask));
-      if (formattingChars.indexOf(c) >= 0) continue;
+      if (formattingChars.indexOf(c) >= 0)
+        continue;
       if (c == '\'') {
         // The following character is a literal
         i++;
@@ -207,7 +216,8 @@ interface FormatterAssist {
    */
   public static String userText(String text, String mask, String formattingChars,
                                 Character placeholderChar) {
-    if (text == null) return "";
+    if (text == null)
+      return "";
     List<Integer> posLiterals = getLiteralsAndPositions(mask, formattingChars).positions();
     // TODO: use reversed when full jdk-21
     //if (!posLiterals.isEmpty() || mf.getPlaceholder() != null)
@@ -216,7 +226,8 @@ interface FormatterAssist {
       // start at the end so the indexes don't change
       for (int i = posLiterals.size() - 1; i >= 0; i--) {
         int pos = posLiterals.get(i);
-        if (pos < sb.length()) sb.deleteCharAt(pos);
+        if (pos < sb.length())
+          sb.deleteCharAt(pos);
       }
       if (placeholderChar != null) {
         // TODO: needs work
@@ -224,7 +235,8 @@ interface FormatterAssist {
         // Is it weird if initial text is shorter that mask.
         //char c = mf.getPlaceholderCharacter();
         for (int pos = sb.length() - 1; pos >= 0; pos--) {
-          if (sb.charAt(pos) == placeholderChar) sb.deleteCharAt(pos);
+          if (sb.charAt(pos) == placeholderChar)
+            sb.deleteCharAt(pos);
         }
       }
       return sb.toString();

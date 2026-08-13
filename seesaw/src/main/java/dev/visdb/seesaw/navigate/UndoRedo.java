@@ -63,7 +63,9 @@ public enum UndoRedo {
    * when rs.updateNull was used.
    */
   public record Change(Object codedValue, boolean isError) {
-    public Object value() { return codedValue == JDBCType.NULL ? null : codedValue; }
+    public Object value() {
+      return codedValue == JDBCType.NULL ? null : codedValue;
+    }
   }
   ;
 
@@ -107,7 +109,9 @@ public enum UndoRedo {
    * @param comp RSC of interest
    * @return true if undo/redo is OK
    */
-  public static boolean isUndoRedoEnabled(RSC comp) { return isUndoRedoEnabled(comp.getRowSet()); }
+  public static boolean isUndoRedoEnabled(RSC comp) {
+    return isUndoRedoEnabled(comp.getRowSet());
+  }
 
   /**
    * Make sure the column's undo/redo stack is initialized; the
@@ -118,7 +122,8 @@ public enum UndoRedo {
    * @throws SQLException
    */
   public static void captureInitialValue(RSC comp) throws SQLException {
-    if (!isUndoRedoEnabled(comp)) return;
+    if (!isUndoRedoEnabled(comp))
+      return;
     comp.getRowsModel().getUndoRow().captureInitialValue(comp);
   }
 
@@ -129,7 +134,8 @@ public enum UndoRedo {
    * @throws SQLException
    */
   public static Change fetchCurrentChange(RSC comp) throws SQLException {
-    if (!isUndoRedoEnabled(comp)) throw new IllegalStateException("UNDO/REDO disabled");
+    if (!isUndoRedoEnabled(comp))
+      throw new IllegalStateException("UNDO/REDO disabled");
     return comp.getRowsModel().getUndoRow().fetchCurrentChange(comp);
   }
 
@@ -140,7 +146,8 @@ public enum UndoRedo {
    */
   // TODO: SSComponent vs RSC
   public static void undoRedo(SSComponent comp, UndoRedo cmd) {
-    if (!isUndoRedoEnabled(comp)) return;
+    if (!isUndoRedoEnabled(comp))
+      return;
     logger.log(
         DEBUG,
         () -> sf("%s: %s for %s", cmd, comp.getClass().getSimpleName(), comp.getColumnName()));
@@ -170,7 +177,8 @@ public enum UndoRedo {
    * @param comp rowset/col
    */
   public static void newSlot(RSC comp) {
-    if (!isUndoRedoEnabled(comp)) return;
+    if (!isUndoRedoEnabled(comp))
+      return;
     comp.getRowsModel().getUndoRow().focusChange(null);
   }
 
@@ -181,7 +189,8 @@ public enum UndoRedo {
    */
   // TODO: make this package visibility, go through rowsModel?
   public static void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException {
-    if (!isUndoRedoEnabled(ev.getSource())) return;
+    if (!isUndoRedoEnabled(ev.getSource()))
+      return;
     ev.getSource().getRowsModel().getUndoRow().addChange(ev);
   }
 }

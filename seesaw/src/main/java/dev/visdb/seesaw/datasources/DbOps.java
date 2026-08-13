@@ -101,7 +101,9 @@ public interface DbOps {
    *
    * @return true if row can be inserted, false aborts the operation
    */
-  default boolean allowInsert() { return true; }
+  default boolean allowInsert() {
+    return true;
+  }
 
   /**
    * This function is called as the first step, before performPreDeletionOps
@@ -109,7 +111,9 @@ public interface DbOps {
    *
    * @return true if the row can be deleted else false and the action is aborted
    */
-  default boolean allowDelete() { return true; }
+  default boolean allowDelete() {
+    return true;
+  }
 
   /**
    * This functions is called just before doing something that is sensitive
@@ -121,7 +125,9 @@ public interface DbOps {
    *
    * @return true is the row can be updated else false.
    */
-  default boolean allowUpdate() { return true; }
+  default boolean allowUpdate() {
+    return true;
+  }
 
   /**
    * This method is invoked by {@link RowsAction#ACT_REVERT}, the undo
@@ -169,7 +175,7 @@ public interface DbOps {
    * @param rm
    * @throws java.sql.SQLException
    */
-  default void performPostInsertOps(RowsModel rm) throws SQLException { }
+  default void performPostInsertOps(RowsModel rm) throws SQLException {}
 
   /**
    * Method to perform pre-deletion operations; it is used for
@@ -186,7 +192,7 @@ public interface DbOps {
    * @param rm
    * @throws java.sql.SQLException
    */
-  default void performPostDeletionOps(RowsModel rm) throws SQLException { }
+  default void performPostDeletionOps(RowsModel rm) throws SQLException {}
 
   /**
    * Method to perform operations at the end of {@link RowsAction#ACT_COMMIT}
@@ -195,5 +201,5 @@ public interface DbOps {
    * @param rm
    * @throws java.sql.SQLException
    */
-  default void performPostUpdateOps(RowsModel rm) throws SQLException { }
+  default void performPostUpdateOps(RowsModel rm) throws SQLException {}
 }

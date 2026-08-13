@@ -73,7 +73,8 @@ public class DbSupportBase implements DbSupport {
    * @param sharedConnection
    */
   public DbSupportBase(Connection sharedConnection) {
-    if (!SSUtils.isJunit()) Objects.requireNonNull(sharedConnection);
+    if (!SSUtils.isJunit())
+      Objects.requireNonNull(sharedConnection);
     this.sharedConnection = sharedConnection;
   }
 
@@ -82,7 +83,8 @@ public class DbSupportBase implements DbSupport {
    */
   @Override
   public Connection getSharedConnection() throws SQLException {
-    if (sharedConnection.isClosed()) throw new IllegalStateException("Shared connection isClosed");
+    if (sharedConnection.isClosed())
+      throw new IllegalStateException("Shared connection isClosed");
     return sharedConnection;
   }
 
@@ -99,15 +101,19 @@ public class DbSupportBase implements DbSupport {
     String dsName = rs.getDataSourceName();
     if (dsName != null) {
       try {
-        if (ctx == null) ctx = new InitialContext();
+        if (ctx == null)
+          ctx = new InitialContext();
         // TODO: keep a local map of dsName to DataSource ???
         DataSource ds = (DataSource) ctx.lookup(dsName);
         return ds.getConnection();
-      } catch (NamingException ex) {}
+      } catch (NamingException ex) {
+      }
     }
 
     String url = rs.getUrl();
-    if (url != null) { return DriverManager.getConnection(url); }
+    if (url != null) {
+      return DriverManager.getConnection(url);
+    }
 
     return null;
   }

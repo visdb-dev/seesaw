@@ -315,7 +315,9 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
   /**
    * Create a DBComboBox2.
    */
-  public DBComboBox2() { this(new Builder<>()); }
+  public DBComboBox2() {
+    this(new Builder<>());
+  }
 
   /**
    * Executes the query specified with setQuery(), populates combobox,
@@ -411,14 +413,18 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
    *
    * @return name of the PK value to query for the bound column keys
    */
-  public String getPrimaryKeyColumnName() { return primaryKeyColumnName; }
+  public String getPrimaryKeyColumnName() {
+    return primaryKeyColumnName;
+  }
 
   /**
    * Returns the pattern in which dates are displayed.
    *
    * @return
    */
-  public String getDateFormat() { return dateFormat; }
+  public String getDateFormat() {
+    return dateFormat;
+  }
 
   /**
    * When a display column is of type date you can choose the format in which it
@@ -437,7 +443,9 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
    * @return returns the name of the column used to get values for combo box
    *         items.
    */
-  public String getDisplayColumnName() { return displayColumnName; }
+  public String getDisplayColumnName() {
+    return displayColumnName;
+  }
 
   // NOTE: IF A LIST OF THE STRINGS IN COMBOBOX IS WANTED,
   //		 THEN THE FOLLOWING CAN BE USED.
@@ -457,7 +465,9 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
    *
    * @return returns the column name {@code <D2>} values
    */
-  public String getD2ColumnName() { return d2ColumnName; }
+  public String getD2ColumnName() {
+    return d2ColumnName;
+  }
 
   /**
    * Sets the column name . If there's extra data to store in the
@@ -497,7 +507,9 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
   // TODO: Needed? Remove.
   @Override
   public void setChosenDisplayValue(D displayValue) {
-    if (hasD2()) { throw new IllegalStateException("d2 enabled"); }
+    if (hasD2()) {
+      throw new IllegalStateException("d2 enabled");
+    }
     super.setChosenDisplayValue(displayValue);
   }
 
@@ -506,7 +518,9 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
    *
    * @return returns the query used.
    */
-  public String getQuery() { return query; }
+  public String getQuery() {
+    return query;
+  }
 
   /**
    * Sets the query used to display items in the combo box.
@@ -527,7 +541,9 @@ public class DBComboBox2<K, D, D2> extends ComboBox2<K, D, D2> {
     boolean result = false;
     try {
       result = super.updateDisplayValue(key, displayValue);
-    } catch (final Exception e) { logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e); }
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
+    }
     if (!result) {
       logger.log(WARNING,
                  ()

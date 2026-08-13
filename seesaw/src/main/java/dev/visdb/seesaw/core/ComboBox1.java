@@ -69,7 +69,9 @@ public class ComboBox1<K, D> extends ComboBox2<K, D, Object> {
   /**
    * @param builder
    */
-  protected ComboBox1(AbstractBuilder<K, D, ?> builder) { super(builder); }
+  protected ComboBox1(AbstractBuilder<K, D, ?> builder) {
+    super(builder);
+  }
 
   /**
    * Creates an object of ComboBox with type params of Object.

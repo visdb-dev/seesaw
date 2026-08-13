@@ -53,7 +53,9 @@ public class DbDatePicker extends DatePicker implements SSComponent {
     public void dateChanged(DateChangeEvent dce) {
       try {
         dbChange(() -> setColumnObject(dce.getNewDate()));
-      } catch (SQLException ex) { logger.log(Logger.Level.ERROR, (String) null, ex); }
+      } catch (SQLException ex) {
+        logger.log(Logger.Level.ERROR, (String) null, ex);
+      }
     }
   }
   /** System Logger for component. */

@@ -68,15 +68,23 @@ final class RowsActions {
 
   private final RowsModel rowsModel;
 
-  RowsActions(RowsModel rowsModel) { this.rowsModel = rowsModel; }
+  RowsActions(RowsModel rowsModel) {
+    this.rowsModel = rowsModel;
+  }
 
-  private RowSet getRowSet() { return rowsModel.getRowSet(); }
+  private RowSet getRowSet() {
+    return rowsModel.getRowSet();
+  }
 
-  private NavigateState getNavState() { return rowsModel.getNavState(); }
+  private NavigateState getNavState() {
+    return rowsModel.getNavState();
+  }
 
   private static final int countActionPerform[] = new int[RowsAction.values().length];
   /** Test/Debug. */
-  static int getCount(RowsAction navAction) { return countActionPerform[navAction.ordinal()]; }
+  static int getCount(RowsAction navAction) {
+    return countActionPerform[navAction.ordinal()];
+  }
 
   void startNavigationAction(RowsAction navAction) {
     logger.log(DEBUG, () -> sf("%s action (usually button clicked)", navAction));
@@ -97,7 +105,9 @@ final class RowsActions {
   }
 
   private final Map<RowsAction, Action> actions = new HashMap<>();
-  void run(RowsAction navAction) { get(navAction).actionPerformed(null); }
+  void run(RowsAction navAction) {
+    get(navAction).actionPerformed(null);
+  }
   Action get(RowsAction navAction) {
     Action action = actions.computeIfAbsent(navAction, key -> switch (key) {
       case ACT_FIRST -> new NavFirstAction();
@@ -112,7 +122,8 @@ final class RowsActions {
       case ACT_GOTOROW -> new NavGotoRowAction();
       default -> throw new IllegalStateException();
     });
-    if (rowsModel.getRowSet() == null) action.setEnabled(false);
+    if (rowsModel.getRowSet() == null)
+      action.setEnabled(false);
     return action;
   }
 
@@ -121,10 +132,13 @@ final class RowsActions {
   }
 
   private boolean disableVerifyEnabledCheck;
-  void setVerifyEnabledFlag_DEBUG(boolean flag) { disableVerifyEnabledCheck = !flag; }
+  void setVerifyEnabledFlag_DEBUG(boolean flag) {
+    disableVerifyEnabledCheck = !flag;
+  }
 
   private boolean verifyEnabled(AbstractAction act) {
-    if (act.isEnabled() || disableVerifyEnabledCheck) return true;
+    if (act.isEnabled() || disableVerifyEnabledCheck)
+      return true;
     logger.log(ERROR, sf("disabled action '%s' called", act.getClass().getSimpleName()),
                new Exception("disabled action called"));
     return false;
@@ -157,8 +171,10 @@ final class RowsActions {
     public void actionPerformed(ActionEvent e) {
       startNavigationAction(ACT_FIRST);
       try {
-        if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
+        if (!verifyEnabled(this))
+          return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel))
+          return;
 
         getRowSet().first();
 
@@ -172,7 +188,9 @@ final class RowsActions {
         JOptionPane.showMessageDialog(
             dlgParent(e),
             "Exception occured while updating row or moving the cursor.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_FIRST); }
+      } finally {
+        finishNavigationAction(ACT_FIRST);
+      }
     }
   } // end NavFirstAction
 
@@ -203,10 +221,14 @@ final class RowsActions {
     public void actionPerformed(ActionEvent e) {
       startNavigationAction(ACT_PREVIOUS);
       try {
-        if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
+        if (!verifyEnabled(this))
+          return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel))
+          return;
 
-        if ((getRowSet().getRow() != 0) && !getRowSet().previous()) { getRowSet().first(); }
+        if ((getRowSet().getRow() != 0) && !getRowSet().previous()) {
+          getRowSet().first();
+        }
 
         getNavState().freshRow();
         getNavState().updateNavigatorRowAndCount();
@@ -218,7 +240,9 @@ final class RowsActions {
         JOptionPane.showMessageDialog(
             dlgParent(e),
             "Exception occured while updating row or moving the cursor.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_PREVIOUS); }
+      } finally {
+        finishNavigationAction(ACT_PREVIOUS);
+      }
     }
   } // end NavPreviousAction
 
@@ -244,8 +268,10 @@ final class RowsActions {
     public void actionPerformed(ActionEvent e) {
       startNavigationAction(ACT_NEXT);
       try {
-        if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
+        if (!verifyEnabled(this))
+          return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel))
+          return;
 
         getRowSet().next();
 
@@ -259,7 +285,9 @@ final class RowsActions {
         JOptionPane.showMessageDialog(
             dlgParent(e),
             "Exception occured while updating row or moving the cursor.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_NEXT); }
+      } finally {
+        finishNavigationAction(ACT_NEXT);
+      }
     }
   } // end NavNextAction
 
@@ -285,8 +313,10 @@ final class RowsActions {
     public void actionPerformed(ActionEvent e) {
       startNavigationAction(ACT_LAST);
       try {
-        if (!verifyEnabled(this)) return;
-        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
+        if (!verifyEnabled(this))
+          return;
+        if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel))
+          return;
 
         getRowSet().last();
 
@@ -300,7 +330,9 @@ final class RowsActions {
         JOptionPane.showMessageDialog(
             dlgParent(e),
             "Exception occured while updating row or moving the cursor.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_LAST); }
+      } finally {
+        finishNavigationAction(ACT_LAST);
+      }
     }
   } // end NavLastAction
 
@@ -329,7 +361,8 @@ final class RowsActions {
     public void actionPerformed(ActionEvent e) {
       startNavigationAction(ACT_COMMIT);
       try {
-        if (!verifyEnabled(this)) return;
+        if (!verifyEnabled(this))
+          return;
         if (RowSetState.isInserting(getRowSet())) {
           // IF on insert row add the row.
 
@@ -366,7 +399,8 @@ final class RowsActions {
           getNavState().updateNavigatorRowAndCount();
         } else {
           // ELSE update the database based on the present row values.
-          if (!getNavState().commitUpdateRowToDatabase(rowsModel)) return;
+          if (!getNavState().commitUpdateRowToDatabase(rowsModel))
+            return;
 
           // commit, resultSet.updateRow(), does not generate an event.
           // ... getRowSet().absolute(getRowSet().getRow()) ...
@@ -383,7 +417,9 @@ final class RowsActions {
         logger.log(ERROR, "SQL Exception.", se);
         JOptionPane.showMessageDialog(dlgParent(e),
                                       "Exception occured while saving row.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_COMMIT); }
+      } finally {
+        finishNavigationAction(ACT_COMMIT);
+      }
     }
   } // end NavCommitAction
 
@@ -413,10 +449,13 @@ final class RowsActions {
       RowsAction act_revert = getRowSet() instanceof CachedRowSet ? ACT_REVERT_FORCE : ACT_REVERT;
       startNavigationAction(act_revert);
       try {
-        if (!verifyEnabled(this)) return;
+        if (!verifyEnabled(this))
+          return;
         // Call move to current row if on insert row.
         boolean wasInserting = RowSetState.isInserting(getRowSet());
-        if (wasInserting) { getRowSet().moveToCurrentRow(); }
+        if (wasInserting) {
+          getRowSet().moveToCurrentRow();
+        }
 
         // THIS FUNCTION IS NOT NEED IF ON INSERT ROW
         // BUT MOVETOINSERTROW WILL NOT TRIGGER ANY EVENT SO FOR THE SCREEN
@@ -432,16 +471,21 @@ final class RowsActions {
         getNavState().getDbOps().performCancelOps();
 
         // Only attempt to refresh row if we have at least one record
-        if (getRowSet().getRow() > 0) { getRowSet().refreshRow(); }
+        if (getRowSet().getRow() > 0) {
+          getRowSet().refreshRow();
+        }
 
         getNavState().freshRow();
         getNavState().updateNavigatorRowAndCount();
-        if (wasInserting) rowsModel.syncSyncManager(); // TODO does this seem right.
+        if (wasInserting)
+          rowsModel.syncSyncManager(); // TODO does this seem right.
       } catch (final SQLException se) {
         logger.log(ERROR, "SQL Exception.", se);
         JOptionPane.showMessageDialog(
             dlgParent(e), "Exception occured while reverting changes.\n" + se.getMessage());
-      } finally { finishNavigationAction(act_revert); }
+      } finally {
+        finishNavigationAction(act_revert);
+      }
     }
   } // end NavRevertRecordAction
 
@@ -472,7 +516,8 @@ final class RowsActions {
       // TODO: use performRefreshOps? Let it return false if handle it here?
       try {
         //if (Boolean.TRUE /*|| getNavState().callExecute*/) {
-        if (!verifyEnabled(this)) return;
+        if (!verifyEnabled(this))
+          return;
 
         getRowSet().execute();
 
@@ -497,7 +542,9 @@ final class RowsActions {
         logger.log(ERROR, "SQL Exception.", se);
         JOptionPane.showMessageDialog(dlgParent(e),
                                       "Exception occured refreshing the data.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_REFRESH); }
+      } finally {
+        finishNavigationAction(ACT_REFRESH);
+      }
     }
   } // end NavRefreshAction
 
@@ -523,7 +570,8 @@ final class RowsActions {
     public void actionPerformed(ActionEvent e) {
       startNavigationAction(ACT_ADD);
       try {
-        if (!verifyEnabled(this)) return;
+        if (!verifyEnabled(this))
+          return;
         // Commit changes for current row to database
         // Ignore return since doesn't matter if there's nothing to do.
         getNavState().autoCommitUpdateRowToDatabase(rowsModel);
@@ -584,7 +632,9 @@ final class RowsActions {
         logger.log(ERROR, "SQL Exception.", se);
         JOptionPane.showMessageDialog(
             dlgParent(e), "Exception occured while moving to insert row.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_ADD); }
+      } finally {
+        finishNavigationAction(ACT_ADD);
+      }
     }
   } // end NavAddAction
 
@@ -611,15 +661,20 @@ final class RowsActions {
     public void actionPerformed(ActionEvent e) {
       startNavigationAction(ACT_DELETE);
       try {
-        if (!verifyEnabled(this)) return;
+        if (!verifyEnabled(this))
+          return;
         if (getNavState().getConfirmDeletes()) {
           final int answer = JOptionPane.showConfirmDialog(
               dlgParent(e), "Are you sure you want to delete this record?", "Delete Present Record",
               JOptionPane.YES_NO_OPTION);
-          if (answer != JOptionPane.YES_OPTION) { return; }
+          if (answer != JOptionPane.YES_OPTION) {
+            return;
+          }
         }
 
-        if (!getNavState().getDbOps().allowDelete()) { return; }
+        if (!getNavState().getDbOps().allowDelete()) {
+          return;
+        }
 
         // CAPTURE CURRENT ROW PRE-DELETION
         final int tmpPosition = getNavState().getRow();
@@ -655,7 +710,9 @@ final class RowsActions {
         logger.log(ERROR, "SQL Exception.", se);
         JOptionPane.showMessageDialog(dlgParent(e),
                                       "Exception occured while deleting row.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_DELETE); }
+      } finally {
+        finishNavigationAction(ACT_DELETE);
+      }
     }
   } // end NavDeleteAction
 
@@ -674,11 +731,13 @@ final class RowsActions {
       // Avoid re-entrancy. Unlike buttons, spinner changes go both ways.
       // While the rowset listeners are removed,
       // we're in the middle of processing, possibly  a row move.
-      if (!getNavState().rowsetListenerAdded) return;
+      if (!getNavState().rowsetListenerAdded)
+        return;
 
       startNavigationAction(ACT_GOTOROW);
       try {
-        if (!verifyEnabled(this)) return;
+        if (!verifyEnabled(this))
+          return;
         int row = (int) getNavState().getRowNumberModel().getNumber();
 
         // TODO: autoCommitUpdateRowToDatabase returns false if the getRowSet()
@@ -702,17 +761,21 @@ final class RowsActions {
         if ((row <= getNavState().rowCount) && (row > 0)
             && !(getRowSet().getRow() == row && e != null
                  && RowsAction.OK_SKIP_CURSOR_MOVE.equals(e.getActionCommand()))) {
-          if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel)) return;
+          if (!getNavState().autoCommitUpdateRowToDatabase(rowsModel))
+            return;
           getRowSet().absolute(row);
           getNavState().freshRow(); // only do this if row changed and commit
-        } else logger.log(WARNING, "skipping commit and cursor move");
+        } else
+          logger.log(WARNING, "skipping commit and cursor move");
 
         getNavState().updateNavigatorRowAndCount();
       } catch (final SQLException se) {
         logger.log(ERROR, "SQL Exception.", se);
         JOptionPane.showMessageDialog(null, //NavigateActions.this,
                                       "Exception occured while going to row.\n" + se.getMessage());
-      } finally { finishNavigationAction(ACT_GOTOROW); }
+      } finally {
+        finishNavigationAction(ACT_GOTOROW);
+      }
     }
   }
 }

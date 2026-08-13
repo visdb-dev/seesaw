@@ -129,7 +129,9 @@ public class SSMaskFormatterFactory extends FormatterFactory {
      * Create the builder.
      * @param mask Formatter's mask
      */
-    public Builder(String mask) { this.mask = mask; }
+    public Builder(String mask) {
+      this.mask = mask;
+    }
 
     /**
      * formatter
@@ -192,7 +194,9 @@ public class SSMaskFormatterFactory extends FormatterFactory {
      * create the factory
      * @return the factory
      */
-    public SSMaskFormatterFactory build() { return new SSMaskFormatterFactory(this); }
+    public SSMaskFormatterFactory build() {
+      return new SSMaskFormatterFactory(this);
+    }
 
     /**
      * Override this to provide custom SSMaskFormatter.
@@ -203,10 +207,18 @@ public class SSMaskFormatterFactory extends FormatterFactory {
     protected SSMaskFormatter getSSMaskFormatter() throws ParseException {
       Objects.requireNonNull(mask, "must specify mask");
       SSMaskFormatter mf = new SSMaskFormatter(this);
-      if (validCharacters != null) { mf.setValidCharacters(validCharacters); }
-      if (invalidCharacters != null) { mf.setValidCharacters(invalidCharacters); }
-      if (placeholder != null) { mf.setPlaceholder(placeholder); }
-      if (placeholderCharacter != null) { mf.setPlaceholderCharacter(placeholderCharacter); }
+      if (validCharacters != null) {
+        mf.setValidCharacters(validCharacters);
+      }
+      if (invalidCharacters != null) {
+        mf.setValidCharacters(invalidCharacters);
+      }
+      if (placeholder != null) {
+        mf.setPlaceholder(placeholder);
+      }
+      if (placeholderCharacter != null) {
+        mf.setPlaceholderCharacter(placeholderCharacter);
+      }
       mf.setValueContainsLiteralCharacters(valueContainsLiterals);
 
       // NOTE:  following required to flip as needed
@@ -228,7 +240,9 @@ public class SSMaskFormatterFactory extends FormatterFactory {
     try {
       SSMaskFormatter mf = builder.getSSMaskFormatter();
       setDefaultFormatter(mf);
-    } catch (ParseException ex) { logger.log(ERROR, () -> "Bad mask format: " + builder.mask); }
+    } catch (ParseException ex) {
+      logger.log(ERROR, () -> "Bad mask format: " + builder.mask);
+    }
   }
 
   /**
@@ -286,7 +300,9 @@ public class SSMaskFormatterFactory extends FormatterFactory {
      *
      * @return
      */
-    public BiFunction<List<String>, RSC, Boolean> getStringValidator() { return stringValidator; }
+    public BiFunction<List<String>, RSC, Boolean> getStringValidator() {
+      return stringValidator;
+    }
 
     /**
      * The Format of the FormattedTextField.
@@ -294,7 +310,8 @@ public class SSMaskFormatterFactory extends FormatterFactory {
      */
     @Override
     public SSFormat getSSFormat() {
-      if (getFormattedTextField() instanceof SSFormattedTextField ftf) return ftf.getSSFormat();
+      if (getFormattedTextField() instanceof SSFormattedTextField ftf)
+        return ftf.getSSFormat();
       return null;
     }
 
@@ -344,7 +361,9 @@ public class SSMaskFormatterFactory extends FormatterFactory {
       String string = (String) super.stringToValue(masked);
 
       Object value = string;
-      if (getConverter() != null) { value = getConverter().stringToValue(string); }
+      if (getConverter() != null) {
+        value = getConverter().stringToValue(string);
+      }
 
       if (getFormattedTextField() instanceof SSFormattedTextField ftf
           && getStringValidator() != null
@@ -415,9 +434,11 @@ public class SSMaskFormatterFactory extends FormatterFactory {
      */
     public String getMaskLiterals(boolean includePlaceholder) {
       if (includePlaceholder) {
-        if (maskLiterals_withPlaceholder != null) return maskLiterals_withPlaceholder;
+        if (maskLiterals_withPlaceholder != null)
+          return maskLiterals_withPlaceholder;
       } else {
-        if (maskLiterals_noPlaceholder != null) return maskLiterals_noPlaceholder;
+        if (maskLiterals_noPlaceholder != null)
+          return maskLiterals_noPlaceholder;
       }
       List<String> allLiterals = getMaskLiteralsAndPositions().literals();
       if (includePlaceholder) {

@@ -77,9 +77,12 @@ public class Utils {
    */
   public static <T extends Wrapper> T unwrap(T wrappedObj, Class<T> clazz) {
     try {
-      if (!wrappedObj.isWrapperFor(clazz)) return null;
+      if (!wrappedObj.isWrapperFor(clazz))
+        return null;
       return wrappedObj.unwrap(clazz);
-    } catch (SQLException ex) { return null; }
+    } catch (SQLException ex) {
+      return null;
+    }
   }
 
   /**
@@ -100,7 +103,8 @@ public class Utils {
         out.accept(sf("    column %d, conflict: '%s', crs: '%s'", cc.columnIndex, cc.resolveValue(),
                       cc.crsValue));
     }
-    if (Boolean.FALSE) dumpConflict(out, null, null);
+    if (Boolean.FALSE)
+      dumpConflict(out, null, null);
   }
 
   /**
@@ -116,7 +120,9 @@ public class Utils {
   static void dumpConflict(Consumer<String> out, SyncResolver resolver, CachedRowSet crs) {
     try {
       dumpConflict(out, collectConflict(resolver, crs));
-    } catch (SQLException ex) { logger.log(ERROR, "dumping SyncResolver conflicts", ex); }
+    } catch (SQLException ex) {
+      logger.log(ERROR, "dumping SyncResolver conflicts", ex);
+    }
   }
 
   record ConflictColumn(int columnIndex, Object resolveValue, Object crsValue) {}
@@ -126,7 +132,9 @@ public class Utils {
     List<ConflictRow> conflicts = null;
     try {
       conflicts = collectConflict(sr, crs);
-    } catch (SQLException ex) { logger.log(ERROR, "Collecting SyncResolver conflicts", ex); }
+    } catch (SQLException ex) {
+      logger.log(ERROR, "Collecting SyncResolver conflicts", ex);
+    }
     return conflicts;
   }
 
@@ -180,9 +188,12 @@ public class Utils {
           }
         }
       }
-    } catch (SQLException ex) { logger.log(ERROR, "dumping SyncResolver conflicts", ex); }
+    } catch (SQLException ex) {
+      logger.log(ERROR, "dumping SyncResolver conflicts", ex);
+    }
     try {
-      if (initialRow > 0) crs.absolute(initialRow);
+      if (initialRow > 0)
+        crs.absolute(initialRow);
       // Following is an exception, looks like the JDK's minimal
       // com.sun.rowset.internal.SyncResolverImpl is non-compliant.
       //sr.first();

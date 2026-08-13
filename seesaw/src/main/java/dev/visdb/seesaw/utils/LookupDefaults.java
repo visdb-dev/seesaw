@@ -68,7 +68,9 @@ import dev.visdb.seesaw.navigate.Utils;
 public class LookupDefaults {
   private LookupDefaults() {}
   private static final System.Logger logger = System.getLogger(LookupDefaults.class.getName());
-  static { Utils.getGlobalEventBus(); }
+  static {
+    Utils.getGlobalEventBus();
+  }
 
   private static boolean initialized;
   /**
@@ -81,7 +83,8 @@ public class LookupDefaults {
    * But this does serve to document some of the things that can be put in lookup.
    */
   public static void init() {
-    if (initialized) return;
+    if (initialized)
+      return;
 
     initStyles();
 
@@ -91,7 +94,8 @@ public class LookupDefaults {
     // There should be a DecoratorStyle.
     //
     Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
-    if (style == null) lkup.add(Decorator.DecoratorStyle.BORDER);
+    if (style == null)
+      lkup.add(Decorator.DecoratorStyle.BORDER);
 
     //
     // There should be BORDER and BACKGROUND decorators.
@@ -101,11 +105,13 @@ public class LookupDefaults {
     boolean hasBorder = false;
     boolean hasBackground = false;
     for (var deco : decos) {
-      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BORDER)) hasBorder = true;
+      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BORDER))
+        hasBorder = true;
       if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BACKGROUND))
         hasBackground = true;
     }
-    if (!hasBorder) lkup.add(new DecoratorSupplier(() -> { return new BorderDecorator(); }));
+    if (!hasBorder)
+      lkup.add(new DecoratorSupplier(() -> { return new BorderDecorator(); }));
     if (!hasBackground)
       lkup.add(new DecoratorSupplier(() -> { return new BackgroundDecorator(); }));
 
@@ -129,9 +135,11 @@ public class LookupDefaults {
    * this is called.
    */
   public static void initStyles() {
-    if (initializedStyles) return;
+    if (initializedStyles)
+      return;
 
-    if (!TextStyles.getStyleNames().isEmpty()) return;
+    if (!TextStyles.getStyleNames().isEmpty())
+      return;
 
     if (EventQueue.isDispatchThread()) {
       String msg = "LookupDefaults.initStyles() invoked from EDT.";
@@ -152,7 +160,9 @@ public class LookupDefaults {
     Reader reader = new StringReader(DEFAULT_STYLES_JSON);
     try {
       TextStyles.loadStylesFromJson(reader, "LookupDefaults");
-    } catch (IOException ex) { logger.log(Level.ERROR, (String) null, ex); }
+    } catch (IOException ex) {
+      logger.log(Level.ERROR, (String) null, ex);
+    }
     initializedStyles = true;
   }
   /** This can be manually loaded if the Styles get cleared. */

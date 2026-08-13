@@ -94,7 +94,9 @@ public class ComboBox2Test {
        * @param key
        * @param displayValue
        */
-      public Item(Integer key, String displayValue) { super(key, displayValue); }
+      public Item(Integer key, String displayValue) {
+        super(key, displayValue);
+      }
     }
 
     /**

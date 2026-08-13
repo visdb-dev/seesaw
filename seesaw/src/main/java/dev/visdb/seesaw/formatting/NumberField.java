@@ -67,7 +67,8 @@ public abstract class NumberField extends Field {
    */
   public static NumberFormat createNumberFormat(Supplier<NumberFormat> f) {
     NumberFormat format = f.get();
-    if (format instanceof DecimalFormat df) df.setParseBigDecimal(true);
+    if (format instanceof DecimalFormat df)
+      df.setParseBigDecimal(true);
     return format;
   }
 
@@ -90,7 +91,9 @@ public abstract class NumberField extends Field {
    * @param o check this
    * @return true if error
    */
-  public static boolean isAccessError(Object o) { return o instanceof Error; }
+  public static boolean isAccessError(Object o) {
+    return o instanceof Error;
+  }
 
   /**
    * Indicators for each {@link Format} for each of
@@ -154,7 +157,9 @@ public abstract class NumberField extends Field {
    *
    * @return the number digits used for integer part of the number, -1 if a problem
    */
-  public int getPrecision() { return getNumberFormatParam((nf) -> nf.getMaximumIntegerDigits()); }
+  public int getPrecision() {
+    return getNumberFormatParam((nf) -> nf.getMaximumIntegerDigits());
+  }
 
   /**
    * Returns the number of digits used for fraction part of the number,
@@ -162,7 +167,9 @@ public abstract class NumberField extends Field {
    *
    * @return the number of digits used for fraction part of the number, -1 if a problem
    */
-  public int getDecimals() { return getNumberFormatParam((nf) -> nf.getMaximumFractionDigits()); }
+  public int getDecimals() {
+    return getNumberFormatParam((nf) -> nf.getMaximumFractionDigits());
+  }
 
   /**
    * Sets whether the parse method returns big decimal.
@@ -182,7 +189,8 @@ public abstract class NumberField extends Field {
    * @param formats initialize these formats
    */
   protected static void initPrecision(Integer precision, NumberFormat... formats) {
-    if (precision == null) return;
+    if (precision == null)
+      return;
     for (NumberFormat format : formats) {
       format.setMaximumIntegerDigits(precision);
       format.setMinimumIntegerDigits(1);
@@ -196,7 +204,8 @@ public abstract class NumberField extends Field {
    * @param formats initialize these formats
    */
   protected static void initDecimals(Integer decimals, NumberFormat... formats) {
-    if (decimals == null) return;
+    if (decimals == null)
+      return;
     for (NumberFormat format : formats) {
       format.setMaximumFractionDigits(decimals);
       format.setMinimumFractionDigits(decimals);
@@ -210,7 +219,8 @@ public abstract class NumberField extends Field {
    */
   protected int getNumberFormatParam(Function<DecimalFormat, Object> param) {
     Object p = getFormatParam(param);
-    if (p instanceof Integer i) return i;
+    if (p instanceof Integer i)
+      return i;
     return -1;
   }
 
@@ -238,14 +248,18 @@ public abstract class NumberField extends Field {
   protected Object getFormatParam(Function<DecimalFormat, Object> paramF,
                                   Function<DefaultFormatterFactory, AbstractFormatter> formatterF) {
     Object o = getNumberFormat(formatterF);
-    if (o instanceof DecimalFormat nf) return paramF.apply(nf);
+    if (o instanceof DecimalFormat nf)
+      return paramF.apply(nf);
     return o;
   }
 
   private Object getNumberFormat(Function<DefaultFormatterFactory, AbstractFormatter> formatterF) {
-    if (!(getFormatterFactory() instanceof DefaultFormatterFactory ff)) return Error.FACTORY;
-    if (!(formatterF.apply(ff) instanceof NumberFormatter nfer)) return Error.FORMATTER;
-    if (!(nfer.getFormat() instanceof NumberFormat nf)) return Error.FORMAT;
+    if (!(getFormatterFactory() instanceof DefaultFormatterFactory ff))
+      return Error.FACTORY;
+    if (!(formatterF.apply(ff) instanceof NumberFormatter nfer))
+      return Error.FORMATTER;
+    if (!(nfer.getFormat() instanceof NumberFormat nf))
+      return Error.FORMAT;
     return nf;
   }
 

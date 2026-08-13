@@ -124,7 +124,9 @@ public class Example2 extends JFrame {
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
       navigator = new SSDataNavigator(rowsModel);
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     // SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
     //	 LETS ASSUME THE STATUS CODE TO TEXT MAPPINGS

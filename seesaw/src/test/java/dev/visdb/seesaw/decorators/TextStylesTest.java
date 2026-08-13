@@ -324,7 +324,8 @@ public class TextStylesTest {
 
   /** Recursively get all the names in the AttributeSet */
   private Set<Object> getAllAttributeNames(AttributeSet as) {
-    if (as == null) return Collections.emptySet();
+    if (as == null)
+      return Collections.emptySet();
     Set<Object> accum = new HashSet<>();
     for (Iterator<?> it = as.getAttributeNames().asIterator(); it.hasNext();) {
       accum.add(it.next());
@@ -372,19 +373,18 @@ public class TextStylesTest {
   public void testLoadStylesWithJacksonProperties() throws Exception {
     System.out.println("loadStylesFromJson_Reader");
     // https://jenkov.com/tutorials/java-json/jackson-objectmapper.html
-    
+
     // Create a Strict Properties bucket that intercept duplicates
     Properties strictProps = new Properties() {
       @Override
       public synchronized Object put(Object key, Object value) {
         if (containsKey(key)) {
-          throw new IllegalArgumentException(
-              sf("Duplicate key found: %s=%s", key, value));
+          throw new IllegalArgumentException(sf("Duplicate key found: %s=%s", key, value));
         }
         return super.put(key, value);
       }
     };
-    
+
     String properties = """
         default.alignment=left
         default.foreground=#333333
@@ -396,31 +396,24 @@ public class TextStylesTest {
 
     strictProps.load(reader);
 
-    JavaPropsMapper mapper = JavaPropsMapper.builder()
-        // .configure(...) configure features here if needed
-        .build();
+    JavaPropsMapper mapper = JavaPropsMapper
+                                 .builder()
+                                 // .configure(...) configure features here if needed
+                                 .build();
 
     // 3. Build a Schema explicitly stating that dots ('.') separate nested paths
-    JavaPropsSchema schemaWithDots = JavaPropsSchema.emptySchema()
-        .withPathSeparator(".")
-        ;
-    
+    JavaPropsSchema schemaWithDots = JavaPropsSchema.emptySchema().withPathSeparator(".");
+
     // Construct the Map<String, Map<String, String>> structural type dynamically
     JavaType mapType = mapper.getTypeFactory().constructMapType(
-        Map.class,
-        mapper.getTypeFactory().constructType(String.class),
-        mapper.getTypeFactory().constructMapType(Map.class, String.class, String.class)
-    );
-    
+        Map.class, mapper.getTypeFactory().constructType(String.class),
+        mapper.getTypeFactory().constructMapType(Map.class, String.class, String.class));
+
     Map<String, Map<String, String>> configMap;
-    
+
     // 4. Bind the validated flat object directly into your deep nested Map structure
-    configMap = mapper.readPropertiesAs(
-        strictProps,
-        schemaWithDots,
-        mapType
-    );
-    
+    configMap = mapper.readPropertiesAs(strictProps, schemaWithDots, mapType);
+
     System.err.println(configMap == null ? "null" : "not null");
   }
 
@@ -440,18 +433,15 @@ public class TextStylesTest {
       }
       """;
     Reader reader = new StringReader(json);
-    
-    ObjectMapper mapper = JsonMapper.builder()
-        .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-        .build();
-    
+
+    ObjectMapper mapper
+        = JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES).build();
+
     // Use TypeReference to cleanly parse directly into nested maps
     @SuppressWarnings("unused")
-    Map<String, Map<String, String>> configMap = mapper.readValue(
-        reader,
-        new TypeReference<Map<String, Map<String, String>>>() {}
-    );
-    
+    Map<String, Map<String, String>> configMap
+        = mapper.readValue(reader, new TypeReference<Map<String, Map<String, String>>>() {});
+
     System.err.println("");
   }
 
@@ -524,7 +514,9 @@ public class TextStylesTest {
                    "Alignment:1", "foreground:java.awt.Color[r=51,g=51,b=51]", "autoscroll:true",
                    "background:java.awt.Color[r=255,g=243,b=205]");
       assertEquals(expect, asPairs);
-    } finally { Files.delete(path); }
+    } finally {
+      Files.delete(path);
+    }
 
     // Did properties, now add something new with json.
     String json = """
@@ -563,7 +555,8 @@ public class TextStylesTest {
 			    }
 			}
 			""");
-    assertThrows(TextStyles.TextStylesException.class, () -> { TextStyles.loadStylesFromJson(reader2, "testLoadStyles-2"); });
+    assertThrows(TextStyles.TextStylesException.class,
+                 () -> { TextStyles.loadStylesFromJson(reader2, "testLoadStyles-2"); });
     // Problem stuff discarded, should still be ok
     StringBuilder sb = new StringBuilder();
     sb.setLength(0);
@@ -587,7 +580,8 @@ public class TextStylesTest {
 			    }
 			}
 			""");
-    assertThrows(TextStyles.TextStylesException.class, () -> { TextStyles.loadStylesFromJson(reader3, "testLoadStyles-3"); });
+    assertThrows(TextStyles.TextStylesException.class,
+                 () -> { TextStyles.loadStylesFromJson(reader3, "testLoadStyles-3"); });
     sb.setLength(0);
     ok = TextStyles.runDiagnostics(sb);
     assertTrue(ok);
@@ -610,7 +604,8 @@ public class TextStylesTest {
     // File has no errors. Use the Reader.
 
     Reader reader = new StringReader(json_ok);
-    TextStyles.LoadStatus status = TextStyles.loadStylesFromJson(reader, "testLoadStylesFromJson_Reader");
+    TextStyles.LoadStatus status
+        = TextStyles.loadStylesFromJson(reader, "testLoadStylesFromJson_Reader");
     assertTrue(status.ok());
     assertEquals(expect_json_ok, status.diagnostics());
     assertEquals(expect_json_ok_trees, status.trees());

@@ -59,7 +59,9 @@ public class TestLogging {
   /**
    * set up logger with default level INFO.
    */
-  public static void load() { load(null); }
+  public static void load() {
+    load(null);
+  }
 
   /**
    * x
@@ -75,7 +77,9 @@ public class TestLogging {
    * flushes each record.
    */
   public static void flush() {
-    for (Handler handler : logger.getHandlers()) { handler.flush(); }
+    for (Handler handler : logger.getHandlers()) {
+      handler.flush();
+    }
   }
 
   /**
@@ -116,7 +120,9 @@ public class TestLogging {
 
   /** During testing don't buffer. */
   private static class TestStreamHandler extends StreamHandler {
-    public TestStreamHandler(OutputStream out, Formatter formatter) { super(out, formatter); }
+    public TestStreamHandler(OutputStream out, Formatter formatter) {
+      super(out, formatter);
+    }
 
     @Override
     public void publish(LogRecord record) {
@@ -134,7 +140,9 @@ public class TestLogging {
      * Create a {@code SimpleFormatter}.
      * @param format
      */
-    public TestFormatter(String format) { this.format = format; }
+    public TestFormatter(String format) {
+      this.format = format;
+    }
 
     private static final String PREFIX = "dev.visdb.seesaw";
 
@@ -153,8 +161,11 @@ public class TestLogging {
       String source;
       if (record.getSourceClassName() != null) {
         source = record.getSourceClassName();
-        if (source.startsWith(PREFIX)) source = "SS" + source.substring(PREFIX.length());
-        if (record.getSourceMethodName() != null) { source += " " + record.getSourceMethodName(); }
+        if (source.startsWith(PREFIX))
+          source = "SS" + source.substring(PREFIX.length());
+        if (record.getSourceMethodName() != null) {
+          source += " " + record.getSourceMethodName();
+        }
       } else {
         source = record.getLoggerName();
       }

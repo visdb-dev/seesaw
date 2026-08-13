@@ -97,7 +97,8 @@ public class BorderDecorator extends FocusDecorator {
         bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
       });
       bdpResult.allInstances().stream().findFirst().ifPresent(item -> bdp = item);
-      if (bdp == null) throw new IllegalStateException("BorderDecoratorPaint not found");
+      if (bdp == null)
+        throw new IllegalStateException("BorderDecoratorPaint not found");
     }
     return bdp;
   }
@@ -193,7 +194,8 @@ public class BorderDecorator extends FocusDecorator {
    * @return
    */
   protected Border getBorder(ComponentState state) {
-    if (state == ComponentState.CLEAN) return defaultBorder;
+    if (state == ComponentState.CLEAN)
+      return defaultBorder;
     logger.log(DEBUG, () -> String.format("%s %s", state, asString(decoComp().getInsets())));
     Border b;
     if (decoComp().getBorder() instanceof CompoundBorder cb) {
@@ -272,7 +274,9 @@ public class BorderDecorator extends FocusDecorator {
     }
     return b;
   }
-  private static Insets toInsets(Border b, JComponent jc) { return b.getBorderInsets(jc); }
+  private static Insets toInsets(Border b, JComponent jc) {
+    return b.getBorderInsets(jc);
+  }
 
   //
   // Below are a few methods that create a CompoundBorder
@@ -302,7 +306,8 @@ public class BorderDecorator extends FocusDecorator {
    * @return border
    */
   public static Border empty_line(Insets i, ComponentState state) {
-    if (state == ComponentState.CLEAN) throw new IllegalArgumentException();
+    if (state == ComponentState.CLEAN)
+      throw new IllegalArgumentException();
     Border decoratingBorder = getDecoratingBorder(state);
     Border b = BorderFactory.createCompoundBorder(
         BorderFactory.createEmptyBorder(Math.max(0, i.top - 1), Math.max(0, i.left - 1),
@@ -323,7 +328,8 @@ public class BorderDecorator extends FocusDecorator {
    */
   public static Border line_empty(Insets i, Color color) // TODO: BorderState
   {
-    if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
+    if (Boolean.TRUE)
+      throw new IllegalCallerException("needs state/color fixup");
     Border b = BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(color),
         BorderFactory.createEmptyBorder(Math.max(0, i.top - 1), Math.max(0, i.left - 1),
@@ -344,7 +350,8 @@ public class BorderDecorator extends FocusDecorator {
    */
   public static Border empty_lineSpace(Insets i, Color color) // TODO: BorderState
   {
-    if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
+    if (Boolean.TRUE)
+      throw new IllegalCallerException("needs state/color fixup");
     Border b = BorderFactory.createCompoundBorder(
         BorderFactory.createEmptyBorder(Math.max(0, i.top - 2), Math.max(0, i.left - 2),
                                         Math.max(0, i.bottom - 2), Math.max(0, i.right - 2)),
@@ -422,7 +429,8 @@ public class BorderDecorator extends FocusDecorator {
    * @return String of border for output
    */
   public static String asString(Border b, JComponent jc) {
-    if (b == null) return null;
+    if (b == null)
+      return null;
     if (b instanceof CompoundBorder cb) {
       return String.format("[%s,%s]", asString(cb.getOutsideBorder(), jc),
                            asString(cb.getInsideBorder(), jc));

@@ -69,6 +69,8 @@ public interface TextDecorator extends AnyDecorator {
     public void uninstall() {}
 
     @Override
-    public SSComponent getSSComponent() { return null; }
+    public SSComponent getSSComponent() {
+      return null;
+    }
   };
 }

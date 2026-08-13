@@ -78,7 +78,9 @@ public class Utils {
 
   /** Singleton EventBus */
   private static final EventBus globalEventBus = new EventBus(new BusExceptionMonitor());
-  static { setupTrackerForKFM(); }
+  static {
+    setupTrackerForKFM();
+  }
 
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -91,7 +93,9 @@ public class Utils {
   /**
    * @return true means save the backtrace in the Event.
    */
-  static boolean recordEventBacktrace() { return SSUtils.isJunit() || logger.isLoggable(DEBUG); }
+  static boolean recordEventBacktrace() {
+    return SSUtils.isJunit() || logger.isLoggable(DEBUG);
+  }
 
   private static void postFieldEvent(EventObjectBacktrace eo) {
     addToEventHistory(eo);
@@ -149,7 +153,8 @@ public class Utils {
    */
   public static void postColumnUndoRedo(SSComponent source, Object value, boolean isError) {
     ColumnUndoRedoEvent ev = new ColumnUndoRedoEvent(source, value, isError);
-    if (isError) logger.log(DEBUG, () -> ev.toString());
+    if (isError)
+      logger.log(DEBUG, () -> ev.toString());
     postFieldEvent(ev);
   }
 
@@ -157,7 +162,9 @@ public class Utils {
    * The global EventBus.
    * @return EventBus for this
    */
-  public static EventBus getGlobalEventBus() { return globalEventBus; }
+  public static EventBus getGlobalEventBus() {
+    return globalEventBus;
+  }
 
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -168,7 +175,9 @@ public class Utils {
   private static KeyboardFocusManager KFM;
 
   /** @return Current KeyboardFocusManager */
-  public static KeyboardFocusManager getKFM() { return KFM; }
+  public static KeyboardFocusManager getKFM() {
+    return KFM;
+  }
 
   private static void trackCurrentKFM() {
     KFM = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -179,10 +188,13 @@ public class Utils {
 
   /** keep track of currentKeyboardFocusManager and switch listeners as needed */
   private static void setupTrackerForKFM() {
-    if (listenerFocusOwner != null) return; // Could throw an exception
+    if (listenerFocusOwner != null)
+      return; // Could throw an exception
 
     // broadcast focus changes
-    listenerFocusOwner = pce -> { globalEventBus.post(new FocusChangeEvent(pce)); };
+    listenerFocusOwner = pce -> {
+      globalEventBus.post(new FocusChangeEvent(pce));
+    };
     // detect change in focus manager,
     // remove listeners from old, move them to current
     listenerManagingFocus = pce -> {
@@ -212,7 +224,8 @@ public class Utils {
       if (context.getEvent() instanceof EventObjectBacktrace eobt
           && eobt.getEventBacktrace() != null)
         logger.log(Level.ERROR, () -> "    " + context.getEvent(), eobt.getEventBacktrace());
-      else logger.log(Level.ERROR, () -> "    " + context.getEvent());
+      else
+        logger.log(Level.ERROR, () -> "    " + context.getEvent());
       StringBuilder sb = new StringBuilder("    ");
       logger.log(Level.ERROR, () -> latestEvents("Where", 20, sb).toString());
     }
@@ -228,7 +241,8 @@ public class Utils {
   private static final int N_EVENTS = 50;
   private static final Queue<EventHistoryItem> latestEvents = new ArrayDeque<>();
   static void addToEventHistory(EventObjectBacktrace event) {
-    if (!SSUtils.isJunit() && !logger.isLoggable(DEBUG)) return;
+    if (!SSUtils.isJunit() && !logger.isLoggable(DEBUG))
+      return;
     while (latestEvents.size() >= N_EVENTS) latestEvents.remove();
     // Convert event to String so there are no references
     // (like RowSet, RowsModel) in the history.

@@ -67,7 +67,9 @@ public class SSDataNavigator extends DataNavigator {
    *
    * @param rowsModel   the RowsModel to which the navigator is bound to
    */
-  public SSDataNavigator(RowsModel rowsModel) { super(rowsModel, Lines.ONE, null); }
+  public SSDataNavigator(RowsModel rowsModel) {
+    super(rowsModel, Lines.ONE, null);
+  }
 
   /**
    * Constructs the SSDataNavigator with the given RowsModel.
@@ -75,7 +77,9 @@ public class SSDataNavigator extends DataNavigator {
    * @param rowsModel   the RowsModel to which the navigator is bound to
    * @param nLines      number of display lines for the navigator
    */
-  public SSDataNavigator(RowsModel rowsModel, Lines nLines) { super(rowsModel, nLines, null); }
+  public SSDataNavigator(RowsModel rowsModel, Lines nLines) {
+    super(rowsModel, nLines, null);
+  }
 
   /**
    * Constructs the SSDataNavigator with the given RowsModel

@@ -132,8 +132,12 @@ public class SSMaskFormatterFactoryTest {
       parentParam = builder.parentParam;
     }
 
-    String getParentArg() { return parentArg; }
-    String getParentParam() { return parentParam; }
+    String getParentArg() {
+      return parentArg;
+    }
+    String getParentParam() {
+      return parentParam;
+    }
   }
 
   /** x */
@@ -180,8 +184,12 @@ public class SSMaskFormatterFactoryTest {
       childParam = builder.childParam;
     }
 
-    String getChildArg() { return childArg; }
-    String getChildParam() { return childParam; }
+    String getChildArg() {
+      return childArg;
+    }
+    String getChildParam() {
+      return childParam;
+    }
   }
 
   /** x */

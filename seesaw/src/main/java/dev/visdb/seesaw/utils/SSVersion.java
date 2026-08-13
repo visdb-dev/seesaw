@@ -103,7 +103,9 @@ public class SSVersion implements Comparable<SSVersion> {
    * @return version
    */
   public static SSVersion get() {
-    if (SINGLETON == null) { SINGLETON = parse(getVersionProperty()); }
+    if (SINGLETON == null) {
+      SINGLETON = parse(getVersionProperty());
+    }
     return SINGLETON;
   }
 
@@ -114,7 +116,9 @@ public class SSVersion implements Comparable<SSVersion> {
    * @param sVer version string to parse
    * @return version
    */
-  public static SSVersion get(String sVer) { return parse(sVer); }
+  public static SSVersion get(String sVer) {
+    return parse(sVer);
+  }
 
   // These three values are used to specify the type of version, used for compare
   private static final int VER_REGULAR = 3;
@@ -139,25 +143,33 @@ public class SSVersion implements Comparable<SSVersion> {
    * Check if this release is a "-SNAPSHOT".
    * @return true if snapshot
    */
-  public boolean isSnapshot() { return isSnapshot; }
+  public boolean isSnapshot() {
+    return isSnapshot;
+  }
 
   /**
    * Check if this release is a pre-release; has "-xxx" appended.
    * @return true if pre-release
    */
-  public boolean isPreRelease() { return !preRelease.isEmpty(); }
+  public boolean isPreRelease() {
+    return !preRelease.isEmpty();
+  }
 
   /**
    * Get the lower case pre-release string; empty if not a prerelease.
    * @return pre-release string as lower case
    */
-  public String preRelease() { return preRelease; }
+  public String preRelease() {
+    return preRelease;
+  }
   /** {@inheritDoc} */
   @Override
   public int compareTo(SSVersion o) {
     for (int i = 0; i < versionSequence.size(); ++i) {
       int diff = versionSequence.get(i) - o.versionSequence.get(i);
-      if (diff != 0) { return diff; }
+      if (diff != 0) {
+        return diff;
+      }
     }
     // The 'x.y.z' parts are equal
     if (versionType == VER_PRE_RELEASE && o.versionType == VER_PRE_RELEASE) {
@@ -244,11 +256,19 @@ public class SSVersion implements Comparable<SSVersion> {
   /** {@inheritDoc} */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) { return true; }
-    if (obj == null) { return false; }
-    if (getClass() != obj.getClass()) { return false; }
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
     final SSVersion other = (SSVersion) obj;
-    if (this.isSnapshot != other.isSnapshot) { return false; }
+    if (this.isSnapshot != other.isSnapshot) {
+      return false;
+    }
     return Objects.equals(this.versionSequence, other.versionSequence);
   }
 }

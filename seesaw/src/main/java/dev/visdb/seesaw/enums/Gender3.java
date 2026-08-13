@@ -54,7 +54,9 @@ public enum Gender3 {
 
   private final String displayValue;
 
-  private Gender3(String _displayValue) { displayValue = _displayValue; }
+  private Gender3(String _displayValue) {
+    displayValue = _displayValue;
+  }
 
   /**
    * Generate user visible display string.

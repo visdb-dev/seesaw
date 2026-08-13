@@ -116,7 +116,9 @@ public class DataNavigator extends JPanel {
    *
    * @param rowsModel   the RowsModel to which the navigator is bound to
    */
-  public DataNavigator(RowsModel rowsModel) { this(rowsModel, Lines.ONE, null); }
+  public DataNavigator(RowsModel rowsModel) {
+    this(rowsModel, Lines.ONE, null);
+  }
 
   /**
    * Constructs the DataNavigator with the given RowsModel.
@@ -124,7 +126,9 @@ public class DataNavigator extends JPanel {
    * @param rowsModel   the RowsModel to which the navigator is bound to
    * @param nLines      number of display lines for the navigator
    */
-  public DataNavigator(RowsModel rowsModel, Lines nLines) { this(rowsModel, nLines, null); }
+  public DataNavigator(RowsModel rowsModel, Lines nLines) {
+    this(rowsModel, nLines, null);
+  }
 
   /**
    * Constructs the DataNavigator with the given RowsModel
@@ -177,8 +181,10 @@ public class DataNavigator extends JPanel {
     // lblRowCount.setEditable(false);
     // lblRowCount.setBorder(UIManager.getBorder("TextField.border"));
 
-    if (nLines == Lines.ONE) createOneLineNavigator();
-    else createTwoLineNavigator();
+    if (nLines == Lines.ONE)
+      createOneLineNavigator();
+    else
+      createTwoLineNavigator();
   }
 
   /**
@@ -193,7 +199,8 @@ public class DataNavigator extends JPanel {
   @Deprecated
   protected void setRowsModel(RowsModel rowsModel) {
     Objects.requireNonNull(rowsModel);
-    if (this.rowsModel != null) throw new IllegalStateException("RowsModel already set");
+    if (this.rowsModel != null)
+      throw new IllegalStateException("RowsModel already set");
     this.rowsModel = rowsModel;
 
     installRowsModel(rowsModel);
@@ -282,18 +289,24 @@ public class DataNavigator extends JPanel {
    *         the data navigator.
    */
   // TODO: Dimension copy?
-  public Dimension getButtonSize() { return buttonSize; }
+  public Dimension getButtonSize() {
+    return buttonSize;
+  }
 
   /**
    * Return the RowsModel for this navigator.
    * @return
    */
-  public RowsModel getRowsModel() { return rowsModel; }
+  public RowsModel getRowsModel() {
+    return rowsModel;
+  }
 
   /**
    * Prevent the navigator buttons from displaying the Action name with the icon.
    */
-  private void hideActionText() { uiButtons.forEach(uiItem -> uiItem.setHideActionText(true)); }
+  private void hideActionText() {
+    uiButtons.forEach(uiItem -> uiItem.setHideActionText(true));
+  }
 
   /**
    * This will make all the components in the navigator to either focusable

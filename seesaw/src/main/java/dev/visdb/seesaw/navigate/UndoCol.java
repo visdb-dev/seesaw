@@ -101,7 +101,9 @@ final class UndoCol {
    * Create UndoCol; initialize undo/redo stack from comp's database value;
    * @param comp RowSet Column
    */
-  UndoCol(RSC comp) throws SQLException { this(new Change(initialValue(comp), false)); }
+  UndoCol(RSC comp) throws SQLException {
+    this(new Change(initialValue(comp), false));
+  }
 
   private static Object initialValue(RSC comp) throws SQLException {
     //return isPreInsertOps(comp.getRowSet())
@@ -110,13 +112,18 @@ final class UndoCol {
     // If doing preInsertOps, just use a null for the initial value
     // (special case text field); the real value is on the way.
     if (isPreInsertOps(comp.getRowSet())) {
-      if (comp instanceof JTextComponent) return comp.getAllowNull() ? null : "";
-      else return null;
-    } else return RowSetOps.getColumnDirect(comp);
+      if (comp instanceof JTextComponent)
+        return comp.getAllowNull() ? null : "";
+      else
+        return null;
+    } else
+      return RowSetOps.getColumnDirect(comp);
   }
 
   /** Check if there is an undo (previous) value. */
-  boolean hasPrev() { return curIdx > 0; }
+  boolean hasPrev() {
+    return curIdx > 0;
+  }
 
   /** Return the undo (prevValue). MUST check hasPrev() first. */
   private Change prevValue() {
@@ -126,7 +133,9 @@ final class UndoCol {
   }
 
   /** Check if there a redo (next) value. */
-  boolean hasNext() { return curIdx < changes.size() - 1; }
+  boolean hasNext() {
+    return curIdx < changes.size() - 1;
+  }
 
   /** Return the redo (nextValue. MUST check hasNext() first. */
   private Change nextValue() {
@@ -158,13 +167,15 @@ final class UndoCol {
     // TODO: only do this if null?
     // Don't push something on the top if it equals what's on the top.
     Change newChange = new Change(me.getValue(), me.isError());
-    if (fetchCurrentChange().equals(newChange)) return;
+    if (fetchCurrentChange().equals(newChange))
+      return;
 
     if (needNewSlot) {
       // First modification after a focus change or change that needs new slot.
       // Put change in a new spot.
       ++curIdx;
-      if (curIdx >= changes.size()) changes.add(null); // need a new slot
+      if (curIdx >= changes.size())
+        changes.add(null); // need a new slot
       needNewSlot = false;
     }
     assert curIdx > 0 : "can not be on the original value";
@@ -186,7 +197,8 @@ final class UndoCol {
    * @return true if a change was removed.
    */
   boolean removeDuplicateChange(int idx) {
-    if (idx == 0 || idx >= changes.size()) return false;
+    if (idx == 0 || idx >= changes.size())
+      return false;
 
     // Can probably assert curIdx == changes.size() - 1
     //if (curIdx != changes.size() - 1) throw new IllegalStateException();
@@ -194,14 +206,18 @@ final class UndoCol {
       NavigateState.getLogger().log(
           DEBUG, () -> sf("UNDO/REDO removeDuplicateChange: %d - %s", idx, changes));
       changes.remove(idx);
-      if (idx <= curIdx) { curIdx--; }
+      if (idx <= curIdx) {
+        curIdx--;
+      }
       needNewSlot = true;
       return true;
     }
     return false;
   }
 
-  boolean isDirty() { return curIdx != 0; }
+  boolean isDirty() {
+    return curIdx != 0;
+  }
 
   Change findUndoRedoChange(UndoRedo cmd) {
     return switch (cmd) {
@@ -216,7 +232,9 @@ final class UndoCol {
    * or it may be the value from a modification event.
    * @return value
    */
-  Change fetchCurrentChange() { return changes.get(curIdx); }
+  Change fetchCurrentChange() {
+    return changes.get(curIdx);
+  }
 
   /**
    * Handle focus change.

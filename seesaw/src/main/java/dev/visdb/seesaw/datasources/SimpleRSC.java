@@ -80,9 +80,13 @@ public class SimpleRSC implements RSC {
     this.name = name != null ? name : RowSetOps.getColumnName(rs, index);
   }
 
-  SimpleRSC(RowsModel rowsModel, int index) throws SQLException { this(rowsModel, index, null); }
+  SimpleRSC(RowsModel rowsModel, int index) throws SQLException {
+    this(rowsModel, index, null);
+  }
 
-  SimpleRSC(RowsModel rowsModel, String name) throws SQLException { this(rowsModel, null, name); }
+  SimpleRSC(RowsModel rowsModel, String name) throws SQLException {
+    this(rowsModel, null, name);
+  }
 
   /** {@inheritDoc} */
   @Override
@@ -113,7 +117,9 @@ public class SimpleRSC implements RSC {
   public JDBCType getColumnJDBCType() {
     try {
       return RowSetOps.getJDBCColumnType(getRowSet(), index);
-    } catch (SQLException ex) { throw new SSSQLRuntimeException(ex); }
+    } catch (SQLException ex) {
+      throw new SSSQLRuntimeException(ex);
+    }
   }
 
   /** {@inheritDoc} */
@@ -125,7 +131,9 @@ public class SimpleRSC implements RSC {
     try {
       if (getRowSet().getRow() != 0) {
         value = RowSetOps.getColumnObjectText(this);
-        if (!getAllowNull() && (value == null)) { value = ""; }
+        if (!getAllowNull() && (value == null)) {
+          value = "";
+        }
       }
     } catch (final SQLException ex) {
       logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
@@ -184,9 +192,11 @@ public class SimpleRSC implements RSC {
 
   // Following to avoid not used error
   static {
-    if (Boolean.FALSE) try {
+    if (Boolean.FALSE)
+      try {
         new SimpleRSC(null, 0).getColumnCount();
-      } catch (SQLException ex) {}
+      } catch (SQLException ex) {
+      }
   }
 
   private int getColumnCount() {

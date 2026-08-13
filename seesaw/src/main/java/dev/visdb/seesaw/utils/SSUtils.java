@@ -113,7 +113,8 @@ public class SSUtils {
   // TODO: could throw exception if more than one model for specified RowSet.
   public static RowsModel findRowsModel(RowSet rs) {
     RowsModel rowsModel = RowsModel.getActiveRowModel(rs);
-    if (rowsModel == null) rowsModel = RowsModel.create(rs);
+    if (rowsModel == null)
+      rowsModel = RowsModel.create(rs);
     return rowsModel;
   }
 
@@ -184,10 +185,13 @@ public class SSUtils {
    */
   @SuppressWarnings("null")
   public static int size(Map<?, ?> map) {
-    if (!(map instanceof ConcurrentMap)) return map.size();
+    if (!(map instanceof ConcurrentMap))
+      return map.size();
     // Can't depend on size() method when weakKeys.
     int counter = 0;
-    for (Map.Entry<?, ?> _ : map.entrySet()) { counter++; }
+    for (Map.Entry<?, ?> _ : map.entrySet()) {
+      counter++;
+    }
     return counter;
   }
 
@@ -203,7 +207,8 @@ public class SSUtils {
         dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
       });
       dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
-      if (dbSupport == null) throw new IllegalStateException("SSDBSupport not found");
+      if (dbSupport == null)
+        throw new IllegalStateException("SSDBSupport not found");
     }
     return dbSupport;
   }
@@ -221,13 +226,17 @@ public class SSUtils {
   //		 Could this be needed for joins?
   public static void setupDefaultPrimaryKeys(SSComponent comp) {
     RowSet rs = comp.getRowSet();
-    if (rs instanceof JoinRowSet) return;
-    if (!(rs instanceof CachedRowSet crs)) return;
+    if (rs instanceof JoinRowSet)
+      return;
+    if (!(rs instanceof CachedRowSet crs))
+      return;
     try {
-      if (crs.getKeyColumns() != null) return;
+      if (crs.getKeyColumns() != null)
+        return;
       int[] keys = getPrimaryKeyColumns(SSUtils.dbSupport().getSharedConnection(), crs);
       crs.setKeyColumns(keys);
-    } catch (SQLException ex) {}
+    } catch (SQLException ex) {
+    }
   }
   private static int[] getPrimaryKeyColumns(Connection connection, CachedRowSet crs)
       throws SQLException {
@@ -434,7 +443,9 @@ public class SSUtils {
    */
   // TODO: put this in utils/SSUtil
   public static String objectID(Object o) {
-    if (o == null) { return "null"; }
+    if (o == null) {
+      return "null";
+    }
     String s = switch (o) {
       case RowSet rs ->
         sf("%s[%s]@%X", o.getClass().getSimpleName(), tableName(rs), System.identityHashCode(o));
@@ -451,7 +462,8 @@ public class SSUtils {
   public static String tableName(RowSet rs) {
     try {
       return rs.getMetaData().getTableName(1);
-    } catch (SQLException ex) {}
+    } catch (SQLException ex) {
+    }
     return null;
   }
 
@@ -466,7 +478,8 @@ public class SSUtils {
       StackWalker walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
       Optional<StackWalker.StackFrame> frame
           = walker.walk(s -> s.filter((f) -> f.getClassName().startsWith("org.junit")).findFirst());
-      if (frame.isPresent()) isJunit = true;
+      if (frame.isPresent())
+        isJunit = true;
       didJunitCheck = true;
     }
     return isJunit;
@@ -477,7 +490,8 @@ public class SSUtils {
    * @return
    */
   public static boolean isJunitPrint() {
-    if (!isJunit()) return false;
+    if (!isJunit())
+      return false;
     java.util.logging.Logger juLog = LogManager.getLogManager().getLogger("dev.visdb.seesaw");
     if (juLog != null) {
       Handler[] handlers = juLog.getHandlers();

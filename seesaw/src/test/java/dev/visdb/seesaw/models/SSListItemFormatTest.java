@@ -103,7 +103,9 @@ public class SSListItemFormatTest {
   public void tearDown() {}
 
   static class LI extends AbstractComboBoxListSwingModel {
-    public LI(int itemNumElems, List<SSListItem> itemList) { super(itemNumElems, itemList); }
+    public LI(int itemNumElems, List<SSListItem> itemList) {
+      super(itemNumElems, itemList);
+    }
 
     @Override
     protected void checkState() {}

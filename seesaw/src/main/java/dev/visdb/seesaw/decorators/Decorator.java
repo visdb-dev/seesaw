@@ -67,7 +67,9 @@ public interface Decorator extends AnyDecorator {
      * create named decorator style
      * @param style arbitrary string
      */
-    public DecoratorStyle(String style) { this.style = style; }
+    public DecoratorStyle(String style) {
+      this.style = style;
+    }
 
     /** {@inheritDoc } */
     @Override
@@ -115,7 +117,9 @@ public interface Decorator extends AnyDecorator {
   public static Decorator nullDecorator = new Decorator() {
     /** {@inheritDoc} */
     @Override
-    public boolean decorate() { return true; }
+    public boolean decorate() {
+      return true;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -127,10 +131,14 @@ public interface Decorator extends AnyDecorator {
 
     /** {@inheritDoc} */
     @Override
-    public DecoratorStyle getDecoratorStyle() { return DecoratorStyle.NONE; }
+    public DecoratorStyle getDecoratorStyle() {
+      return DecoratorStyle.NONE;
+    }
 
     @Override
-    public SSComponent getSSComponent() { return null; }
+    public SSComponent getSSComponent() {
+      return null;
+    }
 
     @Override
     public void setDecorateTextEnabled(boolean flag) {}

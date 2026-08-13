@@ -64,13 +64,17 @@ public class SSTimeField extends DateTimeField {
   /**
    * Create an SSTimeField using the default format.
    */
-  public SSTimeField() { this(SSFormat.TIME); }
+  public SSTimeField() {
+    this(SSFormat.TIME);
+  }
 
   /**
    *  Creates an SSTimeField with the specified format.
    *  @param format - an enum format to be used while the date field is in edit mode
    */
-  public SSTimeField(SSFormat format) { this(createFormatterFactory(format)); }
+  public SSTimeField(SSFormat format) {
+    this(createFormatterFactory(format));
+  }
 
   /**
    * Creates an object of SSTimeField with the specified formatter factory

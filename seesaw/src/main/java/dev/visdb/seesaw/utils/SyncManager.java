@@ -101,7 +101,9 @@ public class SyncManager<K> {
     removeRowsetListener();
     try {
       rowsModel.rsOp(comboBox, () -> handleComboEvent01());
-    } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); } finally {
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception.", se);
+    } finally {
       logger.log(DEBUG,
                  () -> sf("SyncComboListener actionPerformedCount=%s", actionPerformedCount++));
       addRowsetListener();
@@ -119,7 +121,9 @@ public class SyncManager<K> {
   // direct use of getRowSet()
   private void handleComboEvent01() throws SQLException {
     // Nothing to do for an empty/null rowset.
-    if ((getRowSet() == null) || !rowsModel.containsRows()) { return; }
+    if ((getRowSet() == null) || !rowsModel.containsRows()) {
+      return;
+    }
 
     K comboPK = comboBox.getChosenKey();
     logger.log(DEBUG, () -> sf("COMBO NAVIGATOR: getChosenKey() returned: %s.", comboPK));
@@ -190,8 +194,12 @@ public class SyncManager<K> {
             if (numRecords > OFFSET_TO_CHECK) {
               rowsetSearchFrom = guessRowNumber - OFFSET_TO_CHECK;
             }
-            if (rowsetSearchFrom < 1) { rowsetSearchFrom += numRecords; }
-            if (rowsetSearchFrom > numRecords) { rowsetSearchFrom -= numRecords; }
+            if (rowsetSearchFrom < 1) {
+              rowsetSearchFrom += numRecords;
+            }
+            if (rowsetSearchFrom > numRecords) {
+              rowsetSearchFrom -= numRecords;
+            }
             getRowSet().absolute(rowsetSearchFrom);
           }
 
@@ -308,7 +316,9 @@ public class SyncManager<K> {
         //comboBox.setSelectedIndex(-1);
         comboBox.setChosenKey(null);
       }
-    } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception.", se);
+    }
 
     comboBox.setEnabled(true);
     addComboListener();
@@ -384,7 +394,9 @@ public class SyncManager<K> {
    * of the RowSet in {@code <D2>}.
    * @param comboHasRowNum
    */
-  public void setComboHasRowNum(boolean comboHasRowNum) { this.comboHasRowNum = comboHasRowNum; }
+  public void setComboHasRowNum(boolean comboHasRowNum) {
+    this.comboHasRowNum = comboHasRowNum;
+  }
 
   /**
    * Stop synchronization between navigation components.
@@ -431,7 +443,9 @@ public class SyncManager<K> {
     this.rowsModel = rowsModel;
   }
 
-  private RowSet getRowSet() { return rowsModel.getRowSet(); }
+  private RowSet getRowSet() {
+    return rowsModel.getRowSet();
+  }
 
   /**
    * Adds listeners to combobox & rowset.

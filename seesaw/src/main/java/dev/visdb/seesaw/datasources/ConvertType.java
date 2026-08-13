@@ -84,7 +84,9 @@ public class ConvertType {
    */
   private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType
       = new EnumMap<>(JDBCType.class);
-  static { overrideJdbcStandard(); }
+  static {
+    overrideJdbcStandard();
+  }
   private static void overrideJdbcStandard() {
     // The *_WITH_TIMEZONE aren't mentioned in appendix B.1 or B.3
     overrideJdbcToJavaType.put(JDBCType.TIME_WITH_TIMEZONE, OffsetTime.class);
@@ -371,13 +373,13 @@ public class ConvertType {
             case BIGD -> { return n; }	// Should have been caught at entry.
           }
         }
-        // clang-format on
+          // clang-format on
       }
       if (result.longValue() != n.longValue() || bigdOflow)
         throw new SSSQLConversionException(sf("Convert %s to %s: %s", n, target, "overflow"));
       return result;
     }
-    
+
     // clang-format off
     switch (sourceValue) {
       case Boolean b -> {
@@ -497,7 +499,7 @@ public class ConvertType {
           }
         }
       }
-      // clang-format off
+        // clang-format off
       case LOCALDATETIME -> {
         switch(source) {
           case TIMESTAMP -> { return ((java.sql.Timestamp)sourceValue).toLocalDateTime(); }
@@ -558,7 +560,9 @@ public class ConvertType {
     Object[] newArray = (Object[]) java.lang.reflect.Array.newInstance(clazz, objects.length);
     try {
       System.arraycopy(objects, 0, newArray, 0, objects.length);
-    } catch (ArrayStoreException ex) { throw new SQLException(ex); }
+    } catch (ArrayStoreException ex) {
+      throw new SQLException(ex);
+    }
     return newArray;
   }
 
@@ -574,7 +578,9 @@ public class ConvertType {
   public static Object castJDBCToJava(JDBCType jdbcType, Object object) throws SQLException {
     try {
       return findJavaTypeClass(jdbcType).cast(object);
-    } catch (ClassCastException ex) { throw new SQLException(ex); }
+    } catch (ClassCastException ex) {
+      throw new SQLException(ex);
+    }
   }
 
   /**
@@ -587,11 +593,14 @@ public class ConvertType {
   public static Class<?> findJavaTypeClass(JDBCType jdbcType) throws SQLException {
     Class<?> clazz = overrideJdbcToJavaType.getOrDefault(jdbcType, null);
     if (clazz != null) {
-      if (clazz == Exception.class) { throw new SSSQLUnhandledTypeException(jdbcType.toString()); }
+      if (clazz == Exception.class) {
+        throw new SSSQLUnhandledTypeException(jdbcType.toString());
+      }
       return clazz;
     }
 
-    if (!isHandledType(jdbcType)) throw new SSSQLUnhandledTypeException(jdbcType.toString());
+    if (!isHandledType(jdbcType))
+      throw new SSSQLUnhandledTypeException(jdbcType.toString());
 
     return JdbcDataTypeConversionTables.jdbcTypeToClassStrict(jdbcType);
 
@@ -633,7 +642,9 @@ public class ConvertType {
     // TODO: OFFSETTIME, OFFSETDATETIME
     ;
 
-    public static Clazz getClazz(Class<?> c) { return mapClazz.get(c); }
+    public static Clazz getClazz(Class<?> c) {
+      return mapClazz.get(c);
+    }
 
     private final boolean isNumeric;
     private final boolean isIntegral;
@@ -659,20 +670,29 @@ public class ConvertType {
     // A Date/Time value.
     @SuppressWarnings("LeakingThisInConstructor")
     Clazz(Class<?> clazz, boolean isDateTime) {
-      if (!isDateTime) throw new IllegalArgumentException();
+      if (!isDateTime)
+        throw new IllegalArgumentException();
       mapClazz.put(clazz, this);
       this.isNumeric = false;
       this.isIntegral = false;
       this.isDateTime = isDateTime;
     }
 
-    boolean isNumeric() { return isNumeric; }
+    boolean isNumeric() {
+      return isNumeric;
+    }
 
-    public boolean isIntegral() { return isNumeric && isIntegral; }
+    public boolean isIntegral() {
+      return isNumeric && isIntegral;
+    }
 
-    public boolean isFloating() { return isNumeric && !isIntegral; }
+    public boolean isFloating() {
+      return isNumeric && !isIntegral;
+    }
 
-    boolean isDateTime() { return isDateTime; }
+    boolean isDateTime() {
+      return isDateTime;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////

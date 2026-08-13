@@ -53,10 +53,13 @@ public abstract class BaseDecorator extends BaseAnyDecorator implements Decorato
    * @param valid
    */
   protected void handleTextDecorator(ValidationResult valid) {
-    if (!decorateTextEnabled) return;
+    if (!decorateTextEnabled)
+      return;
     TextDecorator td = getSSComponent().getTextDecorator();
     assert td != null;
-    if (td instanceof ComponentStateTextDecorator std) std.decorateText(valid);
-    else td.decorateText();
+    if (td instanceof ComponentStateTextDecorator std)
+      std.decorateText(valid);
+    else
+      td.decorateText();
   }
 }

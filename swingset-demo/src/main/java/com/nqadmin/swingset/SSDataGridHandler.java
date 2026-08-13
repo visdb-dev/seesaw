@@ -42,5 +42,4 @@ package com.nqadmin.swingset;
  * determine whether or not a given row can be deleted, and operation to be
  * performed before and after deletion or insertion of a record.
  */
-public interface SSDataGridHandler extends dev.visdb.seesaw.core.table.SSDataGridHandler {
-}
+public interface SSDataGridHandler extends dev.visdb.seesaw.core.table.SSDataGridHandler {}

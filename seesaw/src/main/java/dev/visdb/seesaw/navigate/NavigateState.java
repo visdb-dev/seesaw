@@ -158,7 +158,9 @@ final class NavigateState {
   private static final boolean AUTO_COMMIT_DEFAULT = false;
 
   /** logger for package use. */
-  static Logger getLogger() { return logger; }
+  static Logger getLogger() {
+    return logger;
+  }
 
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -263,13 +265,17 @@ final class NavigateState {
         try {
           logger.log(DEBUG, "Updating row count.");
           establishRowCountCurrentRow(RowPositioning.AT_FIRST);
-        } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+        } catch (final SQLException se) {
+          logger.log(ERROR, "SQL Exception.", se);
+        }
       }
       try {
         logger.log(DEBUG, "Calling updateNavigator().");
         freshRow();
         updateNavigatorRowAndCount();
-      } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+      } catch (final SQLException se) {
+        logger.log(ERROR, "SQL Exception.", se);
+      }
     }
 
     @WeakSubscribe
@@ -277,18 +283,22 @@ final class NavigateState {
       logger.log(DEBUG, () -> sf("%s %s", objectID(getRowSet()), ev.toString()));
 
       // Return if not our row set.
-      if (ev.getRowsModel().getRowSet() != getRowSet()) return;
+      if (ev.getRowsModel().getRowSet() != getRowSet())
+        return;
 
       try {
         updateNavigatorRowAndCount();
-      } catch (SQLException ex) { logger.log(ERROR, (String) null, ex); }
+      } catch (SQLException ex) {
+        logger.log(ERROR, (String) null, ex);
+      }
     }
 
     // Following are typically from RowSetOps.
 
     @WeakSubscribe
     public void handleColumnChangeStart(ColumnChangeStartEvent ev) {
-      if (!ev.matches(getRowSet())) return;
+      if (!ev.matches(getRowSet()))
+        return;
 
       // Our RowSet's row has changed
       logger.log(TRACE, () -> ev.toString());
@@ -296,7 +306,9 @@ final class NavigateState {
         // TODO what about ev.getSource == null ?
         ((SSComponent) ev.getSource()).addUndoableChange(ev);
         // TODO: don't do the rest of this stuff if exception?
-      } catch (SQLException ex) { logger.log(ERROR, "Undo/redo exception", ex); }
+      } catch (SQLException ex) {
+        logger.log(ERROR, "Undo/redo exception", ex);
+      }
 
       adjustErrorComponentState(ev.getRSC(), ev.isError());
       Utils.postColumnChangeDone(ev);
@@ -304,7 +316,8 @@ final class NavigateState {
 
     @WeakSubscribe
     public void handleColumnUndoRedo(ColumnUndoRedoEvent ev) {
-      if (!ev.matches(getRowSet())) return;
+      if (!ev.matches(getRowSet()))
+        return;
 
       // Our RowSet's row had an undo/redo.
       logger.log(TRACE, () -> ev.toString());
@@ -319,15 +332,18 @@ final class NavigateState {
 
     @WeakSubscribe
     public void handleDbOpsChange(DbOpsChangeEvent ev) {
-      if (Objects.equals(getDbOps(), ev.getDbOps())) updateActionState();
+      if (Objects.equals(getDbOps(), ev.getDbOps()))
+        updateActionState();
     }
   }
 
   /** return true if number of components in error changed. */
   boolean adjustErrorComponentState(RSC rsc, boolean isError) {
     int sz = errorComponents.size();
-    if (isError) errorComponents.add(rsc);
-    else errorComponents.remove(rsc);
+    if (isError)
+      errorComponents.add(rsc);
+    else
+      errorComponents.remove(rsc);
     logger.log(TRACE,
                ()
                    -> sf("{%s} %s error: %b, sz: %d -> %d", JStuff.getCaller(4),
@@ -335,8 +351,10 @@ final class NavigateState {
 
     boolean compsChange = sz != errorComponents.size();
     if (compsChange) {
-      if (rsc instanceof SSComponent comp) comp.decorate();
-      else throw new IllegalStateException("Not SSComponent");
+      if (rsc instanceof SSComponent comp)
+        comp.decorate();
+      else
+        throw new IllegalStateException("Not SSComponent");
     }
     updateActionState();
     return compsChange;
@@ -406,12 +424,14 @@ final class NavigateState {
 
     setupEventBus();
 
-    if (rowSet == null) return;
+    if (rowSet == null)
+      return;
     setupRowSet(rowSet);
   }
 
   void setupRowSet(RowSet rowSet) {
-    if (this.rowSet != null) throw new IllegalStateException("NavState already has a RowSet");
+    if (this.rowSet != null)
+      throw new IllegalStateException("NavState already has a RowSet");
     this.rowSet = rowSet;
     navigateState.put(rowSet, this);
     setupRowSet();
@@ -438,7 +458,9 @@ final class NavigateState {
           establishRowCountCurrentRow(RowPositioning.AT_FIRST);
         }
       }
-    } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception.", se);
+    }
 
     // Add rowset listener.
     enableRowsetListeningFlag("setupRowSet");
@@ -446,7 +468,9 @@ final class NavigateState {
     try {
       // freshRow();	// ************************** remove, setupRow only happens once.
       updateNavigatorRowAndCount();
-    } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception.", se);
+    }
 
     // TODO: This is new since first time NavGroupState was implemented.
     //       I think that doing setRowModified(false) a few lines up
@@ -475,7 +499,9 @@ final class NavigateState {
    *
    * @return returns the RowSet being used.
    */
-  final RowSet getRowSet() { return rowSet; }
+  final RowSet getRowSet() {
+    return rowSet;
+  }
 
   /**
    * @return returns the RowSet's current row being used.
@@ -529,7 +555,8 @@ final class NavigateState {
     int stepsize = act == UpDownKeysAction.UP_DECREMENT   ? -1
                    : act == UpDownKeysAction.UP_INCREMENT ? 1
                                                           : 0;
-    if (stepsize != 0) rowNumberModel.setStepSize(stepsize);
+    if (stepsize != 0)
+      rowNumberModel.setStepSize(stepsize);
   }
 
   /**
@@ -542,12 +569,16 @@ final class NavigateState {
   // TODO: Should this be public? NO, go through the static method in this class
   // TODO: SSComponent vs RSC
   Change doUndoRedo(SSComponent comp, UndoRedo cmd) throws SQLException {
-    if (!UndoRedo.isUndoRedoEnabled(comp)) throw new IllegalStateException("UNDO/REDO disabled");
+    if (!UndoRedo.isUndoRedoEnabled(comp))
+      throw new IllegalStateException("UNDO/REDO disabled");
     Change change = undoRow.undoRedoChange(comp, cmd);
-    if (change == UndoRedo.NO_CHANGE) SSUtils.beep();
+    if (change == UndoRedo.NO_CHANGE)
+      SSUtils.beep();
     else {
-      if (change.isError()) errorComponents.add(comp);
-      else errorComponents.remove(comp);
+      if (change.isError())
+        errorComponents.add(comp);
+      else
+        errorComponents.remove(comp);
       comp.undoRedoUpdateObject(cmd, change);
     }
     updateActionState();
@@ -555,10 +586,13 @@ final class NavigateState {
   }
 
   private final SpinnerNumberModel rowNumberModel;
-  SpinnerNumberModel getRowNumberModel() { return rowNumberModel; }
+  SpinnerNumberModel getRowNumberModel() {
+    return rowNumberModel;
+  }
 
   /*RowsActions*/ boolean autoCommitUpdateRowToDatabase(RowsModel rowsModel) throws SQLException {
-    if (!undoRow.isDirty()) return true; // all is OK
+    if (!undoRow.isDirty())
+      return true; // all is OK
     return commitUpdateRowToDatabase(rowsModel);
   }
 
@@ -606,7 +640,8 @@ final class NavigateState {
     if (updateOK && canUpdate()) {
       RowSetOps.updateRow(getRowSet());
       getDbOps().performPostUpdateOps(rowsModel);
-    } else updateOK = false; // can't update, so return false
+    } else
+      updateOK = false; // can't update, so return false
 
     return updateOK;
   }
@@ -626,12 +661,16 @@ final class NavigateState {
    *
    * @return return true if RowSet contains data else false.
    */
-  public boolean containsRows() { return rowCount != 0; }
+  public boolean containsRows() {
+    return rowCount != 0;
+  }
 
   /**
    * @return boolean indicating if the navigator is on an insert row
    */
-  public boolean isOnInsertRow() { return RowSetState.isInserting(getRowSet()); }
+  public boolean isOnInsertRow() {
+    return RowSetState.isInserting(getRowSet());
+  }
 
   /**
    * Adds listener to the rowset
@@ -688,7 +727,9 @@ final class NavigateState {
    * @param confirmDeletes indicates whether or not to confirm deletions
    */
   // TODO: WHAT?
-  void setConfirmDeletes(boolean confirmDeletes) { this.confirmDeletes = confirmDeletes; }
+  void setConfirmDeletes(boolean confirmDeletes) {
+    this.confirmDeletes = confirmDeletes;
+  }
 
   /**
    * Returns true if deletions must be confirmed by user, else false.
@@ -696,7 +737,9 @@ final class NavigateState {
    * @return returns true if a confirmation dialog is displayed when the user
    *         deletes a record, else false.
    */
-  boolean getConfirmDeletes() { return confirmDeletes; }
+  boolean getConfirmDeletes() {
+    return confirmDeletes;
+  }
 
   /**
    * Enables or disables the row deletion button. This method should be used if
@@ -714,7 +757,9 @@ final class NavigateState {
    *
    * @return returns true if deletions are allowed, else false.
    */
-  boolean getAllowDelete() { return allowDelete; }
+  boolean getAllowDelete() {
+    return allowDelete;
+  }
 
   /**
    * Enables or disables the row insertion button. This method should be used if
@@ -732,7 +777,9 @@ final class NavigateState {
    *
    * @return returns true if insertions are allowed, else false.
    */
-  boolean getAllowInsert() { return allowInsert; }
+  boolean getAllowInsert() {
+    return allowInsert;
+  }
 
   /**
    * Enables or disables the modification-related buttons on the SSDataNavigator.
@@ -752,10 +799,14 @@ final class NavigateState {
    * @return returns true if the user modifications are written back to the
    *         database, else false.
    */
-  boolean getAllowWrite() { return allowWrite; }
+  boolean getAllowWrite() {
+    return allowWrite;
+  }
 
   /** Allow/disallow edits to a RowSets record. */
-  boolean getAllowUpdate() { return allowUpdate; }
+  boolean getAllowUpdate() {
+    return allowUpdate;
+  }
 
   /* Enables or disables the modification-related buttons on the SSDataNavigator. */
   void setAllowUpdate(boolean allowUpdate) {
@@ -763,7 +814,9 @@ final class NavigateState {
     updateActionState();
   }
 
-  boolean hasError(SSComponent comp) { return errorComponents.contains(comp); }
+  boolean hasError(SSComponent comp) {
+    return errorComponents.contains(comp);
+  }
 
   /**
    * Function that passes the implementation of the DbOps interface. This
@@ -784,13 +837,16 @@ when the insert button is pressed to perform custom actions.
    *
    * @return any custom implementation of the DbOps interface
    */
-  DbOps getDbOps() { return dbOps; }
+  DbOps getDbOps() {
+    return dbOps;
+  }
 
   // TODO: handle multipble navCombo?
   <K> void setNavCombo(DBComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
     Objects.requireNonNull(navCombo);
     // TODO: Objects.requireNonNull(syncer);
-    if (this.navCombo != null) throw new IllegalStateException("navCombo already set");
+    if (this.navCombo != null)
+      throw new IllegalStateException("navCombo already set");
     this.navCombo = navCombo;
     this.syncer = syncer;
   }
@@ -799,10 +855,13 @@ when the insert button is pressed to perform custom actions.
    * @return the navCombo
    */
   // TODO: what's this about
-  /*public*/ DBComboBox2<?, ?, ?> getNavCombo() { return navCombo; }
+  /*public*/ DBComboBox2<?, ?, ?> getNavCombo() {
+    return navCombo;
+  }
 
   void syncSyncManager() {
-    if (syncer != null) syncer.sync();
+    if (syncer != null)
+      syncer.sync();
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -814,7 +873,8 @@ when the insert button is pressed to perform custom actions.
   //private boolean isRowModified = false;
 
   void setNavComboEnabled(boolean b) {
-    if (navCombo != null) navCombo.setEnabled(b);
+    if (navCombo != null)
+      navCombo.setEnabled(b);
   }
 
   /** Going to a new row, or undo updates, or refresh row. */
@@ -839,7 +899,8 @@ when the insert button is pressed to perform custom actions.
     List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
     for (RowsModel rowsModel : rowsModels) {
       Action act = rowsModel.getAction(navAction);
-      if (act.isEnabled() != enableFlag) act.setEnabled(enableFlag);
+      if (act.isEnabled() != enableFlag)
+        act.setEnabled(enableFlag);
     }
   }
   @SuppressWarnings("unused")
@@ -866,7 +927,9 @@ when the insert button is pressed to perform custom actions.
    * Return if Pre v4 button behavior.
    * @return true if pre v4
    */
-  private boolean isV3Buttons() { return v3Buttons; }
+  private boolean isV3Buttons() {
+    return v3Buttons;
+  }
 
   /**
    * Set whether or not the commit and cancel buttons are always enabled,
@@ -891,7 +954,9 @@ when the insert button is pressed to perform custom actions.
    *
    * @return true if autoCommit mode
    */
-  private boolean isAutoCommit() { return autoCommit; }
+  private boolean isAutoCommit() {
+    return autoCommit;
+  }
 
   /**
    * Set whether or not to enable autoCommit mode.
@@ -909,7 +974,9 @@ when the insert button is pressed to perform custom actions.
   }
 
   private boolean lastCanNavigate;
-  boolean canNavigate() { return lastCanNavigate; }
+  boolean canNavigate() {
+    return lastCanNavigate;
+  }
 
   private boolean canWrite() {
     DbOps ops = getDbOps();
@@ -917,11 +984,17 @@ when the insert button is pressed to perform custom actions.
         && (ops.allowUpdate() || ops.allowInsert() || ops.allowDelete());
   }
 
-  boolean canInsert() { return getAllowWrite() && getAllowInsert() && getDbOps().allowInsert(); }
+  boolean canInsert() {
+    return getAllowWrite() && getAllowInsert() && getDbOps().allowInsert();
+  }
 
-  boolean canDelete() { return getAllowWrite() && getAllowDelete() && getDbOps().allowDelete(); }
+  boolean canDelete() {
+    return getAllowWrite() && getAllowDelete() && getDbOps().allowDelete();
+  }
 
-  boolean canUpdate() { return getAllowWrite() && getAllowUpdate() && getDbOps().allowUpdate(); }
+  boolean canUpdate() {
+    return getAllowWrite() && getAllowUpdate() && getDbOps().allowUpdate();
+  }
 
   /**
    * Set the enable/disable state of each button according to
@@ -1016,7 +1089,9 @@ when the insert button is pressed to perform custom actions.
         updateEnable(ACT_FIRST, false);
         updateEnable(ACT_PREVIOUS, false);
       }
-    } catch (SQLException ex) { logger.log(ERROR, "SQL Exception.", ex); }
+    } catch (SQLException ex) {
+      logger.log(ERROR, "SQL Exception.", ex);
+    }
   }
 
   /**
@@ -1053,7 +1128,8 @@ when the insert button is pressed to perform custom actions.
       logger.log(DEBUG, "Doing NAV_COMMIT.");
       // TODO: minor optim getAnyRowModel(getRowSet())
       List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
-      if (rowsModels.isEmpty()) throw new IllegalStateException("No RowsModel for rowSet");
+      if (rowsModels.isEmpty())
+        throw new IllegalStateException("No RowsModel for rowSet");
       // Do the commit through any action.
       rowsModels.get(0).getAction(ACT_COMMIT).actionPerformed(null);
     }

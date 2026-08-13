@@ -152,7 +152,9 @@ public class Example5 extends JFrame {
                                    },
                                    new Object[] {null, 0, 1, "New Roads"});
 
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     // MAKE THE JFRAME VISIBLE
     setVisible(true);

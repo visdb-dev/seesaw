@@ -35,5 +35,7 @@ public class ConvertTypeSnippets {
     // @end region=convert_array
   }
 
-  Object[] f() { return null; }
+  Object[] f() {
+    return null;
+  }
 }

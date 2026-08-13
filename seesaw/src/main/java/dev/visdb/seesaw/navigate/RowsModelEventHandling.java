@@ -115,15 +115,19 @@ public class RowsModelEventHandling {
 
     final RowsEventSource getCurrentEventSource() {
       RowsEventSource tos = eventSourceStack.peek();
-      if (tos == null) throw new IllegalStateException("stack empty");
+      if (tos == null)
+        throw new IllegalStateException("stack empty");
       return tos;
     }
 
-    final void pushEventSource(RowsEventSource eventSource) { eventSourceStack.push(eventSource); }
+    final void pushEventSource(RowsEventSource eventSource) {
+      eventSourceStack.push(eventSource);
+    }
 
     final RowsEventSource popEventSource() {
       RowsEventSource tosEventSource = eventSourceStack.pop();
-      if (tosEventSource == null) throw new IllegalStateException("stack empty");
+      if (tosEventSource == null)
+        throw new IllegalStateException("stack empty");
       return tosEventSource;
     }
 
@@ -160,10 +164,13 @@ public class RowsModelEventHandling {
     public void startRowsEvent(OperatorKind _operatorKind, RowsModel model, Object compOrNav) {
       verifyEDT();
       Objects.requireNonNull(model.getRowSet());
-      if (getCurrentEventSource() != IDLE_EVENT) { flushPendingEvent(getCurrentEventSource()); }
+      if (getCurrentEventSource() != IDLE_EVENT) {
+        flushPendingEvent(getCurrentEventSource());
+      }
 
       OperatorKind operatorKind;
-      if (_operatorKind != null) operatorKind = _operatorKind;
+      if (_operatorKind != null)
+        operatorKind = _operatorKind;
       else {
         operatorKind = switch (compOrNav) {
           case RSC _ -> OperatorKind.COMPONENT;
@@ -195,7 +202,8 @@ public class RowsModelEventHandling {
       // If not TRACE, then include info for TOS
       if (logger.isLoggable(TRACE))
         sb.append(sf("%s%s Source Stack (%d)\n", tag2, tag, evs.size()));
-      else sb.append(sf("******* %s (%d) %s\n", tag, evs.size(), evs.peek()));
+      else
+        sb.append(sf("******* %s (%d) %s\n", tag, evs.size(), evs.peek()));
 
       // Only add the stack if TRACE.
       if (logger.isLoggable(TRACE))
@@ -231,17 +239,21 @@ public class RowsModelEventHandling {
     public void addRowSetEvent(RowSetEventType rsEventType, RowSet rs) {
       verifyEDT();
       Objects.requireNonNull(rs);
-      if (isAcceptingCachedRowSetChanges(rs)) return;
+      if (isAcceptingCachedRowSetChanges(rs))
+        return;
       logger.log(DEBUG, () -> sf("####### rs %s evType %s", objectID(rs), rsEventType));
       RowsEventSource eventSource = getCurrentEventSource();
 
       if (eventSource == IDLE_EVENT) {
-        if (isJunitPrint()) System.out.println("Anonymous RowSet");
-        else logger.log(WARNING, "Anonymous RowSet event"); //, new Throwable());
+        if (isJunitPrint())
+          System.out.println("Anonymous RowSet");
+        else
+          logger.log(WARNING, "Anonymous RowSet event"); //, new Throwable());
       }
 
       if (eventSource.rowSet != rs) { // IDLE_EVENT or OutOfTheBlue RowSet.
-        if (eventSource.rowSet != null) logger.log(ERROR, "WRONG ROW SET");
+        if (eventSource.rowSet != null)
+          logger.log(ERROR, "WRONG ROW SET");
         if (!isJunitPrint())
           logger.log(WARNING,
                      ()
@@ -256,8 +268,10 @@ public class RowsModelEventHandling {
       }
 
       if (!eventTypes.isEmpty()) {
-        if (isJunitPrint()) System.out.println("merge: " + eventTypes);
-        else logger.log(TRACE, () -> sf("merge: %s", eventTypes));
+        if (isJunitPrint())
+          System.out.println("merge: " + eventTypes);
+        else
+          logger.log(TRACE, () -> sf("merge: %s", eventTypes));
       }
 
       // Merge for same row set.
@@ -298,7 +312,8 @@ public class RowsModelEventHandling {
         logger.log(TRACE, msg);
       } else {
         // If no event, default to ROW_CHANGED.
-        if (eventTypes.isEmpty()) eventTypes.add(RowSetEventType.ROW_CHANGED);
+        if (eventTypes.isEmpty())
+          eventTypes.add(RowSetEventType.ROW_CHANGED);
         ev = new RowsEvent(eventSource, eventTypes);
         //if(isJunit())System.out.println(ev.toString());
         logger.log(TRACE, () -> sf("" + ev));
@@ -311,7 +326,8 @@ public class RowsModelEventHandling {
 
       eventTypes.clear();
 
-      if (ev != null) post(ev);
+      if (ev != null)
+        post(ev);
     }
   }
 
@@ -398,14 +414,17 @@ public class RowsModelEventHandling {
 
     dispatchLoopRunning = false;
     // If more events have come in...
-    if (!eventsNextQ.isEmpty()) startDispatcher("dispatchLoop startDispatcher:", "####### ");
-    else logger.log(TRACE, "####### dispatchLoop exit: ");
+    if (!eventsNextQ.isEmpty())
+      startDispatcher("dispatchLoop startDispatcher:", "####### ");
+    else
+      logger.log(TRACE, "####### dispatchLoop exit: ");
 
     // Unit tests may set latch.
     if (latch != null) {
       // could use: if (!dispatchLoopActivated && !dispatchLoopRunning)
       // could use: if (eventsNextQ.isEmpty() && eventsActiveQ.isEmpty())
-      if (eventsNextQ.isEmpty()) latch.countDown();
+      if (eventsNextQ.isEmpty())
+        latch.countDown();
     }
   }
   // For unit tests.
@@ -421,8 +440,10 @@ public class RowsModelEventHandling {
     StringBuilder sb = _sb != null ? _sb : new StringBuilder();
 
     // If not TRACE, then include info for TOS
-    if (logger.isLoggable(TRACE)) sb.append(sf("%s%s Events (%d)\n", tag2, tag, evs.size()));
-    else sb.append(sf("******* %s Events (%d) %s\n", tag, evs.size(), evs.peek()));
+    if (logger.isLoggable(TRACE))
+      sb.append(sf("%s%s Events (%d)\n", tag2, tag, evs.size()));
+    else
+      sb.append(sf("******* %s Events (%d) %s\n", tag, evs.size(), evs.peek()));
 
     // Only add the stack if TRACE.
     if (logger.isLoggable(TRACE))
@@ -433,6 +454,7 @@ public class RowsModelEventHandling {
   }
 
   static void verifyEDT() {
-    if (!isDispatchThread() && !isJunit()) logger.log(ERROR, "Should be EDT", new Throwable());
+    if (!isDispatchThread() && !isJunit())
+      logger.log(ERROR, "Should be EDT", new Throwable());
   }
 }

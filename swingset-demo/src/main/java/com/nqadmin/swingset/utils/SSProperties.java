@@ -100,6 +100,8 @@ public class SSProperties {
     final Properties myProps = getProperties();
 
     // Print all properties to the console
-    for (final Entry<Object, Object> e : myProps.entrySet()) { System.out.println(e); }
+    for (final Entry<Object, Object> e : myProps.entrySet()) {
+      System.out.println(e);
+    }
   }
 }

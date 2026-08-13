@@ -178,7 +178,9 @@ public class SSListItemFormat extends Format {
   public void addElemType(int elemIndex, JDBCType jdbcType, Format format) {
     Objects.requireNonNull(jdbcType);
     // first make sure there's room
-    while (elemIndex >= elemInfos.size()) { elemInfos.add(null); }
+    while (elemIndex >= elemInfos.size()) {
+      elemInfos.add(null);
+    }
     elemInfos.set(elemIndex, new ElemInfo(jdbcType, format));
 
     // SSListItem is formatted in the order the items are added
@@ -217,18 +219,24 @@ public class SSListItemFormat extends Format {
    * @param jdbcType format for this
    * @return format or null if no format has been set
    */
-  public Format getFormat(JDBCType jdbcType) { return formats.get(jdbcType); }
+  public Format getFormat(JDBCType jdbcType) {
+    return formats.get(jdbcType);
+  }
 
   /**
    * The separator is goes between elements in a formatted string.
    * @param separator the separator
    */
-  public void setSeparator(String separator) { this.separator = separator; }
+  public void setSeparator(String separator) {
+    this.separator = separator;
+  }
 
   /**
    * @return the separator
    */
-  public String getSeparator() { return separator; }
+  public String getSeparator() {
+    return separator;
+  }
 
   /**
    * This implementation does not create Object from String.
@@ -256,7 +264,9 @@ public class SSListItemFormat extends Format {
       ListItem0 listItem = (ListItem0) _listItem;
       for (int i = 0; i < itemElemIndexes.size(); i++) {
         // if this isn't the first element, add the separator
-        if (i != 0) { toAppendTo.append(separator); }
+        if (i != 0) {
+          toAppendTo.append(separator);
+        }
         int elemIndex = itemElemIndexes.get(i);
         appendValue(toAppendTo, elemIndex, listItem);
       }
@@ -284,12 +294,16 @@ public class SSListItemFormat extends Format {
    */
   protected void appendValue(StringBuffer sb, int elemIndex, SSListItem listItem) {
     Object elem = getElem(elemIndex, listItem);
-    if (elem == null) { return; }
+    if (elem == null) {
+      return;
+    }
 
     ElemInfo elemInfo = elemInfos.get(elemIndex);
     JDBCType jdbcType = elemInfo.type;
     Format format = elemInfo.format;
-    if (format == null) { format = formats.get(jdbcType); }
+    if (format == null) {
+      format = formats.get(jdbcType);
+    }
     if (format != null) {
       try {
         format.format(elem, sb, FP0);

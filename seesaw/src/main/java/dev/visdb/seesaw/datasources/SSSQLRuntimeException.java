@@ -54,11 +54,15 @@ public class SSSQLRuntimeException extends RuntimeException {
    * @param message
    * @param cause
    */
-  public SSSQLRuntimeException(String message, Throwable cause) { super(message, cause); }
+  public SSSQLRuntimeException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
   /**
    * Create exception.
    * @param cause
    */
-  public SSSQLRuntimeException(Throwable cause) { super(cause); }
+  public SSSQLRuntimeException(Throwable cause) {
+    super(cause);
+  }
 }

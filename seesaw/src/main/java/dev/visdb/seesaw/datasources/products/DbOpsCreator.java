@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.datasources.products;
 
-
 import javax.sql.RowSet;
 
 import dev.visdb.seesaw.datasources.DbOps;

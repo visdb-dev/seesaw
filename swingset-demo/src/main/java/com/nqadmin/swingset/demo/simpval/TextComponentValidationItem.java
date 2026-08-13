@@ -41,7 +41,9 @@ public class TextComponentValidationItem extends ValidationListener<JTextCompone
                                      ValidationUI validationUI, Validator<Document> validator) {
     super(JTextComponent.class, validationUI, component);
     this.validator = validator;
-    if (strategy == null) { throw new NullPointerException("strategy null"); }
+    if (strategy == null) {
+      throw new NullPointerException("strategy null");
+    }
     /*
             component.addPropertyChangeListener("enabled", new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
@@ -72,7 +74,9 @@ public class TextComponentValidationItem extends ValidationListener<JTextCompone
 
   /** just run the validator, no decoration */
   public boolean validate() {
-    if (!SwingUtilities.isEventDispatchThread()) { SwingUtilities.invokeLater(() -> validate()); }
+    if (!SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(() -> validate());
+    }
     JTextComponent component = getTarget();
     Problems ps = new Problems();
     validator.validate(ps, SwingValidationGroup.nameForComponent(component),
@@ -80,7 +84,9 @@ public class TextComponentValidationItem extends ValidationListener<JTextCompone
     return !ps.hasFatal();
   }
 
-  protected boolean hasFatalProblem() { return hasFatalProblem; }
+  protected boolean hasFatalProblem() {
+    return hasFatalProblem;
+  }
 
   @Override
   protected final void performValidation(Problems ps) {
@@ -88,7 +94,9 @@ public class TextComponentValidationItem extends ValidationListener<JTextCompone
       SwingUtilities.invokeLater(() -> performValidation(ps));
     }
     JTextComponent component = getTarget();
-    if (!component.isEnabled()) { return; }
+    if (!component.isEnabled()) {
+      return;
+    }
     validator.validate(ps, SwingValidationGroup.nameForComponent(component),
                        component.getDocument());
     hasFatalProblem = ps.hasFatal();

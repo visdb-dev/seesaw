@@ -103,7 +103,9 @@ import static java.lang.System.Logger.Level.*;
 //       Is there a way to tell if current command has been executed?
 //
 public final class RowsModel {
-  static { LookupDefaults.init(); }
+  static {
+    LookupDefaults.init();
+  }
   /** Logger for component */
   private static final Logger logger = JStuff.getLogger();
 
@@ -163,7 +165,8 @@ public final class RowsModel {
     DbOps dbOps = null;
     // creator may check by DB/TBL/whatever
     DbOpsCreator creator = CentralLookup.defLookup(DbOpsCreator.class);
-    if (creator != null) dbOps = creator.create(rs, rowsModel);
+    if (creator != null)
+      dbOps = creator.create(rs, rowsModel);
 
     if (dbOps == null) {
       dbOps = new DbOps() {};
@@ -238,7 +241,8 @@ public final class RowsModel {
     navState = NavigateState.getOrCreate(rs);
     navState.setDbOps(dbOps);
 
-    if (navState.getRowSet() == null) navState.setupRowSet(rs);
+    if (navState.getRowSet() == null)
+      navState.setupRowSet(rs);
   }
 
   // TODO: verifyExecuted HACK, remove this and require executed row set
@@ -253,15 +257,20 @@ public final class RowsModel {
     try {
       boolean ok = rs.getMetaData() != null ? rs.getMetaData().getColumnCount() > 0
                                             : false; // CachedRowSet
-      if (ok) return true;
+      if (ok)
+        return true;
       msg = "no exception";
-    } catch (SQLException ex) { msg = ex.getMessage(); }
+    } catch (SQLException ex) {
+      msg = ex.getMessage();
+    }
     String fMsg = msg;
     try {
       logger.log(Level.ERROR, () -> sf("%s. Will execute query", fMsg));
       // TODO: take out the callExecute error recovery, propogate the exception
       rs.execute();
-    } catch (SQLException ex1) { logger.log(Level.ERROR, "execute() SQL Exception", ex1); }
+    } catch (SQLException ex1) {
+      logger.log(Level.ERROR, "execute() SQL Exception", ex1);
+    }
     return false;
   }
 
@@ -273,7 +282,9 @@ public final class RowsModel {
    *
    * @param rs new RowSet for this model
    */
-  public void setRowSet(RowSet rs) { setRowSet(rs, getDbOps()); }
+  public void setRowSet(RowSet rs) {
+    setRowSet(rs, getDbOps());
+  }
 
   /**
    * Change the RowSet associated with this model.
@@ -312,7 +323,8 @@ public final class RowsModel {
           null, JOptionPane.OK_CANCEL_OPTION);
       // TODO: Note the rowSet's undo/redo still has the modifications.
       //       Really discard?
-      if (response != JOptionPane.OK_OPTION) return false;
+      if (response != JOptionPane.OK_OPTION)
+        return false;
     }
 
     if (rs != null) {
@@ -328,7 +340,8 @@ public final class RowsModel {
       // to avoid exception buried in event handler.
       for (Map.Entry<SSComponent, String> entry : bindings.entrySet()) {
         SSComponent comp = entry.getKey();
-        if (!comp.isFullyBound()) continue;
+        if (!comp.isFullyBound())
+          continue;
 
         // verify same column type and nullable.
         String colName = entry.getValue();
@@ -336,7 +349,9 @@ public final class RowsModel {
         JDBCType newType = JDBCType.NULL;
         try {
           newType = RowSetOps.getJDBCColumnType(rs, colName);
-        } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
+        } catch (SQLException ex) {
+          logger.log(Level.ERROR, (String) null, ex);
+        }
         if (newType != oldType)
           throw new IllegalArgumentException(JDBCTypeMismatch(oldType, newType));
         boolean oldVal = comp.getAllowNull();
@@ -356,7 +371,9 @@ public final class RowsModel {
   }
 
   // TODO: is this path OK?
-  void syncSyncManager() { getNavState().syncSyncManager(); }
+  void syncSyncManager() {
+    getNavState().syncSyncManager();
+  }
 
   /**
    * Establish bindings.
@@ -406,7 +423,7 @@ public final class RowsModel {
 
   /**
    * The event will typically cause all components to update.
-   * @param type 
+   * @param type
    */
   public void issueRowSetEvent(RowSetEventType type) {
     startRowsEvent(this, ACT_ROW_SET_EVENT);
@@ -418,15 +435,19 @@ public final class RowsModel {
    * Return the associated RowSet.
    * @return row set
    */
-  public RowSet getRowSet() { return navState != null ? navState.getRowSet() : null; }
+  public RowSet getRowSet() {
+    return navState != null ? navState.getRowSet() : null;
+  }
 
   /**
-   * Returns DbOps which is used when the insert action, 
+   * Returns DbOps which is used when the insert action,
    * and much more, is pressed, to perform custom actions.
    *
    * @return the DbOps
    */
-  public DbOps getDbOps() { return navState != null ? navState.getDbOps() : null; }
+  public DbOps getDbOps() {
+    return navState != null ? navState.getDbOps() : null;
+  }
 
   /**
    * Use rsOp to capture multiple RowSet eventsNextQ into a single event.
@@ -440,12 +461,18 @@ public final class RowsModel {
     RowsModel.startRowsEvent(OperatorKind.OTHER, this, operator);
     try {
       r.run();
-    } finally { RowsModel.finishRowsEvent(this); }
+    } finally {
+      RowsModel.finishRowsEvent(this);
+    }
   }
 
-  NavigateState getNavState() { return navState; }
+  NavigateState getNavState() {
+    return navState;
+  }
 
-  UndoRow getUndoRow() { return getNavState().undoRow; }
+  UndoRow getUndoRow() {
+    return getNavState().undoRow;
+  }
 
   /**
    * Return an action, associated with this model, that can be plugged
@@ -456,7 +483,9 @@ public final class RowsModel {
   // TODO: javadoc says "action this model", but action is RowSet assoc.
   //       Wrap the action and go indirect to the navState.
   //       Cache the wrapped actions.
-  public Action getAction(RowsAction navAction) { return rowsActions.get(navAction); }
+  public Action getAction(RowsAction navAction) {
+    return rowsActions.get(navAction);
+  }
 
   // These convenience methods may do nothing
 
@@ -466,7 +495,8 @@ public final class RowsModel {
    * @throws java.sql.SQLException
    */
   public boolean first() throws SQLException {
-    if (!getRowSet().isFirst()) rowsActions.run(ACT_FIRST);
+    if (!getRowSet().isFirst())
+      rowsActions.run(ACT_FIRST);
     return getRowSet().getRow() != 0;
   }
   /**
@@ -475,7 +505,8 @@ public final class RowsModel {
    * @throws java.sql.SQLException
    */
   public boolean last() throws SQLException {
-    if (!getRowSet().isLast()) rowsActions.run(ACT_LAST);
+    if (!getRowSet().isLast())
+      rowsActions.run(ACT_LAST);
     return getRowSet().getRow() != 0;
   }
   /**
@@ -498,7 +529,8 @@ public final class RowsModel {
   }
   /** Programmaticaly write the database with the changes. */
   public void commit() {
-    if (isDirty()) rowsActions.run(ACT_COMMIT);
+    if (isDirty())
+      rowsActions.run(ACT_COMMIT);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -507,7 +539,9 @@ public final class RowsModel {
   //
 
   // NOTE: SpinnerModel locked to RowSet
-  SpinnerNumberModel getRowNumberModel() { return navState.getRowNumberModel(); }
+  SpinnerNumberModel getRowNumberModel() {
+    return navState.getRowNumberModel();
+  }
 
   /**
    * Use this after directly moving the cursor around, to get the
@@ -517,13 +551,17 @@ public final class RowsModel {
   // Maybe some of the Spinner logic should go into the SpinnerModel logic.
   // In particular the resync. Also maybe the model should have a reference
   // to the spinner, create a RowNumberSpinnerModel that only has reference.
-  public int syncRowNumber() { return getRow(true); }
+  public int syncRowNumber() {
+    return getRow(true);
+  }
 
   /**
    * Return the associated RowSet's current row number.
    * @return row number
    */
-  public int getRow() { return getRow(false); }
+  public int getRow() {
+    return getRow(false);
+  }
 
   private int getRow(boolean isSync) {
     int spin_row = getRowNumberModel().getNumber().intValue();
@@ -554,7 +592,9 @@ public final class RowsModel {
    */
   public void setRow(int row) {
     SpinnerNumberModel spinnerModel = getRowNumberModel();
-    if (spinnerModel != null) { spinnerModel.setValue(row); }
+    if (spinnerModel != null) {
+      spinnerModel.setValue(row);
+    }
   }
 
   /**
@@ -563,7 +603,8 @@ public final class RowsModel {
    */
   public int getRowCount() {
     SpinnerNumberModel spinnerModel = getRowNumberModel();
-    if (spinnerModel != null) return (Integer) spinnerModel.getMaximum();
+    if (spinnerModel != null)
+      return (Integer) spinnerModel.getMaximum();
     return -1;
   }
 
@@ -589,32 +630,42 @@ public final class RowsModel {
    * Is the current row of this dirty?
    * @return is dirty
    */
-  public boolean isDirty() { return getNavState() != null && getNavState().undoRow.isDirty(); }
+  public boolean isDirty() {
+    return getNavState() != null && getNavState().undoRow.isDirty();
+  }
 
   /**
    * Has navigation been disabled for the rowSet.
    * @return
    */
-  public boolean canNavigate() { return getNavState().canNavigate(); }
+  public boolean canNavigate() {
+    return getNavState().canNavigate();
+  }
 
   /**
    * Check if this RowsModel's rowSet's cursor is on any row or on the insert row.
    * @return true if cursor on a row or insert row
    * @throws SQLException
    */
-  public boolean onActiveRow() throws SQLException { return getRow() != 0 || isOnInsertRow(); }
+  public boolean onActiveRow() throws SQLException {
+    return getRow() != 0 || isOnInsertRow();
+  }
 
   /**
    * Returns true if the RowSet contains one or more rows, else false.
    *
    * @return return true if RowSet contains data else false.
    */
-  public boolean containsRows() { return navState.containsRows(); }
+  public boolean containsRows() {
+    return navState.containsRows();
+  }
 
   /**
    * @return boolean indicating if the rowSet is on an insert row
    */
-  public boolean isOnInsertRow() { return navState.isOnInsertRow(); }
+  public boolean isOnInsertRow() {
+    return navState.isOnInsertRow();
+  }
 
   /**
    * @param comp
@@ -649,7 +700,9 @@ public final class RowsModel {
    * @return returns true if a confirmation dialog is displayed when the user
    *         deletes a record, else false.
    */
-  public boolean getConfirmDeletes() { return navState.getConfirmDeletes(); }
+  public boolean getConfirmDeletes() {
+    return navState.getConfirmDeletes();
+  }
 
   /**
    * Sets the confirm deletion indicator. If set to true, every time delete action
@@ -667,7 +720,9 @@ public final class RowsModel {
    *
    * @return returns true if deletions are allowed, else false.
    */
-  public boolean getAllowDelete() { return navState.getAllowDelete(); }
+  public boolean getAllowDelete() {
+    return navState.getAllowDelete();
+  }
 
   /**
    * Enables or disables the row deletion action. This method should be used if
@@ -675,14 +730,18 @@ public final class RowsModel {
    *
    * @param deletion indicates whether or not to allow deletions
    */
-  public void setAllowDelete(boolean deletion) { navState.setAllowDelete(deletion); }
+  public void setAllowDelete(boolean deletion) {
+    navState.setAllowDelete(deletion);
+  }
 
   /**
    * Returns true if insertions are allowed, else false.
    *
    * @return returns true if insertions are allowed, else false.
    */
-  public boolean getAllowInsert() { return navState.getAllowInsert(); }
+  public boolean getAllowInsert() {
+    return navState.getAllowInsert();
+  }
 
   /**
    * Enables or disables the row insertion action. This method should be used if
@@ -690,7 +749,9 @@ public final class RowsModel {
    *
    * @param insertion indicates whether or not to allow insertions
    */
-  public void setAllowInsert(boolean insertion) { navState.setAllowInsert(insertion); }
+  public void setAllowInsert(boolean insertion) {
+    navState.setAllowInsert(insertion);
+  }
 
   /**
    * Returns true if the user can modify the data in the RowSet, else false.
@@ -698,7 +759,9 @@ public final class RowsModel {
    * @return returns true if the user modifications are written back to the
    *         database, else false.
    */
-  public boolean getAllowWrite() { return navState.getAllowWrite(); }
+  public boolean getAllowWrite() {
+    return navState.getAllowWrite();
+  }
 
   /**
    * Enables or disables the modification-related action on the SSDataNavigator.
@@ -707,19 +770,25 @@ public final class RowsModel {
    *
    * @param writable true to enable writable-related actions; false to disable
    */
-  public void setAllowWrite(boolean writable) { navState.setAllowWrite(writable); }
+  public void setAllowWrite(boolean writable) {
+    navState.setAllowWrite(writable);
+  }
 
   /**
    * Can the rowset be updated?
    * @return
    */
-  public boolean getAllowUpdate() { return navState.getAllowUpdate(); }
+  public boolean getAllowUpdate() {
+    return navState.getAllowUpdate();
+  }
 
   /**
    * Enable/disable row edit
    * @param allowUpdate
    */
-  public void setAllowUpdate(boolean allowUpdate) { navState.setAllowUpdate(allowUpdate); }
+  public void setAllowUpdate(boolean allowUpdate) {
+    navState.setAllowUpdate(allowUpdate);
+  }
 
   //////////////////////////////////////////////////////////////////////
   //
@@ -738,7 +807,8 @@ public final class RowsModel {
   public ActionMap fillNavActionMap(ActionMap actionMap) {
     ActionMap am = actionMap != null ? actionMap : new ActionMap();
     Arrays.stream(RowsAction.values()).forEach(key -> {
-      if (!key.isVirtual()) am.put(key, getAction(key));
+      if (!key.isVirtual())
+        am.put(key, getAction(key));
     });
     return am;
   }
@@ -770,10 +840,12 @@ public final class RowsModel {
     private WeakReference<RowSetListener> refWeakRowSetListener;
 
     protected void registerTo(RowSet rs) {
-      if (refWeakRowSetListener != null) throw new IllegalStateException("Already using listener");
+      if (refWeakRowSetListener != null)
+        throw new IllegalStateException("Already using listener");
       RowSetListener wrsl = WeakListeners.create(RowSetListener.class, this, rs);
       refWeakRowSetListener = new WeakReference<>(wrsl);
-      if (rs != null) rs.addRowSetListener(wrsl);
+      if (rs != null)
+        rs.addRowSetListener(wrsl);
     }
 
     protected void unregisterFrom(RowSet rs) {
@@ -837,9 +909,13 @@ public final class RowsModel {
    * coalesced into a single event.
    * @param model must match the model associated with startRowsEvent
    */
-  public static void finishRowsEvent(RowsModel model) { enq.finishRowsEvent(model); }
+  public static void finishRowsEvent(RowsModel model) {
+    enq.finishRowsEvent(model);
+  }
 
-  static void post(RowsModelEvent event) { postAsync(event); }
+  static void post(RowsModelEvent event) {
+    postAsync(event);
+  }
 
   private static final SimpleEvents enq = new SimpleEvents();
 
@@ -853,7 +929,9 @@ public final class RowsModel {
    * @return the event bus
    */
   // TODO: per model event bus ???
-  static EventBus getEventBus() { return getGlobalEventBus(); }
+  static EventBus getEventBus() {
+    return getGlobalEventBus();
+  }
 
   interface EnqueueRowsModelEvent {
     void startRowsEvent(RowsModel model, Object compOrNav);
@@ -881,7 +959,9 @@ public final class RowsModel {
    * The number of active NavigateState; for debug.
    * @return
    */
-  public static int navCount() { return NavigateState.count(); }
+  public static int navCount() {
+    return NavigateState.count();
+  }
 
   /**
    * for debug.

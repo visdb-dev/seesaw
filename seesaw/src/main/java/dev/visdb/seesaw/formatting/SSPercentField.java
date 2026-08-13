@@ -59,7 +59,9 @@ public class SSPercentField extends NumberField {
   /**
    * Creates a default object of SSPercentField
    */
-  public SSPercentField() { this(createFormatterFactory(SSFormat.CUSTOM, null, null)); }
+  public SSPercentField() {
+    this(createFormatterFactory(SSFormat.CUSTOM, null, null));
+  }
 
   /**
    * Creates a default object of SSPercentField.
@@ -74,13 +76,17 @@ public class SSPercentField extends NumberField {
    * Creates an object of SSPercentField with the specified formatter factory
    * @param factory - formatter factory to be used
    */
-  public SSPercentField(AbstractFormatterFactory factory) { super(factory); }
+  public SSPercentField(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   /**
    * Get the multiplier used in percent.
    * @return multiplier
    */
-  public int getMultiplier() { return getNumberFormatParam((nf) -> nf.getMultiplier()); }
+  public int getMultiplier() {
+    return getNumberFormatParam((nf) -> nf.getMultiplier());
+  }
 
   /**
    * Sets the multiplier for use in percent. With multiplier 100,

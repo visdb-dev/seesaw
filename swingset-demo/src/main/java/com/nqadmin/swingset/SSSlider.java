@@ -66,7 +66,9 @@ public class SSSlider extends Slider {
    *
    * @param _orientation slider spatial orientation
    */
-  public SSSlider(final int _orientation) { super(_orientation); }
+  public SSSlider(final int _orientation) {
+    super(_orientation);
+  }
 
   /**
    * Creates a horizontal slider using the specified min and max.
@@ -74,7 +76,9 @@ public class SSSlider extends Slider {
    * @param _min minimum slider value
    * @param _max maximum slider value
    */
-  public SSSlider(final int _min, final int _max) { super(_min, _max); }
+  public SSSlider(final int _min, final int _max) {
+    super(_min, _max);
+  }
 
   /**
    * Creates a horizontal slider with the range 0 to 100 and binds it to the

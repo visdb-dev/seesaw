@@ -85,9 +85,13 @@ public enum RowsAction {
   private final boolean force;
   private final boolean virtual;
 
-  private RowsAction() { this(false, false); }
+  private RowsAction() {
+    this(false, false);
+  }
 
-  private RowsAction(boolean force) { this(force, false); }
+  private RowsAction(boolean force) {
+    this(force, false);
+  }
 
   private RowsAction(boolean force, boolean virtual) {
     this.force = force;
@@ -100,13 +104,17 @@ public enum RowsAction {
    *
    * @return true means unconditionally create event
    */
-  public boolean isForce() { return force; }
+  public boolean isForce() {
+    return force;
+  }
 
   /**
    * Not a real event.
    * @return true means don't try to instantiate it
    */
-  public boolean isVirtual() { return virtual; }
+  public boolean isVirtual() {
+    return virtual;
+  }
 
   /**
    * Following could be used by spinner as event's command to indicate that if

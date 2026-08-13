@@ -204,7 +204,9 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
   /**
    * @return a database Connection
    */
-  protected Connection getConnection() { return connection; }
+  protected Connection getConnection() {
+    return connection;
+  }
 
   /**
    * Returns a READONLY statement for running select queries against the database
@@ -219,7 +221,9 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
     try {
       readOnlyStatement
           = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-    } catch (Exception e) { e.printStackTrace(); }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     return readOnlyStatement;
   }
@@ -242,12 +246,16 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
   /**
    * @return the top left horizontal screen offset
    */
-  public int getDefaultX() { return defaultX; }
+  public int getDefaultX() {
+    return defaultX;
+  }
 
   /**
    * @return the top left vertical screen offset
    */
-  public int getDefaultY() { return defaultY; }
+  public int getDefaultY() {
+    return defaultY;
+  }
 
   /**
    * Helper method to provide a JMenuBar with a single File Menu
@@ -276,19 +284,25 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
   /**
    * @return the parent container/window for this screen
    */
-  protected Container getParentContainer() { return parentContainer; }
+  protected Container getParentContainer() {
+    return parentContainer;
+  }
 
   /**
    * Returns the parent ID used for record retrieval (FK for current rowset))
    *
    * @return primary key value of parent record (FK for current rowset) used for record retrieval
    */
-  public Long getParentID() { return parentID; }
+  public Long getParentID() {
+    return parentID;
+  }
 
   /**
    * @return Primary key column name for rowset.
    */
-  public String getPkColumn() { return pkColumn; }
+  public String getPkColumn() {
+    return pkColumn;
+  }
 
   /**
    * Convenience method when developer wants to pass the result of
@@ -305,7 +319,9 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
    */
   public static Long getPKForQuery(com.nqadmin.swingset.SSDBComboBox _combo) {
     Long result = _combo.getChosenKey();
-    if (result == null) { result = hopefullyNoPKValue; }
+    if (result == null) {
+      result = hopefullyNoPKValue;
+    }
 
     return result;
   }
@@ -313,12 +329,16 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
   /**
    * @return the root component for the current component tree
    */
-  public JFrame getRootFrame() { return (JFrame) SwingUtilities.getRoot(this); }
+  public JFrame getRootFrame() {
+    return (JFrame) SwingUtilities.getRoot(this);
+  }
 
   /**
    * @return the RowsModel
    */
-  protected RowsModel getRowsModel() { return rowsModel; }
+  protected RowsModel getRowsModel() {
+    return rowsModel;
+  }
 
   /**
    * @return the rowset
@@ -350,19 +370,25 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
    * Moves the screen and all its children recursively to their respective default
    * positions.
    */
-  public void moveAllToDefaultLocation() { moveToDefaultLocation(); }
+  public void moveAllToDefaultLocation() {
+    moveToDefaultLocation();
+  }
 
   /**
    * Moves the screen to its default position.
    *
    * Can be used when you want to position the screens in their default positions.
    */
-  public void moveToDefaultLocation() { setLocation(getDefaultX(), getDefaultY()); }
+  public void moveToDefaultLocation() {
+    setLocation(getDefaultX(), getDefaultY());
+  }
 
   /**
    * @param _connection the database connection
    */
-  protected void setConnection(final Connection _connection) { connection = _connection; }
+  protected void setConnection(final Connection _connection) {
+    connection = _connection;
+  }
 
   /**
    * Sets default X and Y coordinates for the screen (top left offset)
@@ -402,14 +428,18 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
    *
    * @param _defaultX the default X coordinate for the screen
    */
-  public void setDefaultX(final int _defaultX) { defaultX = _defaultX; }
+  public void setDefaultX(final int _defaultX) {
+    defaultX = _defaultX;
+  }
 
   /**
    * Sets the default Y coordinate for the screen (top left vertical offset)
    *
    * @param _defaultY the default Y coordinate for the screen
    */
-  public void setDefaultY(final int _defaultY) { defaultY = _defaultY; }
+  public void setDefaultY(final int _defaultY) {
+    defaultY = _defaultY;
+  }
 
   /**
    * Sets the parent container/window for this screen if applicable.
@@ -430,17 +460,23 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
    *
    * @param _parentID the parentID to set
    */
-  public void setParentID(final Long _parentID) { parentID = _parentID; }
+  public void setParentID(final Long _parentID) {
+    parentID = _parentID;
+  }
 
   /**
    * @param _pkColumn the pkColumn to set
    */
-  protected void setPkColumn(final String _pkColumn) { pkColumn = _pkColumn; }
+  protected void setPkColumn(final String _pkColumn) {
+    pkColumn = _pkColumn;
+  }
 
   /**
    * @param rowsModel
    */
-  protected void setRowsModel(RowsModel rowsModel) { this.rowsModel = rowsModel; }
+  protected void setRowsModel(RowsModel rowsModel) {
+    this.rowsModel = rowsModel;
+  }
 
   /**
    * @param _rowset rowset to be used by the screen/form
@@ -487,11 +523,15 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
     int i;
     for (i = 0; i < components.length; i++) {
       // if (_callingClass.isInstance(components[i])) {
-      if (getClass().isInstance(components[i])) { break; }
+      if (getClass().isInstance(components[i])) {
+        break;
+      }
     }
 
     // IF IT IS NOT THERE ADD THE SCREEN TO THE CONTAINER
-    if (i == components.length) { _container.add(this); }
+    if (i == components.length) {
+      _container.add(this);
+    }
 
     // MOVE THE SCREEN TO THE FRONT
     moveToFront();

@@ -66,14 +66,18 @@ public class SSCheckBox extends CheckBox {
   /**
    * Creates an object of SSCheckBox.
    */
-  public SSCheckBox() { super(); }
+  public SSCheckBox() {
+    super();
+  }
 
   /**
    * Creates an object of SSCheckBox.
    *
    * @param _text Checkbox label
    */
-  public SSCheckBox(String _text) { super(_text); }
+  public SSCheckBox(String _text) {
+    super(_text);
+  }
 
   /**
    * Creates an object of SSCheckBox binding it to the specified column in the
@@ -82,7 +86,9 @@ public class SSCheckBox extends CheckBox {
    * @param rowsModel        datasource to be used.
    * @param columnName name of the column to which this check box should be
    */
-  public SSCheckBox(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
+  public SSCheckBox(RowsModel rowsModel, String columnName) {
+    super(rowsModel, columnName);
+  }
 
   /**
    * Creates an object of SSCheckBox binding it to the specified column in the

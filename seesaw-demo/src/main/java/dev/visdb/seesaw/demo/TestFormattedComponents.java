@@ -167,23 +167,27 @@ public class TestFormattedComponents extends JFrame {
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
       navigator = new DataNavigator(rowsModel);
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     // SETUP NAVIGATOR QUERY
     final String query = "SELECT * FROM swingset_formatted_test_data;";
     // (connection, query, "swingset_formatted_test_pk", "swingset_formatted_test_pk");
-    cmbSSDBComboNav = new DBComboBox2.Builder<Long, Object, Object>(){}
-          .connection(connection)
-          .query(query)
-          .primaryKeyColumnName("swingset_formatted_test_pk")
-          .displayColumnName("swingset_formatted_test_pk")
-          .build();
+    cmbSSDBComboNav = new DBComboBox2.Builder<Long, Object, Object>() {}
+                          .connection(connection)
+                          .query(query)
+                          .primaryKeyColumnName("swingset_formatted_test_pk")
+                          .displayColumnName("swingset_formatted_test_pk")
+                          .build();
 
     try {
       cmbSSDBComboNav.execute();
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
-    } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, "Exception.", e);
+    }
 
     // SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
     // DATA NAVIGATOR IN SYNC.
@@ -411,7 +415,9 @@ public class TestFormattedComponents extends JFrame {
           cmbSSDBComboNav.execute();
         } catch (final SQLException se) {
           logger.log(Level.ERROR, "SQL Exception.", se);
-        } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+        } catch (final Exception e) {
+          logger.log(Level.ERROR, "Exception.", e);
+        }
         syncManager.sync();
       }
     };

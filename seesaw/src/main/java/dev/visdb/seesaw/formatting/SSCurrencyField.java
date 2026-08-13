@@ -58,7 +58,9 @@ public class SSCurrencyField extends NumberField {
   /**
    * Creates a new instance of SSCurrencyField
    */
-  public SSCurrencyField() { this(createFormatterFactory(CUSTOM, null, null, null, null)); }
+  public SSCurrencyField() {
+    this(createFormatterFactory(CUSTOM, null, null, null, null));
+  }
 
   /**
    * Creates an instance of SSCurrenyField with the specified number of integer and
@@ -89,7 +91,9 @@ public class SSCurrencyField extends NumberField {
    *
    * @param factory - formatter factory to be used
    */
-  public SSCurrencyField(AbstractFormatterFactory factory) { super(factory); }
+  public SSCurrencyField(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   /**
    * Create a FormatterFactory.

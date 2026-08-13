@@ -108,7 +108,9 @@ public class SSTextSupport {
      * Create DocumentListener for the component.
      * @param comp associated component
      */
-    public SSDocumentListener(SSComponent comp) { this.ssCommon = comp.getSSCommon(); }
+    public SSDocumentListener(SSComponent comp) {
+      this.ssCommon = comp.getSSCommon();
+    }
 
     private void updateTextComponent() {
       String text = ((JTextComponent) ssCommon.getSSComponent()).getText();
@@ -123,7 +125,9 @@ public class SSTextSupport {
           postColumnChangeStartError(ssCommon.getSSComponent(), text);
           return;
         }
-      } finally { ssCommon.skipValidateHasError = false; }
+      } finally {
+        ssCommon.skipValidateHasError = false;
+      }
       ssCommon.setColumnText(text);
     }
 
@@ -145,7 +149,9 @@ public class SSTextSupport {
           lastNotifiedChange = lastChange;
           try {
             ssCommon.dbChange(() -> updateTextComponent());
-          } catch (SQLException ex) { logger.log(Logger.Level.ERROR, (String) null, ex); }
+          } catch (SQLException ex) {
+            logger.log(Logger.Level.ERROR, (String) null, ex);
+          }
         }
       });
     }
@@ -190,7 +196,9 @@ public class SSTextSupport {
      * Create DocumentListener for the component.
      * @param comp associated component
      */
-    public SSPlainDocument(SSComponent comp) { this.ssCommon = comp.getSSCommon(); }
+    public SSPlainDocument(SSComponent comp) {
+      this.ssCommon = comp.getSSCommon();
+    }
 
     void capturePrevious(DocumentFilter.FilterBypass fb) {
       try {
@@ -198,7 +206,9 @@ public class SSTextSupport {
         logger.log(TRACE, () -> "Capture previous text value: " + prev);
         if (ssCommon.getEventListener() instanceof SSDocumentListenerWithRestoreOnError listener)
           listener.previousValue = prev;
-      } catch (BadLocationException ex) { logger.log(DEBUG, "Capture previous text value", ex); }
+      } catch (BadLocationException ex) {
+        logger.log(DEBUG, "Capture previous text value", ex);
+      }
     }
 
     /** {@inheritDoc} */
@@ -292,7 +302,9 @@ public class SSTextSupport {
           lastNotifiedChange = lastChange;
           try {
             ssCommon.dbChange(() -> updateTextComponent());
-          } catch (SQLException ex) { logger.log(Logger.Level.ERROR, (String) null, ex); }
+          } catch (SQLException ex) {
+            logger.log(Logger.Level.ERROR, (String) null, ex);
+          }
         }
       });
     }
@@ -313,7 +325,9 @@ public class SSTextSupport {
           postColumnChangeStartError(ssCommon.getSSComponent(), text);
           return;
         }
-      } finally { ssCommon.skipValidateHasError = false; }
+      } finally {
+        ssCommon.skipValidateHasError = false;
+      }
       boolean ok = true;
       //boolean inErrorState = ssCommon.getRowsModel().hasError(ssCommon.getSSComponent());
       try {

@@ -40,7 +40,9 @@ public class MyCheckBox extends JCheckBox implements SSComponent {
             ()
                 -> setColumnObject(
                     isSelected())); // @link substring="setColumnObject" target="SSComponent#setColumnObject" @link substring="dbChange" target="SSComponent#dbChange"
-      } catch (SQLException ex) { log(xxx); } // @replace regex='xxx' replacement="..."
+      } catch (SQLException ex) {
+        log(xxx);
+      } // @replace regex='xxx' replacement="..."
     }
   }
   MyCheckBox() {

@@ -108,19 +108,27 @@ public enum SSFormat {
   final private SSFormat type;
 
   /** the default has no args */
-  SSFormat() { type = this; }
+  SSFormat() {
+    type = this;
+  }
 
-  SSFormat(SSFormat _base) { type = _base; }
+  SSFormat(SSFormat _base) {
+    type = _base;
+  }
 
   /**
    * Is this enum value the default for the given type
    * @return true if this enum is the default.
    */
-  boolean isBase() { return type == this; }
+  boolean isBase() {
+    return type == this;
+  }
 
   /**
    * The type of this format, e.g. DATE.
    * @return type
    */
-  public SSFormat getType() { return type; }
+  public SSFormat getType() {
+    return type;
+  }
 }

@@ -91,7 +91,9 @@ public abstract class RowSetButtons extends JPanel {
       // else
       // 	DemoExtraDB.check();
       DemoExtraDB.check();
-    } catch (SQLException | ClassNotFoundException ex) { l.log(Level.ERROR, (String) null, ex); }
+    } catch (SQLException | ClassNotFoundException ex) {
+      l.log(Level.ERROR, (String) null, ex);
+    }
   }
 
   // Default table cycle: 2, 3, 4, 2, 3, 4, ...
@@ -185,7 +187,9 @@ public abstract class RowSetButtons extends JPanel {
     }
   }
 
-  void tableLoopIncr() { tableLoopIndex = ++tableLoopIndex % tableLoopCount; }
+  void tableLoopIncr() {
+    tableLoopIndex = ++tableLoopIndex % tableLoopCount;
+  }
 
   /**
    * Create the RowSet for the current table loop iteration.
@@ -268,14 +272,22 @@ public abstract class RowSetButtons extends JPanel {
     // everything should be enabled
     RowsModel rm = ai.rowsModel;
     DbOpsAllows ops = ai.dbOps;
-    if (rm == null || ops == null) return;
+    if (rm == null || ops == null)
+      return;
     // verify everything enabled
-    if (rm.getAllowUpdate() != true) throw new IllegalStateException("n-upd");
-    if (rm.getAllowInsert() != true) throw new IllegalStateException("n-ins");
-    if (rm.getAllowDelete() != true) throw new IllegalStateException("n-del");
-    if (rm.getAllowWrite() != true) throw new IllegalStateException("n-wrt");
-    if (ops.allowUpdate() != true) throw new IllegalStateException("d-upd");
-    if (ops.allowInsert() != true) throw new IllegalStateException("d-ins");
-    if (ops.allowDelete() != true) throw new IllegalStateException("d-del");
+    if (rm.getAllowUpdate() != true)
+      throw new IllegalStateException("n-upd");
+    if (rm.getAllowInsert() != true)
+      throw new IllegalStateException("n-ins");
+    if (rm.getAllowDelete() != true)
+      throw new IllegalStateException("n-del");
+    if (rm.getAllowWrite() != true)
+      throw new IllegalStateException("n-wrt");
+    if (ops.allowUpdate() != true)
+      throw new IllegalStateException("d-upd");
+    if (ops.allowInsert() != true)
+      throw new IllegalStateException("d-ins");
+    if (ops.allowDelete() != true)
+      throw new IllegalStateException("d-del");
   }
 }

@@ -46,5 +46,7 @@ public abstract class StringValidator extends AbstractValidator<String> {
   /**
    * Specify the validator handles a string.
    */
-  protected StringValidator() { super(String.class); }
+  protected StringValidator() {
+    super(String.class);
+  }
 }

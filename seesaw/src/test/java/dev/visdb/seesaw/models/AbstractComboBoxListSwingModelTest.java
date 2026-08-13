@@ -148,7 +148,9 @@ public class AbstractComboBoxListSwingModelTest {
 
   List<SSListItem> liCreateMany(int n) {
     List<SSListItem> items = new ArrayList<>();
-    for (int i = 0; i < l1.size(); i++) { items.add(listInfo.createListItem(liCreateArray(n, i))); }
+    for (int i = 0; i < l1.size(); i++) {
+      items.add(listInfo.createListItem(liCreateArray(n, i)));
+    }
     return items;
   }
 
@@ -261,7 +263,9 @@ public class AbstractComboBoxListSwingModelTest {
 
   private static boolean getElemEquals(Object[] elems, int listItemIndex, LI.Remodel remodel) {
     for (int i = 0; i < elems.length; i++) {
-      if (!elems[i].equals(remodel.getElem(listItemIndex, i))) { return false; }
+      if (!elems[i].equals(remodel.getElem(listItemIndex, i))) {
+        return false;
+      }
     }
     return true;
   }
@@ -325,7 +329,9 @@ public class AbstractComboBoxListSwingModelTest {
       }
 
       // Read back the same items
-      for (int i = 0; i < nElem; i++) { assertEquals(elems[i], remodel.getElem(testItemIndex, i)); }
+      for (int i = 0; i < nElem; i++) {
+        assertEquals(elems[i], remodel.getElem(testItemIndex, i));
+      }
 
       // test some get/set exceptions
       assertThrows(ArrayIndexOutOfBoundsException.class,
@@ -344,7 +350,9 @@ public class AbstractComboBoxListSwingModelTest {
       try (LI.Remodel remodel = listInfo.getRemodel()) {
         for (int listItemIndex = 0; listItemIndex < nGetSetItems; listItemIndex++) {
           Integer[] elems = new Integer[nElem];
-          for (int slice = 0; slice < nElem; slice++) { elems[slice] = slice * 10 + listItemIndex; }
+          for (int slice = 0; slice < nElem; slice++) {
+            elems[slice] = slice * 10 + listItemIndex;
+          }
           remodel.add(listInfo.createListItem((Object[]) elems));
         }
       }
@@ -380,7 +388,9 @@ public class AbstractComboBoxListSwingModelTest {
 
     List<List<?>> lists = new ArrayList<>();
     // create and reference 8 more slices
-    for (int i = 0; i < 8; i++) { lists.add(listInfo.createElementSlice(i % 4)); }
+    for (int i = 0; i < 8; i++) {
+      lists.add(listInfo.createElementSlice(i % 4));
+    }
     System.gc();
     // The original 4 slices, plus the 8 just created
     assertEquals(12, listInfo.checkCreatedLists());

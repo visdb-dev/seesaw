@@ -35,18 +35,24 @@ to use
   /**
    * Creates a new CentralLookup
    */
-  public CentralLookup() { this(new InstanceContent()); }
+  public CentralLookup() {
+    this(new InstanceContent());
+  }
   /**
    * Adds an instance to the Lookup. The instance will be added with the classes
    * in its hierarchy as keys which may be used to lookup the instance(s).
    * @param instance The instance to add
    */
-  public void add(Object instance) { content.add(instance); }
+  public void add(Object instance) {
+    content.add(instance);
+  }
   /**
    * Removes the specific instance from the Lookup content.
    * @param instance The specific instance to remove.
    */
-  public void remove(Object instance) { content.remove(instance); }
+  public void remove(Object instance) {
+    content.remove(instance);
+  }
 
   /**
    * Remove all instances of {@code clazz}, then add {@code instance}.
@@ -66,7 +72,9 @@ to use
    * added to make updating the data easier.
    * @return The default CentralLookup which is global in nature.
    */
-  public static synchronized CentralLookup getDefault() { return def; }
+  public static synchronized CentralLookup getDefault() {
+    return def;
+  }
 
   /**
    * Convenience method to Lookup from the default.
@@ -74,5 +82,7 @@ to use
    * @param clazz
    * @return
    */
-  public static <T> T defLookup(Class<T> clazz) { return getDefault().lookup(clazz); }
+  public static <T> T defLookup(Class<T> clazz) {
+    return getDefault().lookup(clazz);
+  }
 }

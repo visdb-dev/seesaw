@@ -51,12 +51,16 @@ public class DbOpsChangeEvent extends EventObjectBacktrace {
   /**
    * @return the DbOops that changed.
    */
-  public DbOps getDbOps() { return (DbOps) getSource(); }
+  public DbOps getDbOps() {
+    return (DbOps) getSource();
+  }
 
   /**
    * which permission/allow changed
    *
    * @return
    */
-  public DbOps.Allow getAllow() { return allow; }
+  public DbOps.Allow getAllow() {
+    return allow;
+  }
 }

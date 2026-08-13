@@ -99,10 +99,12 @@ public class RowSetState {
     if (columnName == null) // POSSIBLE?. IF POSSIBLE, WHY CAN'T IT BE A KEY?
       throw new IllegalArgumentException("null column name");
     RowSet rs = rsRef.get();
-    if (rs == null) throw new IllegalStateException("must be a rowset");
+    if (rs == null)
+      throw new IllegalStateException("must be a rowset");
 
     Boolean rv = keys.get(columnName);
-    if (rv != null) return rv;
+    if (rv != null)
+      return rv;
     // This method is frequently used, create a map entry for each column
     // Saving each RowSets column minimizes metadata access.
     // May want to cache more metadata info in the future.
@@ -122,7 +124,8 @@ public class RowSetState {
       throw new IllegalStateException(ex);
     }
     rv = keys.get(columnName);
-    if (rv == null) throw new IllegalArgumentException(sf("Column not in RowSet: %s", columnName));
+    if (rv == null)
+      throw new IllegalArgumentException(sf("Column not in RowSet: %s", columnName));
     return rv;
   }
 
@@ -130,14 +133,18 @@ public class RowSetState {
    * Find out if this RowSet is on the insert row.
    * @return true if on the insert row
    */
-  private boolean isInserting() { return inserting; }
+  private boolean isInserting() {
+    return inserting;
+  }
 
   /**
    * Find out if this RowSet is
    * a {@linkplain CachedRowSet} doing {@linkplain CachedRowSet#acceptChanges}.
    * @return true if executing acceptingChanges
    */
-  private boolean isAcceptingCachedRowSetChanges() { return acceptingCachedRowSetChanges; }
+  private boolean isAcceptingCachedRowSetChanges() {
+    return acceptingCachedRowSetChanges;
+  }
 
   /**
    * Is the current row of the RowSet dirty?
@@ -147,7 +154,9 @@ public class RowSetState {
     return getNavigateState() != null && getNavigateState().undoRow.isDirty();
   }
 
-  NavigateState getNavigateState() { return NavigateState.get(rsRef.get()); }
+  NavigateState getNavigateState() {
+    return NavigateState.get(rsRef.get());
+  }
 
   // TODO: make more stuff instance accessible.
 
@@ -155,7 +164,8 @@ public class RowSetState {
   private final RowSetListener debugRowSetListener; // Strong reference needed.
   private static class DebugRowSetListener implements RowSetListener {
     static RowSetListener create(RowSet rs) {
-      if (defLookup(DebugRowSetListenerFlag.class) == null) return null;
+      if (defLookup(DebugRowSetListenerFlag.class) == null)
+        return null;
       DebugRowSetListener l = new DebugRowSetListener();
       rs.addRowSetListener(WeakListeners.create(RowSetListener.class, l, rs));
       return l;
@@ -224,7 +234,9 @@ public class RowSetState {
    * @param rs
    * @return RowSetState kept alive by RowSet reference
    */
-  public static RowSetState getExistingRowSetState(RowSet rs) { return rowSetState.get(rs); }
+  public static RowSetState getExistingRowSetState(RowSet rs) {
+    return rowSetState.get(rs);
+  }
 
   // /**
   //  * True if this is a known rowset.
@@ -236,7 +248,9 @@ public class RowSetState {
   // }
 
   static void setInserting(RowSet rs, boolean flag) {
-    if (rs != null) { getRowSetState(rs).inserting = flag; }
+    if (rs != null) {
+      getRowSetState(rs).inserting = flag;
+    }
   }
 
   // // NOTE: only invoked from one method which is syncronized.
@@ -276,7 +290,9 @@ public class RowSetState {
   }
 
   static void setPreInsertOps(RowSet rs, boolean flag) {
-    if (rs != null) { getRowSetState(rs).preInsertOps = flag; }
+    if (rs != null) {
+      getRowSetState(rs).preInsertOps = flag;
+    }
   }
 
   static boolean isPreInsertOps(RowSet rs) {
@@ -289,7 +305,9 @@ public class RowSetState {
    * @param flag state set to this.
    */
   private static void setAcceptingCachedRowSetChanges(CachedRowSet crs, boolean flag) {
-    if (crs != null) { getRowSetState(crs).acceptingCachedRowSetChanges = flag; }
+    if (crs != null) {
+      getRowSetState(crs).acceptingCachedRowSetChanges = flag;
+    }
   }
 
   /**
@@ -316,7 +334,9 @@ public class RowSetState {
     try {
       setAcceptingCachedRowSetChanges(crs, true);
       crs.acceptChanges();
-    } finally { setAcceptingCachedRowSetChanges(crs, false); }
+    } finally {
+      setAcceptingCachedRowSetChanges(crs, false);
+    }
   }
 
   /**
@@ -351,17 +371,23 @@ public class RowSetState {
       //if (runAfterChanges != null) {
       //	runAfterChanges.run();		// assume if acceptChanges throws, don't need "code"
       //}
-    } catch (SyncProviderException ex) { syncEx = ex; } finally {
+    } catch (SyncProviderException ex) {
+      syncEx = ex;
+    } finally {
       if (runAfterCachedRowSetChanges != null) {
         try {
           runAfterCachedRowSetChanges.run();
-        } catch (Exception ex) { afterEx = ex; }
+        } catch (Exception ex) {
+          afterEx = ex;
+        }
       }
       setAcceptingCachedRowSetChanges(crs, false);
     }
     if (syncEx != null) {
-      if (afterEx == null) throw syncEx;
-      else throw new NOT_USED_SSSQLSyncProviderException("Exception after Sync", syncEx, afterEx);
+      if (afterEx == null)
+        throw syncEx;
+      else
+        throw new NOT_USED_SSSQLSyncProviderException("Exception after Sync", syncEx, afterEx);
     }
 
     if (syncEx != null || afterEx != null)
@@ -406,6 +432,8 @@ public class RowSetState {
      * Throwable that occurred while executing after {@code crs.acceptChanges}.
      * @return may be null
      */
-    public Throwable getCauseAfter() { return causeAfter; }
+    public Throwable getCauseAfter() {
+      return causeAfter;
+    }
   }
 }

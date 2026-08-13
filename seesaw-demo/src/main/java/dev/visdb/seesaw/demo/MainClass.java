@@ -143,9 +143,15 @@ public class MainClass extends JFrame {
   // lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
   static class H2Trace {
     private final String flags;
-    H2Trace() { this.flags = ""; }
-    H2Trace(String flags) { this.flags = flags; }
-    String getTraceUrlFlags() { return flags; }
+    H2Trace() {
+      this.flags = "";
+    }
+    H2Trace(String flags) {
+      this.flags = flags;
+    }
+    String getTraceUrlFlags() {
+      return flags;
+    }
   }
   static class H2Workaround {}
 
@@ -153,7 +159,9 @@ public class MainClass extends JFrame {
    * ActionListener implementation to call code for each button.
    */
   private class MyButtonListener implements ActionListener {
-    public MyButtonListener() { super(); }
+    public MyButtonListener() {
+      super();
+    }
 
     @SuppressWarnings({"unused", "ResultOfObjectAllocationIgnored"})
     @Override
@@ -178,16 +186,16 @@ public class MainClass extends JFrame {
       } else if (source == btnExample4Advanced) {
         logger.log(DEBUG, "**** Opening Example4Advanced ****");
         new Example4Advanced(dbConnection);
-      // } else if (source == btnExample4UsingHelper) {
-      //   logger.log(DEBUG, "**** Opening Example4UsingHelper ****");
-      //   JFrame e4JFrame = new JFrame("Example4 Using Helper");
-      //   e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
-      //   Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
-      //   e4JFrame.add(example4);
-      //   example4.showUp(e4JFrame);
-      //   e4JFrame.pack();
-      //   // screen dimensions handled by SSScreenHelperCommon.setScreenSize()
-      //   e4JFrame.setVisible(true);
+        // } else if (source == btnExample4UsingHelper) {
+        //   logger.log(DEBUG, "**** Opening Example4UsingHelper ****");
+        //   JFrame e4JFrame = new JFrame("Example4 Using Helper");
+        //   e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
+        //   Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
+        //   e4JFrame.add(example4);
+        //   example4.showUp(e4JFrame);
+        //   e4JFrame.pack();
+        //   // screen dimensions handled by SSScreenHelperCommon.setScreenSize()
+        //   e4JFrame.setVisible(true);
       } else if (source == btnExample5) {
         logger.log(DEBUG, "**** Opening Example5 ****");
         new Example5(dbConnection);
@@ -197,16 +205,16 @@ public class MainClass extends JFrame {
       } else if (source == btnExample7) {
         logger.log(DEBUG, "**** Opening Example7 ****");
         new Example7(dbConnection);
-      // } else if (source == btnExample7UsingHelper) {
-      //   logger.log(DEBUG, "**** Opening Example7UsingHelper ****");
-      //   JFrame e7JFrame = new JFrame("Example7 Using Helper");
-      //   Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
-      //   e7JFrame.add(example7);
-      //   e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
-      //   example7.showUp(e7JFrame);
-      //   //e7JFrame.pack(); // NOT USING .pack() FOR DATA GRID SCREENS
-      //   e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-      //   e7JFrame.setVisible(true);
+        // } else if (source == btnExample7UsingHelper) {
+        //   logger.log(DEBUG, "**** Opening Example7UsingHelper ****");
+        //   JFrame e7JFrame = new JFrame("Example7 Using Helper");
+        //   Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
+        //   e7JFrame.add(example7);
+        //   e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
+        //   example7.showUp(e7JFrame);
+        //   //e7JFrame.pack(); // NOT USING .pack() FOR DATA GRID SCREENS
+        //   e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+        //   e7JFrame.setVisible(true);
       } else if (source == btnTestBase) {
         logger.log(DEBUG, "**** Opening TestBaseComponents ****");
         new TestBaseComponents(dbConnection, hints);
@@ -251,7 +259,9 @@ public class MainClass extends JFrame {
       DemoUtil.RowSetSource rsSource = getChosenEnum();
       DemoUtil.setWhichRowSetDefault(rsSource);
       btnRowSetSource.setText("RowSet: " + rsSource.toString());
-      if (popup == null) { return; }
+      if (popup == null) {
+        return;
+      }
       popup.hide();
       popup = null;
     }
@@ -388,7 +398,8 @@ public class MainClass extends JFrame {
           "Database product '%s', version '%s', MajMin '%s'\n", dbMeta.getDatabaseProductName(),
           dbMeta.getDatabaseProductVersion(),
           "" + dbMeta.getDatabaseMajorVersion() + ":" + dbMeta.getDatabaseMinorVersion());
-    } catch (SQLException ex) {}
+    } catch (SQLException ex) {
+    }
 
     DbSupport supp = DbSupportFactory.addDbSupportToLookup(dbConnection);
     if (supp == null) {
@@ -578,7 +589,9 @@ public class MainClass extends JFrame {
 
     abstract List<String> getScripts();
 
-    Connection getConnection() { return conn; }
+    Connection getConnection() {
+      return conn;
+    }
 
     /**
      * Find resource; an alternate implementation could take the resource as a file.
@@ -601,7 +614,9 @@ public class MainClass extends JFrame {
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void run() {
       Properties info = getDatabaseProperties();
-      if (info == null) { return; }
+      if (info == null) {
+        return;
+      }
       String clazz = info.getProperty("DB_DRIVER_CLASS", "");
 
       if (clazz.isEmpty()) {
@@ -619,16 +634,24 @@ public class MainClass extends JFrame {
       }
 
       conn = DemoUtil.getConnection(info.getProperty("DB_URL"), info);
-      if (conn == null) { return; }
+      if (conn == null) {
+        return;
+      }
 
-      if (no_initialize_db) { return; }
+      if (no_initialize_db) {
+        return;
+      }
 
       boolean ok = false;
       for (String script : getScripts()) {
         ok = false;
         BufferedReader br = getBufferedReader(script);
-        if (br != null) { ok = DemoUtil.runSqlStatements(conn, br, verbose); }
-        if (!ok) { break; }
+        if (br != null) {
+          ok = DemoUtil.runSqlStatements(conn, br, verbose);
+        }
+        if (!ok) {
+          break;
+        }
       }
 
       if (ok && !no_load_images) {
@@ -638,7 +661,9 @@ public class MainClass extends JFrame {
         ok = DemoUtil.loadBinaries(conn, "/swingset-demo-images.txt", sql, verbose);
       }
 
-      if (!ok) { conn = null; }
+      if (!ok) {
+        conn = null;
+      }
     }
 
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -650,7 +675,9 @@ public class MainClass extends JFrame {
         return props;
       } catch (FileNotFoundException ex) {
         System.err.println("Property file '" + fname + "' not found");
-      } catch (IOException ex) { logger.log(Level.ERROR, "IO exception.", ex); }
+      } catch (IOException ex) {
+        logger.log(Level.ERROR, "IO exception.", ex);
+      }
       return null;
     }
 
@@ -663,12 +690,18 @@ public class MainClass extends JFrame {
             try (FileWriter fout = new FileWriter(name)) {
               char buf[] = new char[4 * 1024];
               int n;
-              while ((n = br.read(buf)) > 0) { fout.write(buf, 0, n); }
+              while ((n = br.read(buf)) > 0) {
+                fout.write(buf, 0, n);
+              }
             }
           }
           ok = true;
-        } catch (IOException ex) { logger.log(Level.ERROR, "IO exception.", ex); }
-        if (!ok) { break; }
+        } catch (IOException ex) {
+          logger.log(Level.ERROR, "IO exception.", ex);
+        }
+        if (!ok) {
+          break;
+        }
       }
     }
   }
@@ -676,7 +709,9 @@ public class MainClass extends JFrame {
   static class ExternalSetup extends DatabaseSetup {
     List<String> sqlFiles;
 
-    public ExternalSetup(List<String> _sqlFiles) { sqlFiles = _sqlFiles; }
+    public ExternalSetup(List<String> _sqlFiles) {
+      sqlFiles = _sqlFiles;
+    }
 
     @Override
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -852,7 +887,9 @@ public class MainClass extends JFrame {
       for (SyncProvider sp : Collections.list(SyncFactory.getRegisteredProviders())) {
         Class<?> c = sp.getClass();
         System.err.printf("SyncProvider: %s\n", c.getName());
-        for (Class<?> iface : c.getInterfaces()) { System.err.println("    " + iface.getName()); }
+        for (Class<?> iface : c.getInterfaces()) {
+          System.err.println("    " + iface.getName());
+        }
       }
     } catch (SyncFactoryException ex) {
       logger.log(DEBUG, "SyncFactory.getRegisteredProviders()", ex);
@@ -882,11 +919,15 @@ public class MainClass extends JFrame {
     if (verbose) {
       StringBuilder sb = new StringBuilder();
       sb.append('\n').append(cmdName);
-      for (String arg : _args) { sb.append(' ').append(arg); }
+      for (String arg : _args) {
+        sb.append(' ').append(arg);
+      }
       System.err.println(sb.toString());
     }
 
-    if (some_error) { usage(); }
+    if (some_error) {
+      usage();
+    }
 
     // if (readme) {
     // return;
@@ -897,7 +938,9 @@ public class MainClass extends JFrame {
     int i = g.getOptind();
     if (i != _args.length) {
       // There are positional arguemnts. Can only be one.
-      if (i + 1 != _args.length) { usage(); }
+      if (i + 1 != _args.length) {
+        usage();
+      }
       dbname = _args[i];
       databaseServerSpecified = true;
     }
@@ -934,7 +977,9 @@ public class MainClass extends JFrame {
       some_error = true;
     }
 
-    if (some_error) { System.exit(1); }
+    if (some_error) {
+      System.exit(1);
+    }
 
     if (dump) {
       databaseSetup.dump();

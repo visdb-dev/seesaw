@@ -210,7 +210,9 @@ public class TestBaseComponents extends JFrame {
     C("Combo Enum 2"),
     D("Combo Enum 3");
     private final String displayVal;
-    private ComboEnum(String _displayVal) { displayVal = _displayVal; }
+    private ComboEnum(String _displayVal) {
+      displayVal = _displayVal;
+    }
 
     @Override
     public String toString() {
@@ -227,7 +229,9 @@ public class TestBaseComponents extends JFrame {
     F("List Enum 6"),
     G("List Enum 7");
     private final String displayVal;
-    private ListEnum(String _displayVal) { displayVal = _displayVal; }
+    private ListEnum(String _displayVal) {
+      displayVal = _displayVal;
+    }
 
     @Override
     public String toString() {
@@ -270,11 +274,12 @@ public class TestBaseComponents extends JFrame {
   // class. See declarations for cmbSSComboBox, cmbEnumSSComboBox following.
   // See SSComboBox for an example that exposes Buidler.
   static class MyComboBox extends ComboBox1<Integer, String> {
-    MyComboBox() { super(new ComboBox1.Builder<Integer, String>(){}); }
+    MyComboBox() {
+      super(new ComboBox1.Builder<Integer, String>() {});
+    }
   }
 
-  ComboBox1<Integer, String> cmbSSComboBox
-      = new ComboBox1.Builder<Integer, String>(){}.build();
+  ComboBox1<Integer, String> cmbSSComboBox = new ComboBox1.Builder<Integer, String>() {}.build();
   MyComboBox cmbEnumSSComboBox = new MyComboBox();
   TextField txtTestPK = new TextField();
   CheckBox chkSSCheckBox = new CheckBox("labeled checkbox");
@@ -377,13 +382,17 @@ public class TestBaseComponents extends JFrame {
       rowsModel = RowsModel.create(rowset, null);
       // navigator = new SSDataNavigator(rowsModel);
       navigator = new DataNavigator(rowsModel, DataNavigator.Lines.TWO);
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
     String name = rowsModel.getDbOps().getClass().getSimpleName();
     if (!name.equals("TestBaseComponentsDbOps")) {
       throw new IllegalStateException(sf("wrong customizer %s", name));
     }
     lkup.remove(creator);
-    if (prevCreator != null) { lkup.add(prevCreator); }
+    if (prevCreator != null) {
+      lkup.add(prevCreator);
+    }
 
     if (!activeComps.contains(NAV)) {
       cmbSSDBComboNav = null;
@@ -392,18 +401,20 @@ public class TestBaseComponents extends JFrame {
       // setup navigator query
       final String query = "SELECT * FROM swingset_base_test_data;";
       //= (connection, query, "swingset_base_test_pk", "swingset_base_test_pk");
-      cmbSSDBComboNav = new DBComboBox2.Builder<Long, Object, Object>(){}
-          .connection(connection)
-          .query(query)
-          .primaryKeyColumnName("swingset_base_test_pk")
-          .displayColumnName("swingset_base_test_pk")
-          .build();
+      cmbSSDBComboNav = new DBComboBox2.Builder<Long, Object, Object>() {}
+                            .connection(connection)
+                            .query(query)
+                            .primaryKeyColumnName("swingset_base_test_pk")
+                            .displayColumnName("swingset_base_test_pk")
+                            .build();
 
       try {
         cmbSSDBComboNav.execute();
       } catch (final SQLException se) {
         logger.log(Level.ERROR, "SQL Exception.", se);
-      } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+      } catch (final Exception e) {
+        logger.log(Level.ERROR, "Exception.", e);
+      }
 
       // Setup syncmanager, which will take care of keeping the combo navigator and
       // data navigator in sync.
@@ -439,13 +450,13 @@ public class TestBaseComponents extends JFrame {
 
     if (activeComps.contains(DB_COMBO)) {
       final String dbComboQuery = "SELECT * FROM part_data;";
-        // (connection, dbComboQuery, "part_id", "part_name");
+      // (connection, dbComboQuery, "part_id", "part_name");
       cmbSSDBComboBox = new DBComboBox2.Builder<Long, Object, Object>() {}
-          .connection(connection)
-          .query(dbComboQuery)
-          .primaryKeyColumnName("part_id")
-          .displayColumnName("part_name")
-          .build();
+                            .connection(connection)
+                            .query(dbComboQuery)
+                            .primaryKeyColumnName("part_id")
+                            .displayColumnName("part_name")
+                            .build();
       cmbSSDBComboBox.setAllowNull(false);
       // TODO if getAllowNull() is false, user can still blank out the combo - we may want to prevent this
     }
@@ -466,7 +477,9 @@ public class TestBaseComponents extends JFrame {
       txtSSTextFieldB.setPluginValidator(TextComponentValidator.create(validator));
       try {
         setupOurTextStyles();
-      } catch (IOException ex) { logger.log(Level.ERROR, (String) null, ex); }
+      } catch (IOException ex) {
+        logger.log(Level.ERROR, (String) null, ex);
+      }
       txtSSTextFieldB.setTextDecorator(new ComponentStateTextDecorator(
           Map.of(ComponentState.ERROR, "testComponents_componentStateError",
                  ComponentState.MODIFIED, "testComponents_componentStateModified")));
@@ -482,7 +495,9 @@ public class TestBaseComponents extends JFrame {
         cmbSSDBComboBox.execute();
       } catch (final SQLException se) {
         logger.log(Level.ERROR, "SQL Exception.", se);
-      } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+      } catch (final Exception e) {
+        logger.log(Level.ERROR, "Exception.", e);
+      }
     }
 
     // Set the dimensions of the labels and components.
@@ -552,9 +567,9 @@ public class TestBaseComponents extends JFrame {
    */
   @SuppressWarnings("CallToPrintStackTrace")
   private void setupOurTextStyles() throws IOException {
-    if (TextStyles.getStyle("testComponents_componentStateError") != null) return;
-    StringReader reader = new StringReader(
-        """
+    if (TextStyles.getStyle("testComponents_componentStateError") != null)
+      return;
+    StringReader reader = new StringReader("""
         {
           "testComponents_componentStateError": {
             "fontSize": 14,
@@ -571,7 +586,9 @@ public class TestBaseComponents extends JFrame {
     TextStyles.loadFromAnyThread(() -> TextStyles.loadStylesFromJson(reader, "TestBaseComponents"));
   }
 
-  private DbOps createDbNav() { return new TestBaseComponentsDbOps(); }
+  private DbOps createDbNav() {
+    return new TestBaseComponentsDbOps();
+  }
 
   /**
    * Various navigator overrides needed to support H2
@@ -580,7 +597,9 @@ public class TestBaseComponents extends JFrame {
    * re-queried following insert and delete with rowset.execute()
    */
   private class TestBaseComponentsDbOps extends DbOpsBase {
-    public TestBaseComponentsDbOps() { super(TestBaseComponents.this); }
+    public TestBaseComponentsDbOps() {
+      super(TestBaseComponents.this);
+    }
     /**
      * Requery the rowset following a deletion. This is needed for H2.
      */
@@ -621,14 +640,17 @@ public class TestBaseComponents extends JFrame {
     @Override
     public void performRefreshOps() {
       super.performRefreshOps();
-      if (syncManager == null) return;
+      if (syncManager == null)
+        return;
 
       syncManager.async();
       try {
         cmbSSDBComboNav.execute();
       } catch (final SQLException se) {
         logger.log(Level.ERROR, "SQL Exception.", se);
-      } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+      } catch (final Exception e) {
+        logger.log(Level.ERROR, "Exception.", e);
+      }
       syncManager.sync();
     }
 
@@ -638,7 +660,8 @@ public class TestBaseComponents extends JFrame {
     @Override
     public void performCancelOps() {
       super.performCancelOps();
-      if (cmbSSDBComboNav == null) return;
+      if (cmbSSDBComboNav == null)
+        return;
 
       cmbSSDBComboNav.setEnabled(true);
     }
@@ -655,7 +678,9 @@ public class TestBaseComponents extends JFrame {
   }
 
   /** For enabled components, return list of descriptive records. */
-  private Collection<CompID> getActiveComps() { return activeComps; }
+  private Collection<CompID> getActiveComps() {
+    return activeComps;
+  }
 
   /** For enabled components, return list of records. */
   private List<CompInfo> getActiveCompInfo() {
@@ -664,7 +689,8 @@ public class TestBaseComponents extends JFrame {
 
   private void buildGui_bind() {
     for (CompInfo comp : getActiveCompInfo()) {
-      if (comp.col != null) rowsModel.bind((SSComponent) comp.comp, comp.col);
+      if (comp.col != null)
+        rowsModel.bind((SSComponent) comp.comp, comp.col);
     }
   }
 
@@ -680,7 +706,8 @@ public class TestBaseComponents extends JFrame {
       JComponent jc = compInfo.comp;
       if (keepMinHeight.contains(compID)) {
         int curHeight = jc.getPreferredSize().height;
-        if (curHeight > targetDim.height) targetDim.height = curHeight;
+        if (curHeight > targetDim.height)
+          targetDim.height = curHeight;
       }
       jc.setPreferredSize(targetDim);
     }
@@ -728,13 +755,15 @@ public class TestBaseComponents extends JFrame {
       constraints.anchor = GridBagConstraints.FIRST_LINE_END;
       if (Objects.equals(noInsets, constraints.insets))
         constraints.insets = new Insets(0, 5, 0, 10);
-      if (constraints.ipadx == 0) constraints.ipadx = 5;
+      if (constraints.ipadx == 0)
+        constraints.ipadx = 5;
     }
     if (pos.gridx == 1) {
       // ssComponent
       constraints.anchor = GridBagConstraints.LINE_START;
       constraints.insets = new Insets(0, 5, 0, 10);
-      if (constraints.weightx == 0.0) constraints.weightx = .1;
+      if (constraints.weightx == 0.0)
+        constraints.weightx = .1;
     }
     return constraints;
   }

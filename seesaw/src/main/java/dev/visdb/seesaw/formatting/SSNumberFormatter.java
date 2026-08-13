@@ -57,7 +57,8 @@ public class SSNumberFormatter extends NumberFormatter implements FormatterAssis
    */
   @Override
   public SSFormat getSSFormat() {
-    if (getFormattedTextField() instanceof SSFormattedTextField ftf) return ftf.getSSFormat();
+    if (getFormattedTextField() instanceof SSFormattedTextField ftf)
+      return ftf.getSSFormat();
     return null;
   }
 

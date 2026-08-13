@@ -81,7 +81,8 @@ public class RowNumberSpinnerTest {
   /** x */
   @AfterEach
   public void tearDown() {
-    if (busReceiver != null) WeakEventBus.unregister(busReceiver, getGlobalEventBus());
+    if (busReceiver != null)
+      WeakEventBus.unregister(busReceiver, getGlobalEventBus());
     busReceiver = null;
   }
 

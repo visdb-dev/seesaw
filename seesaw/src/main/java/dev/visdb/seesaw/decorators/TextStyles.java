@@ -183,13 +183,13 @@ import static java.lang.System.Logger.Level.*;
  *     "fontFamily": "Monospaced",        |      default.fontFamily=Monospaced
  *     "fontSize": 16,                    |      default.fontSize=16
  *     "alignment": "left"                |      default.alignment=left
- *   },                                   |      
- *   "warning": {                         |      
+ *   },                                   |
+ *   "warning": {                         |
  *     "inherits": "default",             |      warning.inherits=default
  *     "background": "#FFF3CD",           |      warning.background=#FFF3CD
  *     "alignment": "center"              |      warning.alignment=center
- *   },                                   |      
- *   "criticalError": {                   |      
+ *   },                                   |
+ *   "criticalError": {                   |
  *     "inherits": "warning",             |      criticalError.inherits=warning
  *     "alignment": "right",              |      criticalError.alignment=right
  *     "foreground": "#721C24",           |      criticalError.foreground=#721C24
@@ -300,11 +300,14 @@ public class TextStyles {
    * @return AttributeSet or null if doesn't exist
    */
   public static AttributeSet getStyle(String styleName) {
-    if (styleName == null || newStyleNames.contains(styleName)) return null;
+    if (styleName == null || newStyleNames.contains(styleName))
+      return null;
     AttributeSet style = readOnlyRegistry.get(styleName);
-    if (style != null) return style;
+    if (style != null)
+      return style;
     AttributeSet resolvedStyle = getResolvedStyle(styleName);
-    if (resolvedStyle == null) return null;
+    if (resolvedStyle == null)
+      return null;
     SimpleAttributeSet newAttrs = new SimpleAttributeSet();
     flatten(getResolvedStyle(styleName), newAttrs);
     newAttrs.removeAttribute(StyleConstants.ResolveAttribute);
@@ -314,7 +317,8 @@ public class TextStyles {
   }
 
   private static void flatten(AttributeSet origAttrs, MutableAttributeSet newAttrs) {
-    if (origAttrs == null) return;
+    if (origAttrs == null)
+      return;
     flatten(origAttrs.getResolveParent(), newAttrs);
     newAttrs.addAttributes(origAttrs);
   }
@@ -357,8 +361,10 @@ public class TextStyles {
     boolean healthy = runDiagnostics(sb);
     String diagnostics = sb.toString();
     logger.log(INFO, () -> sf("\n%s", diagnostics));
-    if (toConsole) System.out.print(sb.toString());
-    if (!healthy) logger.log(ERROR, () -> sf("Style diagnotics failed."));
+    if (toConsole)
+      System.out.print(sb.toString());
+    if (!healthy)
+      logger.log(ERROR, () -> sf("Style diagnotics failed."));
 
     // 2. Locate root nodes and generate structural tree map string
     sb.setLength(0);
@@ -367,7 +373,8 @@ public class TextStyles {
     sb.append("=======================================================\n");
 
     logger.log(INFO, () -> sf("\n%s", sb.toString()));
-    if (toConsole) System.out.print(sb.toString());
+    if (toConsole)
+      System.out.print(sb.toString());
     return new LoadStatus(healthy, diagnostics, trees);
   }
 
@@ -382,7 +389,9 @@ public class TextStyles {
     Set<String> roots = new HashSet<>(registry.keySet());
     roots.removeAll(inheritanceMap.keySet());
 
-    for (String root : roots) { generateDiagnosticTree(sb, root, "", true); }
+    for (String root : roots) {
+      generateDiagnosticTree(sb, root, "", true);
+    }
   }
 
   /**
@@ -440,7 +449,8 @@ public class TextStyles {
     for (SimpleAttributeSet attrSet : registry.values()) {
       if (attrSet != null) {
         totalIndividualAttributesParsed += attrSet.getAttributeCount();
-        if (attrSet.isDefined(StyleConstants.NameAttribute)) totalIndividualAttributesParsed -= 1;
+        if (attrSet.isDefined(StyleConstants.NameAttribute))
+          totalIndividualAttributesParsed -= 1;
       }
     }
 
@@ -498,7 +508,9 @@ public class TextStyles {
     // Locate downstream dependents
     List<String> children = new ArrayList<>();
     for (Map.Entry<String, String> entry : inheritanceMap.entrySet()) {
-      if (entry.getValue().equals(styleName)) { children.add(entry.getKey()); }
+      if (entry.getValue().equals(styleName)) {
+        children.add(entry.getKey());
+      }
     }
 
     for (int i = 0; i < children.size(); i++) {
@@ -524,7 +536,8 @@ public class TextStyles {
           continue;
         }
       }
-      if (name == StyleConstants.NameAttribute) continue;
+      if (name == StyleConstants.NameAttribute)
+        continue;
 
       Object value = style.getAttribute(name);
       String cleanName = name.toString();
@@ -556,7 +569,8 @@ public class TextStyles {
                                                      AttributeSet style, String key,
                                                      @SuppressWarnings("unused") String label) {
     Object val = style.getAttribute(key);
-    if (val == null) return;
+    if (val == null)
+      return;
     sb.append(prefix).append("  • ").append(key).append(" = ").append(val).append("\n");
   }
 
@@ -568,7 +582,9 @@ public class TextStyles {
     }
     visited.add(current);
     String parent = inheritanceMap.get(current);
-    if (parent != null) { checkCircularReference(parent, visited); }
+    if (parent != null) {
+      checkCircularReference(parent, visited);
+    }
   }
 
   private static AttributeSet getResolvedStyle(String targetStyle) {
@@ -598,7 +614,8 @@ public class TextStyles {
     }
 
     SimpleAttributeSet currentStyle = registry.get(currentName);
-    if (currentStyle == null) return null;
+    if (currentStyle == null)
+      return null;
 
     visited.add(currentName);
     String parentName = inheritanceMap.get(currentName);
@@ -685,10 +702,10 @@ public class TextStyles {
    * All load methods go through here
    * @param parseToMap parses either json or properties.
    */
-  private static LoadStatus loadStyles(Reader reader, String fName,
+  private static LoadStatus loadStyles(
+      Reader reader, String fName,
       BiFunctionIO<Reader, String, Map<String, Map<String, String>>> parseToMap)
       throws IOException {
-
     verifyNotEDT();
     boolean cleanFinish = false;
     LoadStatus status;
@@ -708,7 +725,7 @@ public class TextStyles {
   private static void loadStylesFromMaps(Map<String, Map<String, String>> styles) {
     for (Map.Entry<String, Map<String, String>> styleEntry : styles.entrySet()) {
       String styleName = styleEntry.getKey();
-      Map<String,String> attrs = styleEntry.getValue();
+      Map<String, String> attrs = styleEntry.getValue();
 
       // validate the new styleName, and register it
       if (initialStyleNames.contains(styleName))
@@ -725,7 +742,7 @@ public class TextStyles {
       for (Map.Entry<String, String> attr : attrs.entrySet()) {
         String propertyName = attr.getKey();
         String value = attr.getValue();
-        
+
         if ("inherits".equalsIgnoreCase(propertyName)) {
           inheritanceMap.put(styleName, value.trim());
         } else {
@@ -747,17 +764,15 @@ public class TextStyles {
   private static JavaType stylesNestedMapType(ObjectMapper mapper) {
     TypeFactory typeFactory = mapper.getTypeFactory();
     JavaType mapType = typeFactory.constructMapType(
-        Map.class,
-        typeFactory.constructType(String.class),
-        typeFactory.constructMapType(Map.class, String.class, String.class)
-    );
+        Map.class, typeFactory.constructType(String.class),
+        typeFactory.constructMapType(Map.class, String.class, String.class));
     return mapType;
   }
 
   private static LoadStatus loadStylesFromProperties(Path path) throws IOException {
     // props.load wraps the reader in it's own buffered reader, so do least here
-    try (InputStreamReader reader = new InputStreamReader(
-        Files.newInputStream(path), StandardCharsets.UTF_8)) {
+    try (InputStreamReader reader
+         = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
       return loadStylesFromProperties(reader, path.toString());
     }
   }
@@ -795,7 +810,8 @@ public class TextStyles {
   }
 
   // Parse the properties into a map.
-  private static Map<String, Map<String, String>> parseProperties(Properties props) throws IOException {
+  private static Map<String, Map<String, String>> parseProperties(Properties props)
+      throws IOException {
     JavaPropsMapper mapper = JavaPropsMapper.builder().build();
     JavaPropsSchema schemaWithDots = JavaPropsSchema.emptySchema().withPathSeparator(".");
     Map<String, Map<String, String>> styles
@@ -820,28 +836,28 @@ public class TextStyles {
    * @return
    * @throws IOException
    */
-  public static synchronized LoadStatus loadStylesFromJson(Reader reader, String fName) throws IOException {
-    return loadStyles(reader, fName, (aReader, name) -> {
-      return parseJson(aReader, name);
-    });
+  public static synchronized LoadStatus loadStylesFromJson(Reader reader, String fName)
+      throws IOException {
+    return loadStyles(reader, fName, (aReader, name) -> { return parseJson(aReader, name); });
   }
 
-  private static Map<String, Map<String, String>> parseJson(Reader reader, String fName) throws IOException {
-    ObjectMapper mapper = JsonMapper.builder()
-        // .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-        .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
-        .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
-        .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
-        .enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
-        .build();
+  private static Map<String, Map<String, String>> parseJson(Reader reader, String fName)
+      throws IOException {
+    ObjectMapper mapper = JsonMapper
+                              .builder()
+                              // .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+                              .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+                              .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+                              .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                              .enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
+                              .build();
 
     try {
       // Use TypeReference to cleanly parse directly into nested maps
-      Map<String, Map<String, String>> styles = mapper.readValue(
-          reader,
-          //new TypeReference<Map<String, Map<String, String>>>() {}
-          stylesNestedMapType(mapper)
-      );
+      Map<String, Map<String, String>> styles
+          = mapper.readValue(reader,
+                             //new TypeReference<Map<String, Map<String, String>>>() {}
+                             stylesNestedMapType(mapper));
       return styles;
     } catch (JacksonException ex) {
       System.err.println(ex.getMessage());
@@ -854,8 +870,8 @@ public class TextStyles {
       // but put the filename in the loc, instead of something like "(StringReader)"
       String loc = ex.getLocation().toString();
       loc = loc.replace(ex.getLocation().sourceDescription(), fName);
-      String newMsg = sf("%s\nat %s (through reference chain: %s)",
-          ex.getOriginalMessage(), loc, ex.getPathReference());
+      String newMsg = sf("%s\nat %s (through reference chain: %s)", ex.getOriginalMessage(), loc,
+                         ex.getPathReference());
       logger.log(ERROR, newMsg);
       JacksonException je = new JacksonException(newMsg, ex) {
         @Override
@@ -937,7 +953,9 @@ public class TextStyles {
         }
       }
       cleanFinish = true;
-    } finally { status = loadStylesCompleted(cleanFinish); }
+    } finally {
+      status = loadStylesCompleted(cleanFinish);
+    }
     return status;
   }
 
@@ -974,11 +992,14 @@ public class TextStyles {
       Throwable ex = null;
       try {
         sw.get(); // Waits for completion.
-      } catch (InterruptedException x) { ex = x; } catch (ExecutionException x) {
+      } catch (InterruptedException x) {
+        ex = x;
+      } catch (ExecutionException x) {
         ex = x.getCause();
       }
       if (ex != null) {
-        if (ex instanceof IOException iox) throw iox;
+        if (ex instanceof IOException iox)
+          throw iox;
         throw new IOException("Problem loading TextStyles", ex);
       }
     }
@@ -1148,7 +1169,6 @@ public class TextStyles {
           default -> {
             throw new TextStylesException(sf("'%s' not for '%s'", val, key));
           }
-
         }
         attrSet.addAttribute(SCROLLBARS_KEY, val);
       }
@@ -1202,7 +1222,8 @@ public class TextStyles {
       case "yellow" -> Color.YELLOW;
       default -> null;
     };
-    if (color != null) return color;
+    if (color != null)
+      return color;
 
     // Deep reflection fallback for environment-specific or extended Look-And-Feel colors
     try {
@@ -1210,7 +1231,9 @@ public class TextStyles {
         if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
             && field.getType() == Color.class) {
           String fieldName = field.getName().replace("_", "").toLowerCase();
-          if (fieldName.equals(cleanValue)) { return (Color) field.get(null); }
+          if (fieldName.equals(cleanValue)) {
+            return (Color) field.get(null);
+          }
         }
       }
     } catch (IllegalAccessException | IllegalArgumentException e) {
@@ -1244,7 +1267,9 @@ public class TextStyles {
     if (style == RESET) {
       // Could remove the resetMemento map entry, but performance waste
       // since RESET is common; instead could have "forgetResetMemento" method
-      if (resetMemento != null) { resetMemento.restoreTo(jComponent); }
+      if (resetMemento != null) {
+        resetMemento.restoreTo(jComponent);
+      }
       jComponent.putClientProperty(STYLE_NAME, null);
       return;
     }
@@ -1253,7 +1278,8 @@ public class TextStyles {
     // If there is a problem, this could be a bread crumb.
     jComponent.putClientProperty(STYLE_NAME, style.getAttribute(StyleConstants.NameAttribute));
 
-    if (resetMemento == null) resetMementos.put(jComponent, getMemento(jComponent));
+    if (resetMemento == null)
+      resetMementos.put(jComponent, getMemento(jComponent));
 
     if (jComponent instanceof JTextArea textArea) {
       applyStyle(textArea, style);
@@ -1311,7 +1337,8 @@ public class TextStyles {
     applyCoreStyle(textArea, style);
 
     JScrollPane jsp = findScrollPane(textArea);
-    if (jsp == null) return;
+    if (jsp == null)
+      return;
 
     vd = styleAttrName2Default("scrollbars", style);
     if (!vd.keep()) {
@@ -1363,13 +1390,19 @@ public class TextStyles {
     // 1. Process Core Component Foreground/Background Colors
 
     ValueDefault vd = styleAttrName2Default("foreground", style);
-    if (!vd.keep()) { component.setForeground((Color) (vd.useDflt ? vd.dflt() : vd.value())); }
+    if (!vd.keep()) {
+      component.setForeground((Color) (vd.useDflt ? vd.dflt() : vd.value()));
+    }
 
     vd = styleAttrName2Default("background", style);
-    if (!vd.keep()) { component.setBackground((Color) (vd.useDflt ? vd.dflt() : vd.value())); }
+    if (!vd.keep()) {
+      component.setBackground((Color) (vd.useDflt ? vd.dflt() : vd.value()));
+    }
 
     vd = styleAttrName2Default("opaque", style);
-    if (!vd.keep()) { component.setOpaque((boolean) (vd.useDflt() ? vd.dflt() : vd.value())); }
+    if (!vd.keep()) {
+      component.setOpaque((boolean) (vd.useDflt() ? vd.dflt() : vd.value()));
+    }
 
     // 2. Process Core Font Typography configurations
 
@@ -1393,14 +1426,16 @@ public class TextStyles {
                                         currentFontAttributes.get(TextAttribute.UNDERLINE))
                    : vd.useDflt() ? false
                                   : (boolean) vd.value();
-    if (isOn) fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+    if (isOn)
+      fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 
     vd = styleAttrName2Default("strikethrough", style);
     isOn = vd.keep()      ? TextAttribute.STRIKETHROUGH_ON.equals(
                                 currentFontAttributes.get(TextAttribute.STRIKETHROUGH))
            : vd.useDflt() ? false
                           : (boolean) vd.value();
-    if (isOn) fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+    if (isOn)
+      fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
 
     int currentFontStyle = currentFont.getStyle();
     int fontStyle = Font.PLAIN;
@@ -1419,7 +1454,9 @@ public class TextStyles {
     component.repaint();
   }
 
-  static ComponentMemento getMemento(JComponent c) { return new ComponentMemento(c); }
+  static ComponentMemento getMemento(JComponent c) {
+    return new ComponentMemento(c);
+  }
 
   /**
    * For saving and restoring component state changed by styles.
@@ -1543,19 +1580,31 @@ public class TextStyles {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       final ComponentMemento other = (ComponentMemento) obj;
-      if (this.opaque != other.opaque) return false;
-      if (this.alignment != other.alignment) return false;
-      if (this.isTextArea != other.isTextArea) return false;
-      if (this.lineWrap != other.lineWrap) return false;
-      if (this.wordWrap != other.wordWrap) return false;
-      if (this.vsb != other.vsb) return false;
-      if (this.hsb != other.hsb) return false;
-      if (!Objects.equals(this.foreground, other.foreground)) return false;
-      if (!Objects.equals(this.background, other.background)) return false;
+      if (this.opaque != other.opaque)
+        return false;
+      if (this.alignment != other.alignment)
+        return false;
+      if (this.isTextArea != other.isTextArea)
+        return false;
+      if (this.lineWrap != other.lineWrap)
+        return false;
+      if (this.wordWrap != other.wordWrap)
+        return false;
+      if (this.vsb != other.vsb)
+        return false;
+      if (this.hsb != other.hsb)
+        return false;
+      if (!Objects.equals(this.foreground, other.foreground))
+        return false;
+      if (!Objects.equals(this.background, other.background))
+        return false;
       return Objects.equals(this.font, other.font);
     }
   }
@@ -1570,7 +1619,9 @@ public class TextStyles {
      *
      * @param attrs
      */
-    public AttributeSetDelegate(AttributeSet attrs) { this.attrs = attrs; }
+    public AttributeSetDelegate(AttributeSet attrs) {
+      this.attrs = attrs;
+    }
 
     /** {@inheritDoc} */
     @Override

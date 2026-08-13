@@ -53,14 +53,18 @@ public class SSSSNField extends SSFormattedTextField {
   /**
    * Creates a new instance of SSSSNField
    */
-  public SSSSNField() { this(createFormatterFactory()); }
+  public SSSSNField() {
+    this(createFormatterFactory());
+  }
 
   /**
    * Creates an object of SSSSNField with the specified formatter factory
    *
    * @param factory - formatter factory to be used
    */
-  public SSSSNField(AbstractFormatterFactory factory) { super(factory); }
+  public SSSSNField(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   /**
    * SSN MaskFormatterFactory.

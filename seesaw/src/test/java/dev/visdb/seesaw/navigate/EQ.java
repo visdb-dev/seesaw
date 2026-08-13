@@ -63,7 +63,9 @@ public class EQ {
    * x
    * @return
    */
-  static int timeoutVal() { return 3; }
+  static int timeoutVal() {
+    return 3;
+  }
 
   /**
    * x
@@ -72,7 +74,8 @@ public class EQ {
    */
   static void await(CountDownLatch latch) throws InterruptedException {
     int seconds = timeoutVal();
-    if (seconds == 0) latch.await();
+    if (seconds == 0)
+      latch.await();
     else if (!latch.await(seconds, TimeUnit.SECONDS))
       throw new IllegalStateException("latch timeout");
   }
@@ -87,13 +90,21 @@ public class EQ {
   static class GetRowsModelEvent {
     private final List<EventObjectBacktrace> basicEvents;
 
-    GetRowsModelEvent(List<EventObjectBacktrace> basicEvents) { this.basicEvents = basicEvents; }
+    GetRowsModelEvent(List<EventObjectBacktrace> basicEvents) {
+      this.basicEvents = basicEvents;
+    }
 
-    int size() { return basicEvents.size(); }
+    int size() {
+      return basicEvents.size();
+    }
 
-    void clear() { basicEvents.clear(); }
+    void clear() {
+      basicEvents.clear();
+    }
 
-    RowsEvent get(int idx) { return (RowsEvent) basicEvents.get(idx); }
+    RowsEvent get(int idx) {
+      return (RowsEvent) basicEvents.get(idx);
+    }
 
     @SuppressWarnings("unused")
     EventObjectBacktrace oget(int idx) {
@@ -117,10 +128,14 @@ public class EQ {
     private final List<EventObjectBacktrace> events = new ArrayList<>();
 
     BusReceiver() {
-      PerTestDispatch = (ev) -> { events.add(ev); };
+      PerTestDispatch = (ev) -> {
+        events.add(ev);
+      };
     }
 
-    GetRowsModelEvent events() { return new GetRowsModelEvent(events); }
+    GetRowsModelEvent events() {
+      return new GetRowsModelEvent(events);
+    }
 
     /**
      * Catch RowSet events; update the component's display.
@@ -141,7 +156,8 @@ public class EQ {
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void report(EventObjectBacktrace ev) {
       System.out.println("EventBus: " + ev.toString());
-      if (PerTestDispatch != null) try {
+      if (PerTestDispatch != null)
+        try {
           PerTestDispatch.accept(ev);
         } catch (Exception ex) {
           System.err.println("EXCEPTION: " + ex.getLocalizedMessage());
@@ -245,7 +261,8 @@ public class EQ {
         if (_latch == null) // internal countdown?
           latch.countDown();
       } catch (Exception ex) {
-        if (exs != null) exs.add(ex);
+        if (exs != null)
+          exs.add(ex);
         else {
           ex.printStackTrace();
           ok[0] = false;

@@ -120,7 +120,7 @@ import static java.sql.JDBCType.*;
  * {@link #getZoomSlider() },
  * {@link #getZoomResetButton() },
  * {@link #getCurrentZoomLabel() }.
- * 
+ *
  * <p>
  * Though not visible in the API, there's a {@link ZoomCanvas} in the scroll pane.
  */
@@ -142,7 +142,9 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
         return;
 
       JFileChooser fc = new JFileChooser();
-      if (fc.showOpenDialog(btnUpdateImage) != JFileChooser.APPROVE_OPTION) { return; }
+      if (fc.showOpenDialog(btnUpdateImage) != JFileChooser.APPROVE_OPTION) {
+        return;
+      }
 
       Path tPath = fc.getSelectedFile().toPath();
       java.awt.Image image;
@@ -176,7 +178,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
       // Verify the bytes are a recognized image
       BufferedImage bimg = ZoomCanvas.bytes2image(bytes);
-      if (bimg == null) throw new IOException("Unknown image format");
+      if (bimg == null)
+        throw new IOException("Unknown image format");
 
       // Stage the image to the database
       dbChange(() -> { setColumn(bytes); });
@@ -235,7 +238,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   /**
    * How is resize handled.
-   * @return 
+   * @return
    */
   public ResizeMode getResizeMode() {
     return canvas.getResizeMode();
@@ -243,15 +246,16 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   /**
    * How to handle resize.
-   * @param resizeMode 
+   * @param resizeMode
    */
   public void setResizeMode(ResizeMode resizeMode) {
     canvas.setResizeMode(resizeMode);
   }
 
-
   /** @return the scroll pane */
-  protected JScrollPane getScrollPane() { return scrollPane; }
+  protected JScrollPane getScrollPane() {
+    return scrollPane;
+  }
 
   /**
    * Easy way to set scroll bar policy for both directions. For example
@@ -304,10 +308,12 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   private void setupImageCanvasInScrollPane() {
     canvas = new MyZoomCanvas(scrollPane,
-                              () -> zoomFactor,
-                              () -> zoomSlider.getValueIsAdjusting()
-                                       ? ZoomCanvas.RenderingQuality.MEDIUM
-                                       : ZoomCanvas.RenderingQuality.HIGH);
+                              ()
+                                  -> zoomFactor,
+                              ()
+                                  -> zoomSlider.getValueIsAdjusting()
+                                         ? ZoomCanvas.RenderingQuality.MEDIUM
+                                         : ZoomCanvas.RenderingQuality.HIGH);
     nullBackground = canvas.getBackground();
     scrollPane.getViewport().setView(canvas);
 
@@ -333,7 +339,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
       // Capture the starting mouse point, and popup point
       origin = e.getPoint();
       requestFocusInWindow();
-      if (tryPopup(e)) return;
+      if (tryPopup(e))
+        return;
 
       // Change cursor to a hand/grabbing cursor when clicking down
       canvas.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
@@ -343,7 +350,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     public void mouseReleased(MouseEvent e) { // Panning
       // Capture popup point
       origin = e.getPoint();
-      if (tryPopup(e)) return;
+      if (tryPopup(e))
+        return;
 
       // Restore standard default cursor when letting go
       canvas.setCursor(Cursor.getDefaultCursor());
@@ -351,7 +359,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
     @Override
     public void mouseDragged(MouseEvent e) { // Panning
-      if (origin == null) return;
+      if (origin == null)
+        return;
 
       JViewport viewport = scrollPane.getViewport();
       Point viewPos = viewport.getViewPosition();
@@ -368,10 +377,14 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
       int maxX = canvas.getWidth() - viewport.getWidth();
       int maxY = canvas.getHeight() - viewport.getHeight();
 
-      if (newX < 0) newX = 0;
-      if (newY < 0) newY = 0;
-      if (newX > maxX) newX = Math.max(0, maxX);
-      if (newY > maxY) newY = Math.max(0, maxY);
+      if (newX < 0)
+        newX = 0;
+      if (newY < 0)
+        newY = 0;
+      if (newX > maxX)
+        newX = Math.max(0, maxX);
+      if (newY > maxY)
+        newY = Math.max(0, maxY);
 
       viewport.setViewPosition(new Point(newX, newY));
     }
@@ -381,7 +394,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   /** @return true if a popupTrigger */
   private boolean tryPopup(MouseEvent e) {
-    if (!e.isPopupTrigger()) return false;
+    if (!e.isPopupTrigger())
+      return false;
     JPopupMenu imagePopup = createImagePopup();
     if (imagePopup != null) {
       Point pos = e.getPoint();
@@ -393,7 +407,7 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   /**
    * The image's tooltip may be set during construction by the code that provides
    * the popup menu or it can be dynamic.
-   * @param txt 
+   * @param txt
    */
   protected void setImageToolTipText(String txt) {
     canvas.setToolTipText(txt);
@@ -404,8 +418,9 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
    */
   protected JPopupMenu createImagePopup() {
     JPopupMenu imagePopup = new JPopupMenu();
-    imagePopup.add(menuAction("Center mouse point",
-                              () -> { canvas.centerViewportOnCanvasPoint(canvasMouseListener.origin); }));
+    imagePopup.add(menuAction("Center mouse point", () -> {
+      canvas.centerViewportOnCanvasPoint(canvasMouseListener.origin);
+    }));
     imagePopup.add(menuAction("Fit image", () -> { bestFit(); }));
     imagePopup.add(menuAction("Zoom factor 1.0", () -> { resetZoom(); }));
     return imagePopup;
@@ -502,19 +517,29 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
    *
    * @return button that indicates a new image has been selected and accepted
    */
-  protected JButton getUpdateButton() { return btnUpdateImage; }
+  protected JButton getUpdateButton() {
+    return btnUpdateImage;
+  }
 
   /** @return current zoom factor */
-  protected double getZoomFactor() { return zoomFactor; }
+  protected double getZoomFactor() {
+    return zoomFactor;
+  }
 
   /** @return component used to adjust the zoom */
-  protected JSlider getZoomSlider() { return zoomSlider; }
+  protected JSlider getZoomSlider() {
+    return zoomSlider;
+  }
 
   /** @return component that display the current zoom */
-  protected JLabel getCurrentZoomLabel() { return currentZoomLabel; }
+  protected JLabel getCurrentZoomLabel() {
+    return currentZoomLabel;
+  }
 
   /** @return component button that resets the zoom */
-  protected JButton getZoomResetButton() { return sliderResetButton; }
+  protected JButton getZoomResetButton() {
+    return sliderResetButton;
+  }
 
   /** {@inheritDoc } */
   @Override
@@ -564,7 +589,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
       // Optionally continue reading the image with the same reader
       //reader.setInput(iis);
       //BufferedImage image = reader.read(0);
-    } else throw new IOException("Unknown image format");
+    } else
+      throw new IOException("Unknown image format");
     return formatName;
   }
 
@@ -685,7 +711,9 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
         // Force the tooltip to refresh text and update X coordinates
         // dynamically while dragging
-        if (zoomSlider.getValueIsAdjusting()) { updateFloatingTooltip(); }
+        if (zoomSlider.getValueIsAdjusting()) {
+          updateFloatingTooltip();
+        }
       }
     });
   }
@@ -783,8 +811,10 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   private void setKeepFit(boolean keepFit) {
     this.keepFit = keepFit;
-    if (keepFit) NEVER.setPolicy(scrollPane);
-    else ALWAYS.setPolicy(scrollPane);
+    if (keepFit)
+      NEVER.setPolicy(scrollPane);
+    else
+      ALWAYS.setPolicy(scrollPane);
   }
 
   // To get the viewort size exactly can do various things
@@ -798,7 +828,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
    * and fits inside the scrollPane.
    */
   protected void bestFit() {
-    if (originalImage == null) return;
+    if (originalImage == null)
+      return;
     setKeepFit(true);
     // let the scrollbar layout settle
     // Using invokeLater so layout settles, gets a visible double draw.
@@ -826,8 +857,10 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
       // Safety bounds checks to ensure it complies with our UI Slider
       // constraints (10% to 400%)
-      if (targetZoom < MIN_ZOOM) targetZoom = MIN_ZOOM;
-      if (targetZoom > MAX_ZOOM) targetZoom = MAX_ZOOM;
+      if (targetZoom < MIN_ZOOM)
+        targetZoom = MIN_ZOOM;
+      if (targetZoom > MAX_ZOOM)
+        targetZoom = MAX_ZOOM;
     } else {
       // Does this belong here? Shoudl it be in setImage?
       redoImageWithDimensions();
@@ -842,8 +875,10 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
 
   private double capZoom(double targetZ) {
     double targetZoom = targetZ;
-    if (targetZoom < MIN_ZOOM) targetZoom = MIN_ZOOM;
-    if (targetZoom > MAX_ZOOM) targetZoom = MAX_ZOOM;
+    if (targetZoom < MIN_ZOOM)
+      targetZoom = MIN_ZOOM;
+    if (targetZoom > MAX_ZOOM)
+      targetZoom = MAX_ZOOM;
     return targetZoom;
   }
 
@@ -853,7 +888,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
    * @param targetZoom
    */
   protected void zoomOneShot(double targetZoom) {
-    if (originalImage == null) return;
+    if (originalImage == null)
+      return;
     setKeepFit(false); // User's zooming.
 
     this.zoomFactorAtClick = this.zoomFactor;
@@ -870,7 +906,9 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     zoomOneShot(1.0);
   }
 
-  private void reportZoom() { currentZoomLabel.setText(sf("%.2f", zoomFactor)); }
+  private void reportZoom() {
+    currentZoomLabel.setText(sf("%.2f", zoomFactor));
+  }
 
   // Ensures the hidden or visible slider matches the current zoom calculation
   private void syncSliderUI() {
@@ -886,7 +924,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
     // Sync Slider
     syncSliderUI();
 
-    if (originalImage == null) return;
+    if (originalImage == null)
+      return;
 
     // Trigger immediate layout recalculation and screen redraw
     canvas.revalidate();
@@ -918,7 +957,9 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   }
 
   /** Force the scroll pane to reset its scroll bars to the middle */
-  protected void centerScrollPane() { SwingUtilities.invokeLater(this::centerScrollbarsInstantly); }
+  protected void centerScrollPane() {
+    SwingUtilities.invokeLater(this::centerScrollbarsInstantly);
+  }
 
   private void centerScrollbarsInstantly() {
     scrollPane.getHorizontalScrollBar().setValue(
@@ -948,7 +989,8 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
           // Remove the listener, only need the initial size once
           viewport.removeComponentListener(this);
           logger.log(DEBUG, "Stop listening for viewport size");
-        } else logger.log(DEBUG, "Keep listening for viewport size");
+        } else
+          logger.log(DEBUG, "Keep listening for viewport size");
       }
     });
   }
@@ -969,9 +1011,12 @@ public class Image extends JPanel implements SSComponent, ScrollPaneConstants {
   private void updateFloatingTooltip() {
     hideFloatingTooltip();
 
-    if (zoomSlider == null || !zoomSlider.isShowing()) return;
+    if (zoomSlider == null || !zoomSlider.isShowing())
+      return;
 
-    if (customTooltip == null) { customTooltip = zoomSlider.createToolTip(); }
+    if (customTooltip == null) {
+      customTooltip = zoomSlider.createToolTip();
+    }
 
     // Set active text layout format (e.g., "150%")
     customTooltip.setTipText((int) (zoomFactor * 100) + "%");

@@ -81,7 +81,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
      * @param _container container in which to display messages for the data
      *                   navigator
      */
-    public FormHelperSSDBNavImpl(final Container _container) { super(_container); }
+    public FormHelperSSDBNavImpl(final Container _container) {
+      super(_container);
+    }
 
     /**
      * Perform checks to determine if the row can be deleted or not.
@@ -144,7 +146,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
       SwingUtilities.invokeLater(() -> {
         try {
           activateDeactivateComponents();
-        } catch (Exception e) { logger.log(Level.ERROR, e.getMessage(), e); }
+        } catch (Exception e) {
+          logger.log(Level.ERROR, e.getMessage(), e);
+        }
       });
     }
 
@@ -238,13 +242,17 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
         SwingUtilities.invokeLater(() -> {
           try {
             activateDeactivateComponents();
-          } catch (Exception e) { logger.log(Level.ERROR, e.getMessage(), e); }
+          } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
+          }
         });
         ssDBNavPerformRefreshOps();
       } catch (final Exception e) {
         logger.log(Level.ERROR, "Exception.", e);
         JOptionPane.showMessageDialog(container, "Database error while refreshing record display.");
-      } finally { activateSyncManager(); }
+      } finally {
+        activateSyncManager();
+      }
     }
   }
 
@@ -414,28 +422,38 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    * Deactivate sync between cmbNavigator and navigate actions.
    */
   private void deactivateSyncManager() {
-    if (getSyncManager() != null) { getSyncManager().async(); }
+    if (getSyncManager() != null) {
+      getSyncManager().async();
+    }
   }
 
   /**
    * @return name of the 1st database column to display in the combo navigator
    */
-  protected String getCmbDisplayColumn1() { return comboNavDisplayColumn1; }
+  protected String getCmbDisplayColumn1() {
+    return comboNavDisplayColumn1;
+  }
 
   /**
    * @return name of the 2nd database column to display in the combo navigator
    */
-  protected String getCmbDisplayColumn2() { return comboNavDisplayColumn2; }
+  protected String getCmbDisplayColumn2() {
+    return comboNavDisplayColumn2;
+  }
 
   /**
    * @return character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
    */
-  protected String getCmbSeparator() { return comboNavSeparator; }
+  protected String getCmbSeparator() {
+    return comboNavSeparator;
+  }
 
   /**
    * @return the combo navigator
    */
-  protected SSDBComboBox getComboNav() { return comboNav; }
+  protected SSDBComboBox getComboNav() {
+    return comboNav;
+  }
 
   /**
    * Provides the full SQL query for the combo navigator.
@@ -453,7 +471,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    * @return the dataNavigator
    */
   protected SSDataNavigator getDataNavigator() {
-    if (dataNavigator == null) dataNavigator = new SSDataNavigator(getRowsModel());
+    if (dataNavigator == null)
+      dataNavigator = new SSDataNavigator(getRowsModel());
     return dataNavigator;
   }
 
@@ -466,17 +485,23 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    *
    * @return boolean indicating if .execute() has to be called on rowset following insertion or deletion
    */
-  protected boolean getRequeryAfterInsertOrDelete() { return requeryAfterInsertOrDelete; }
+  protected boolean getRequeryAfterInsertOrDelete() {
+    return requeryAfterInsertOrDelete;
+  }
 
   /**
    * @return the sync manager keeping the combo navigator and data navigator in sync
    */
-  protected SSSyncManager getSyncManager() { return syncManager; }
+  protected SSSyncManager getSyncManager() {
+    return syncManager;
+  }
 
   /**
    * @return the text field bound to the primary key column
    */
-  protected SSTextField getTxtPrimaryKey() { return txtPrimaryKey; }
+  protected SSTextField getTxtPrimaryKey() {
+    return txtPrimaryKey;
+  }
 
   /**
    * Initialize combo navigator and populate with database values.
@@ -492,7 +517,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
       getComboNav().setSecondDisplayColumnName(getCmbDisplayColumn2());
     }
 
-    if (getCmbSeparator() != null) { getComboNav().setSeparator(getCmbSeparator()); }
+    if (getCmbSeparator() != null) {
+      getComboNav().setSeparator(getCmbSeparator());
+    }
 
     getComboNav().execute();
   }
@@ -594,7 +621,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
   /**
    * @param _comboNav the combo navigator to use for this screen/form
    */
-  private void setComboNav(final SSDBComboBox _comboNav) { comboNav = _comboNav; }
+  private void setComboNav(final SSDBComboBox _comboNav) {
+    comboNav = _comboNav;
+  }
 
   /**
    * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
@@ -617,7 +646,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    * @param _comboNavSeparator character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator.
    */
   protected void setComboNavSeparator(final String _comboNavSeparator) {
-    if (_comboNavSeparator != null) { comboNavSeparator = _comboNavSeparator; }
+    if (_comboNavSeparator != null) {
+      comboNavSeparator = _comboNavSeparator;
+    }
   }
 
   /**
@@ -632,7 +663,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
   /**
    * @param _syncManager the sync manager used to keep the selection combo and data navigator in sync
    */
-  private void setSyncManager(final SSSyncManager _syncManager) { syncManager = _syncManager; }
+  private void setSyncManager(final SSSyncManager _syncManager) {
+    syncManager = _syncManager;
+  }
 
   /**
    * Perform any checks to determine if data can be deleted. If return value is
@@ -642,7 +675,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    *
    * @return Boolean indicating if record deletions are allowed. True by default. Can be overridden.
    */
-  protected boolean ssDBNavAllowDeletion() { return true; }
+  protected boolean ssDBNavAllowDeletion() {
+    return true;
+  }
 
   /**
    * Perform any checks to determine if data can be inserted. If return value is
@@ -652,7 +687,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    *
    * @return Boolean indicating if record insertions are allowed. True by default. Can be overridden.
    */
-  protected boolean ssDBNavAllowInsertion() { return true; }
+  protected boolean ssDBNavAllowInsertion() {
+    return true;
+  }
 
   /**
    * Perform any checks to determine if the present row can be updated. If return
@@ -662,7 +699,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    *
    * @return Boolean indicating if record updates are allowed. True by default. Can be overridden.
    */
-  protected boolean ssDBNavAllowUpdate() { return true; }
+  protected boolean ssDBNavAllowUpdate() {
+    return true;
+  }
 
   /**
    * Perform any actions needed after the cancel/undo button is pressed.
@@ -761,7 +800,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
       SwingUtilities.invokeLater(() -> {
         try {
           activateDeactivateComponents();
-        } catch (Exception e) { logger.log(Level.ERROR, e.getMessage(), e); }
+        } catch (Exception e) {
+          logger.log(Level.ERROR, e.getMessage(), e);
+        }
       });
 
     } catch (final SQLException se) {

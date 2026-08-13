@@ -61,7 +61,8 @@ public class DemoExtraDB {
 
   /** Verify initial state; cursors position same as table index */
   static void check() {
-    if (Boolean.TRUE) return;
+    if (Boolean.TRUE)
+      return;
     simpleSupplierData.forEach((idx, rs) -> {
       try {
         if (rs.getRow() != idx) {
@@ -70,7 +71,8 @@ public class DemoExtraDB {
           System.err.println(s);
           logger.log(Level.ERROR, s);
         }
-      } catch (SQLException ex) {}
+      } catch (SQLException ex) {
+      }
     });
   };
 
@@ -79,13 +81,15 @@ public class DemoExtraDB {
     try {
       rs.getRow();
       rc = true;
-    } catch (SQLException ex) {}
+    } catch (SQLException ex) {
+    }
     return rc;
   }
 
   static Integer findIdxTbl(RowSet rs) {
     for (Map.Entry<Integer, RowSet> entry : simpleSupplierData.entrySet()) {
-      if (entry.getValue() == rs) return entry.getKey();
+      if (entry.getValue() == rs)
+        return entry.getKey();
     }
     return null;
   }
@@ -122,7 +126,8 @@ public class DemoExtraDB {
    */
   static RowSet findSimpleSupplierData(int idxTbl, int nRow)
       throws SQLException, ClassNotFoundException {
-    if (!DemoUtil.hasDriver(DemoUtil.DemoDriver.H2_MEM)) return null;
+    if (!DemoUtil.hasDriver(DemoUtil.DemoDriver.H2_MEM))
+      return null;
     RowSet rowSet = simpleSupplierData.get(idxTbl);
     if (rowSet != null) {
       logger.log(Level.INFO, () -> sf("Reuse tbl%d, nRows %d", idxTbl, nRow));

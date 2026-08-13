@@ -71,12 +71,16 @@ public class SSList extends List1<Object, String> implements SSComponent {
    *
    * @param jdbcType type of key of database elements
    */
-  public SSList(JDBCType jdbcType) { super(jdbcType); }
+  public SSList(JDBCType jdbcType) {
+    super(jdbcType);
+  }
 
   /**
    * Creates a List1 with specified model.
    *
    * @param collectionModel model to read/write the database
    */
-  public SSList(SSCollection collectionModel) { super(collectionModel); }
+  public SSList(SSCollection collectionModel) {
+    super(collectionModel);
+  }
 }

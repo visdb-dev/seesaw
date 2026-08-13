@@ -81,7 +81,9 @@ public class SVUtils {
     return new StringValidator() {
       @Override
       public void validate(Problems problems, String compName, String model) {
-        if (!condition.apply(model)) { problems.append(problem.get()); }
+        if (!condition.apply(model)) {
+          problems.append(problem.get());
+        }
       }
     };
   }

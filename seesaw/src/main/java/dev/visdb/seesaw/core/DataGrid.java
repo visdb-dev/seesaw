@@ -172,7 +172,9 @@ public class DataGrid extends JTable {
     protected JDBCType columnClass = null;
 
     /** Grid boolean editor. */
-    public CheckBoxEditor() { super(new JCheckBox()); }
+    public CheckBoxEditor() {
+      super(new JCheckBox());
+    }
 
     /** @return boolean/int */
     @Override
@@ -191,16 +193,14 @@ public class DataGrid extends JTable {
 
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean selected, int row,
-                                                 int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean selected,
+                                                 int row, int column) {
       // GET THE COMPONENT RENDERING THE VALUE.
       final JCheckBox checkBox = (JCheckBox) getComponent();
       boolean isSelected = false;
 
       // CHECK THE TYPE OF COLUMN, IT SHOULD BE THE SAME AS THE TYPE OF VALUE.
       switch (value) {
-
         case Boolean b -> {
           columnClass = JDBCType.BOOLEAN; // STORE THE TYPE OF COLUMN WE NEED
           isSelected = b;
@@ -212,7 +212,7 @@ public class DataGrid extends JTable {
         }
         default -> // THE COLUMN IS NOT BOOLEAN OR INTEGER, LOG ERROR MESSAGE.
           logger.log(Level.ERROR, "Can't set check box value. Unknown data type. Column type "
-                                  + "should be Boolean or Integer for check box columns.");
+                                      + "should be Boolean or Integer for check box columns.");
       }
 
       checkBox.setSelected(isSelected); // USE VALUE TO CHECK OR UNCHECK BOX.
@@ -226,17 +226,15 @@ public class DataGrid extends JTable {
   protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-                                                   boolean selected, boolean hasFocus,
-                                                   int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean selected,
+                                                   boolean hasFocus, int row, int column) {
       boolean isSelected = false;
       switch (value) {
-
         case Boolean b -> isSelected = b;
         case Integer i -> isSelected = i != 0;
         default ->
           logger.log(Level.ERROR, "Can't set check box value. Unknown data type. Column type "
-                                  + "should be Boolean or Integer for check box columns.");
+                                      + "should be Boolean or Integer for check box columns.");
       }
       setSelected(isSelected);
 
@@ -283,7 +281,9 @@ public class DataGrid extends JTable {
     public Object getCellEditorValue() {
       final GridComboModels.GridComboItem item = getComponent().getGridSelItem();
 
-      if (item == null) { return underlyingValues != null ? underlyingValues[0] : null; }
+      if (item == null) {
+        return underlyingValues != null ? underlyingValues[0] : null;
+      }
 
       logger.log(TRACE, () -> sf("Item %s:%s", item.getElem(0), item.getElem(1)));
       return item.getElem(1);
@@ -297,11 +297,15 @@ public class DataGrid extends JTable {
     protected int getIndexOf(Object value) {
       if (underlyingValues == null) {
         // IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
-        if (value == null) { return -1; }
+        if (value == null) {
+          return -1;
+        }
         return ((Integer) value);
       }
       for (int i = 0; i < underlyingValues.length; i++) {
-        if (underlyingValues[i].equals(value)) { return i; }
+        if (underlyingValues[i].equals(value)) {
+          return i;
+        }
       }
 
       return -1;
@@ -309,9 +313,8 @@ public class DataGrid extends JTable {
 
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean selected, int row,
-                                                 int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean selected,
+                                                 int row, int column) {
       final JComboBox<?> comboBox = getComponent();
       comboBox.setSelectedIndex(getIndexOf(value));
       return comboBox;
@@ -333,7 +336,9 @@ public class DataGrid extends JTable {
     private final class GridComboModels extends SimpleComboListSwingModel {
       private GridComboModels() {
         super(2, new ArrayList<>(items.length));
-        for (int i = 0; i < items.length; i++) { getRemodel().add(new GridComboItem(i)); }
+        for (int i = 0; i < items.length; i++) {
+          getRemodel().add(new GridComboItem(i));
+        }
       }
 
       @SuppressWarnings("unchecked")
@@ -345,7 +350,9 @@ public class DataGrid extends JTable {
       class GridComboItem implements ListItem0, Cloneable {
         private final int listIdx;
 
-        public GridComboItem(int listIdx) { this.listIdx = listIdx; }
+        public GridComboItem(int listIdx) {
+          this.listIdx = listIdx;
+        }
 
         @Override
         public Object getElem(int index) {
@@ -396,19 +403,24 @@ public class DataGrid extends JTable {
      * @return index
      */
     protected int getIndexOf(Object value) {
-      if (value == null) { return -1; }
-      if (underlyingValues == null) { return ((Integer) value); }
+      if (value == null) {
+        return -1;
+      }
+      if (underlyingValues == null) {
+        return ((Integer) value);
+      }
       for (int i = 0; i < underlyingValues.length; i++) {
-        if (underlyingValues[i].equals(value)) { return i; }
+        if (underlyingValues[i].equals(value)) {
+          return i;
+        }
       }
       return 0;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-                                                   boolean selected, boolean hasFocus,
-                                                   int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean selected,
+                                                   boolean hasFocus, int row, int column) {
       final JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, selected,
                                                                         hasFocus, row, column);
 
@@ -443,14 +455,15 @@ public class DataGrid extends JTable {
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected, int row,
-                                                 int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                 int row, int column) {
       JTextField tf = ((JTextField) getComponent());
       tf.setBorder(new LineBorder(Color.black));
       try {
         tf.setText(getDateTimeText(value, RSC.get(rowsModel, cIdx + 1)));
-      } catch (Exception e) { tf.setText(""); }
+      } catch (Exception e) {
+        tf.setText("");
+      }
       return tf;
     }
 
@@ -573,7 +586,9 @@ public class DataGrid extends JTable {
   protected class DateRenderer extends DefaultTableCellRenderer {
     private final int cIdx;
 
-    private DateRenderer(int cIdx) { this.cIdx = cIdx; }
+    private DateRenderer(int cIdx) {
+      this.cIdx = cIdx;
+    }
 
     /**
      * Set the value to render. Expect date; if not, give it to super.
@@ -626,7 +641,9 @@ public class DataGrid extends JTable {
        */
       @Override
       public void keyPressed(KeyEvent ke) {
-        if (ke.getKeyCode() != KeyEvent.VK_TAB) { keyPressed++; }
+        if (ke.getKeyCode() != KeyEvent.VK_TAB) {
+          keyPressed++;
+        }
       }
 
       /**
@@ -641,7 +658,9 @@ public class DataGrid extends JTable {
           }
         }
         keyPressed--;
-        if (keyPressed < 0) { keyPressed = 0; }
+        if (keyPressed < 0) {
+          keyPressed = 0;
+        }
       }
 
       @Override
@@ -668,7 +687,7 @@ public class DataGrid extends JTable {
      * Constructs Default Editor.
      */
     public DefaultEditor() {
-      super(new TextField());   // TODO: just JTextField
+      super(new TextField()); // TODO: just JTextField
       getComponent().setFocusTraversalKeysEnabled(false);
       final MyListener listener = new MyListener();
       getComponent().addFocusListener(listener);
@@ -685,9 +704,8 @@ public class DataGrid extends JTable {
 
     @Override
     @SuppressWarnings({"UseSpecificCatch", "BroadCatchBlock", "TooBroadCatch"})
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected, int row,
-                                                 int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                 int row, int column) {
       // SET INITIAL VALUE TO NULL.
       this.value = null;
 
@@ -697,9 +715,13 @@ public class DataGrid extends JTable {
       // THIS IS NEEDED FOR RETURNING THE VALUE IN COLUMN CLASS OBJECT
       try {
         Class<?> type = table.getColumnClass(column);
-        if (type == Object.class) { type = String.class; }
+        if (type == Object.class) {
+          type = String.class;
+        }
         constructor = type.getConstructor(new Class<?>[] {String.class});
-      } catch (final Exception e) { return null; }
+      } catch (final Exception e) {
+        return null;
+      }
 
       return super.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
@@ -710,7 +732,9 @@ public class DataGrid extends JTable {
       final String s = (String) super.getCellEditorValue();
 
       if (s.trim().isEmpty()) {
-        if (constructor.getDeclaringClass() == String.class) { value = s; }
+        if (constructor.getDeclaringClass() == String.class) {
+          value = s;
+        }
       } else {
         try {
           value = constructor.newInstance(new Object[] {s});
@@ -864,7 +888,9 @@ public class DataGrid extends JTable {
   }
 
   private class Sorter extends TableRowSorter<SSTableModel> {
-    public Sorter(SSTableModel model) { super(model); }
+    public Sorter(SSTableModel model) {
+      super(model);
+    }
 
     /** Cycle: {@literal ASC --> DESC --> UNSORTED --> ASC} ... */
     @Override
@@ -906,7 +932,8 @@ public class DataGrid extends JTable {
       savedRowSorterKeys = null;
       savedRowFilter = null;
     }
-    if (!getSorting()) return;
+    if (!getSorting())
+      return;
 
     // sorting's enabled, save or restore state as needed
 
@@ -949,12 +976,16 @@ public class DataGrid extends JTable {
   protected final void bind() {
     try {
       // EXECUTE THE QUERY
-      if (callExecute) { rowSet.execute(); }
+      if (callExecute) {
+        rowSet.execute();
+      }
 
       // SPECIFY THE SSROWSET TO THE TABLE MODEL.
       getModel().setRowsModel(rowsModel);
 
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     // THIS IS NEEDED IF THE NUMBER OF COLUMNS IN THE NEW SSROWSET
     // DOES NOT MATCH WITH THE OLD COLUMNS.
@@ -971,7 +1002,9 @@ public class DataGrid extends JTable {
    *
    * @return true if execute function call has to be skipped else false
    */
-  public boolean getCallExecute() { return callExecute; }
+  public boolean getCallExecute() {
+    return callExecute;
+  }
 
   /**
    * Return the enumeration of
@@ -988,7 +1021,9 @@ public class DataGrid extends JTable {
    *
    * @return minimum column width of the each column
    */
-  public int getColumnWidth() { return columnWidth; }
+  public int getColumnWidth() {
+    return columnWidth;
+  }
 
   /**
    * Returns scroll pane with the JTable embedded in it.
@@ -997,7 +1032,9 @@ public class DataGrid extends JTable {
    *
    * @return scroll pane with embedded JTable
    */
-  public JScrollPane getComponent() { return scrollPane; }
+  public JScrollPane getComponent() {
+    return scrollPane;
+  }
 
   /**
    * Returns the default value being used for the specified column. Returns null
@@ -1041,7 +1078,9 @@ public class DataGrid extends JTable {
    *
    * @return true if new rows can be added else false.
    */
-  public boolean getInsertion() { return insertion; }
+  public boolean getInsertion() {
+    return insertion;
+  }
 
   /**
    * Returns the component on which error messages will be popped up. The error
@@ -1049,7 +1088,9 @@ public class DataGrid extends JTable {
    *
    * @return the component that should be used when displaying error messages
    */
-  public Component getMessageWindow() { return messageWindow; }
+  public Component getMessageWindow() {
+    return messageWindow;
+  }
 
   /**
    * Returns number of selected columns.
@@ -1061,7 +1102,9 @@ public class DataGrid extends JTable {
   @Override
   public int getSelectedColumnCount() {
     final int[] selectedColumns = getSelectedColumns();
-    if (selectedColumns == null) { return 0; }
+    if (selectedColumns == null) {
+      return 0;
+    }
 
     return selectedColumns.length;
   }
@@ -1079,7 +1122,9 @@ public class DataGrid extends JTable {
   @Override
   public int[] getSelectedColumns() {
     // IF THERE ARE NO HIDDEN COLUMNS THEN RETURN THE SAME LIST
-    if (hiddenColumnsList.isEmpty()) { return super.getSelectedColumns(); }
+    if (hiddenColumnsList.isEmpty()) {
+      return super.getSelectedColumns();
+    }
 
     return IntStream.of(super.getSelectedColumns())
         .filter((selCol) -> !hiddenColumnsList.contains(selCol))
@@ -1091,21 +1136,27 @@ public class DataGrid extends JTable {
    *
    * @return returns the RowSet being used.
    */
-  public final RowSet getRowSet() { return rowsModel.getRowSet(); }
+  public final RowSet getRowSet() {
+    return rowsModel.getRowSet();
+  }
 
   /**
    * Returns the RowSet being used to get the values.
    *
    * @return returns the RowSet being used.
    */
-  public final RowsModel getRowsModel() { return rowsModel; }
+  public final RowsModel getRowsModel() {
+    return rowsModel;
+  }
 
   /**
    * Get whether or not sorting is enable.
    *
    * @return true if sorting enabled
    */
-  public boolean getSorting() { return sorting; }
+  public boolean getSorting() {
+    return sorting;
+  }
 
   /**
    * Hides the columns specified in the hidden columns list.
@@ -1122,7 +1173,9 @@ public class DataGrid extends JTable {
         col.setPreferredWidth(0);
       } else {
         // TODO: Does this belong in init()?
-        if (getAutoResizeMode() == AUTO_RESIZE_OFF) { col.setPreferredWidth(columnWidth); }
+        if (getAutoResizeMode() == AUTO_RESIZE_OFF) {
+          col.setPreferredWidth(columnWidth);
+        }
         // Restore the column to some visibility
         if (col.getMinWidth() == 0 && col.getMaxWidth() <= 15) {
           // If the column used to be hidden, then restore it to defaults
@@ -1153,20 +1206,29 @@ public class DataGrid extends JTable {
     getActionMap().put(key, new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (!allowDeletion) return;
+        if (!allowDeletion)
+          return;
         final int numRows = getSelectedRowCount();
-        if (numRows == 0) { return; }
+        if (numRows == 0) {
+          return;
+        }
         final int[] rows = getSelectedRows();
         // CONFIRM THE DELETION
         final int returnValue = JOptionPane.showConfirmDialog(
             messageWindow, "You are about to delete " + rows.length + " rows. "
                                + "\nAre you sure you want to delete the rows?");
-        if (returnValue != JOptionPane.YES_OPTION) { return; }
+        if (returnValue != JOptionPane.YES_OPTION) {
+          return;
+        }
         // Convert visual row numbers to model row numbers
-        for (int i = 0; i < rows.length; ++i) { rows[i] = convertRowIndexToModel(rows[i]); }
+        for (int i = 0; i < rows.length; ++i) {
+          rows[i] = convertRowIndexToModel(rows[i]);
+        }
         Arrays.sort(rows);
         // Delete in reverse order so row numbers don't change while deleting
-        for (int i = rows.length - 1; i >= 0; i--) { getModel().deleteRow(rows[i]); }
+        for (int i = rows.length - 1; i >= 0; i--) {
+          getModel().deleteRow(rows[i]);
+        }
       }
     });
 
@@ -1192,12 +1254,16 @@ public class DataGrid extends JTable {
   /**
    * @return the allowDeletion flag
    */
-  public boolean isAllowDeletion() { return allowDeletion; }
+  public boolean isAllowDeletion() {
+    return allowDeletion;
+  }
 
   /**
    * @param allowDeletion boolean indicating if deletions are allowed
    */
-  public void setAllowDeletion(boolean allowDeletion) { this.allowDeletion = allowDeletion; }
+  public void setAllowDeletion(boolean allowDeletion) {
+    this.allowDeletion = allowDeletion;
+  }
 
   /**
    * Sets the callExecute property. If set to true causes the navigator to skip
@@ -1265,8 +1331,7 @@ public class DataGrid extends JTable {
    * @param underlyingValues the values that have to be written to the database
    *                          when an item in the combo box is selected.
    */
-  public void setComboRenderer(int column, Object[] displayItems,
-                               Object[] underlyingValues) {
+  public void setComboRenderer(int column, Object[] displayItems, Object[] underlyingValues) {
     setComboRenderer(column, displayItems, underlyingValues, 250);
   }
 
@@ -1284,8 +1349,8 @@ public class DataGrid extends JTable {
    *                          when an item in the combo box is selected.
    * @param columnWidth		minimium width for table column
    */
-  public void setComboRenderer(int column, Object[] displayItems,
-                               Object[] underlyingValues, int columnWidth) {
+  public void setComboRenderer(int column, Object[] displayItems, Object[] underlyingValues,
+                               int columnWidth) {
     setRowHeight(20);
     final TableColumnModel tmpColumnModel = getColumnModel();
     final TableColumn tmpTableColumn = tmpColumnModel.getColumn(column);
@@ -1308,8 +1373,8 @@ public class DataGrid extends JTable {
    *                          when an item in the combo box is selected.
    * @throws SQLException	SQLException
    */
-  public void setComboRenderer(String column, Object[] displayItems,
-                               Object[] underlyingValues) throws SQLException {
+  public void setComboRenderer(String column, Object[] displayItems, Object[] underlyingValues)
+      throws SQLException {
     setComboRenderer(column, displayItems, underlyingValues, 250);
   }
 
@@ -1328,9 +1393,8 @@ public class DataGrid extends JTable {
    * @param columnWidth      required minimum width for this column
    * @throws SQLException	SQLException
    */
-  public void setComboRenderer(String _column, Object[] displayItems,
-                               Object[] underlyingValues, int columnWidth)
-      throws SQLException {
+  public void setComboRenderer(String _column, Object[] displayItems, Object[] underlyingValues,
+                               int columnWidth) throws SQLException {
     //final int column = rowSet.getColumnIndex(_column) - 1;
     final int column = RowSetOps.getColumnIndex(rowSet, _column) - 1;
     setComboRenderer(column, displayItems, underlyingValues, columnWidth);
@@ -1400,8 +1464,7 @@ public class DataGrid extends JTable {
    * @throws SQLException if the specified column name is not present in the RowSet
    */
   // TODO: Use List not Array
-  public void setDefaultValues(String[] columnNames, Object[] values)
-      throws SQLException {
+  public void setDefaultValues(String[] columnNames, Object[] values) throws SQLException {
     int[] columnNumbers = null;
 
     if (columnNames != null) {
@@ -1426,7 +1489,9 @@ public class DataGrid extends JTable {
    *                 column.
    */
   // TODO: Use List not Array
-  public void setHeaders(String[] headers) { getModel().setHeaders(headers); }
+  public void setHeaders(String[] headers) {
+    getModel().setHeaders(headers);
+  }
 
   /**
    * Sets the column numbers that should be hidden. The SSDataGrid sets the column

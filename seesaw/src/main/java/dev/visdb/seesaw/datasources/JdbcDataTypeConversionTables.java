@@ -258,9 +258,10 @@ public class JdbcDataTypeConversionTables {
    * The AI claims this works with PostgreSQL, H2, HSQLDB, ClickHouse, MySQL/TiDB,
    * Oracle, DuckDB, and SQL Server.
    * See {@link dev.visdb.seesaw.datasources.DbSupport#resolveArrayElementType(java.sql.ResultSetMetaData, int) resolveArrayElementType(ResultSetMetaData, int)}
-   * @return 
-  */
+   * @return
+   */
   public static Map<String, JDBCType> vendorTypeMap() {
+    // clang-format off
     if (arrayTypeMap == null ) {
       arrayTypeMap = Map.ofEntries(
         entry("INT", JDBCType.INTEGER),
@@ -311,6 +312,7 @@ public class JdbcDataTypeConversionTables {
         entry("BLOB", JDBCType.BLOB)
       );
     }
+    // clang-format on
     return arrayTypeMap;
   }
 

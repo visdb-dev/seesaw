@@ -45,19 +45,25 @@ public class DebugField extends Field {
   /**
    *  Creates a default SSDateField object using the default date format.
    */
-  public DebugField() { this(CUSTOM); }
+  public DebugField() {
+    this(CUSTOM);
+  }
 
   /**
    *  Creates a new instance of SSDateField with the specified format.
    *  @param format - an enum format to be used while the date field is in edit mode
    */
-  public DebugField(SSFormat format) { this(createFormatterFactory(format)); }
+  public DebugField(SSFormat format) {
+    this(createFormatterFactory(format));
+  }
 
   /**
    * Creates an object of SSDateField with the specified formatter factory
    * @param factory - formatter factory to be used
    */
-  public DebugField(AbstractFormatterFactory factory) { super(factory); }
+  public DebugField(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   @Override
   public void cleanField() {

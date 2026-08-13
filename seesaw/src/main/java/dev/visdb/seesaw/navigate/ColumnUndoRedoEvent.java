@@ -60,7 +60,9 @@ public class ColumnUndoRedoEvent extends EventObjectBacktrace implements ChangeE
    * @param rowSet check against this rowSet
    * @return true if the event is for the specified rowSet
    */
-  public boolean matches(RowSet rowSet) { return getSource().getRowSet() == rowSet; }
+  public boolean matches(RowSet rowSet) {
+    return getSource().getRowSet() == rowSet;
+  }
 
   /**
    * {@inheritDoc }

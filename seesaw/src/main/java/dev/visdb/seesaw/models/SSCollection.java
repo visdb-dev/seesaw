@@ -112,8 +112,8 @@ public interface SSCollection {
     JDBCType columnType = JDBCType.valueOf(columnTyp);
     dbCollection = switch (columnType) {
       case ARRAY -> {
-      // May not be any rows, so only use metadata to determine elemtype
-      JDBCType elemType = SSUtils.dbSupport().resolveArrayElementType(md, comp.getColumnIndex());
+        // May not be any rows, so only use metadata to determine elemtype
+        JDBCType elemType = SSUtils.dbSupport().resolveArrayElementType(md, comp.getColumnIndex());
 
         if (collectionType != elemType) {
           String s = sf("collection type '%s' != ARRAY type '%s'", jdbcType, elemType);
@@ -144,7 +144,8 @@ public interface SSCollection {
   // TODO: put this into ConvertType
   public static List<?> convertArrayToObjectList(Object array) throws SQLDataException {
     Objects.requireNonNull(array);
-    if (!array.getClass().isArray()) throw new IllegalArgumentException("Must be an array");
+    if (!array.getClass().isArray())
+      throw new IllegalArgumentException("Must be an array");
     // logger.log(DEBUG, () -> "SSList.toObjArray() contents: " + array);
 
     // TODO: Switch on type of array? dbArray.getClass().getComponentType()

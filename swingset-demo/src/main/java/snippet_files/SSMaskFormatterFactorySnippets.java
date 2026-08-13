@@ -27,7 +27,9 @@ import dev.visdb.seesaw.formatting.SSMaskFormatterFactory.SSMaskFormatter;
 public class SSMaskFormatterFactorySnippets {
   // @start region=init1
   static class CustomBuilder extends SSMaskFormatterFactory.Builder<CustomBuilder> {
-    CustomBuilder(String mask) { super(mask); }
+    CustomBuilder(String mask) {
+      super(mask);
+    }
 
     @Override
     protected SSMaskFormatter getSSMaskFormatter() throws ParseException {
@@ -37,7 +39,9 @@ public class SSMaskFormatterFactorySnippets {
 
   @SuppressWarnings("serial")
   static class CustomSSMaskFormatter extends SSMaskFormatter {
-    CustomSSMaskFormatter() throws ParseException { super(null); }
+    CustomSSMaskFormatter() throws ParseException {
+      super(null);
+    }
     // ...
   }
 

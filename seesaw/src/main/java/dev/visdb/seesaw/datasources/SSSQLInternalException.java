@@ -54,18 +54,24 @@ public class SSSQLInternalException extends SSSQLException {
    * Internal error.
    * @param message
    */
-  public SSSQLInternalException(String message) { super(message); }
+  public SSSQLInternalException(String message) {
+    super(message);
+  }
 
   /**
    * Internal error.
    * @param message
    * @param cause
    */
-  public SSSQLInternalException(String message, Throwable cause) { super(message, cause); }
+  public SSSQLInternalException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
   /**
    * Internal error.
    * @param cause
    */
-  public SSSQLInternalException(Throwable cause) { super(cause); }
+  public SSSQLInternalException(Throwable cause) {
+    super(cause);
+  }
 }

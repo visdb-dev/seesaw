@@ -43,7 +43,9 @@ abstract public class DateTimeField extends Field {
    * Create.
    * @param factory formatter factory
    */
-  public DateTimeField(AbstractFormatterFactory factory) { super(factory); }
+  public DateTimeField(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   /**
    * Sets the value of the field to an initial state consistent with
@@ -65,13 +67,16 @@ abstract public class DateTimeField extends Field {
    * @return false if the component does not have valid data.
    */
   public static boolean stringValidator(List<String> strings, RSC comp) {
-    if (!(comp instanceof DateTimeField dtfield)) return false;
+    if (!(comp instanceof DateTimeField dtfield))
+      return false;
     if (DateTime.isHandledDateTimeComp(dtfield)) {
       if (!dtfield.containsUserText()) {
-        if (DateTime.dateTimeColumnValidate("", dtfield)) return true;
+        if (DateTime.dateTimeColumnValidate("", dtfield))
+          return true;
       }
       for (String string : strings) {
-        if (DateTime.dateTimeColumnValidate(string, dtfield)) return true;
+        if (DateTime.dateTimeColumnValidate(string, dtfield))
+          return true;
       }
     }
     return false;

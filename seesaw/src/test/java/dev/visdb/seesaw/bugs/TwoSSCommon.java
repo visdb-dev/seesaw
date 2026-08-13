@@ -70,7 +70,9 @@ public class TwoSSCommon {
     @SuppressWarnings("unused")
     Object xxx;
 
-    public TestImage() { finishSSCommon(); }
+    public TestImage() {
+      finishSSCommon();
+    }
 
     @Override
     public void customInit() {

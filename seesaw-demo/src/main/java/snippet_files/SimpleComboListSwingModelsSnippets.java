@@ -45,7 +45,9 @@ public class SimpleComboListSwingModelsSnippets {
     private MyComboModel() {
       super(2, new ArrayList<>(items.length));
       // initialization
-      for (int i = 0; i < items.length; i++) { getRemodel().add(new MyComboItem(i)); }
+      for (int i = 0; i < items.length; i++) {
+        getRemodel().add(new MyComboItem(i));
+      }
     }
 
     public ComboBoxModel<MyComboItem> getComboModel() {
@@ -56,7 +58,9 @@ public class SimpleComboListSwingModelsSnippets {
     private class MyComboItem implements ListItem0, Cloneable {
       private final int listIdx;
 
-      public MyComboItem(int listIdx) { this.listIdx = listIdx; }
+      public MyComboItem(int listIdx) {
+        this.listIdx = listIdx;
+      }
       // ...
 
       // This ListItem's getElem(0) from items, getElem(1) is it's index.

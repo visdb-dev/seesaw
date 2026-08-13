@@ -43,7 +43,6 @@ package dev.visdb.seesaw.core.table;
  * value for a cell is valid or invalid.
  */
 public interface SSCellEditing {
-
   /**
    * This function is called when ever a update to a cell is done but before the
    * value is updated in the database.<BR>
@@ -57,8 +56,7 @@ public interface SSCellEditing {
    *
    * @return returns true if update should be made else false.
    */
-  default boolean cellUpdateRequested(int row, int column, Object oldValue,
-                                      Object newValue) {
+  default boolean cellUpdateRequested(int row, int column, Object oldValue, Object newValue) {
     return true;
   }
 
@@ -75,6 +73,8 @@ public interface SSCellEditing {
    *
    * @return returns true is the cell is editable else false.
    */
-  default boolean isCellEditable(int row, int column) { return true; }
+  default boolean isCellEditable(int row, int column) {
+    return true;
+  }
 
 } // end public interface SSCellEditing {

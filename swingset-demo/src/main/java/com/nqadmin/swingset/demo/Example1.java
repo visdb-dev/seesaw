@@ -152,7 +152,9 @@ public class Example1 extends JFrame {
     newBorderSet++;
   }
 
-  RowSet getRowSet() { return rowsModel.getRowSet(); }
+  RowSet getRowSet() {
+    return rowsModel.getRowSet();
+  }
 
   /**
    * Constructor for Example1
@@ -215,7 +217,9 @@ public class Example1 extends JFrame {
       if (Boolean.FALSE) {
         rsButtons.tableLoopIncr(); // at beginning of cycling
         RowSet tRowSet = rsButtons.getTableLoopRowSet();
-        if (tRowSet != null) { rowsModel = RowsModel.create(tRowSet, dbNav); }
+        if (tRowSet != null) {
+          rowsModel = RowsModel.create(tRowSet, dbNav);
+        }
       }
       if (Boolean.FALSE) {
         // start out null
@@ -307,7 +311,9 @@ public class Example1 extends JFrame {
   }
 
   class DbOpsAllows extends DbOpsBase {
-    DbOpsAllows(Container container) { super(container); }
+    DbOpsAllows(Container container) {
+      super(container);
+    }
 
     @Override
     protected void allowUpdate(boolean allow) {
@@ -327,7 +333,6 @@ public class Example1 extends JFrame {
 
   private DbOpsAllows createDbOps() {
     return new DbOpsAllows(this) {
-
       /**
        * Obtain and set the PK value for the new record & perform any other
        * actions needed before an insert.

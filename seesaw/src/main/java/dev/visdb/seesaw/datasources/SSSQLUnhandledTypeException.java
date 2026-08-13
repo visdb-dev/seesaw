@@ -51,7 +51,9 @@ public class SSSQLUnhandledTypeException extends SSSQLException {
    * Unhandled type.
    * @param reason reason
    */
-  public SSSQLUnhandledTypeException(String reason) { super(reason); }
+  public SSSQLUnhandledTypeException(String reason) {
+    super(reason);
+  }
 
   /**
    * Unhandled type.
@@ -62,12 +64,16 @@ public class SSSQLUnhandledTypeException extends SSSQLException {
    * Unhandled type.
    * @param cause cause
    */
-  public SSSQLUnhandledTypeException(Throwable cause) { super(cause); }
+  public SSSQLUnhandledTypeException(Throwable cause) {
+    super(cause);
+  }
 
   /**
    * Unhandled type.
    * @param reason reason
    * @param cause cause
    */
-  public SSSQLUnhandledTypeException(String reason, Throwable cause) { super(reason, cause); }
+  public SSSQLUnhandledTypeException(String reason, Throwable cause) {
+    super(reason, cause);
+  }
 }

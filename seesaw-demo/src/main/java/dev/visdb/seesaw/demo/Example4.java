@@ -111,7 +111,9 @@ public class Example4 extends JFrame {
         return new MyComboBox2<>(this);
       }
     }
-    private MyComboBox2(Builder<D2> builder) { super(builder); }
+    private MyComboBox2(Builder<D2> builder) {
+      super(builder);
+    }
   }
 
   static class MyDbComboBox extends DBComboBox2<Integer, String, Byte> {
@@ -126,7 +128,9 @@ public class Example4 extends JFrame {
         return new MyDbComboBox(this);
       }
     }
-    private MyDbComboBox(Builder builder) { super(builder); }
+    private MyDbComboBox(Builder builder) {
+      super(builder);
+    }
   }
 
   // Concrete class, additional generric type, with type capture, extendable
@@ -172,12 +176,17 @@ public class Example4 extends JFrame {
       d3TypeToken = builder.d3TypeToken;
     }
 
-    public D3 getD3() { return d3Value; }
-    public TypeToken<D3> getD3TypeToken() { return d3TypeToken; }
+    public D3 getD3() {
+      return d3Value;
+    }
+    public TypeToken<D3> getD3TypeToken() {
+      return d3TypeToken;
+    }
   }
 
   private void comboPlay() {
-    if (Boolean.TRUE) return;
+    if (Boolean.TRUE)
+      return;
     new DbComboBox2Extra.Builder<Double, List<Double>>() {};
 
     @SuppressWarnings("unused")
@@ -283,14 +292,15 @@ public class Example4 extends JFrame {
       query = orderedQuery;
     }
 
-    DBComboBox2.Builder<Long, Object, Object> builder = new DBComboBox2.Builder<>(){};
+    DBComboBox2.Builder<Long, Object, Object> builder = new DBComboBox2.Builder<>() {};
     builder.connection(connection)
         .query(query)
         .primaryKeyColumnName("part_id")
         .displayColumnName("part_name");
     if (!comboModelType.equals(DbComboBox2Extra.DEFAULT_MODEL_DB_COMBO2))
       builder.modelType(comboModelType);
-    if (comboHasRowNum) builder.d2ColumnName("rown");
+    if (comboHasRowNum)
+      builder.d2ColumnName("rown");
 
     // builder.d2DisplayEnabled(true);
 
@@ -300,7 +310,9 @@ public class Example4 extends JFrame {
       cmbSelectPart.execute();
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
-    } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, "Exception.", e);
+    }
 
     // Setup the part color combo box options to be displayed and their
     // corresponding values.
@@ -473,7 +485,9 @@ public class Example4 extends JFrame {
           cmbSelectPart.execute();
         } catch (final SQLException se) {
           logger.log(Level.ERROR, "SQL Exception.", se);
-        } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+        } catch (final Exception e) {
+          logger.log(Level.ERROR, "Exception.", e);
+        }
         syncManager.sync();
       }
     };

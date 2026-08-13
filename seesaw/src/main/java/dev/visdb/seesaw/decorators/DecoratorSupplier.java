@@ -60,11 +60,15 @@ public class DecoratorSupplier {
    * Create and return a decorator.
    * @return decorator
    */
-  public Decorator get() { return supplier.get(); }
+  public Decorator get() {
+    return supplier.get();
+  }
 
   /**
    * Decorator style.
    * @return decorator style
    */
-  public Decorator.DecoratorStyle getDecoratorStyle() { return style; }
+  public Decorator.DecoratorStyle getDecoratorStyle() {
+    return style;
+  }
 }

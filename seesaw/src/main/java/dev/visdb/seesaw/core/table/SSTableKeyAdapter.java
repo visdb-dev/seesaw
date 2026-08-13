@@ -86,8 +86,7 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @return returns the value as a column class object.
    * @throws Exception catch all exception
    */
-  protected static Object getObjectToSet(JTable jTable, int column,
-                                         String value) throws Exception {
+  protected static Object getObjectToSet(JTable jTable, int column, String value) throws Exception {
     // GET THE COLUMN CLASS
     final Class<?> objectClass = jTable.getColumnClass(column);
     Object newValue = null;
@@ -141,13 +140,17 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @param jTable JTable for which copy and paste support should be added.
    */
   @SuppressWarnings("OverridableMethodCallInConstructor")
-  public SSTableKeyAdapter(JTable jTable) { init(jTable); }
+  public SSTableKeyAdapter(JTable jTable) {
+    init(jTable);
+  }
 
   /**
    * Adds the key listener for the specified JTable.
    * @param jTable table for which listener is to be added
    */
-  protected void init(JTable jTable) { jTable.addKeyListener(this); }
+  protected void init(JTable jTable) {
+    jTable.addKeyListener(this);
+  }
 
   /**
    * Invoked when a key is released.
@@ -178,7 +181,9 @@ public class SSTableKeyAdapter extends KeyAdapter {
 
       // CHECK IF THERE IS ATLEAST ONE SELECTED CELL.
       // IF NOT NOTHING TO COPY JUST RETURN.
-      if ((numRows < 1) || (numColumns < 1)) { return; }
+      if ((numRows < 1) || (numColumns < 1)) {
+        return;
+      }
 
       // GET THE ROWS AND COLUMNS SELECTED.
       final int[] selectedRows = jTable.getSelectedRows();
@@ -189,7 +194,9 @@ public class SSTableKeyAdapter extends KeyAdapter {
       for (int i = 0; i < selectedRows.length; i++) {
         for (int j = 0; j < selectedColumns.length; j++) {
           strBuf.append(jTable.getValueAt(selectedRows[i], selectedColumns[j]));
-          if (j < (numColumns - 1)) { strBuf.append("\t"); }
+          if (j < (numColumns - 1)) {
+            strBuf.append("\t");
+          }
         }
         strBuf.append("\n");
       }
@@ -229,7 +236,9 @@ public class SSTableKeyAdapter extends KeyAdapter {
         }
 
         // IF USER HAS NOT SELECTED ANY CELL THEN DO NOT COPY.
-        if ((jTable.getSelectedRowCount() < 1) || (jTable.getSelectedColumnCount() < 1)) { return; }
+        if ((jTable.getSelectedRowCount() < 1) || (jTable.getSelectedColumnCount() < 1)) {
+          return;
+        }
 
         // GET THE SELECTED ROWS AND COLUMNS
         final int[] selectedRows = jTable.getSelectedRows();
@@ -250,17 +259,23 @@ public class SSTableKeyAdapter extends KeyAdapter {
           numRows++;
           columnTokens = new StringTokenizer(rowTokens.nextToken(), "\t", false);
           // WHILE THERE ARE TOKENS INCREMENT THE COLUMN COUNT
-          for (; columnTokens.hasMoreTokens(); numColumns++) { columnTokens.nextToken(); }
+          for (; columnTokens.hasMoreTokens(); numColumns++) {
+            columnTokens.nextToken();
+          }
         }
 
         // GET THE NUMBER OF ROWS PRESENT
-        for (; rowTokens.hasMoreTokens(); numRows++) { rowTokens.nextToken(); }
+        for (; rowTokens.hasMoreTokens(); numRows++) {
+          rowTokens.nextToken();
+        }
 
         // GET THE NUMBER OF COLUMNS AND ROWS IN THE JTABLE.
         int rowCount = jTable.getRowCount();
         final int columnCount = jTable.getColumnCount();
 
-        if (forSSDataGrid || (jTable instanceof DataGrid)) { rowCount--; }
+        if (forSSDataGrid || (jTable instanceof DataGrid)) {
+          rowCount--;
+        }
 
         // IF THE NUMBER OF COLUMNS NEEDED TO COPY FROM CLIPBOARD
         // IS MORE THAN THAT IN JTABLE CANCEL COPY
@@ -331,27 +346,27 @@ public class SSTableKeyAdapter extends KeyAdapter {
         } catch (final NoSuchMethodException nsme) {
           logger.log(ERROR,
                      "No Such Method Exception. One of the column classes does not provide a "
-                     + "constructor that takes a single String argument.",
+                         + "constructor that takes a single String argument.",
                      nsme);
           JOptionPane.showMessageDialog(jTable,
                                         "One of the column classes does not provide a constructor "
-                                        + "that takes a single String argument.");
+                                            + "that takes a single String argument.");
         } catch (final SecurityException se) {
           logger.log(ERROR,
                      "Security Exception. One of the column class does not provide a constructor "
-                     + "that takes a single String argument.",
+                         + "that takes a single String argument.",
                      se);
           JOptionPane.showMessageDialog(jTable,
                                         "One of the column class does not provide a constructor "
-                                        + "that takes a single String argument.");
+                                            + "that takes a single String argument.");
         } catch (final InstantiationException ie) {
           logger.log(ERROR,
                      "(Instantiation Exception. Failed to copy data. Error occured while "
-                     + "instantiating a single String argument constructor for a column.",
+                         + "instantiating a single String argument constructor for a column.",
                      ie);
           JOptionPane.showMessageDialog(jTable,
                                         "Failed to copy data. Error occured while instantiating a "
-                                        + "single String argument constructor for a column.");
+                                            + "single String argument constructor for a column.");
         } catch (final Exception e) {
           logger.log(ERROR, "Exception. Failed to copy data.", e);
           JOptionPane.showMessageDialog(jTable, "Failed to copy data.");
@@ -371,7 +386,9 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @param allowInsertion true if new rows can be added when pasting data from
    *                        clipboard, else false.
    */
-  public void setAllowInsertion(boolean allowInsertion) { this.allowInsertion = allowInsertion; }
+  public void setAllowInsertion(boolean allowInsertion) {
+    this.allowInsertion = allowInsertion;
+  }
 
   /**
    * Sets forSSDataGrid indicator. True if the key adapter is used for SSDataGrid
@@ -380,5 +397,7 @@ public class SSTableKeyAdapter extends KeyAdapter {
    * @param forSSDataGrid - true if this key adapter is used for DataGrid, else
                       false.
    */
-  public void setForSSDataGrid(boolean forSSDataGrid) { this.forSSDataGrid = forSSDataGrid; }
+  public void setForSSDataGrid(boolean forSSDataGrid) {
+    this.forSSDataGrid = forSSDataGrid;
+  }
 }

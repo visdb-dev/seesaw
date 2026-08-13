@@ -76,11 +76,14 @@ public class Slider extends JSlider implements SSComponent {
     @Override
     public void stateChanged(ChangeEvent ce) {
       // While adjusting don't need to update the database.
-      if (getValueIsAdjusting()) return;
+      if (getValueIsAdjusting())
+        return;
 
       try {
         dbChange(() -> setColumnObject(getValue()));
-      } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
+      } catch (SQLException ex) {
+        logger.log(Level.ERROR, (String) null, ex);
+      }
     }
 
   } // end protected class SliderListener implements ChangeListener, Serializable
@@ -92,7 +95,9 @@ public class Slider extends JSlider implements SSComponent {
    * Empty constructor needed for deserialization. Creates a horizontal slider
    * with the range 0 to 100.
    */
-  public Slider() { finishSSCommon(); }
+  public Slider() {
+    finishSSCommon();
+  }
 
   /**
    * Creates a slider using the specified orientation with the range 0 to 100.

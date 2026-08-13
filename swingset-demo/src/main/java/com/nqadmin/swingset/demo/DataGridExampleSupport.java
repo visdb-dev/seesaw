@@ -136,7 +136,9 @@ class DataGridExampleSupport {
     public void performPostInsertOps(int _row) {
       try {
         rowset.execute();
-      } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+      } catch (final SQLException se) {
+        logger.log(ERROR, "SQL Exception.", se);
+      }
     }
 
     @Override
@@ -146,7 +148,9 @@ class DataGridExampleSupport {
     public void performPostDeletionOps(int _row) {
       try {
         rowset.execute();
-      } catch (final SQLException se) { logger.log(ERROR, "SQL Exception.", se); }
+      } catch (final SQLException se) {
+        logger.log(ERROR, "SQL Exception.", se);
+      }
     }
   }
 
@@ -254,14 +258,17 @@ class DataGridExampleSupport {
         for (int colIdx : i_hide_cols) {
           try {
             s_hide_cols.add(RowSetOps.getColumnName(rowset, colIdx + 1));
-          } catch (SQLException ex) { throw new IllegalStateException("SQL: " + ex.getMessage()); }
+          } catch (SQLException ex) {
+            throw new IllegalStateException("SQL: " + ex.getMessage());
+          }
         }
       }
       // TODO: since not using arrays, don't need cases 2/3
       switch (indexOrName) {
         case 0:
         case 2:
-          if (indexOrName == 2 && i_hide_cols.isEmpty()) i_hide_cols = Collections.emptyList();
+          if (indexOrName == 2 && i_hide_cols.isEmpty())
+            i_hide_cols = Collections.emptyList();
           System.err.println("setHiddenColumns(int)" + (i_hide_cols == null ? " null" : ""));
           dataGrid.setHiddenColumns(i_hide_cols);
           break;
@@ -272,7 +279,9 @@ class DataGridExampleSupport {
                              + (s_hide_cols == null ? " null" : ""));
           try {
             dataGrid.setHiddenColumnsByName(s_hide_cols);
-          } catch (SQLException ex) { throw new IllegalStateException("SQL: " + ex.getMessage()); }
+          } catch (SQLException ex) {
+            throw new IllegalStateException("SQL: " + ex.getMessage());
+          }
           break;
       }
       hidden[0] = !hidden[0];
@@ -280,7 +289,8 @@ class DataGridExampleSupport {
       //outputColInfo();
       System.err.println("Hidden: " + hidden[0]);
     });
-    if (Boolean.FALSE) outputColInfo();
+    if (Boolean.FALSE)
+      outputColInfo();
   }
   boolean[] hidden = new boolean[1];
   int indexOrName = 0;

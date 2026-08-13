@@ -105,7 +105,9 @@ public class Example3 extends JFrame {
   SSDataNavigator navigator = null;
   RowsModel rowsModel;
 
-  RowSet getRowSet() { return rowsModel.getRowSet(); }
+  RowSet getRowSet() {
+    return rowsModel.getRowSet();
+  }
 
   /**
    * Constructor for Example3
@@ -134,7 +136,9 @@ public class Example3 extends JFrame {
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
       navigator = new SSDataNavigator(rowsModel);
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     // SETUP DB COMBO QUERIES
     String query = "SELECT * FROM supplier_data;";
@@ -159,7 +163,9 @@ public class Example3 extends JFrame {
 
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
-    } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, "Exception.", e);
+    }
 
     // SET LABEL DIMENSIONS
     lblSupplierPartID.setPreferredSize(MainClass.labelDim);

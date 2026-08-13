@@ -52,7 +52,9 @@ public enum YesNo {
 
   private final String displayValue;
 
-  private YesNo(String _displayValue) { displayValue = _displayValue; }
+  private YesNo(String _displayValue) {
+    displayValue = _displayValue;
+  }
 
   /**
    * Generate user visible display string.

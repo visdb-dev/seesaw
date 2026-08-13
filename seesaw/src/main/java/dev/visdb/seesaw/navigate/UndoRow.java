@@ -66,7 +66,9 @@ final class UndoRow {
   private UndoCol[] cols;
 
   /** Use this when going to a different row or row set. */
-  void clear() { cols = null; }
+  void clear() {
+    cols = null;
+  }
 
   private void setupCols(RowSet rowSet) throws SQLException {
     if (cols == null) {
@@ -133,24 +135,29 @@ final class UndoRow {
    * ev may be null.
    */
   void focusChange(FocusChangeEvent ev) {
-    if (cols == null) return;
+    if (cols == null)
+      return;
     for (UndoCol col : cols) {
-      if (col != null) col.focusChange(ev);
+      if (col != null)
+        col.focusChange(ev);
     }
   }
 
   boolean isDirty(SSComponent comp) {
-    if (cols == null) return false;
+    if (cols == null)
+      return false;
     UndoCol col = cols[comp.getColumnIndex()];
     return col != null && col.isDirty();
   }
 
   /** return true if there's a column value which is not from the database */
   boolean isDirty() {
-    if (cols == null) return false;
+    if (cols == null)
+      return false;
     for (UndoCol col : cols) {
       if (col != null)
-        if (col.isDirty()) return true;
+        if (col.isDirty())
+          return true;
     }
     return false;
   }
@@ -193,9 +200,11 @@ final class UndoRow {
    * @throws SQLException
    */
   Change undoRedoChange(RSC comp, UndoRedo cmd) throws SQLException {
-    if (cols == null) return UndoRedo.NO_CHANGE;
+    if (cols == null)
+      return UndoRedo.NO_CHANGE;
     UndoCol col = cols[comp.getColumnIndex()];
-    if (col == null) return UndoRedo.NO_CHANGE;
+    if (col == null)
+      return UndoRedo.NO_CHANGE;
     return col.findUndoRedoChange(cmd);
   }
 

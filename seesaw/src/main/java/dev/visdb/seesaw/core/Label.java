@@ -80,12 +80,16 @@ public class Label extends JLabel implements SSComponent {
      */
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
-      if (!allowPropertyChangePropagation) return;
-      if (!"text".equals(pce.getPropertyName())) return;
+      if (!allowPropertyChangePropagation)
+        return;
+      if (!"text".equals(pce.getPropertyName()))
+        return;
 
       try {
         dbChange(() -> setColumnText(getText()));
-      } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
+      } catch (SQLException ex) {
+        logger.log(Level.ERROR, (String) null, ex);
+      }
     }
   } // end protected class LabelListener
 
@@ -96,7 +100,9 @@ public class Label extends JLabel implements SSComponent {
    * Empty constructor needed for deserialization. Creates a Label instance with
    * no image and no text.
    */
-  public Label() { finishSSCommon(); }
+  public Label() {
+    finishSSCommon();
+  }
 
   /**
    * Creates a Label instance with the specified image.

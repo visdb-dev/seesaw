@@ -110,13 +110,17 @@ public class SSDbStringCollection extends SSAbstractCollection {
    * The separator used to delimit collection elements in the string
    * @return the separator
    */
-  public char getSeparator() { return separator.charAt(0); }
+  public char getSeparator() {
+    return separator.charAt(0);
+  }
 
   /**
    * The name of the separator.May be used in messages.
    * @return human readable name of the separator
    */
-  public String getSeparatorName() { return separatorName; }
+  public String getSeparatorName() {
+    return separatorName;
+  }
 
   /**
    * The database string is converted and returned as an array
@@ -133,7 +137,8 @@ public class SSDbStringCollection extends SSAbstractCollection {
   /** {@inheritDoc} */
   @Override
   public void writeData(SSComponent comp, Object _data) throws SQLException {
-    if (!_data.getClass().isArray()) throw new IllegalArgumentException("Must be an array");
+    if (!_data.getClass().isArray())
+      throw new IllegalArgumentException("Must be an array");
     Object[] data = (Object[]) _data; // TODO: Could be any type of array...
 
     List<String> arr = new ArrayList<>(data.length);
@@ -156,7 +161,9 @@ public class SSDbStringCollection extends SSAbstractCollection {
   // TODO: put into RowSetOps?
   // TODO: toObjArray additional JDBC types: TIME/TIMESTAMP/*_WITH_TIMEZONE/...
   private Object toArray(JDBCType jdbcType, String dbstring) throws SQLException {
-    if (dbstring == null) { return null; }
+    if (dbstring == null) {
+      return null;
+    }
 
     logger.log(DEBUG, () -> "toArray() contents: " + dbstring);
     String[] split = dbstring.split(separator);
@@ -206,6 +213,8 @@ public class SSDbStringCollection extends SSAbstractCollection {
           throw new IllegalArgumentException(sf("String collection of '%s' not handled", jdbcType));
         }
       }
-    } catch (IllegalArgumentException ex) { throw new SQLException(ex); }
+    } catch (IllegalArgumentException ex) {
+      throw new SQLException(ex);
+    }
   }
 }

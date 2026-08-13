@@ -175,7 +175,8 @@ public class DateTime {
                                                                     SSFormat ssFormat) {
     if (ssFormat != null) {
       List<DateTimeFormatter> rv = ssFormatters.get(ssFormat);
-      if (rv != null) return rv;
+      if (rv != null)
+        return rv;
     }
     return dateTimeParsersMap.computeIfAbsent(jdbcType, (type) -> {
       return switch (type) {
@@ -245,7 +246,8 @@ public class DateTime {
     List<DateTimeFormatter> formatters = getInternalDateTimeParsers(comp);
     if (formatters == null || formatters.isEmpty())
       throw new IllegalArgumentException("only JTextComponent handled");
-    if (text.isBlank()) return new DtoParse(null, !comp.getAllowNull(), null); // maybe error
+    if (text.isBlank())
+      return new DtoParse(null, !comp.getAllowNull(), null); // maybe error
 
     Exception tex = null;
     for (DateTimeFormatter formatter : formatters) {
@@ -301,7 +303,8 @@ public class DateTime {
    */
   public static Object getSQLDateTimeObject(String text, RSC comp) {
     DtoParse dtoParse = internalDateTimeColumnParse(text, comp);
-    if (dtoParse.isError()) return null;
+    if (dtoParse.isError())
+      return null;
     JDBCType jdbcType = comp.getColumnJDBCType();
     Temporal dto = dtoParse.dto();
     return switch (jdbcType) {
@@ -357,10 +360,13 @@ public class DateTime {
    */
   private static String getDateTimeText(Object jdbcDateTimeObject, JDBCType jdbcType,
                                         DateTimeFormatter _formatter) {
-    if (jdbcDateTimeObject instanceof String s) return s;
-    if (jdbcDateTimeObject == null) return "";
+    if (jdbcDateTimeObject instanceof String s)
+      return s;
+    if (jdbcDateTimeObject == null)
+      return "";
     DateTimeFormatter formatter = _formatter != null ? _formatter : getDateTimeFormatter(jdbcType);
-    if (formatter == null) throw new IllegalArgumentException(sf("%s not handled", jdbcType));
+    if (formatter == null)
+      throw new IllegalArgumentException(sf("%s not handled", jdbcType));
 
     switch (jdbcType) {
       case TIME -> {
@@ -410,12 +416,17 @@ public class DateTime {
    */
   // TODO: check that all callers handle excepted as needed
   private static Date getSQLDate(String _strDate) throws IllegalArgumentException {
-    if (_strDate == null) { return null; }
+    if (_strDate == null) {
+      return null;
+    }
     String strDate = _strDate.trim();
-    if (strDate.isEmpty()) { return null; }
+    if (strDate.isEmpty()) {
+      return null;
+    }
 
     List<DateTimeFormatter> formatters = getInternalDateTimeParsers(JDBCType.DATE, null);
-    if (formatters == null || formatters.isEmpty()) return null;
+    if (formatters == null || formatters.isEmpty())
+      return null;
 
     for (DateTimeFormatter formatter : formatters) {
       try {

@@ -38,7 +38,9 @@ public abstract class Field extends SSFormattedTextField {
    * Constructor.
    * @param factory formatter factory
    */
-  public Field(AbstractFormatterFactory factory) { super(factory); }
+  public Field(AbstractFormatterFactory factory) {
+    super(factory);
+  }
 
   /**
    * {@inheritDoc }

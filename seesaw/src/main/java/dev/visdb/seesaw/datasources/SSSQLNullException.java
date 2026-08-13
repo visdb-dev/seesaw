@@ -16,5 +16,7 @@ public class SSSQLNullException extends SSSQLException {
    *
    * @param reason description of the exception
    */
-  public SSSQLNullException(String reason) { super(reason); }
+  public SSSQLNullException(String reason) {
+    super(reason);
+  }
 }

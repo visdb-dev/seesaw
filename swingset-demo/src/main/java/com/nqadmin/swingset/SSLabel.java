@@ -69,7 +69,9 @@ public class SSLabel extends Label {
    *
    * @param _image specified image for label
    */
-  public SSLabel(final Icon _image) { super(_image); }
+  public SSLabel(final Icon _image) {
+    super(_image);
+  }
 
   /**
    * Creates a SSLabel instance with the specified image and horizontal alignment.
@@ -89,7 +91,9 @@ public class SSLabel extends Label {
    * @param columnName name of the column to which this label should be
    *                         bound
    */
-  public SSLabel(RowsModel rowsModel, String columnName) { super(rowsModel, columnName); }
+  public SSLabel(RowsModel rowsModel, String columnName) {
+    super(rowsModel, columnName);
+  }
 
   /**
    * Creates a SSLabel instance with no image and binds it to the specified RowSet

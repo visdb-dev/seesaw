@@ -76,13 +76,13 @@ AllowAllArgumentsOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowBreakBeforeNoexceptSpecifier: Never
 AllowBreakBeforeQtProperty: false
-AllowShortBlocksOnASingleLine: Always #Never
+AllowShortBlocksOnASingleLine: Never #Always #Never
 AllowShortCaseExpressionOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortCompoundRequirementOnASingleLine: true
 AllowShortEnumsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: All #Empty
-AllowShortIfStatementsOnASingleLine: AllIfsAndElse #Never #Never
+AllowShortFunctionsOnASingleLine: Empty #All #Empty
+AllowShortIfStatementsOnASingleLine: Never #Never
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
 AllowShortNamespacesOnASingleLine: false
@@ -94,7 +94,7 @@ AttributeMacros:
   - absl_nullable
   - absl_nullability_unknown
 BinPackArguments: true
-BinPackLongBracedList: false
+BinPackLongBracedList: true
 BinPackParameters: BinPack
 BitFieldColonSpacing: Both
 BracedInitializerIndentWidth: -1
@@ -141,7 +141,7 @@ BreakBeforeTernaryOperators: true
 BreakBinaryOperations: Never
 BreakConstructorInitializers: BeforeColon
 BreakFunctionDefinitionParameters: false
-BreakInheritanceList: AfterComma #BeforeColon
+BreakInheritanceList: BeforeColon #AfterComma #BeforeColon
 BreakStringLiterals: true
 BreakTemplateDeclarations: Yes
 ColumnLimit:     100
@@ -282,8 +282,7 @@ RawStringFormats:
     BasedOnStyle:    google
 ReferenceAlignment: Pointer
 ReflowComments:  IndentOnly #Always
-# 2nd pass
-RemoveBracesLLVM: false #true #false
+RemoveBracesLLVM: false
 RemoveEmptyLinesInUnwrappedLines: false
 RemoveParentheses: Leave
 RemoveSemicolon: false

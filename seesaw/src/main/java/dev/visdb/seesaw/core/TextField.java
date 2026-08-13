@@ -73,13 +73,17 @@ public class TextField extends JTextField implements SSComponent {
   /**
    * Constructs a new, empty text field.
    */
-  public TextField() { this(null); }
+  public TextField() {
+    this(null);
+  }
 
   /**
    * Constructs a new text field with the given text.
    * @param text initial text
    */
-  public TextField(String text) { this(text, null, null); }
+  public TextField(String text) {
+    this(text, null, null);
+  }
 
   /**
    * Creates a TextField instance and binds it to the specified RowSet column.
@@ -87,13 +91,16 @@ public class TextField extends JTextField implements SSComponent {
    * @param rowsModel        model for a RowSet
    * @param columnName name of the column to which this label should be bound
    */
-  public TextField(RowsModel rowsModel, String columnName) { this(null, rowsModel, columnName); }
+  public TextField(RowsModel rowsModel, String columnName) {
+    this(null, rowsModel, columnName);
+  }
 
   /** All the constructors feed through here */
   private TextField(String text, RowsModel rowsModel, String columnName) {
     super(text);
     finishSSCommon();
-    if (rowsModel != null) rowsModel.bind(this, columnName);
+    if (rowsModel != null)
+      rowsModel.bind(this, columnName);
   }
 
   // /**

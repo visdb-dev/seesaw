@@ -87,10 +87,14 @@ public class DbConvertOpsTest {
     Object co = g_rs.getObject(col);
     //assertTrue(co.getClass() == val.getClass());
 
-    if (expect == NO_EXPECT) return;
-    if (expect != null) assertEquals(expect, co);
-    else if (val instanceof BigDecimal bd) assertEquals(bd.compareTo((BigDecimal) co), 0);
-    else assertEquals(val, co);
+    if (expect == NO_EXPECT)
+      return;
+    if (expect != null)
+      assertEquals(expect, co);
+    else if (val instanceof BigDecimal bd)
+      assertEquals(bd.compareTo((BigDecimal) co), 0);
+    else
+      assertEquals(val, co);
   }
   private void updateObject(DT dt, Object val) throws Exception {
     updateObject(dt.col, val, dt.fExpect.apply(dt));

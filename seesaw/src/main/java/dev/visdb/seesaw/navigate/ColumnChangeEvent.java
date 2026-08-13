@@ -71,7 +71,9 @@ abstract class ColumnChangeEvent extends EventObjectBacktrace implements ChangeE
     this.error = error;
   }
 
-  public ColumnChangeEvent(ChangeEventData ev) { this(ev.getRSC(), ev.getValue(), ev.isError()); }
+  public ColumnChangeEvent(ChangeEventData ev) {
+    this(ev.getRSC(), ev.getValue(), ev.isError());
+  }
 
   /**
    *
@@ -95,19 +97,25 @@ abstract class ColumnChangeEvent extends EventObjectBacktrace implements ChangeE
    * @param _rowSet check against this rowSet
    * @return true if the event is for the specified rowSet
    */
-  public boolean matches(RowSet _rowSet) { return getSource().getRowSet() == _rowSet; }
+  public boolean matches(RowSet _rowSet) {
+    return getSource().getRowSet() == _rowSet;
+  }
 
   /**
    * Modified column name.
    * @return column name
    */
-  public String getColumnName() { return getSource().getColumnName(); }
+  public String getColumnName() {
+    return getSource().getColumnName();
+  }
 
   /**
    * Modified column name.
    * @return column name
    */
-  public int getColumnIndex() { return getSource().getColumnIndex(); }
+  public int getColumnIndex() {
+    return getSource().getColumnIndex();
+  }
 
   /**
    * Value written to rowSet.

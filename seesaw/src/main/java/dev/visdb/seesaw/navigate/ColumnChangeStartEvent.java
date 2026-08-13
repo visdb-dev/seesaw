@@ -42,7 +42,9 @@ public class ColumnChangeStartEvent extends ColumnChangeEvent {
    * @param source the component making the modification
    * @param value the value written to the rowSet
    */
-  public ColumnChangeStartEvent(RSC source, Object value) { this(source, value, false); }
+  public ColumnChangeStartEvent(RSC source, Object value) {
+    this(source, value, false);
+  }
 
   /**
    * Create a modification event.

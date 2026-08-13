@@ -87,7 +87,9 @@ public class CheckBox extends JCheckBox implements SSComponent {
     public void itemStateChanged(ItemEvent ie) {
       try {
         dbChange(() -> setColumnObject(isSelected()));
-      } catch (SQLException ex) { logger.log(Level.ERROR, (String) null, ex); }
+      } catch (SQLException ex) {
+        logger.log(Level.ERROR, (String) null, ex);
+      }
     }
   }
 
@@ -97,7 +99,9 @@ public class CheckBox extends JCheckBox implements SSComponent {
   /**
    * Creates an object of CheckBox.
    */
-  public CheckBox() { this(null); }
+  public CheckBox() {
+    this(null);
+  }
 
   /**
    * Creates an object of CheckBox binding it to the specified column in the

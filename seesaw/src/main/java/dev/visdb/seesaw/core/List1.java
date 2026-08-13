@@ -113,11 +113,14 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
     @Override
     public void valueChanged(ListSelectionEvent e) {
       // While adjusting don't need to update the database.
-      if (e.getValueIsAdjusting()) return;
+      if (e.getValueIsAdjusting())
+        return;
 
       try {
         dbChange(() -> updateRowSet());
-      } catch (SQLException ex) { logger.log(Level.ERROR, ex.getMessage(), ex); }
+      } catch (SQLException ex) {
+        logger.log(Level.ERROR, ex.getMessage(), ex);
+      }
     }
   }
 
@@ -191,7 +194,9 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
       } catch (SQLException ex) {
         logger.log(Level.ERROR, ex.getMessage(), ex);
         throw new SSSQLRuntimeException(ex);
-      } finally { collectionSet = true; }
+      } finally {
+        collectionSet = true;
+      }
     }
   }
 
@@ -201,7 +206,9 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
    *
    * @return the key values for the items displayed in the list box
    */
-  public List<K> getKeys() { return swingModel.getKeys(); }
+  public List<K> getKeys() {
+    return swingModel.getKeys();
+  }
 
   /**
    * Returns the items displayed in the list box,
@@ -209,7 +216,9 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
    *
    * @return the items displayed in the list box
    */
-  public List<D> getDisplayValues() { return swingModel.getDisplayValues(); }
+  public List<D> getDisplayValues() {
+    return swingModel.getDisplayValues();
+  }
 
   /**
    * Leave this here so it's use can be detected.
@@ -314,7 +323,9 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
    *
    * @param displayValues  displayValues to be displayed in the list box.
    */
-  public void setDisplayValues(List<D> displayValues) { setDisplayValues(displayValues, null); }
+  public void setDisplayValues(List<D> displayValues) {
+    setDisplayValues(displayValues, null);
+  }
 
   /**
    * Sets the displayValues to be displayed in the list based on the enum
@@ -488,7 +499,9 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
    * the Component listener removed
    */
   public void updateComponent() {
-    if (swingModel == null) { return; }
+    if (swingModel == null) {
+      return;
+    }
 
     Object array = null;
     //
@@ -496,7 +509,8 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
     //		 Seems like it, it's used just about everywhere else.
     //
     try {
-      if (getRowsModel().onActiveRow()) array = dbCollection.readData(List1.this);
+      if (getRowsModel().onActiveRow())
+        array = dbCollection.readData(List1.this);
     } catch (final SQLException se) {
       logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);
     }

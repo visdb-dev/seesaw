@@ -56,7 +56,9 @@ public class ComponentStateTextDecorator extends BaseTextDecorator {
    * Create using specified map.
    * @param map
    */
-  public ComponentStateTextDecorator(Map<ComponentState, String> map) { styleNames.putAll(map); }
+  public ComponentStateTextDecorator(Map<ComponentState, String> map) {
+    styleNames.putAll(map);
+  }
 
   /**
    * Decorate the text according to {@code valid}.

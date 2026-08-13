@@ -46,12 +46,10 @@ import dev.visdb.seesaw.navigate.RowsModel;
  */
 @SuppressWarnings("serial")
 public class SSDataGrid extends dev.visdb.seesaw.core.DataGrid {
-
   /**
    * See {@link dev.visdb.seesaw.core.DataGrid}
    */
-  public SSDataGrid() {
-  }
+  public SSDataGrid() {}
 
   /**
    * See {@link dev.visdb.seesaw.core.DataGrid}
@@ -74,6 +72,4 @@ public class SSDataGrid extends dev.visdb.seesaw.core.DataGrid {
   protected SSTableModel createDefaultDataModel() {
     return new SSTableModel();
   }
-
-  
 }

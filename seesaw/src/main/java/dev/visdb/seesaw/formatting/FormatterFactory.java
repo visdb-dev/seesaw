@@ -107,7 +107,9 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
      * builder
      * @return converter
      */
-    public AbstractFormatter getConverter() { return converter; }
+    public AbstractFormatter getConverter() {
+      return converter;
+    }
   }
 
   /**
@@ -124,7 +126,9 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
    * The Format used to create factory.
    * @return format
    */
-  public SSFormat getSSFormat() { return ssFormat; }
+  public SSFormat getSSFormat() {
+    return ssFormat;
+  }
 
   /**
    * Convert the string as needed and do
@@ -140,7 +144,9 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
    * Converter used with stringToValue and valueToString; typically null.
    * @return converter
    */
-  public AbstractFormatter getConverter() { return converter; }
+  public AbstractFormatter getConverter() {
+    return converter;
+  }
 
   /**
    * Function used to determine if text field has user input; typically null.
@@ -192,7 +198,8 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
           // Attempt to put the caret after the character.
           try {
             ftf.setCaretPosition(((String) value).length());
-          } catch (IllegalArgumentException ex) {}
+          } catch (IllegalArgumentException ex) {
+          }
         } catch (ParseException ex) {
           // mask formatter (probably) got an exception,
           // back to the null formatter

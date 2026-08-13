@@ -105,7 +105,9 @@ public class Example3 extends JFrame {
   RowsModel rowsModel;
 
   @SuppressWarnings("unused")
-  RowSet getRowSet() { return rowsModel.getRowSet(); }
+  RowSet getRowSet() {
+    return rowsModel.getRowSet();
+  }
 
   /**
    * Constructor for Example3
@@ -134,26 +136,28 @@ public class Example3 extends JFrame {
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
       navigator = new DataNavigator(rowsModel);
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     // SETUP DB COMBO QUERIES
     String query = "SELECT * FROM supplier_data;";
     // (connection, query, "supplier_id", "supplier_name");
-    cmbSupplierName = new DBComboBox2.Builder<Long, Object, Object>(){}
-        .connection(connection)
-        .query(query)
-        .primaryKeyColumnName("supplier_id")
-        .displayColumnName("supplier_name")
-        .build();
+    cmbSupplierName = new DBComboBox2.Builder<Long, Object, Object>() {}
+                          .connection(connection)
+                          .query(query)
+                          .primaryKeyColumnName("supplier_id")
+                          .displayColumnName("supplier_name")
+                          .build();
 
     query = "SELECT * FROM part_data;";
     //(connection, query, "part_id", "part_name");
-    cmbPartName = new DBComboBox2.Builder<Long, Object, Object>(){}
-        .connection(connection)
-        .query(query)
-        .primaryKeyColumnName("part_id")
-        .displayColumnName("part_name")
-        .build();
+    cmbPartName = new DBComboBox2.Builder<Long, Object, Object>() {}
+                      .connection(connection)
+                      .query(query)
+                      .primaryKeyColumnName("part_id")
+                      .displayColumnName("part_name")
+                      .build();
 
     // BIND THE COMPONENTS TO THE DATABASE COLUMNS
     cmbPartName.setAllowNull(false);
@@ -171,7 +175,9 @@ public class Example3 extends JFrame {
 
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
-    } catch (final Exception e) { logger.log(Level.ERROR, "Exception.", e); }
+    } catch (final Exception e) {
+      logger.log(Level.ERROR, "Exception.", e);
+    }
 
     // SET LABEL DIMENSIONS
     lblSupplierPartID.setPreferredSize(MainClass.labelDim);

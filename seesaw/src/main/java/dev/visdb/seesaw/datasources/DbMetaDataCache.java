@@ -41,11 +41,10 @@ import dev.visdb.seesaw.utils.SSUtils;
  * running should not be referenced.
  * <p>
  * <b>NOTE:</b> There's only one database, found in SSUtils.dbSupport.getSharedConnection.
- * 
+ *
  */
 public class DbMetaDataCache {
-
-  private DbMetaDataCache() { }
+  private DbMetaDataCache() {}
 
   //
   // The databasemetadata is cached, so only the first call connects to

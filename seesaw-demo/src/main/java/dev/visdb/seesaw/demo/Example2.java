@@ -89,7 +89,7 @@ public class Example2 extends JFrame {
   TextField txtSupplierCity = new TextField();
   /** see {@link TestBaseComponents.MyComboBox} */
   ComboBox1<Integer, String> cmbSupplierStatus
-      = new ComboBox1.Builder<Integer, String>(){}.build();
+      = new ComboBox1.Builder<Integer, String>() {}.build();
 
   /**
    * database component declarations
@@ -125,7 +125,9 @@ public class Example2 extends JFrame {
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
       navigator = new DataNavigator(rowsModel);
-    } catch (final SQLException se) { logger.log(Level.ERROR, "SQL Exception.", se); }
+    } catch (final SQLException se) {
+      logger.log(Level.ERROR, "SQL Exception.", se);
+    }
 
     // SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
     //	 LETS ASSUME THE STATUS CODE TO TEXT MAPPINGS

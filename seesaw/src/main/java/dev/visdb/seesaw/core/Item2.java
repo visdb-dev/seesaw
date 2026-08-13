@@ -87,13 +87,17 @@ public class Item2<K, D, D2> {
    * key getter.
    * @return
    */
-  public K getKey() { return key; }
+  public K getKey() {
+    return key;
+  }
 
   /**
    * displayValue getter.
    * @return
    */
-  public D getDisplayValue() { return displayValue; }
+  public D getDisplayValue() {
+    return displayValue;
+  }
 
   /**
    * d2 getter.
@@ -101,7 +105,8 @@ public class Item2<K, D, D2> {
    * @return
    */
   public D2 getD2() {
-    if (d2 == NO_D2) throw new IllegalStateException("Item does not have d2");
+    if (d2 == NO_D2)
+      throw new IllegalStateException("Item does not have d2");
     return d2;
   }
 
@@ -109,7 +114,9 @@ public class Item2<K, D, D2> {
    * Check if this has a d2
    * @return true if there is a d2
    */
-  public boolean hasD2() { return d2 != NO_D2; }
+  public boolean hasD2() {
+    return d2 != NO_D2;
+  }
 
   /**
    * hashCode.
@@ -131,12 +138,17 @@ public class Item2<K, D, D2> {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
                 final Item2<?, ?, ?> other = (Item2<?, ?, ?>) obj;
-                if (!Objects.equals(this.key, other.key)) return false;
-                if (!Objects.equals(this.displayValue, other.displayValue)) return false;
+                if (!Objects.equals(this.key, other.key))
+                  return false;
+                if (!Objects.equals(this.displayValue, other.displayValue))
+                  return false;
                 return Objects.equals(this.d2, other.d2);
   }
 }

@@ -74,7 +74,8 @@ public class TrivialCtxFactory implements InitialContextFactory {
       @Override
       public Object lookup(String name) throws NamingException {
         Object obj = jndiStuff.get(name);
-        if (obj == null) throw new NameNotFoundException(name);
+        if (obj == null)
+          throw new NameNotFoundException(name);
         return obj;
       }
 
