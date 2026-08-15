@@ -163,11 +163,11 @@ import static java.lang.System.Logger.Level.*;
  * <li>
  * If an attribute is not specified, then "keep" is assumed.
  * <li>
- * If a color starts with "#" try {@link Color#decode(String)}, next try
+ * If a color starts with "#" try {@link Color#decode(String)}; if not try
  * matching the value to a name of a color as seen in {@link Color}'s fields.
  * <li>
  * If a style is applied to a component, and the style has attributes that are
- * not applicable to the component, the attributes are ignored.
+ * not applicable to the component, the inapplicable attributes are ignored.
  * <li>
  * The scroll related styles are only applied if the JTextArea is embedded in a ScrollPane
  * </ul>
@@ -176,6 +176,7 @@ import static java.lang.System.Logger.Level.*;
  * formats for specifying styles, json and properties.
  *
  * <pre>
+ * # comments allowed in json             |
  * {                                      |
  *   "default": {                         |
  *     "foreground": "#333333",           |      default.foreground=#333333
@@ -847,10 +848,13 @@ public class TextStyles {
                               .builder()
                               // .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
                               .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
-                              .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+                              .enable(JsonReadFeature.ALLOW_YAML_COMMENTS)
                               .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
                               .enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
                               .build();
+
+    // Turn lines with comments into emtpy lines.
+    //      jsonInputString = jsonInputString.replaceAll("(?m)^\\s*#.*$", "");
 
     try {
       // Use TypeReference to cleanly parse directly into nested maps
@@ -1243,7 +1247,7 @@ public class TextStyles {
     }
 
     logger.log(ERROR, () -> sf("Color '%s' unrecognized.", val));
-    throw new TextStylesException(sf("Unrecognized color: '%s'", cleanValue));
+    throw new TextStylesException(sf("Unrecognized color: '%s'", val));
     // logger.log(WARNING, () -> sf("Color '%s' unrecognized. Defaulting to BLACK.", val));
     // return Color.BLACK;
   }

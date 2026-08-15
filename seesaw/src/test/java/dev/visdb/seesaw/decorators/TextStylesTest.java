@@ -523,8 +523,8 @@ public class TextStylesTest {
 		{
 		    "criticalError_2": {
 		        "inherits": "warning",
-		        "foreground": "#010203"//,
-                  //"one": "two"
+		        "foreground": "#010203"
+                  #, "one": "two"
 		    }
 		}
 		""";
