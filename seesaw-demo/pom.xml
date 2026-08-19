@@ -1,171 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>dev.visdb.seesaw</groupId>
-		<artifactId>seesaw-parent</artifactId>
-		<version>5.0.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+  <parent>
+    <groupId>dev.visdb.seesaw</groupId>
+    <artifactId>seesaw-parent</artifactId>
+    <version>0.5.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-	<!-- Keep your existing demo coordinates -->
-	<groupId>dev.visdb.seesaw.demo</groupId>
-	<artifactId>seesaw-demo</artifactId>
-	<packaging>jar</packaging>
+  <!-- Keep your existing demo coordinates -->
+  <groupId>dev.visdb.seesaw.demo</groupId>
+  <artifactId>seesaw-demo</artifactId>
+  <packaging>jar</packaging>
 
-	<name>seesaw-demo</name>
-	<description>Demo for SeeSaw</description>
-	<url>https://github.com/errael/visdb</url>
+  <name>seesaw-demo</name>
+  <description>Demo for SeeSaw</description>
+  <url>https://github.com/errael/visdb</url>
 
-	<properties>
-		<!-- Never publish demo artifacts to Maven Central -->
-		<maven.deploy.skip>true</maven.deploy.skip>
-        <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
-	</properties>
+  <properties>
+    <!-- Never publish demo artifacts to Maven Central -->
+    <maven.deploy.skip>true</maven.deploy.skip>
+    <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
+  </properties>
 
-	<licenses>
-		<license>
-			<name>BSD 3-Clause</name>
-			<url>https://spdx.org/licenses/BSD-3-Clause.html</url>
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>BSD 3-Clause</name>
+      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+    </license>
+  </licenses>
 
-        <developers>
-            <developer>
-                <id>errael</id>
-                <name>Ernie R Rael</name>
-                <email>errael@raelity.com</email>
-                <organization>Raelity Engineering</organization>
-                <organizationUrl>http://raelity.com</organizationUrl>
-            </developer>
-            <developer>
-                <name>Prasanth R. Pasala</name>
-                <email>swingset@pangburngroup.com</email>
-                <organization>The Pangburn Group, Inc.</organization>
-                <organizationUrl>https://pangburngroup.com</organizationUrl>
-            </developer>
-            <developer>
-                <name>Brian E. Pangburn</name>
-                <email>brian@pangburngroup.com</email>
-                <organization>The Pangburn Group, Inc.</organization>
-                <organizationUrl>https://pangburngroup.com</organizationUrl>
-            </developer>
-        </developers>
+  <developers>
+    <developer>
+      <id>errael</id>
+      <name>Ernie R Rael</name>
+      <email>errael@raelity.com</email>
+      <organization>Raelity Engineering</organization>
+      <organizationUrl>http://raelity.com</organizationUrl>
+    </developer>
+  </developers>
 
-	<dependencies>
-		<dependency>
-			<groupId>dev.visdb.seesaw</groupId>
-			<artifactId>seesaw</artifactId>
-		</dependency>
+  <scm>
+    <url>https://github.com/errael/swingset</url>
+    <connection>scm:git:git@github.com:errael/swingset.git</connection>
+    <developerConnection>scm:git:git@github.com:errael/swingset.git</developerConnection>
+  </scm>
 
-		<dependency>
-			<groupId>com.nqadmin.rowset</groupId>
-			<artifactId>jdbcrowsetimpl</artifactId>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>dev.visdb.seesaw</groupId>
+      <artifactId>seesaw</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>gnu.getopt</groupId>
+      <artifactId>java-getopt</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>gnu.getopt</groupId>
-			<artifactId>java-getopt</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>com.raelity</groupId>
+      <artifactId>raelity-lib</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>com.raelity</groupId>
-			<artifactId>raelity-lib</artifactId>
-		</dependency>
+    <!--
+            log4j-jpl: "The Log4j 2 JDK Logging Adapter allow
+            to route all System.Logger events to Log4j 2 APIs."
 
-		<!--
-			log4j-jpl: "The Log4j 2 JDK Logging Adapter allow
-			to route all System.Logger events to Log4j 2 APIs."
+            This single dependency can be removed to take
+            log4j out of the picture; or can comment out all log4j-*.
+    -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-jpl</artifactId>
+    </dependency>
 
-			This single dependency can be removed to take
-			log4j out of the picture; or can comment out all 3.
-		-->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-jpl</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-		</dependency>
+    <dependency>
+      <!-- TODO: don't include simplevalidation -->
+      <groupId>com.raelity.logman</groupId>
+      <artifactId>logman-lib</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-		</dependency>
+    <!-- pick up simplevalidation from logman-lib
+    <dependency>
+      <groupId>com.mastfrog</groupId>
+      <artifactId>simplevalidation-standalone</artifactId>
+    </dependency>
+    -->
 
-		<dependency>
-			<!-- TODO: don't include simplevalidation -->
-			<groupId>com.raelity.logman</groupId>
-			<artifactId>logman-lib</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>com.github.lgooddatepicker</groupId>
+      <artifactId>LGoodDatePicker</artifactId>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
+      <artifactId>LGoodDatePicker</artifactId>
+    </dependency>
+    -->
+  </dependencies>
 
-		<!-- pick up simplevalidation from logman-lib
-		<dependency>
-			<groupId>com.mastfrog</groupId>
-			<artifactId>simplevalidation-standalone</artifactId>
-		</dependency>
-		-->
+  <build>
+    <plugins>
 
-		<dependency>
-			<groupId>com.github.lgooddatepicker</groupId>
-			<artifactId>LGoodDatePicker</artifactId>
-		</dependency>
-<!--
-		<dependency>
-			<groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
-			<artifactId>LGoodDatePicker</artifactId>
-		</dependency>
--->
-	</dependencies>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
 
-	<build>
-		<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>
+                    dev.visdb.seesaw.demo.MainClass</mainClass>
+                </manifest>
+                <manifestEntries>
+                  <Multi-Release>true</Multi-Release>
+                </manifestEntries>
+              </archive>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<archive>
-								<manifest>
-									<mainClass>
-										dev.visdb.seesaw.demo.MainClass</mainClass>
-								</manifest>
-								<manifestEntries>
-									<Multi-Release>true</Multi-Release>
-								</manifestEntries>
-							</archive>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-	</build>
+    </plugins>
+  </build>
 
 </project>

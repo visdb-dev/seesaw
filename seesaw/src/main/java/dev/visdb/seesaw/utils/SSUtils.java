@@ -61,9 +61,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
-import java.util.logging.Handler;
-import java.util.logging.LogManager;
-import java.util.logging.SimpleFormatter;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
@@ -484,6 +481,9 @@ public class SSUtils {
     return isJunit;
   }
 
+  /** Set when junit tests set up a logger. */
+  public static String JUNIT_TEST_LOGGING = "JUNIT_TEST_LOGGING";
+
   /**
    * true if in JUnit and NOT using JUnit logging
    * @return
@@ -491,19 +491,6 @@ public class SSUtils {
   public static boolean isJunitPrint() {
     if (!isJunit())
       return false;
-    java.util.logging.Logger juLog = LogManager.getLogManager().getLogger("dev.visdb.seesaw");
-    if (juLog != null) {
-      Handler[] handlers = juLog.getHandlers();
-      if (handlers.length > 0 && handlers[0].getFormatter() instanceof TestFormatterBase)
-        return false;
-    }
-    return true;
+    return !System.getProperty(JUNIT_TEST_LOGGING).equals("true");
   }
-
-  /**
-   * This is used to distinguish formatter used in JUnit tests.
-   * Define it here for use by isJunitPrint.
-   * This is extended by the unit test logging infrastructure.
-   */
-  public static class TestFormatterBase extends SimpleFormatter {}
 }

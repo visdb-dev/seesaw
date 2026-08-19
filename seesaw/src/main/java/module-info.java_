@@ -1,0 +1,100 @@
+/* *****************************************************************************
+ * Copyright (C) 2026, Ernie R Rael. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ * ****************************************************************************/
+
+// open the module to everything...
+/*open*/ module dev.visdb.seesaw {
+
+    // 1. EXPORTS: Expose your API packages to consumers
+    exports dev.visdb.seesaw.utils;
+    exports dev.visdb.seesaw.decorators;
+    exports dev.visdb.seesaw.core;
+    exports dev.visdb.seesaw.core.table;
+    exports dev.visdb.seesaw.models;
+    exports dev.visdb.seesaw.navigate;
+    exports dev.visdb.seesaw.formatting;
+    exports dev.visdb.seesaw.datasources;
+    exports dev.visdb.seesaw.datasources.products;
+    exports dev.visdb.seesaw.enums;
+
+    requires java.base;
+    requires java.datatransfer;
+    requires java.desktop;
+    requires java.sql;
+    requires java.sql.rowset;
+
+    // AUTOMATIC MODULE NAMES FOR NETBEANS
+    // requires org.openide.util.RELEASE310;
+    // requires org.openide.util.lookup.RELEASE310;
+    requires util.lookup.bundle;
+
+    // MODERN EXPLICIT MODULES
+    requires tools.jackson.core;
+    requires tools.jackson.databind;
+    requires tools.jackson.dataformat.properties;
+
+    // AUTOMATIC MODULES 
+    requires com.google.common; // Guava
+    
+    // RAELITY / FILENAME-BASED AUTOMATIC MODULES
+    // Note: If compilation fails on these three, run 'mvn dependency:tree' 
+    // to verify the final clean JAR name Maven assigns to them.
+    requires glazedlists; 
+    requires table.sort.header.renderer;
+    requires weak.event.bus.receiver;
+
+    //
+    // Since seesaw only uses java classes for databinding don't need this.
+    //
+    // // REFLECTION BLUEPRINT FOR JACKSON (Crucial for a library)
+    // // Jackson needs to look inside your DTO/Model classes to parse data.
+    // // Instead of using an "open module", selectively open your model package.
+    // opens com.yourcompany.yourlibraryname.models to tools.jackson.databind;
+
+    // opens dev.visdb.seesaw.utils to weak.event.bus.receiver;
+}
+
+// module Seesaw {
+//   requires glazedlists;
+//   requires org.openide.util.lookup.RELEASE240;
+//   requires org.openide.util.RELEASE240;
+//   requires com.google.common;
+//   requires com.google.common.util.concurrent.internal;
+//   requires listenablefuture;
+//   requires org.jspecify;
+//   requires com.google.errorprone.annotations;
+//   requires com.google.j2objc.annotations;
+//   requires table.sort.header.renderer;
+//   requires weak.event.bus.receiver;
+//   requires tools.jackson.core;
+//   requires tools.jackson.databind;
+//   requires com.fasterxml.jackson.annotation;
+//   requires tools.jackson.dataformat.properties;
+//   requires seesaw;
+// }

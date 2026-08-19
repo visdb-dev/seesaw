@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
-import dev.visdb.seesaw.utils.SSUtils.TestFormatterBase;
+import dev.visdb.seesaw.utils.SSUtils;
 
 /**
  * Logging for use during tests.
@@ -70,6 +70,7 @@ public class TestLogging {
   public static void load(Level _level) {
     Level level = _level == null ? Level.INFO : _level;
     testLogging(level);
+    System.setProperty(SSUtils.JUNIT_TEST_LOGGING, "true");
   }
 
   /**
@@ -132,7 +133,7 @@ public class TestLogging {
   }
 
   /** To distinguish formatter used in JUnit tests */
-  private static class TestFormatter extends TestFormatterBase {
+  private static class TestFormatter extends SimpleFormatter {
     private final String format;
     // SurrogateLogger.getSimpleFormat(SimpleFormatter::getLoggingProperty);
 

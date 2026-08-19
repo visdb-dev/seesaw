@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# The last path component should be META-INF for each
+
+set -e
+
+src=$(realpath $1)
+dst=$(realpath $2)
+
+#echo $src $dst
+
+note() {
+    return
+    echo "$1"
+}
+
+mkdir -p $dst
+cd $src
+for i in $(find -type f ); do
+    if [[ -e $dst/$i ]]; then
+        if [[ ${i##*/} == MANIFEST.MF ]]; then
+            note "manifest: $i is a manifest"
+            continue;
+        fi
+        if cmp --quiet $i $dst/$i; then
+            note "identical: $i are identical files"
+            continue
+        fi
+        echo "COMBINE: $i"
+        # Hope blank lines are OK, need this because sometimes no \n at EOF
+        echo >>$dst/$i
+        cat $i >> $dst/$i
+        continue
+    else
+        echo "=== cp $i"
+        cp --parents $i $dst
+    fi
+done

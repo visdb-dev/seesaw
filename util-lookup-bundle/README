@@ -1,0 +1,19 @@
+
+- Extract util, util-lookup
+- "find -type f | wc " to get number of files fore each directory
+- cp -r util/org DST/org; cp -r util-lookup/org DST/org
+- "find -type f | wc" make sure number of files is the sum of original totals
+- copyAddMeta util/META META; copyAddMeta util-lookup/META META
+  look around to be sure
+- mv META into DST
+- jar -cf ../util-lookup-bundle-290.jar org META-INF/
+
+
+After adding dependency in netbeans:
+    com.raelity.3rdparty.org.netbeans
+    util-lookup-bundle
+    290
+NB dependency: ManuallyInstallArtifact
+NB dependency: CopyLocation
+can copy updates to the location
+mvn clean install -U

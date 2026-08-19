@@ -42,18 +42,11 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.datasources.products;
 
-import dev.visdb.seesaw.datasources.DbSupport;
-
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import javax.sql.RowSet;
-
+import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.utils.SSUtils;
 
 /**
@@ -88,33 +81,34 @@ public class DbSupportBase implements DbSupport {
     return sharedConnection;
   }
 
-  private InitialContext ctx;
-  /**
-   * {@inheritDoc }
-   * @param rs
-   * @return
-   * @throws SQLException
-   */
-  @Override
-  public Connection getConnection(RowSet rs) throws SQLException {
-    Objects.requireNonNull(rs);
-    String dsName = rs.getDataSourceName();
-    if (dsName != null) {
-      try {
-        if (ctx == null)
-          ctx = new InitialContext();
-        // TODO: keep a local map of dsName to DataSource ???
-        DataSource ds = (DataSource) ctx.lookup(dsName);
-        return ds.getConnection();
-      } catch (NamingException ex) {
-      }
-    }
+  // NOT USED
+  // private InitialContext ctx;
+  // /**
+  //  * {@inheritDoc }
+  //  * @param rs
+  //  * @return
+  //  * @throws SQLException
+  //  */
+  // @Override
+  // public Connection getConnection(RowSet rs) throws SQLException {
+  //   Objects.requireNonNull(rs);
+  //   String dsName = rs.getDataSourceName();
+  //   if (dsName != null) {
+  //     try {
+  //       if (ctx == null)
+  //         ctx = new InitialContext();
+  //       // TODO: keep a local map of dsName to DataSource ???
+  //       DataSource ds = (DataSource) ctx.lookup(dsName);
+  //       return ds.getConnection();
+  //     } catch (NamingException ex) {
+  //     }
+  //   }
 
-    String url = rs.getUrl();
-    if (url != null) {
-      return DriverManager.getConnection(url);
-    }
+  //   String url = rs.getUrl();
+  //   if (url != null) {
+  //     return DriverManager.getConnection(url);
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 }

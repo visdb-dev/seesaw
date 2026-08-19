@@ -82,15 +82,16 @@ public interface DbSupport {
    */
   Connection getSharedConnection() throws SQLException;
 
-  /**
-   * Return a connection to the {@code RowSet}'s database using information
-   * from the {@code RowSet} to get the connection; <em>close when finished</em>.
-   * Tries {@code RowSet}'s DataSource then url.
-   * @param rs row set from target database
-   * @return connection
-   * @throws java.sql.SQLException
-   */
-  Connection getConnection(RowSet rs) throws SQLException;
+  // NOT USED
+  // /**
+  //  * Return a connection to the {@code RowSet}'s database using information
+  //  * from the {@code RowSet} to get the connection; <em>close when finished</em>.
+  //  * Tries {@code RowSet}'s DataSource then url.
+  //  * @param rs row set from target database
+  //  * @return connection
+  //  * @throws java.sql.SQLException
+  //  */
+  // Connection getConnection(RowSet rs) throws SQLException;
 
   /**
    * Create a query that contains the row number of a non "order by" query.
