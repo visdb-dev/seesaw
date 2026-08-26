@@ -109,38 +109,38 @@ import static java.lang.System.Logger.Level.*;
  * RowSet as a source of data. It also provides different cell renderers
  * including a comboboxes renderer and a date renderer.
  * <p>
-DataGrid internally uses the SSTableModel to display the information in a
-table format. DataGrid also provides an easy means for displaying headers.
-Columns can be hidden or made uneditable. In addition, it provides much finer
-control over which cells can be edited and which cells can't be edited. It
-uses the SSCellEditing interface for achieving this. The implementation of
-this interface also provides a way to specify what kind of information is
-valid for each cell.
-<p>
-DataGrid maps Control-X to delete multiple selected rows.
-Adds copy/paste handling of rectangular regions.
-<p>
-DataGrid uses the isCellEditable() method in SSCellEditing to determine if
-a cell is editable or not. The cellUpdateRequested() method of SSCellEditing
-is used to notify a user program when an update is requested. While doing so
-it provides the present value in the cell and also the new value. Based on
-this information the new value can be rejected or accepted by the program.
-<p>
-DataGrid also provides an "extra" row to facilitate the addition of rows to
-the table. Default values for various columns can be set programmatically. A
-programmer can also specify which column is the primary key column for the
-underlying RowSet and supply a primary key for that column when a new row
-is being added.
-<p>
+ * DataGrid internally uses the SSTableModel to display the information in a
+ * table format. DataGrid also provides an easy means for displaying headers.
+ * Columns can be hidden or made uneditable. In addition, it provides much finer
+ * control over which cells can be edited and which cells can't be edited. It
+ * uses the SSCellEditing interface for achieving this. The implementation of
+ * this interface also provides a way to specify what kind of information is
+ * valid for each cell.
+ * <p>
+ * DataGrid maps Control-X to delete multiple selected rows.
+ * Adds copy/paste handling of rectangular regions.
+ * <p>
+ * DataGrid uses the isCellEditable() method in SSCellEditing to determine if
+ * a cell is editable or not. The cellUpdateRequested() method of SSCellEditing
+ * is used to notify a user program when an update is requested. While doing so
+ * it provides the present value in the cell and also the new value. Based on
+ * this information the new value can be rejected or accepted by the program.
+ * <p>
+ * DataGrid also provides an "extra" row to facilitate the addition of rows to
+ * the table. Default values for various columns can be set programmatically. A
+ * programmer can also specify which column is the primary key column for the
+ * underlying RowSet and supply a primary key for that column when a new row
+ * is being added.
+ * <p>
  * While using the headers always set them before you set the RowSet.
  * Otherwise the headers will not appear.
  * <p>
-Also if you are using column names rather than column numbers for different
-function you have to call them only after setting the RowSet. Because
-DataGrid uses the RowSet to convert the column names to column numbers.
-If you specify the column numbers you can do before or after setting the
-RowSet, it does not matter.
-<p>
+ * Also if you are using column names rather than column numbers for different
+ * function you have to call them only after setting the RowSet. Because
+ * DataGrid uses the RowSet to convert the column names to column numbers.
+ * If you specify the column numbers you can do before or after setting the
+ * RowSet, it does not matter.
+ * <p>
  * You can simply remember this order
  * <ol>
  * <li>Set the headers
@@ -1432,7 +1432,7 @@ public class DataGrid extends JTable {
 
   /**
    * Sets the default values for different columns. When a new row is added these
-   * default values will be added to the columns. Please make sure that the object
+   * default values will be added to the columns. Make sure that the object
    * specified for each column is of the same type as that of the column in the
    * database. Use the getColumnClass function in JTable to determine the exact
    * data type.

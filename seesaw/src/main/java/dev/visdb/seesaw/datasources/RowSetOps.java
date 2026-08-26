@@ -732,9 +732,10 @@ public class RowSetOps {
    * holds the actual value, after conversion, written to the database.
    * Also there is a special value, {@link #UPDATE_NULL}, used when
    * {@link RowSet#updateNull(int)} is used to update the database.
+   * @param value The actual value written to the database
    */
   public record DbUpdate(Object value) {}
-  /** The actual value written to the database */
+  /** Indicates {@link RowSet#updateNull(int)} was used to update the database. */
   public static DbUpdate UPDATE_NULL = new DbUpdate(JDBCType.NULL);
 
   /**

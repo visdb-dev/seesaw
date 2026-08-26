@@ -63,6 +63,7 @@
     <version.logman>2.3.1</version.logman>
     <!--        Test -->
     <version.junit-jupiter>5.14.1</version.junit-jupiter>
+    <version.assertj>3.27.7</version.assertj>
     <version.mockito>5.14.2</version.mockito>
 
     <!-- Plugins -->
@@ -200,6 +201,12 @@
         <artifactId>junit-jupiter</artifactId>
         <version>${version.junit-jupiter}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.assertj</groupId>
+          <artifactId>assertj-core</artifactId>
+          <version>${version.assertj}</version>
+          <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
