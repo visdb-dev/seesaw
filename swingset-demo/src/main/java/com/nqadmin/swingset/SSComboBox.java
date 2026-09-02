@@ -42,7 +42,10 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import java.util.Optional;
+
 import dev.visdb.seesaw.core.ComboBox1;
+import dev.visdb.seesaw.models.Item1;
 
 /**
  * This class provides a ComboBox with an Integer key and String value.
@@ -90,4 +93,28 @@ public class SSComboBox extends ComboBox1<Integer, String> {
   public SSComboBox(ModelType modelType) {
     this(new Builder().modelType(modelType));
   }
-} // end public class SSComboBox extends JComboBox {
+
+  /**
+   * @return a copy of the chosenItem with methods getKey(), getDisplayValue()
+   */
+  @Override
+  public Item getChosenItem() {
+    //   return new Item(getChosenKey(), getChosenDisplayValue());
+    Optional<Item> item = getChosenItem((remodel, lItem) -> {
+      return new Item(remodel.getKey(lItem), remodel.getDisplayValue(lItem));
+    });
+    return item.orElse(new Item(null, null));
+  }
+
+  /**
+   * For non generic getChosenItem().
+   */
+  public static class Item extends Item1<Integer, String> {
+    /** Create an Item
+     * @param key
+     * @param displayValue */
+    public Item(Integer key, String displayValue) {
+      super(key, displayValue);
+    }
+  }
+} // end public class SSComboBox

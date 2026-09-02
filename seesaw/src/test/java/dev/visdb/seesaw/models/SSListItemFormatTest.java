@@ -100,7 +100,8 @@ public class SSListItemFormatTest {
 
   /** x */
   @AfterEach
-  public void tearDown() {}
+  public void tearDown() {
+  }
 
   static class LI extends AbstractComboBoxListSwingModel {
     public LI(int itemNumElems, List<SSListItem> itemList) {
@@ -109,10 +110,7 @@ public class SSListItemFormatTest {
 
     @Override
     protected void checkState() {}
-    @Override
-    protected void remodelTakeWriteLock() {}
-    @Override
-    protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {}
+
     @Override
     protected Remodel getRemodel() {
       return new RM();
@@ -250,6 +248,7 @@ public class SSListItemFormatTest {
     format = fmt.format(listItem);
     expect = "true";
     assertEquals(expect, format);
+    listInfo.verifyNoLocksHeld(null);
   }
   /**
    * Test of setDatePattern method, of class SSListItemFormat.

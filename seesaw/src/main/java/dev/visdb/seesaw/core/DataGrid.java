@@ -336,8 +336,10 @@ public class DataGrid extends JTable {
     private final class GridComboModels extends SimpleComboListSwingModel {
       private GridComboModels() {
         super(2, new ArrayList<>(items.length));
-        for (int i = 0; i < items.length; i++) {
-          getRemodel().add(new GridComboItem(i));
+        try (Remodel remodel = getRemodel()) {
+          for (int i = 0; i < items.length; i++) {
+            remodel.add(new GridComboItem(i));
+          }
         }
       }
 

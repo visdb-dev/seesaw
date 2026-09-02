@@ -3,6 +3,7 @@ package snippet_files;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.JdbcRowSet;
@@ -12,7 +13,7 @@ import com.google.common.reflect.TypeToken;
 
 import dev.visdb.seesaw.core.ComboBox1;
 import dev.visdb.seesaw.core.DBComboBox2;
-import dev.visdb.seesaw.core.Item1;
+import dev.visdb.seesaw.models.Item1;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 /**
@@ -201,13 +202,17 @@ public class ComboBoxSnippets extends JFrame {
   // @start region=chosen_item
   public class ComboBoxIntString extends ComboBox1<Integer, String> {
     public static class Item extends Item1<Integer, String> {
-      public Item(Integer getKey, String getDisplayValue) {
-        super(getKey, getDisplayValue);
+      public Item(Integer key, String displayValue) {
+        super(key, displayValue);
       }
     }
+
     @Override
     public Item getChosenItem() {
-      return new Item(getChosenKey(), getChosenDisplayValue());
+      Optional<Item> item = getChosenItem((remodel, lItem) -> {
+        return new Item(remodel.getKey(lItem), remodel.getDisplayValue(lItem));
+      });
+      return item.orElse(new Item(null, null));
     }
   }
   // @end region=chosen_item

@@ -32,6 +32,7 @@ package dev.visdb.seesaw.core;
 import java.sql.JDBCType;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import dev.visdb.seesaw.mock.TestLogging;
 import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.models.KeyDisplayValueSwingModel;
 import dev.visdb.seesaw.utils.SSComponent;
@@ -55,6 +57,7 @@ public class List1Test {
   /** x */
   @BeforeAll
   public static void setUpClass() {
+    // TestLogging.load(Level.FINE);
     Util.initLookup();
   }
 
@@ -162,7 +165,10 @@ Also getChosenDisplayValues.
     myList.setDisplayValues(listItems, listCodes);
     assertEquals(expect1, optionModel.dump());
 
-    remodel.clear();
+    try (KeyDisplayValueSwingModel<Object, String, Object>.Remodel remodel2
+        = optionModel.getRemodel();) {
+      remodel2.clear();
+    }
     assertEquals("", optionModel.dump());
 
     // different sizes
@@ -188,5 +194,6 @@ Also getChosenDisplayValues.
     assertEquals(expect, optionModel.dump());
 
     remodel.close();
+    optionModel.verifyNoLocksHeld(remodel);
   }
 }

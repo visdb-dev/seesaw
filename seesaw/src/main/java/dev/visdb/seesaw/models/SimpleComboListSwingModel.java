@@ -60,6 +60,9 @@ import javax.swing.ListModel;
  *
  * {@snippet class=SimpleComboListSwingModelsSnippets region=init1}
  */
+// TODO: fixup SimpleComboListswingModel so remodel handling more like
+//       KeyDisplayValueSwingModel. Maybe make it an inbetween class
+//       extended by KeyDis...
 // TODO: add <T> to avoid user's cast of get*Model() ???
 public abstract class SimpleComboListSwingModel extends AbstractComboBoxListSwingModel {
   /**
@@ -85,28 +88,30 @@ public abstract class SimpleComboListSwingModel extends AbstractComboBoxListSwin
     return AbstractComboBoxListSwingModel.getSimpleComboBoxModel(this);
   }
 
-  /** {@inheritDoc} */
+  /** no checks */
   @Override
   protected void checkState() {}
 
-  /** {@inheritDoc} */
+  /** Do nothing. */
   @Override
-  protected void remodelTakeWriteLock() {}
+  protected void remodelTakeWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
+  }
 
-  /** {@inheritDoc} */
+  /** Do nothing. */
   @Override
-  protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {}
+  protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
+  }
 
   /**
-   * A no locking, re-use the model.
+   * A no locking, re-use the model, no checks.
    */
   final public class Remodel extends AbstractComboBoxListSwingModel.Remodel {}
   private final Remodel remodel = new Remodel();
 
-  /** {@inheritDoc} */
+  /** Just return the re-used remodel. */
   @Override
   public final Remodel getRemodel() {
-    // default is no locking, re-use the model.
+    remodel.isClosed = false;
     return remodel;
   }
 }

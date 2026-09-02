@@ -108,30 +108,38 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
     return null;
   }
 
+  /** Use with constructors to specify D2 or not */
+  public enum HasD2 {
+    /** With D2: key, displayValue, D2. */
+    TRUE,
+    /** No D2: key, displayValue. */
+    FALSE;
+  }
+
   /**
    * Create an empty KeyDisplayValueSwingModel with no {@code <D2>}.
    */
   protected KeyDisplayValueSwingModel() {
-    this(false);
+    this(HasD2.FALSE);
   }
 
   /**
    * Create an empty KeyDisplayValueSwingModel.
    *
-   * @param d2Enabled true says to provide a d2 field in SSListItem
+   * @param d2Flag true says to provide a d2 field in SSListItem
    */
-  public KeyDisplayValueSwingModel(boolean d2Enabled) {
-    this(d2Enabled, null);
+  public KeyDisplayValueSwingModel(HasD2 d2Flag) {
+    this(d2Flag, null);
   }
 
   /**
    * Create an empty KeyDisplayValueSwingModel.
-   * @param d2Enabled true says to provide a d2 field in SSListItem
+   * @param d2Flag true says to provide a d2 field in SSListItem
    * @param itemList tModel backing store
    */
-  public KeyDisplayValueSwingModel(boolean d2Enabled, List<SSListItem> itemList) {
-    super(d2Enabled ? 3 : 2, itemList);
-    this.d2Enabled = d2Enabled;
+  public KeyDisplayValueSwingModel(HasD2 d2Flag, List<SSListItem> itemList) {
+    super(d2Flag == HasD2.TRUE ? 3 : 2, itemList);
+    this.d2Enabled = d2Flag == HasD2.TRUE;
   }
 
   /**
@@ -176,21 +184,21 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
 
   /**
    * Change whether the layout of an SSListItem managed by this class
-   * contains an displayValue. An exception is thrown if the item list is not empty.
-   * An existing d2 list {@link #getD2}
+   * contains a displayValue. An exception is thrown if the item list
+   * is not empty. An existing d2 list {@link #getD2}
    * is invalidated or validated accordingly.
-   * @param d2Enabled true if list item shall contain displayValue
+   * @param d2Enbl true if list item shall contain displayValue
    */
-  public void setD2Enabled(boolean d2Enabled) {
-    if (this.d2Enabled == d2Enabled) {
-      return;
-    }
+  public void setD2Enabled(boolean d2Enbl) {
     if (!getItemList().isEmpty()) {
       throw new IllegalStateException("Only change displaValue2enabled when empty");
     }
-    this.d2Enabled = d2Enabled;
+    if (d2Enabled == d2Enbl) {
+      return;
+    }
+    d2Enabled = d2Enbl;
     // normally 2 elements in ListItem {key,displaValue}, displaValue2 add 3rd.
-    setItemNumElems(d2Enabled ? 3 : 2);
+    setItemNumElems(d2Enbl ? 3 : 2);
   }
 
   /**
@@ -296,35 +304,70 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
   }
 
   /**
-   * Get object to make changes.
+   * Get a remodel object to make changes. This does no locking
+   * and there's only one remodel which is reused, so there's
+   * special handling required.
    * @return Remodel
    * @see Remodel
    */
+  // TODO: 
   @Override
   public Remodel getRemodel() {
     // default is no locking, re-use the tModel.
     if (remodel == null) {
+      reuse = true; // Flag that we're doing reuse.
+      // Do a lock then unlock to get the shared remodel into a known state.
       remodel = new Remodel();
-    }
+    } else
+      remodelTakeWriteLock(remodel);
     return remodel;
   }
+  private boolean reuse;
   private Remodel remodel;
 
-  // no locking by default
-  /** {@inheritDoc} */
+  /**
+   * Since we're resusing the remodel a single Remodel, we need to keep
+   * it open as long as there's some open locks.
+   * We don't have a lock, pass the take/release on for counting.
+   */
   @Override
-  protected void remodelTakeWriteLock() {}
-  /** {@inheritDoc} */
+  protected void remodelTakeWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
+    if (reuse) {
+      if(checkLocksHeld() == 0 && !remodel.isClosed)
+        throw new IllegalStateException("No locks and not closed");
+    }
+    super.remodelTakeWriteLock(remodel);
+  }
+  /**
+   * Since we're resusing the remodel a single Remodel, we need to keep
+   * it open as long as there's some open locks.
+   * We don't have a lock, so pass the take/release on for counting.
+   */
   @Override
-  protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {}
+  protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
+    super.remodelReleaseWriteLock(remodel);
+    // Since this class' remodel is reused, keep it open as long as there's
+    // a lock. There is no real lock, so OK to check after releasing lock.
+    if (reuse) {
+      if (checkLocksHeld() != 0)
+        remodel.isClosed = false;
+    }
+  }
 
   /**
-   * Methods for inspecting and modifying list info
+   * Add some additional methods for inspecting and modifying list info
+   * with key/displayValue/D2.
+   * See {@link AbstractComboBoxListSwingModel.Remodel}
+   * <p>
+   * This pattern should be used when working with the list to guarantee
+   * exclusive access. It avoids many potential synchronization problems.
+   * Nesting is OK.
    * {@snippet lang="java" :
    *     try (Model.remodel remodel = keyVis.getRemodel()) {
    *         // ...
    *     }
    * }
+   * When there is no locking, getRemodel() is fast; there is minimal overhead.
    */
   public class Remodel extends AbstractComboBoxListSwingModel.Remodel {
     /**

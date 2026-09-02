@@ -43,8 +43,10 @@
 package com.nqadmin.swingset;
 
 import java.sql.Connection;
+import java.util.Optional;
 
 import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.models.Item2;
 
 /**
  * See {@link DBComboBox2}.
@@ -120,6 +122,32 @@ public class SSDBComboBox extends DBComboBox2<Long, Object, Object> {
              .query(_query)
              .primaryKeyColumnName(_primaryKeyColumnName)
              .displayColumnName(_displayColumnName));
+  }
+
+  /**
+   * @return a copy of the chosenItem with getKey(), getDisplayValue(), getD2()
+   */
+  @Override
+  public Item getChosenItem() {
+    //   return new Item(getChosenKey(), getChosenDisplayValue());
+    Optional<Item> item = getChosenItem((remodel, lItem) -> {
+      return new Item(remodel.getKey(lItem), remodel.getDisplayValue(lItem),
+          hasD2() ? remodel.getD2(lItem) : Item2.NO_D2);
+    });
+    return item.orElse(new Item(null, null, null));
+  }
+
+  /**
+   * For non generic getChosenItem().
+   */
+  public static class Item extends Item2<Long, Object, Object> {
+    /** Create an Item
+     * @param key
+     * @param displayValue
+     * @param d2 */
+    public Item(Long key, Object displayValue, Object d2) {
+      super(key, displayValue, d2);
+    }
   }
 
   public void setSecondDisplayColumnName(final String secondDisplayColumnName) {

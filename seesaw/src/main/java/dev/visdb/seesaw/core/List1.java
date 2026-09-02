@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.core;
 
+
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
@@ -66,6 +67,7 @@ import com.google.common.reflect.TypeToken;
 
 import dev.visdb.seesaw.datasources.SSSQLRuntimeException;
 import dev.visdb.seesaw.models.AbstractComboBoxListSwingModel;
+import dev.visdb.seesaw.models.Item1;
 import dev.visdb.seesaw.models.KeyDisplayValueSwingModel;
 import dev.visdb.seesaw.models.SSCollection;
 import dev.visdb.seesaw.models.SSDbArray;
@@ -101,6 +103,11 @@ import static java.lang.System.Logger.Level.*;
  * @param <K>
  * @param <D>
  */
+// TODO: Fix inconsistent remodel and getChosenItem?
+//       See ComboBox2 for hints. But there's only
+//       a basic model (no locking). Either make
+//       "correct" or make it simplest, like a single
+//       remodel that's never closed.
 @SuppressWarnings("serial")
 public class List1<K, D> extends JList<SSListItem> implements SSComponent {
   /**
@@ -133,8 +140,7 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
     }
 
     private Model() {
-      // false means no d2
-      super(false);
+      super(HasD2.FALSE);
     }
   }
 
@@ -240,7 +246,6 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
     throw new UnsupportedOperationException();
   }
 
-  // TODO: Item2 getChosenItem()
   // TODO: List<Item> getChosenItems()
 
   /**
@@ -249,8 +254,8 @@ public class List1<K, D> extends JList<SSListItem> implements SSComponent {
    */
   // TODO: provide D2
   // TODO: OPTIM: only get the SSListItem once.
-  public Item2<K, D, Object> getChosenItem() {
-    return new Item2<>(getChosenKey(), getChosenDisplayValue());
+  public Item1<K, D> getChosenItem() {
+    return new Item1<>(getChosenKey(), getChosenDisplayValue());
   }
 
   /**

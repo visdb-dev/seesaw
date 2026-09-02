@@ -61,6 +61,8 @@ import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -80,6 +82,7 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
 import dev.visdb.seesaw.datasources.JdbcDataTypeConversionTables;
 import dev.visdb.seesaw.models.AbstractComboBoxListSwingModel;
 import dev.visdb.seesaw.models.GlazedListsKeyDisplayValueInfo;
+import dev.visdb.seesaw.models.Item2;
 import dev.visdb.seesaw.models.KeyDisplayValueSwingModel;
 import dev.visdb.seesaw.models.SSListItem;
 import dev.visdb.seesaw.models.SSListItemFormat;
@@ -285,8 +288,7 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
      * Create a model.
      */
     protected BaseModel() {
-      // false means no displayValues2
-      super(false);
+      super(HasD2.FALSE);
     }
   }
 
@@ -336,7 +338,7 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
     @SuppressWarnings("Convert2Diamond")
     protected BaseGlazedModel() {
       // false means no D2
-      super(false, new BasicEventList<SSListItem>());
+      super(HasD2.FALSE, new BasicEventList<SSListItem>());
     }
   }
 
@@ -928,10 +930,11 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
       keys = keyVisual.getDisconnectedList(keys);
       List<D> displayValues = keyVisual.getDisconnectedList(_displayValues);
       List<D2> d2s = keyVisual.getDisconnectedList(_d2s);
+      remodel.clear();
+
       hasD2 = d2s != null;
       keyVisual.setD2Enabled(hasD2());
 
-      remodel.clear();
       nullItem = null;
 
       establishListItemFormat(JdbcDataTypeConversionTables.classToJdbcType(getDisplayValueType()),
@@ -1067,18 +1070,44 @@ public class ComboBox2<K, D, D2> extends JComboBox<SSListItem> implements SSComp
   }
 
   /**
+   * Optimization that only calls getRemodel once.
+   * Most meaningful when getRemodel does locking.
+   * 
+   * @param <R> optional return type
+   * @param fnConstructItem
+   * @return optional, empty if chosen item is not an SSListItem
+   */
+
+  protected <R extends Item2<K, D, D2>> Optional<R> getChosenItem(
+      BiFunction<Model.Remodel, SSListItem, R> fnConstructItem) {
+    try (Model.Remodel remodel = keyVisual.getRemodel()) {
+      Object item = getSelectedItem();
+      if (item instanceof SSListItem lItem) {
+        return Optional.of(fnConstructItem.apply(remodel, lItem));
+      }
+      return Optional.empty();
+    }
+  }
+
+  /**
    * Return a copy of the chosenItem with methods getKey(), getDisplayValue();
-   * if hasD2() there's getD2().
+   * if {@link #hasD2()} there's also getD2().
    * <p>
    * Here's an example of creating a non-generic version of
    * getChosenItem().
    * {@snippet class=ComboBoxSnippets region=chosen_item}
    * @return a copy of the chosen item
    */
-  // TODO: return new Item2<>(SSListItem)
-  protected Item2<K, D, D2> getChosenItem() {
-    return !hasD2() ? new Item2<>(getChosenKey(), getChosenDisplayValue())
-                    : new Item2<>(getChosenKey(), getChosenDisplayValue(), getChosenD2());
+  // TODO: return new Item2<>(SSListItem); // would that be better?
+  @SuppressWarnings("unchecked")
+  public Item2<K, D, D2> getChosenItem() {
+    Optional<Item2<K, D, D2>> item = getChosenItem((remodel, lItem) -> {
+      return new Item2<>(remodel.getKey(lItem), remodel.getDisplayValue(lItem),
+          hasD2() ? remodel.getD2(lItem) : (D2)Item2.NO_D2); // D2 cast unchecked
+    });
+    return item.orElse(new Item2<>(null, null, hasD2() ? null : (D2)Item2.NO_D2));
+    // return !hasD2() ? new Item2<>(getChosenKey(), getChosenDisplayValue())
+    //     : new Item2<>(getChosenKey(), getChosenDisplayValue(), getChosenD2());
   }
 
   /**

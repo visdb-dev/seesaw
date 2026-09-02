@@ -27,11 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package dev.visdb.seesaw.core;
+package dev.visdb.seesaw.models;
 
 import java.util.Objects;
-
-import dev.visdb.seesaw.models.SSListItem;
 
 /**
  * An item that acts kind of like a standalone SSListItem.
@@ -45,7 +43,8 @@ public class Item2<K, D, D2> {
   private final D displayValue;
   private final D2 d2;
 
-  private static final Object NO_D2 = new Object();
+  /** Use this for D2 arg of constructor, if there is no D2. */
+  public static final Object NO_D2 = new Object();
 
   /**
    * Create immutable item.
@@ -69,19 +68,23 @@ public class Item2<K, D, D2> {
     this(key, displayValue, (D2) NO_D2);
   }
 
-  /**
-   * Create immutable item based on SSListItem.
-   * @param listItem
-   * @param hasD2
-   */
-  @SuppressWarnings("unchecked")
-  Item2(SSListItem listItem, boolean hasD2) {
-    // li = (ListItem0)listItem;
-    // key = (K)li.getElem(OptionMappingSwingModel.KEY_IDX);
-    // displayValue = (D)li.getElem(OptionMappingSwingModel.DISP_IDX);
-    // handle D2
-    this(null, null, null);
-  }
+  //
+  // It seems this never worked. Note the "this(null, null, null);".
+  // ComboBox2.getChosenItem(fnConstructItem) is pretty good.
+  //
+  // /**
+  //  * Create immutable item based on SSListItem.
+  //  * @param listItem
+  //  * @param hasD2
+  //  */
+  // @SuppressWarnings("unchecked")
+  // Item2(SSListItem listItem, boolean hasD2) {
+  //   // li = (ListItem0)listItem;
+  //   // key = (K)li.getElem(OptionMappingSwingModel.KEY_IDX);
+  //   // displayValue = (D)li.getElem(OptionMappingSwingModel.DISP_IDX);
+  //   // handle D2
+  //   this(null, null, null);
+  // }
 
   /**
    * key getter.

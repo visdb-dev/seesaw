@@ -868,7 +868,6 @@ public abstract class AbstractComboBoxListSwingModel {
   /**
    * Configure the number of elements contained in an SSListItem.
    * An exception is thrown if the item list is not empty.
-   * Currently only 2 or 3 items are allowed.
    * ElementSlices are marked valid/invalid as appropriate.
    * @param itemNumElems number of elements in SSListItem
    */
@@ -1175,21 +1174,76 @@ public abstract class AbstractComboBoxListSwingModel {
   protected abstract void checkState();
 
   /**
-   * This is invoked during Remodel construction, be careful.
-   * If there is no locking, implement an empty method
+   * Remodel may be called from a remodel, this depends on reenterant
+   * locks.
+   * There may be more than one remodel active at a time and they
+   * may be nested. They all share the same lock (if there's locking).
+   * These counters essentially count the reentrant 
    */
-  protected abstract void remodelTakeWriteLock();
+  private int countLocksHeld;
+  private int maxLocksHeld;
 
   /**
+   * Track the depth of taken reentrent lock, and adjust remodel.isClosed.
+   * This is invoked during Remodel construction, be careful.
+   * If a sub-class has real locking, the lock should be taken
+   * before super... call to here.
+   * This method is responsible for incrementing countOpens
+   * Other than that, if there is no locking then implement an empty method
+   * @param remodel if null, then manual take
+   */
+  protected void remodelTakeWriteLock(Remodel remodel) {
+    if (++countLocksHeld > maxLocksHeld)
+      maxLocksHeld = countLocksHeld;
+    if (remodel != null)
+      remodel.isClosed = false;
+  }
+
+  /**
+   * Track the depth of taken reentrent lock, and adjust remodel.isClosed.
    * This is invoked during Remodel close.
-   * If there is no locking, implement an empty method.
    * <p>
-   * This method is responsible for setting
+   * This method is responsible for decrementing countOpens
    * {@code remodel.isClosed = true}
    * to prevent re-use
-   * @param remodel base remodel for re-use handling
+   * @param remodel if null, then manual release
    */
-  protected abstract void remodelReleaseWriteLock(Remodel remodel);
+  protected void remodelReleaseWriteLock(Remodel remodel) {
+    countLocksHeld--;
+    if (countLocksHeld < 0)
+      throw new IllegalStateException("Too many remodel unlocks: "+objectID(remodel));
+    if (countLocksHeld == 0) {
+      logger.log(DEBUG, () ->
+          sf("Remodel %s unlocked, max %d", objectID(remodel), maxLocksHeld));
+      maxLocksHeld = 0;
+    }
+    if (remodel != null) {
+      if (remodel.isClosed)
+        throw new IllegalStateException("Remodel already closed: "+objectID(remodel));
+      remodel.isClosed = true;
+    }
+  }
+
+  /**
+   * For debug. Throw if any locks are held.
+   * @param remodel 
+   */
+  public void verifyNoLocksHeld(Remodel remodel) {
+    if (countLocksHeld != 0)
+      throw new IllegalStateException(
+          sf("%s: countLocksHeld %d", objectID(remodel), countLocksHeld));
+    if (remodel != null && !remodel.isClosed)
+      throw new IllegalStateException(sf("%s: is not closed", objectID(remodel)));
+  }
+
+  /**
+   * For debug. Return count of locks held (reentrant).
+   * @return 
+   */
+  public int checkLocksHeld() {
+    return countLocksHeld;
+  }
+
 
   /**
    * This returns a Remodel which has method for
@@ -1218,13 +1272,11 @@ public abstract class AbstractComboBoxListSwingModel {
   // 	// eventList.clear();
   // 	// eventList.add(mappings);
   // }
+  // TODO: class Inspect, similar to Remodel, with only read data.
 
   /**
    * This provides methods to perform inspections and
    * modification of XxxListInfo.
-   * There is a class Inspect, similar to Remodel,
-   * that has methods that only read data.
-   * <p>
    * It is anticipated that subclass may want to use Remodel
    * as part of a locking scheme for multi-threaded
    * access to AbstractComboBoxListSwingModel.
@@ -1237,18 +1289,31 @@ public abstract class AbstractComboBoxListSwingModel {
    * as its first statement; this avoids modifications
    * after the lock is released.
    * <p>
+   * This pattern should be used when working with the list to guarantee
+   * exclusive access. It avoids many potential synchronization problems.
+   * {@snippet lang="java" :
+   *     try (Model.remodel remodel = keyVis.getRemodel()) {
+   *         // ...
+   *     }
+   * }
+   * When there is no locking, getRemodel() is fast; there is minimal overhead.
+   * <p>
    * See {@link GlazedListsKeyDisplayValueInfo} for example of Remodel locking
    */
   protected abstract class Remodel implements AutoCloseable {
-    /** has this been closed? Error if access after close */
-    protected boolean isClosed = false;
+    /**
+     * Has this been closed? Error if access while closed.
+     * Start closed, gets opened when the lock is taken.
+     */
+    protected boolean isClosed = true;
+    /** Track number of opens to detect usage when not open errors. */
 
     // /** if optimized indexOfItem, following means must rebuild optimizations */
     // protected boolean isModifiedLength = false;
 
     /** a Remodel */
     protected Remodel() {
-      remodelTakeWriteLock();
+      remodelTakeWriteLock(this);
     }
 
     /**
@@ -1258,7 +1323,7 @@ public abstract class AbstractComboBoxListSwingModel {
      */
     protected void verifyOpened() {
       if (isClosed) {
-        throw new IllegalStateException("Remodel completed; can not reuse");
+        throw new IllegalStateException("Remodel completed; can not reuse: "+objectID(this));
       }
       checkState();
     }

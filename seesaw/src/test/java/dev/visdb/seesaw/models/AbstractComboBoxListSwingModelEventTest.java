@@ -76,12 +76,7 @@ public class AbstractComboBoxListSwingModelEventTest {
 
     @Override
     protected void checkState() {}
-    @Override
-    protected void remodelTakeWriteLock() {}
-    @Override
-    protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
-      remodel.isClosed = true;
-    }
+
     @Override
     protected Remodel getRemodel() {
       return new RM();
@@ -190,6 +185,8 @@ public class AbstractComboBoxListSwingModelEventTest {
     assertTrue(events.remove(lde));
   }
 
+  // Generator for parameterized tests.
+  @SuppressWarnings("unused")
   static Stream<LI> generateLI3() {
     return Arrays.stream(new LI[] {new LI(4, false), new LI(4, true)});
   }
@@ -242,6 +239,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     li.proxy.addAll(items);
     SSListItem item2 = li.proxy.getElementAt(2);
     assertEquals(items.get(2).toString(), item2.toString());
+    li.verifyNoLocksHeld(null);
   }
 
   /**
@@ -319,6 +317,7 @@ public class AbstractComboBoxListSwingModelEventTest {
       assertEquals(null, selectedItem);
     }
     assertTrue(events.isEmpty());
+    li.verifyNoLocksHeld(null);
   }
 
   /**
@@ -344,9 +343,11 @@ public class AbstractComboBoxListSwingModelEventTest {
     // This is a copy of the list taken from the proxy model
     // assertThrows(UnsupportedOperationException.class, () -> il.add(null));
 
+    assertThrows(IllegalStateException.class, () -> li.verifyNoLocksHeld(null));
     remodel.close();
     // don't touch after close
     assertThrows(IllegalStateException.class, () -> remodel.isEmpty());
+    li.verifyNoLocksHeld(null);
   }
 
   /**
@@ -388,6 +389,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     expectEvent(REMOVED, 0, 4);
 
     assertTrue(events.isEmpty());
+    li.verifyNoLocksHeld(null);
   }
 
   /**
@@ -438,6 +440,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     // list 1,3,5
     itemsCopy.remove(1);
     assertEquals(itemsCopy, getItemList(li));
+    li.verifyNoLocksHeld(null);
   }
   /**
    * Test selected change if the item is removed
@@ -527,6 +530,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     itemsCopy.add(items.get(1)); // 2
     itemsCopy.add(items.get(3)); // 4
     assertEquals(itemsCopy, getItemList(li));
+    li.verifyNoLocksHeld(null);
   }
 
   /**
@@ -549,6 +553,7 @@ public class AbstractComboBoxListSwingModelEventTest {
       expectEvent(CHANGED, 3, 3);
     }
     assertTrue(events.isEmpty());
+    li.verifyNoLocksHeld(null);
   }
 
   // @ParameterizedTest

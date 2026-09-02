@@ -12,7 +12,7 @@ import com.google.common.reflect.TypeToken;
 
 import dev.visdb.seesaw.core.ComboBox1;
 import dev.visdb.seesaw.core.DBComboBox2;
-import dev.visdb.seesaw.core.Item1;
+import dev.visdb.seesaw.models.Item1;
 
 import dev.visdb.seesaw.navigate.RowsModel;
 

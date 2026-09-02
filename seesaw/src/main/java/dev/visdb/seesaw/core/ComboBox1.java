@@ -29,6 +29,10 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.core;
 
+import java.util.Optional;
+
+import dev.visdb.seesaw.models.Item1;
+
 /**
  * A ComboBox that only has a single displayValue.
  * See {@link ComboBox2} for documentation.
@@ -80,5 +84,16 @@ public class ComboBox1<K, D> extends ComboBox2<K, D, Object> {
   // TODO: this fails because "K" is not concrete.
   public ComboBox1() {
     this(new ComboBox1.Builder<>() {});
+  }
+
+  /**
+   * Return a copy of the chosenItem with methods getKey(), getDisplayValue().
+   */
+  @Override
+  public Item1<K, D> getChosenItem() {
+    Optional<Item1<K, D>> item = getChosenItem((remodel, lItem) -> {
+      return new Item1<>(remodel.getKey(lItem), remodel.getDisplayValue(lItem));
+    });
+    return item.orElse(new Item1<>(null, null));
   }
 }

@@ -32,6 +32,7 @@ package dev.visdb.seesaw.core;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +41,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import dev.visdb.seesaw.mock.Util;
+import dev.visdb.seesaw.models.Item1;
+import dev.visdb.seesaw.models.Item2;
 import dev.visdb.seesaw.models.KeyDisplayValueSwingModel;
 
 import static dev.visdb.seesaw.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
@@ -127,7 +130,7 @@ public class ComboBox2Test {
        * @param displayValue2
        */
       public Item(Integer key, String displayValue, Long displayValue2) {
-        super(key, displayValue);
+        super(key, displayValue, displayValue2);
       }
     }
 
@@ -137,8 +140,12 @@ public class ComboBox2Test {
      */
     @Override
     public Item getChosenItem() {
-      // TODO: getChosenDisplayValue2() doesn't work here
-      return new Item(getChosenKey(), getChosenDisplayValue(), null);
+      // return new Item(getChosenKey(), getChosenDisplayValue(), null);
+      Optional<Item> item = getChosenItem((remodel, lItem) -> {
+        return new Item(remodel.getKey(lItem), remodel.getDisplayValue(lItem),
+            hasD2() ? remodel.getD2(lItem) : null);
+      });
+      return item.orElse(new Item(null, null, null));
     }
   }
 
@@ -293,6 +300,15 @@ public class ComboBox2Test {
     ComboBoxIntStringLongItem.Item item004 = cbisli.getChosenItem();
     assertEquals(11, item004.getKey());
     assertEquals("one", item004.getDisplayValue());
+
+
+    cbisli = new ComboBoxIntStringLongItem();
+    cbisli.setDisplayValues(List.of("one", "two"), List.of(11, 12), List.of(1L, 2L));
+    cbisli.setChosenKey(11);
+    item004 = cbisli.getChosenItem();
+    assertEquals(11, item004.getKey());
+    assertEquals("one", item004.getDisplayValue());
+    assertEquals(1L, item004.getD2());
   }
 
   /**

@@ -27,9 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package dev.visdb.seesaw.core;
-
-import dev.visdb.seesaw.models.SSListItem;
+package dev.visdb.seesaw.models;
 
 /**
  * An item that acts kind of like a standalone SSListItem.
@@ -47,11 +45,11 @@ public class Item1<K, D> extends Item2<K, D, Object> {
     super(key, displayValue);
   }
 
-  /**
-   * Create immutable item based on SSListItem.
-   * @param listItem
-   */
-  public Item1(SSListItem listItem) {
-    super(listItem, false);
-  }
+  // /**
+  //  * Create immutable item based on SSListItem.
+  //  * @param listItem
+  //  */
+  // public Item1(SSListItem listItem) {
+  //   super(listItem, false);
+  // }
 }

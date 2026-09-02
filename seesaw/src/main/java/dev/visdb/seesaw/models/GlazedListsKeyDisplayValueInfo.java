@@ -57,11 +57,11 @@ public class GlazedListsKeyDisplayValueInfo<K, D, D2> extends KeyDisplayValueSwi
 
   /**
    * Create an empty ComboInfo.
-   * @param d2Enabled true says to provide an options2 field in SSListItem
+   * @param d2Flag true says to provide an options2 field in SSListItem
    * @param eventList which is installed into AutoCompleteSupport
    */
-  public GlazedListsKeyDisplayValueInfo(boolean d2Enabled, EventList<SSListItem> eventList) {
-    super(d2Enabled, eventList);
+  public GlazedListsKeyDisplayValueInfo(HasD2 d2Flag, EventList<SSListItem> eventList) {
+    super(d2Flag, eventList);
     this.eventList = eventList;
   }
 
@@ -97,10 +97,12 @@ public class GlazedListsKeyDisplayValueInfo<K, D, D2> extends KeyDisplayValueSwi
   /**
    * This is called during Remodel construction,
    * take the EventList's write lock.
+   * @param remodel
    */
   @Override
-  protected void remodelTakeWriteLock() {
+  protected void remodelTakeWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
     eventList.getReadWriteLock().writeLock().lock();
+    super.remodelTakeWriteLock(remodel); // after taking the lock
   }
 
   /**
@@ -111,7 +113,7 @@ public class GlazedListsKeyDisplayValueInfo<K, D, D2> extends KeyDisplayValueSwi
    */
   @Override
   protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
+    super.remodelReleaseWriteLock(remodel); // before releasing the lock
     eventList.getReadWriteLock().writeLock().unlock();
-    remodel.isClosed = true;
   }
 }

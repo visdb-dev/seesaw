@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
@@ -35,22 +36,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import dev.visdb.seesaw.mock.TestLogging;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- *
- */
+/** x */
 @SuppressWarnings("javadoc")
 public class AbstractComboBoxListSwingModelTest {
+  /** x */
   public AbstractComboBoxListSwingModelTest() {}
 
+  /** x */
   @BeforeAll
-  public static void setUpClass() {}
+  public static void setUpClass() {
+    // TestLogging.load(Level.FINE);
+  }
 
+  /** x */
   @AfterAll
   public static void tearDownClass() {}
 
   static class LI extends AbstractComboBoxListSwingModel {
+    @SuppressWarnings("unused")
     ComboBoxModelProxy proxy;
 
     public LI(int itemNumElems, List<SSListItem> itemList) {
@@ -60,10 +67,6 @@ public class AbstractComboBoxListSwingModelTest {
 
     @Override
     protected void checkState() {}
-    @Override
-    protected void remodelTakeWriteLock() {}
-    @Override
-    protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {}
     @Override
     protected Remodel getRemodel() {
       return new RM();
@@ -76,6 +79,7 @@ public class AbstractComboBoxListSwingModelTest {
   // At the start of each test create 4 lists
   // and an empty listInfo that handles 3 elements.
   //
+  /** x */
   @BeforeEach
   @SuppressWarnings({"unchecked", "rawtypes"})
   public void setUp() {
@@ -110,8 +114,10 @@ public class AbstractComboBoxListSwingModelTest {
                                              Timestamp.valueOf(dt[4])}));
   }
 
+  /** x */
   @AfterEach
   public void tearDown() {
+    listInfo.verifyNoLocksHeld(null);
     clearAll();
   }
 
@@ -158,6 +164,7 @@ public class AbstractComboBoxListSwingModelTest {
    * Test of isEmpty method, of class AbstractComboBoxListSwingModel.
    */
   @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public void testIsEmpty() {
     System.out.println("isEmpty");
     //boolean expResult = true;
@@ -173,6 +180,7 @@ public class AbstractComboBoxListSwingModelTest {
    * Test of indexOfItem method, of class AbstractComboBoxListSwingModel.
    */
   @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public void testIndexOfItem() {
     System.out.println("indexOfItem");
     itemList.addAll(liCreateMany(3)); // 3 elems in list item
@@ -187,6 +195,7 @@ public class AbstractComboBoxListSwingModelTest {
    * Test of getItemNumElems method, of class AbstractComboBoxListSwingModel.
    */
   @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public void testGetItemNumElems() {
     System.out.println("getItemNumElems");
     int expResult = 3;
@@ -198,6 +207,7 @@ public class AbstractComboBoxListSwingModelTest {
    * Test of setItemNumElems method, of class AbstractComboBoxListSwingModel.
    */
   @Test
+  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
   public void testSetItemNumElems() {
     System.out.println("setItemNumElems");
     itemList.addAll(liCreateMany(3)); // 3 elems in list item
@@ -240,6 +250,7 @@ public class AbstractComboBoxListSwingModelTest {
    * Test of createListItem method, of class AbstractComboBoxListSwingModel.
    */
   @Test
+  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
   public void testCreateListItem() {
     System.out.println("createListItem");
     //
@@ -271,7 +282,7 @@ public class AbstractComboBoxListSwingModelTest {
   }
 
   // number of listItems for GetSet test
-  private static int nGetSetItems = 6;
+  private static final int N_GET_SET_ITEMS = 6;
   /**
    * For each type of SSListItem
    * Test of getElem method, of class SSAbstractListInfo.
@@ -279,9 +290,11 @@ public class AbstractComboBoxListSwingModelTest {
    * Test equals for each list item type
    * AND
    * Test of setElem method, of class SSAbstractListInfo.
+   * @param linfo
    */
   @ParameterizedTest
   @MethodSource
+  @SuppressWarnings({"NonPublicExported", "UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
   public void testGetSetElem(LI linfo) {
     System.err.println("" + linfo);
     // calculate expected item element value, slice is 0 - n-1
@@ -340,6 +353,8 @@ public class AbstractComboBoxListSwingModelTest {
                    () -> remodel.getElem(testItemIndex, nElem));
     }
   }
+  // Generator method
+  @SuppressWarnings("unused")
   static Stream<LI> testGetSetElem() {
     List<LI> listInfos = new ArrayList<>();
     // Gererate 4 LI, num elements 1,2,3,4, All elements are Integer
@@ -348,7 +363,7 @@ public class AbstractComboBoxListSwingModelTest {
     for (int nElem = 1; nElem <= 7; nElem++) {
       LI listInfo = new LI(nElem, new ArrayList<>());
       try (LI.Remodel remodel = listInfo.getRemodel()) {
-        for (int listItemIndex = 0; listItemIndex < nGetSetItems; listItemIndex++) {
+        for (int listItemIndex = 0; listItemIndex < N_GET_SET_ITEMS; listItemIndex++) {
           Integer[] elems = new Integer[nElem];
           for (int slice = 0; slice < nElem; slice++) {
             elems[slice] = slice * 10 + listItemIndex;
@@ -361,7 +376,9 @@ public class AbstractComboBoxListSwingModelTest {
     return listInfos.stream();
   }
 
+  /** x */
   @Test
+  @SuppressWarnings("ThrowableResultIgnored")
   public void testBoundaries() {
     assertThrows(IllegalArgumentException.class, () -> listInfo.setItemNumElems(0));
     listInfo.setItemNumElems(1);
@@ -373,6 +390,7 @@ public class AbstractComboBoxListSwingModelTest {
    * Test of createElementSlice method, of class AbstractComboBoxListSwingModel.
    */
   @Test
+  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "UnusedAssignment"})
   public void testCreateElementSlice() {
     System.out.println("createElementSlice");
     //

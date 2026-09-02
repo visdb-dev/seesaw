@@ -45,8 +45,10 @@ public class SimpleComboListSwingModelsSnippets {
     private MyComboModel() {
       super(2, new ArrayList<>(items.length));
       // initialization
-      for (int i = 0; i < items.length; i++) {
-        getRemodel().add(new MyComboItem(i));
+      try (Remodel remodel = getRemodel()) {
+        for (int i = 0; i < items.length; i++) {
+          remodel.add(new MyComboItem(i));
+        }
       }
     }
 

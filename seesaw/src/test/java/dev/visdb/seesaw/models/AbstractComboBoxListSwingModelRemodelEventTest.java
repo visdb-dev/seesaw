@@ -69,12 +69,7 @@ public class AbstractComboBoxListSwingModelRemodelEventTest {
 
     @Override
     protected void checkState() {}
-    @Override
-    protected void remodelTakeWriteLock() {}
-    @Override
-    protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
-      remodel.isClosed = true;
-    }
+
     @Override
     protected Remodel getRemodel() {
       return new RM();
@@ -183,6 +178,7 @@ public class AbstractComboBoxListSwingModelRemodelEventTest {
     assertTrue(events.remove(lde));
   }
 
+  @SuppressWarnings("unused")
   static Stream<LI> generateLI3() {
     return Arrays.stream(new LI[] {new LI(4, false), new LI(4, true)});
   }
@@ -312,7 +308,9 @@ public class AbstractComboBoxListSwingModelRemodelEventTest {
     List<SSListItem> il = remodel.getItemList();
     assertThrows(UnsupportedOperationException.class, () -> il.add(null));
 
+    assertThrows(IllegalStateException.class, () -> li.verifyNoLocksHeld(remodel));
     remodel.close();
+    li.verifyNoLocksHeld(remodel);
     // don't touch after close
     assertThrows(IllegalStateException.class, () -> remodel.isEmpty());
   }
@@ -356,8 +354,8 @@ public class AbstractComboBoxListSwingModelRemodelEventTest {
       remodel.clear();
       expectEvent(REMOVED, 0, 4);
     }
-
     assertTrue(events.isEmpty());
+    li.verifyNoLocksHeld(null);
   }
 
   /**
@@ -407,6 +405,7 @@ public class AbstractComboBoxListSwingModelRemodelEventTest {
       itemsCopy.remove(1);
       assertEquals(itemsCopy, remodel.getItemList());
     }
+    li.verifyNoLocksHeld(null);
   }
   /**
    * Test selected change if the item is removed
@@ -498,6 +497,7 @@ public class AbstractComboBoxListSwingModelRemodelEventTest {
       itemsCopy.add(items.get(3)); // 4
       assertEquals(itemsCopy, remodel.getItemList());
     }
+    li.verifyNoLocksHeld(null);
   }
 
   /**
@@ -516,6 +516,7 @@ public class AbstractComboBoxListSwingModelRemodelEventTest {
       expectEvent(CHANGED, 3, 3);
     }
     assertTrue(events.isEmpty());
+    li.verifyNoLocksHeld(null);
   }
 
   // @ParameterizedTest
