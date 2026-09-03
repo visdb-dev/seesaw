@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # 📦 1. Keep Maven dependencies up-to-date
+  - package-ecosystem: "maven"
+    directory: "/" # Looks for your parent pom.xml in the root directory
+    schedule:
+      interval: "weekly" # Checks for updates every week
+      day: "monday"
+
+  # 🤖 2. Keep GitHub Actions up-to-date (like checkout, setup-java, etc.)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"

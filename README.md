@@ -1,10 +1,13 @@
-# ReadMe file for the SwingSet Open Toolkit for Java Swing.
+### (documentation in progress)
+# Seesaw database aware components
 
 ## DESCRIPTION
 
-SwingSet is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
 
-The SwingSet feature-set currently includes:
+
+Seesaw is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
+
+The Seesaw feature-set currently includes:
 
 1. data-aware replacements for JTextField, JTextArea, JComboBox, JCheckBox, JLabel, JSlider, & JFormattedTextField
 2. binding of a "hidden" numeric column for combo boxes with text choices
@@ -25,25 +28,35 @@ The SwingSet feature-set currently includes:
     (h) allows data entry "masks" to be applied to text columns
 7. formatted fields for various types like currency, percent, SSN, date etc.
 
+<!--
 More information on SwingSet is available from:
 https://github.com/bpangburn/swingset
 
-For questions regarding SwingSet, send an email to:
-swingset#NO-SPAM#@pangburngroup.com
+visdb#NO-SPAM#@visdb.dev
+-->
+For questions regarding Seesaw, contact info at
+[visdb-dev](https://github.com/visdb-dev)
 
 ## SCREENSHOTS
 
-### SwingSet Demo - Example 1
-![SwingSet Demo - Example 1](https://a.fsdn.com/con/app/proj/swingset/screenshots/example1.png)
+<!--
+    Standard Markdown doesn't let you resize/restrict image dimensions.
+    If your PNG is massive, use an HTML <img> tag to constrain it: 
 
-### SwingSet Demo - Example 2
-![SwingSet Demo - Example 2](https://a.fsdn.com/con/app/proj/swingset/screenshots/example2.png)
+    <img src="assets/screenshot.png" alt="App Screenshot" width="500">
+-->
 
-### SwingSet Demo - Example 3
-![SwingSet Demo - Example 3](https://a.fsdn.com/con/app/proj/swingset/screenshots/example3.png)
+### Seesaw Demo - Example 1
+![Seesaw Demo - Example 1](docs/ss4/img/example1.png)
 
-### SwingSet Demo - Example 4
-![SwingSet Demo - Example 4](https://a.fsdn.com/con/app/proj/swingset/screenshots/example4.png)
+### Seesaw Demo - Example 2
+![Seesaw Demo - Example 2](docs/ss4/img/example2.png)
 
-### SwingSet Demo - Example 5
-![SwingSet Demo - Example 5](https://a.fsdn.com/con/app/proj/swingset/screenshots/example5.png)
+### Seesaw Demo - Example 3
+![Seesaw Demo - Example 3](docs/ss4/img/example3.png)
+
+### Seesaw Demo - Example 4
+![Seesaw Demo - Example 4](docs/ss4/img/example4.png)
+
+### Seesaw Demo - Example 5
+![Seesaw Demo - Example 5](docs/ss4/img/example5.png)

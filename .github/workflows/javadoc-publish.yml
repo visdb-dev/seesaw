@@ -1,0 +1,53 @@
+name: Deploy Javadoc to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # or master
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          java-version: '25' 
+          distribution: 'temurin'
+          cache: 'maven'     
+
+      - name: Generate Javadoc
+        # 🤫 2. '-B' for batch mode to hide the progress bars
+        run: mvn javadoc:javadoc -P release -pl :seesaw -am -B 
+
+      - name: Deploy to GitHub Pages 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: seesaw/target/reports/apidocs
+          branch: gh-pages
+          nojekyll: true # to avoid possible problems, e.g. underscore directories
+
+# name: Deploy Javadoc
+# 
+# on:
+#   push:
+#     branches:
+#       - main # change to master if your default branch is master
+# 
+# jobs:
+#   publish:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Deploy JavaDoc 🚀
+#         uses: MathieuSoysal/Javadoc-publisher.yml@v2.0.4
+#         with:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           javadoc-branch: javadoc
+#           java-version: 25 # Change to your project's Java version
+#           target-folder: javadoc

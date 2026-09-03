@@ -8,5 +8,6 @@ syntax: glob
 *.orig.*
 *.rej
 
-syntax: rootglob
 tags
+
+syntax: rootglob
