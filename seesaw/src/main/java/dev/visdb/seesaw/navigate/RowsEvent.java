@@ -40,15 +40,15 @@ import dev.visdb.seesaw.navigate.RowsModelEventHandling.RowsEventSource;
 import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.isJunit;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.isJunit;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 import static java.lang.System.Logger.Level.*;
 
 /**
  * An Event object that bundles events generated through  one or more operations
  * on a {@link javax.sql.RowSet}.
  * The event can originate from a {@link RowsAction}, from an
- * {@link RSC}/{@link dev.visdb.seesaw.utils.SSComponent}, or
+ * {@link RSC}/{@link dev.visdb.seesaw.utils.SsComponent}, or
  * from something else, use {@link #getKindOperator} to determine the kind;
  * and use {@link #getOperComponent()} or {@link #getOperAct()} for
  * the specific operator.
@@ -75,13 +75,13 @@ public class RowsEvent extends EventObjectBacktrace implements RowsModelEvent {
   public enum OperatorKind {
     /** A {@link RowsAction}, typically a button push, generated this event */
     ACTION,
-    /** An SSComponent's action generated this event, like user input. */
+    /** An SsComponent's action generated this event, like user input. */
     COMPONENT,
-    /** Other bracketed event, like SSSyncManger. */
+    /** Other bracketed event, like SyncManger. */
     OTHER,
     /**
      * Direct RowSet operation; not bracketed.
-     * Alternate SSSyncManager handling or outside of SS.
+     * Alternate SyncManager handling or outside of Seesaw.
      */
     ANON,
     /** Initialization that should never show up in use. */
@@ -196,7 +196,7 @@ public class RowsEvent extends EventObjectBacktrace implements RowsModelEvent {
 
   /**
    * The {@link RSC} that originated the event.
-   * Null if the OperatorKind is not an SSComponent.
+   * Null if the OperatorKind is not an SsComponent.
    * @return the component that originated the events
    */
   public RSC getOperComponent() {

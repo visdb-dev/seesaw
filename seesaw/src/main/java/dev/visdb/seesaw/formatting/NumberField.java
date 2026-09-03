@@ -42,7 +42,7 @@ import javax.swing.SwingConstants;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
-import dev.visdb.seesaw.formatting.FormatterFactory.SSNullFormatter;
+import dev.visdb.seesaw.formatting.FormatterFactory.NullFormatter;
 
 /**
  * Number field; this class has methods to assist in accessing a NumberFormat.
@@ -328,7 +328,7 @@ public abstract class NumberField extends Field {
         AbstractFormatter nullFormatter
             = ((DefaultFormatterFactory) getFormatterFactory()).getNullFormatter();
         // leave it as null unless...
-        if (nullFormatter != null && !(nullFormatter instanceof SSNullFormatter))
+        if (nullFormatter != null && !(nullFormatter instanceof NullFormatter))
           nullFormatterError = Error.NULL_FORMATTER;
       }
       case null, default -> nullFormatterError = Error.NULL_FORMATTER;

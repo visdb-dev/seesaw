@@ -300,7 +300,7 @@ public class ConvertType {
 
     Object target = internalConvertObject(value, type);
     if (target == CanNotConvert)
-      throw new SSSQLConversionException(
+      throw new SqlConversionException(
           sf("Missing conversion %s to %s", value.getClass().getName(), jdbcType));
     return target;
   }
@@ -313,14 +313,14 @@ public class ConvertType {
    * @param value value to convert
    * @param type class of target type
    * @return converted type, may be the same object
-   * @throws dev.visdb.seesaw.datasources.SSSQLConversionException
+   * @throws dev.visdb.seesaw.datasources.SqlConversionException
    */
   // TODO: handle primitive types??? See enum Clazz for notes.
-  public static <T> T convertToType(Object value, Class<T> type) throws SSSQLConversionException {
+  public static <T> T convertToType(Object value, Class<T> type) throws SqlConversionException {
     @SuppressWarnings("unchecked")
     T target = (T) internalConvertObject(value, type);
     if (target == CanNotConvert)
-      throw new SSSQLConversionException(
+      throw new SqlConversionException(
           sf("Missing conversion %s to %s", value.getClass().getName(), type.getClass().getName()));
     return type.cast(target); // TODO: Don't really need the cast, but it's cheap.
   }
@@ -333,7 +333,7 @@ public class ConvertType {
    * unless can't convert then "CanNotConvert" Object is returned.
    */
   private static Object internalConvertObject(Object sourceValue, Class<?> type)
-      throws SSSQLConversionException {
+      throws SqlConversionException {
     if (sourceValue == null || type.isAssignableFrom(sourceValue.getClass())) return sourceValue;
 
     Clazz source = getClazz(sourceValue.getClass());
@@ -376,7 +376,7 @@ public class ConvertType {
           // clang-format on
       }
       if (result.longValue() != n.longValue() || bigdOflow)
-        throw new SSSQLConversionException(sf("Convert %s to %s: %s", n, target, "overflow"));
+        throw new SqlConversionException(sf("Convert %s to %s: %s", n, target, "overflow"));
       return result;
     }
 
@@ -439,7 +439,7 @@ public class ConvertType {
             // TODO: add other converstions.
           }
         } catch (NumberFormatException ex) {
-          throw new SSSQLConversionException(sf("Convert '%s' to %s: %s",
+          throw new SqlConversionException(sf("Convert '%s' to %s: %s",
               s, target, ex.getMessage()), ex);
         }
       }
@@ -594,13 +594,13 @@ public class ConvertType {
     Class<?> clazz = overrideJdbcToJavaType.getOrDefault(jdbcType, null);
     if (clazz != null) {
       if (clazz == Exception.class) {
-        throw new SSSQLUnhandledTypeException(jdbcType.toString());
+        throw new SqlUnhandledTypeException(jdbcType.toString());
       }
       return clazz;
     }
 
     if (!isHandledType(jdbcType))
-      throw new SSSQLUnhandledTypeException(jdbcType.toString());
+      throw new SqlUnhandledTypeException(jdbcType.toString());
 
     return JdbcDataTypeConversionTables.jdbcTypeToClassStrict(jdbcType);
 

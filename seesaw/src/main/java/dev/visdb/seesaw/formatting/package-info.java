@@ -51,13 +51,16 @@
  * <p>
  * OLD STUFF
  * <p>
- * Generally bound components are implemented by extending SSFormattedTextField and
- * instantiating with a custom FormatterFactory. E.g. {@link SSDateField }
+ * Generally bound components are implemented by extending SsFormattedTextField and
+ * instantiating with a custom FormatterFactory. E.g. {@link SsDateField }
  *
  * <p>
- * It would be possible to instead use a MaskFormatter, but custom code has to be written if the field needs to be nullable/blanked
- * by the user. For a MaskFormatter, this triggers a ParseException, which would need to be caught in the code and surplanted by
- * a call to setValue(null); Using a MaskFormatter still requires additional validation of some sort. E.g. preventing a MM/dd/yyyy date of
+ * It would be possible to instead use a MaskFormatter, but custom code has to be
+ * written if the field needs to be nullable/blanked
+ * by the user. For a MaskFormatter, this triggers a ParseException,
+ * which would need to be caught in the code and supplanted by
+ * a call to setValue(null); Using a MaskFormatter still requires additional
+ * validation of some sort. E.g. preventing a MM/dd/yyyy date of
  * 99/99/9999 from being entered.
  */
 package dev.visdb.seesaw.formatting;

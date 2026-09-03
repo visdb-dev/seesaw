@@ -43,7 +43,7 @@
 
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * Component decorator gives a visual indication of the component state.
@@ -123,7 +123,7 @@ public interface Decorator extends AnyDecorator {
 
     /** {@inheritDoc} */
     @Override
-    public void install(SSComponent comp) {}
+    public void install(SsComponent comp) {}
 
     /** {@inheritDoc} */
     @Override
@@ -136,7 +136,7 @@ public interface Decorator extends AnyDecorator {
     }
 
     @Override
-    public SSComponent getSSComponent() {
+    public SsComponent getSsComponent() {
       return null;
     }
 

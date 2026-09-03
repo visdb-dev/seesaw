@@ -64,7 +64,7 @@ import org.netbeans.validation.api.ui.ValidationItem;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
-import dev.visdb.seesaw.core.TextField;
+import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
@@ -73,7 +73,7 @@ import dev.visdb.seesaw.demo.simpval.SVUtils;
 import dev.visdb.seesaw.demo.simpval.StringValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.CentralLookup;
-import dev.visdb.seesaw.utils.DataNavigator;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
 
 /**
@@ -81,7 +81,7 @@ import dev.visdb.seesaw.utils.JStuff;
  * TextFields are used to display supplier id, name, city,
  * and status.
  * <p>
- * Record navigation is handled with a DataNavigator.
+Record navigation is handled with a SsDataNavigator.
  */
 
 @SuppressWarnings("serial")
@@ -99,16 +99,16 @@ public class Example1 extends JFrame {
   /**
    * bound component declarations
    */
-  TextField txtSupplierID = new TextField();
-  TextField txtSupplierName = new TextField();
-  TextField txtSupplierCity = new TextField();
-  TextField txtSupplierStatus = new TextField();
+  SsTextField txtSupplierID = new SsTextField();
+  SsTextField txtSupplierName = new SsTextField();
+  SsTextField txtSupplierCity = new SsTextField();
+  SsTextField txtSupplierStatus = new SsTextField();
 
   /**
    * database component declarations
    */
   Connection connection;
-  DataNavigator navigator;
+  SsDataNavigator navigator;
   RowsModel rowsModel;
   DbOpsAllows dbNav;
 
@@ -230,7 +230,7 @@ public class Example1 extends JFrame {
         rowsModel = RowsModel.create(rs, dbNav);
       }
 
-      navigator = new DataNavigator(rowsModel);
+      navigator = new SsDataNavigator(rowsModel);
     } catch (SQLException | ClassNotFoundException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }

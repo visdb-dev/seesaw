@@ -56,7 +56,7 @@ import javax.swing.text.JTextComponent;
 
 import com.google.common.collect.ImmutableMap;
 
-import dev.visdb.seesaw.formatting.SSFormat;
+import dev.visdb.seesaw.formatting.SsFormat;
 import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -154,25 +154,25 @@ public class DateTime {
     return Collections.unmodifiableList(getInternalDateTimeParsers(jdbcType, null));
   }
 
-  private static final ImmutableMap<SSFormat, List<DateTimeFormatter>> ssFormatters
-      = new ImmutableMap.Builder<SSFormat, List<DateTimeFormatter>>()
-            .put(SSFormat.DATE_MMDDYYYY_SLASH,
+  private static final ImmutableMap<SsFormat, List<DateTimeFormatter>> ssFormatters
+      = new ImmutableMap.Builder<SsFormat, List<DateTimeFormatter>>()
+            .put(SsFormat.DATE_MMDDYYYY_SLASH,
                  List.of(strict(DateTimeFormatter.ofPattern("M/d/uuuu")),
                          strict(DateTimeFormatter.ofPattern("MMdduuuu"))))
-            .put(SSFormat.DATE_DDMMYYYY_SLASH,
+            .put(SsFormat.DATE_DDMMYYYY_SLASH,
                  List.of(strict(DateTimeFormatter.ofPattern("d/M/uuuu")),
                          strict(DateTimeFormatter.ofPattern("ddMMuuuu"))))
-            .put(SSFormat.TIME_HHMMSS, List.of(strict(DateTimeFormatter.ISO_LOCAL_TIME),
+            .put(SsFormat.TIME_HHMMSS, List.of(strict(DateTimeFormatter.ISO_LOCAL_TIME),
                                                strict(DateTimeFormatter.ofPattern("HHmmss"))))
-            .put(SSFormat.TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ,
+            .put(SsFormat.TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ,
                  List.of(strict(DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]"))))
             .buildOrThrow();
 
   private static List<DateTimeFormatter> getInternalDateTimeParsers(RSC comp) {
-    return getInternalDateTimeParsers(comp.getColumnJDBCType(), comp.getSSFormat());
+    return getInternalDateTimeParsers(comp.getColumnJDBCType(), comp.getSsFormat());
   }
   private static List<DateTimeFormatter> getInternalDateTimeParsers(JDBCType jdbcType,
-                                                                    SSFormat ssFormat) {
+                                                                    SsFormat ssFormat) {
     if (ssFormat != null) {
       List<DateTimeFormatter> rv = ssFormatters.get(ssFormat);
       if (rv != null)
@@ -326,7 +326,7 @@ public class DateTime {
     JDBCType jdbcType = comp.getColumnJDBCType();
     // TODO: should there be a way to do a switch on type, use getDate...?
     Object o = comp.getRowSet().getObject(comp.getColumnIndex());
-    // TODO: derived 3rd arg from comp.getSSFormat
+    // TODO: derived 3rd arg from comp.getSsFormat
     return getDateTimeText(o, jdbcType, null);
   }
 
@@ -340,7 +340,7 @@ public class DateTime {
    */
   public static String getDateTimeText(Object jdbcDateTimeObject, RSC comp) {
     JDBCType jdbcType = comp.getColumnJDBCType();
-    // TODO: derived 3rd arg from comp.getSSFormat
+    // TODO: derived 3rd arg from comp.getSsFormat
     return getDateTimeText(jdbcDateTimeObject, jdbcType, null);
   }
 

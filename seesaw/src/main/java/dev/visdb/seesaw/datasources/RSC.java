@@ -47,18 +47,18 @@ import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
-import dev.visdb.seesaw.formatting.SSFormat;
+import dev.visdb.seesaw.formatting.SsFormat;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 /**
  * This interface is an accessor to a {@linkplain RowSet} and one of its
- * columns; it is extended by {@link dev.visdb.seesaw.utils.SSComponent}.
- * Some components, in particular {@linkplain dev.visdb.seesaw.core.DataGrid},
+ * columns; it is extended by {@link dev.visdb.seesaw.utils.SsComponent}.
+ * Some components, in particular {@linkplain dev.visdb.seesaw.SsTable},
  * have multiple columns; this
  * interface allows a lightweight object to provide row set access for
  * a specified column. Many
  * methods can declare a {@linkplain RSC} parameter instead of a
- * {@link dev.visdb.seesaw.utils.SSComponent}.
+ * {@link dev.visdb.seesaw.utils.SsComponent}.
  */
 // TODO: getAllowNull() is an issue
 // TODO: some of these must carefully be specified to only use a subset of the
@@ -72,7 +72,7 @@ public interface RSC {
    * @param rowsModel
    * @param columnIndex
    * @return
-   * @throws SSSQLRuntimeException
+   * @throws SqlRuntimeException
    */
   static RSC get(RowsModel rowsModel, int columnIndex) {
     //
@@ -81,7 +81,7 @@ public interface RSC {
     try {
       return new SimpleRSC(rowsModel, columnIndex);
     } catch (SQLException ex) {
-      throw new SSSQLRuntimeException(ex);
+      throw new SqlRuntimeException(ex);
     }
   }
 
@@ -158,7 +158,7 @@ public interface RSC {
    * A component may have a display/parse format.
    * @return The format for this component
    */
-  default SSFormat getSSFormat() {
+  default SsFormat getSsFormat() {
     return null;
   }
 

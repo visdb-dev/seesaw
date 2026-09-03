@@ -54,9 +54,9 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 
+import dev.visdb.seesaw.navigate.RowsAction.Navigation;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSEnums.Navigation;
 
 import static java.lang.System.Logger.Level.*;
 

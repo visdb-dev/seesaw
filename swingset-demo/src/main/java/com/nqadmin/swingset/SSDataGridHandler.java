@@ -38,8 +38,8 @@
 package com.nqadmin.swingset;
 
 /**
- * The SSDataGridHandler interface specifies set of methods that can be used to
+ * The SsDataGridHandler interface specifies set of methods that can be used to
  * determine whether or not a given row can be deleted, and operation to be
  * performed before and after deletion or insertion of a record.
  */
-public interface SSDataGridHandler extends dev.visdb.seesaw.core.table.SSDataGridHandler {}
+public interface SSDataGridHandler extends dev.visdb.seesaw.table.SsDataGridHandler {}

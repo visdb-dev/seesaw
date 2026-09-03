@@ -50,7 +50,7 @@ import javax.sql.RowSet;
 import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.navigate.UndoRedo.Change;
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * A support class for undo/redo on a single row in a rowsest.
@@ -143,7 +143,7 @@ final class UndoRow {
     }
   }
 
-  boolean isDirty(SSComponent comp) {
+  boolean isDirty(SsComponent comp) {
     if (cols == null)
       return false;
     UndoCol col = cols[comp.getColumnIndex()];

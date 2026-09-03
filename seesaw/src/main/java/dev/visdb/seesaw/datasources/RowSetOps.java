@@ -65,8 +65,8 @@ import dev.visdb.seesaw.datasources.Utils.ConflictRow;
 import dev.visdb.seesaw.navigate.RowSetState;
 import dev.visdb.seesaw.navigate.UndoRedo;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static com.google.common.collect.Sets.immutableEnumSet;
 import static dev.visdb.seesaw.datasources.ConvertType.convertToType;
@@ -486,8 +486,8 @@ public class RowSetOps {
   public static Object getColumnDirect(RSC rsc) throws SQLException {
     Objects.requireNonNull(rsc);
 
-    if (rsc instanceof SSComponent comp) {
-      DbSupport.DbReader<RowSet, Integer, SSComponent> columnReader = comp.getColumnReader();
+    if (rsc instanceof SsComponent comp) {
+      DbSupport.DbReader<RowSet, Integer, SsComponent> columnReader = comp.getColumnReader();
       if (columnReader != null)
         return comp.getColumnReader().apply(comp.getRowSet(), comp.getColumnIndex(), comp);
     }
@@ -623,7 +623,7 @@ public class RowSetOps {
    * @param comp
    * @return
    */
-  public static Array getColumnArray(SSComponent comp) {
+  public static Array getColumnArray(SsComponent comp) {
     try {
       if (getColumnCount(comp.getRowSet()) == 0)
         return null;
@@ -645,7 +645,7 @@ public class RowSetOps {
    * @throws java.sql.SQLException
    * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
    */
-  public static Object getColumn(SSComponent comp) throws SQLException {
+  public static Object getColumn(SsComponent comp) throws SQLException {
     return UndoRedo.isUndoRedoEnabled(comp) ? UndoRedo.fetchCurrentChange(comp).value()
                                             : DbSupport.runDbReader(comp);
   }
@@ -703,7 +703,7 @@ public class RowSetOps {
    * @throws SQLException
    */
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  public static void checkForceConflict(SSComponent comp, String updatedValue) throws SQLException {
+  public static void checkForceConflict(SsComponent comp, String updatedValue) throws SQLException {
     // Only do this for strings.
     if (jdbcTypeToClass(comp.getColumnJDBCType()) != String.class)
       return;
@@ -714,7 +714,7 @@ public class RowSetOps {
 
     // Get a resultSet that is probably the same as the RowSet associated
     // with the param comp.
-    Connection conn = SSUtils.dbSupport().getSharedConnection();
+    Connection conn = SsUtils.dbSupport().getSharedConnection();
     try (Statement statement
          = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
          ResultSet rs = statement.executeQuery(comp.getRowSet().getCommand());) {
@@ -747,16 +747,16 @@ public class RowSetOps {
    * change to the RowSet. A separate call is required to flush/commit the change
    * to the database.
    *
-   * @param comp The SSComponent doing the update
+   * @param comp The SsComponent doing the update
    * @param updatedValue string to be type-converted as needed and updated in
    *                      underlying RowSet column
    * @return actual item written to the database, throws if nothing written
-   * @throws SSSQLNullException thrown if null is not allowed
+   * @throws SqlNullException thrown if null is not allowed
    * @throws SQLException  thrown if a database error is encountered
    * @throws NumberFormatException thrown if unable to parse a string to number format
    */
-  public static DbUpdate updateColumnText(SSComponent comp, String updatedValue)
-      throws SSSQLNullException, SQLException, NumberFormatException {
+  public static DbUpdate updateColumnText(SsComponent comp, String updatedValue)
+      throws SqlNullException, SQLException, NumberFormatException {
     checkForceConflict(comp, updatedValue); // TODO: This is only for debug
 
     return updateColumnText(comp, comp.getRowSet(), updatedValue, comp.getColumnIndex(),
@@ -771,21 +771,21 @@ public class RowSetOps {
    * change to the RowSet. A separate call is required to flush/commit the change
    * to the database.
    *
-   * @param comp The SSComponent doing the update
+   * @param comp The SsComponent doing the update
    * @param rowSet RowSet on which to operate
    * @param updatedValue string to be type-converted as needed and updated in
    *                      underlying RowSet column
    * @param columnIndex   name of the database column
    * @param allowNull 	indicates if Component and underlying column can contain null values
-   * @throws SSSQLNullException thrown if null is not allowed
+   * @throws SqlNullException thrown if null is not allowed
    * @throws SQLException  thrown if a database error is encountered
    * @throws NumberFormatException thrown if unable to parse a string to number format
    * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
    */
   // TODO: test this and conversions
-  private static DbUpdate updateColumnText(SSComponent comp, RowSet rowSet, String updatedValue,
+  private static DbUpdate updateColumnText(SsComponent comp, RowSet rowSet, String updatedValue,
                                            int columnIndex, boolean allowNull)
-      throws SSSQLNullException, SQLException, NumberFormatException {
+      throws SqlNullException, SQLException, NumberFormatException {
     int row = logger.isLoggable(DEBUG) ? rowSet.getRow() : -1;
     logger.log(DEBUG,
                () -> sf("[%s] row %d. Update to: %s. Allow null? [%s]", comp.getColumnForLog(),
@@ -797,7 +797,7 @@ public class RowSetOps {
       // TODO: internal error exception?
       logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column "
                             + comp.getColumnForLog() + ".");
-      throw new SSSQLUnhandledTypeException(sf("'%s' can't be used as text", jdbcType));
+      throw new SqlUnhandledTypeException(sf("'%s' can't be used as text", jdbcType));
     }
 
     Object dbValue = null;
@@ -844,7 +844,7 @@ public class RowSetOps {
         // TODO: Have a method "CreateMessage(RSC) see also
         //		 SSFormattedTextField, SSCommon
         // NOTE: in following should mention column name
-        throw new SSSQLNullException("Null values are not allowed for this field.");
+        throw new SqlNullException("Null values are not allowed for this field.");
       }
     }
     assert (updatedValue != null);
@@ -879,14 +879,14 @@ public class RowSetOps {
    * change to the RowSet. A separate call is required to flush/commit the change
    * to the database.
    *
-   * @param comp The SSComponent doing the update
+   * @param comp The SsComponent doing the update
    * @param updatedValue value to write to underlying RowSet column
    * @return actual item written to the database, throws if nothing written
-   * @throws SSSQLNullException thrown if null is not allowed
+   * @throws SqlNullException thrown if null is not allowed
    * @throws SQLException  thrown if a database error is encountered
    */
-  public static DbUpdate updateColumnObject(SSComponent comp, Object updatedValue)
-      throws SSSQLNullException, SQLException, NumberFormatException {
+  public static DbUpdate updateColumnObject(SsComponent comp, Object updatedValue)
+      throws SqlNullException, SQLException, NumberFormatException {
     if (updatedValue instanceof String s) {
       // This method doesn't have all the string checks,
       // use updateColumnText if String Object.
@@ -905,7 +905,7 @@ public class RowSetOps {
         rowSet.updateNull(columnIndex);
         return UPDATE_NULL;
       } else
-        throw new SSSQLNullException("NULL not allowed for this field.");
+        throw new SqlNullException("NULL not allowed for this field.");
     }
 
     //_rowSet.updateObject(_columnIndex, _updatedValue);
@@ -932,14 +932,14 @@ public class RowSetOps {
    * change to the RowSet. A separate call is required to flush/commit the change
    * to the database.
    *
-   * @param comp The SSComponent doing the update
+   * @param comp The SsComponent doing the update
    * @param updatedValue Array
    * @return actual item written to the database, throws if nothing written
-   * @throws SSSQLNullException thrown if null is not allowed
+   * @throws SqlNullException thrown if null is not allowed
    * @throws SQLException  thrown if a database error is encountered
    */
-  public static DbUpdate updateColumnArray(SSComponent comp, Array updatedValue)
-      throws SSSQLNullException, SQLException {
+  public static DbUpdate updateColumnArray(SsComponent comp, Array updatedValue)
+      throws SqlNullException, SQLException {
     return updateColumnArray(comp, comp.getRowSet(), updatedValue, comp.getColumnName(),
                              comp.getAllowNull());
   }
@@ -952,18 +952,18 @@ public class RowSetOps {
    * change to the RowSet. A separate call is required to flush/commit the change
    * to the database.
    *
-   * @param comp The SSComponent doing the update
+   * @param comp The SsComponent doing the update
    * @param rowSet RowSet on which to operate
    * @param dbValue Array
    * @param columnName   name of the database column
    * @param allowNull 	indicates if Component and underlying column can contain null values
-   * @throws SSSQLNullException thrown if null is not allowed
+   * @throws SqlNullException thrown if null is not allowed
    * @throws SQLException  thrown if a database error is encountered
    */
-  private static DbUpdate updateColumnArray(@SuppressWarnings("unused") SSComponent comp,
+  private static DbUpdate updateColumnArray(@SuppressWarnings("unused") SsComponent comp,
                                             RowSet rowSet, Array dbValue, String columnName,
                                             boolean allowNull)
-      throws SSSQLNullException, SQLException {
+      throws SqlNullException, SQLException {
     logger.log(
         DEBUG,
         () -> "[" + columnName + "]. Update to: " + dbValue + ". Allow null? [" + allowNull + "]");
@@ -980,7 +980,7 @@ public class RowSetOps {
         rowSet.updateNull(columnName);
         return UPDATE_NULL;
       } else
-        throw new SSSQLNullException("NULL not allowed for this field.");
+        throw new SqlNullException("NULL not allowed for this field.");
     }
 
     rowSet.updateArray(columnName, dbValue);
@@ -996,7 +996,7 @@ public class RowSetOps {
    * @return actual item written to the database, throws if nothing written
    * @throws SQLException
    */
-  public static DbUpdate updateColumn(SSComponent comp, Object value) throws SQLException {
+  public static DbUpdate updateColumn(SsComponent comp, Object value) throws SQLException {
     DbUpdate dbUpdate = DbSupport.runDbUpdater(comp, value);
     return dbUpdate;
   }

@@ -45,17 +45,17 @@ import java.util.Objects;
 import javax.swing.ListModel;
 
 /**
- * This class manages a list of {@link SSListItem}.
+ * This class manages a list of {@link ListItem}.
  * See {@link GlazedListsKeyDisplayValueInfo} for GlazedList specific handling.
- * The SSListItem elements are {@literal {key, displayValue, <D2>}};
+ * The ListItem elements are {@literal {key, displayValue, <D2>}};
  * where key is generally a primary key, displayValue has display info,
  * {@code <D2>} has additional data. {@code <D2>} is optional, see
  * {@link #setD2Enabled(boolean)} and the constructors. There are ways
- * to create, modify and examine the SSListItem. Individual read-only lists for
+ * to create, modify and examine the ListItem. Individual read-only lists for
  * keys, displayValues, {@code <D2>} are available, for example {@link #getKeys() }.
  * {@code <D>} is conventionally known as the displayValue and {@code <D2>}
  * is optional data.
- * {@link SSListItemFormat} creates a String to display a list item using any
+ * {@link ListItemFormat} creates a String to display a list item using any
  * or all of the list item elements.
  * <p>
  * Use {@link #getRemodel} for modifying and examining the itemList and list items.
@@ -74,14 +74,14 @@ import javax.swing.ListModel;
  * @since 4.0.0
  */
 public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwingModel {
-  /** index of displayValue in SSListItem */
-  // DisplayValue IS FIRST. THIS IS THE DEFAULT FOR SSListItemFormat
+  /** index of displayValue in ListItem */
+  // DisplayValue IS FIRST. THIS IS THE DEFAULT FOR ListItemFormat
   // In addition, only DisplayValue is required.
   // LOOK AT createDisplayValueItem BEFORE THINKING ABOUT CHANGING THESE DEFINES
   protected final static int DISP_IDX = 0; //
-  /** index of primary key in SSListItem */
+  /** index of primary key in ListItem */
   protected final static int KEY_IDX = 1;
-  /** index of d2 in SSListItem */
+  /** index of d2 in ListItem */
   protected final static int DISP2_IDX = 2;
 
   /** up to 3 slices created, DISP, KEY, DISP2 */
@@ -95,7 +95,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
    * @return KeyDisplayValueSwingModel or null
    */
   public static KeyDisplayValueSwingModel<?, ?, ?> asKeyDisplayValueSwingModel(
-      ListModel<SSListItem> model) {
+      ListModel<ListItem> model) {
     if (model instanceof KeyDisplayValueSwingModel) {
                         return (KeyDisplayValueSwingModel<?,?,?>) model;
     }
@@ -126,7 +126,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
   /**
    * Create an empty KeyDisplayValueSwingModel.
    *
-   * @param d2Flag true says to provide a d2 field in SSListItem
+   * @param d2Flag true says to provide a d2 field in ListItem
    */
   public KeyDisplayValueSwingModel(HasD2 d2Flag) {
     this(d2Flag, null);
@@ -134,17 +134,17 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
 
   /**
    * Create an empty KeyDisplayValueSwingModel.
-   * @param d2Flag true says to provide a d2 field in SSListItem
+   * @param d2Flag true says to provide a d2 field in ListItem
    * @param itemList tModel backing store
    */
-  public KeyDisplayValueSwingModel(HasD2 d2Flag, List<SSListItem> itemList) {
+  public KeyDisplayValueSwingModel(HasD2 d2Flag, List<ListItem> itemList) {
     super(d2Flag == HasD2.TRUE ? 3 : 2, itemList);
     this.d2Enabled = d2Flag == HasD2.TRUE;
   }
 
   /**
    * create List slices lazily
-   * @param sliceIndex elem index in SSListItem
+   * @param sliceIndex elem index in ListItem
    * @return the slice for the specified elem
    */
   private <T> List<T> getSlice(int sliceIndex) {
@@ -183,7 +183,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
   }
 
   /**
-   * Change whether the layout of an SSListItem managed by this class
+   * Change whether the layout of an ListItem managed by this class
    * contains a displayValue. An exception is thrown if the item list
    * is not empty. An existing d2 list {@link #getD2}
    * is invalidated or validated accordingly.
@@ -226,7 +226,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
    * @param d2 additional display info
    * @return the new list item
    */
-  protected SSListItem createDisplayValueItem(K key, D displayValue, D2 d2) {
+  protected ListItem createDisplayValueItem(K key, D displayValue, D2 d2) {
     // ALL ListItem CREATION GOES THROUGH HERE
     // THE DEFINES FOR KEY_IDX, DISP_IDX ARE RELEVANT TO THE ORDER.
     // displayValue MUST GO FIRST
@@ -241,7 +241,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
    * @param d2 additional display info
    * @return the new list item
    */
-  protected List<SSListItem> createDisplayValueItems(List<K> keys, List<D> displayValues,
+  protected List<ListItem> createDisplayValueItems(List<K> keys, List<D> displayValues,
                                                      List<D2> d2) {
     Objects.requireNonNull(keys);
     Objects.requireNonNull(displayValues);
@@ -256,7 +256,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
     if (displayValues.size() != n || d2 != null && d2.size() != n) {
       throw new IllegalArgumentException("Lists must be the same size");
     }
-    List<SSListItem> displayValueItems = new ArrayList<>(keys.size());
+    List<ListItem> displayValueItems = new ArrayList<>(keys.size());
     if (d2Enabled && d2 != null) {
       for (int i = 0; i < keys.size(); i++) {
         displayValueItems.add(createDisplayValueItem(keys.get(i), displayValues.get(i), d2.get(i)));
@@ -277,8 +277,8 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
   }
 
   /**
-   * Get the opaque index for the key element in a SSListItem.
-   * Useful for use with {@link SSListItemFormat} or setElem.
+   * Get the opaque index for the key element in a ListItem.
+   * Useful for use with {@link ListItemFormat} or setElem.
    * @return the index of the key
    */
   public int getKeyListItemElemIndex() {
@@ -286,8 +286,8 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
   }
 
   /**
-   * Get the opaque index for the displayValue element in a SSListItem.
-   * Useful for use with {@link SSListItemFormat}.
+   * Get the opaque index for the displayValue element in a ListItem.
+   * Useful for use with {@link ListItemFormat}.
    * @return the index of displayValue
    */
   public int getDisplayValueListItemElemIndex() {
@@ -295,8 +295,8 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
   }
 
   /**
-   * Get the opaque index for the displaValue2 element in a SSListItem.
-   * Useful for use with {@link SSListItemFormat}.
+   * Get the opaque index for the displaValue2 element in a ListItem.
+   * Useful for use with {@link ListItemFormat}.
    * @return the index of displaValue2
    */
   public int getD2ListItemElemIndex() {
@@ -409,7 +409,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
      * @return the key
      */
     @SuppressWarnings("unchecked")
-    public K getKey(SSListItem listItem) {
+    public K getKey(ListItem listItem) {
       return (K) super.getElem(listItem, KEY_IDX);
     }
 
@@ -419,7 +419,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
      * @return the displayValue
      */
     @SuppressWarnings("unchecked")
-    public D getDisplayValue(SSListItem listItem) {
+    public D getDisplayValue(ListItem listItem) {
       return (D) super.getElem(listItem, DISP_IDX);
     }
 
@@ -429,7 +429,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
      * @return the displayValue
      */
     @SuppressWarnings("unchecked")
-    public D2 getD2(SSListItem listItem) {
+    public D2 getD2(ListItem listItem) {
       usingD2();
       return (D2) super.getElem(listItem, DISP2_IDX);
     }
@@ -503,14 +503,14 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
       if (d2s != null) {
         usingD2();
       }
-      List<SSListItem> list
+      List<ListItem> list
           = KeyDisplayValueSwingModel.this.createDisplayValueItems(keys, displayValues, d2s);
       return super.addAll(list);
       //isModifiedLength = true;
     }
 
     /**
-     * Create an SSListItem with the specified contents
+     * Create an ListItem with the specified contents
      * and add it to the item list. The input lists shall be the same size.
      * @param key list of key values key value (primary key)
      * @param displayValue display info
@@ -521,7 +521,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
     }
 
     /**
-     * Create an SSListItem with the specified contents
+     * Create an ListItem with the specified contents
      * and add it to the item list. The input lists shall be the same size.
      * @param key commonly a primary key
      * @param displayValue display info derived from this
@@ -545,7 +545,7 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
      * @param d2 additional display info
      * @return the new list item
      */
-    public SSListItem createKeyDisplayValueItem(K key, D displayValue, D2 d2) {
+    public ListItem createKeyDisplayValueItem(K key, D displayValue, D2 d2) {
       return KeyDisplayValueSwingModel.this.createDisplayValueItem(key, displayValue, d2);
     }
   }

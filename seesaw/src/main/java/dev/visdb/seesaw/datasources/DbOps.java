@@ -46,8 +46,8 @@ import java.sql.SQLException;
 
 import dev.visdb.seesaw.navigate.DbOpsChangeEvent;
 import dev.visdb.seesaw.navigate.RowsAction;
+import dev.visdb.seesaw.navigate.RowsAction.Navigation;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.SSEnums.Navigation;
 
 /**
  * Interface that provides a set of methods to perform custom operations
@@ -55,7 +55,7 @@ import dev.visdb.seesaw.utils.SSEnums.Navigation;
  * that application changes to the database are reflected in the RowSet;
  * thus the displayed information has the changes that are made.
  * Typically the "Pre" operations operate on
- * SSComponents associated with an app window; and the "Post" operations
+ * SsComponents associated with an app window; and the "Post" operations
  * make sure the changes are visible in the RowSet (commonly by re-executing
  * the query).
  * There are also other methods to prevent/allow or assist
@@ -65,7 +65,7 @@ import dev.visdb.seesaw.utils.SSEnums.Navigation;
  * enum values which have associated actions. The actions
  * are typically invoked by a <b>navigator button push</b> which invokes the
  * associated action,
- * for example see {@link dev.visdb.seesaw.utils.DataNavigator}
+ * for example see {@link dev.visdb.seesaw.utils.SsDataNavigator}
  * <p>
  * This interface has only default methods, none of which do anything; it
  * can be instantiated by doing {@code new DbOps() {}}.
@@ -75,7 +75,7 @@ import dev.visdb.seesaw.utils.SSEnums.Navigation;
  * <ul>
  * <li> it has an implementation of
  * {@link DbOps#performPreInsertOps() performPreInsertOps()}
- * that will clear/initialize {@link dev.visdb.seesaw.utils.SSComponent SSComponent}
+ * that will clear/initialize {@link dev.visdb.seesaw.utils.SsComponent SsComponent}
  * values before editing.
  * <li> it has implementations of
  * {@link dev.visdb.seesaw.datasources.products.DbOpsBase#performPostInsertOps(dev.visdb.seesaw.navigate.RowsModel) performPostInsertOps(rowsModel)}
@@ -85,7 +85,7 @@ import dev.visdb.seesaw.utils.SSEnums.Navigation;
  * allow update/insert/delete.
  * </ul>
  */
-// TODO: rename SSDBCustomOps
+// TODO: rename SsDbCustomOps
 public interface DbOps {
   /** For an event, to specify which field changed. */
   /** The allow Fields. Used in event notification, see {@link DbOpsChangeEvent} */
@@ -119,7 +119,7 @@ public interface DbOps {
    * This functions is called just before doing something that is sensitive
    * to a row being dirty. When it returns true, it is followed by
    * rowSet.updateRow(). Note that the default for {@code AutoCommit} is false.
-   * So the behavior of {@link dev.visdb.seesaw.utils.DataNavigator} in conjunction with
+   * So the behavior of {@link dev.visdb.seesaw.utils.SsDataNavigator} in conjunction with
    * {@link RowsAction} is that when the current row is dirty only
    * commit and undo are enabled.
    *
@@ -159,7 +159,7 @@ public interface DbOps {
   /**
    * Method to perform pre-insertion operations by {@link RowsAction#ACT_ADD}
    * after rowSet.moveToInsertRow. Typically initializes all the columns'
-   * {@code SSComponent}s. See
+   * {@code SsComponent}s. See
    * {@link dev.visdb.seesaw.datasources.products.DbOpsBase#performPreInsertOps()}.
    */
   default void performPreInsertOps() {}

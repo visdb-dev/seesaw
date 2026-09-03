@@ -36,7 +36,7 @@ import java.util.Map;
 import javax.swing.text.AttributeSet;
 
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.DEBUG;
@@ -64,8 +64,8 @@ public class ComponentStateTextDecorator extends BaseTextDecorator {
    * Decorate the text according to {@code valid}.
    * @param valid
    */
-  public void decorateText(SSComponent.ValidationResult valid) {
-    ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
+  public void decorateText(SsComponent.ValidationResult valid) {
+    ComponentState state = ComponentState.getComponentState(getSsComponent(), valid);
     AttributeSet style = TextStyles.getStyle(styleNames.get(state));
     TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
     logger.log(DEBUG, sf("Style: %s", jComp().getClientProperty(TextStyles.STYLE_NAME)));
@@ -76,7 +76,7 @@ public class ComponentStateTextDecorator extends BaseTextDecorator {
    */
   @Override
   public void decorateText() {
-    SSComponent.ValidationResult valid = getSSComponent().allValidate();
+    SsComponent.ValidationResult valid = getSsComponent().allValidate();
     decorateText(valid);
   }
 }

@@ -11,8 +11,8 @@ import javax.swing.JFrame;
 
 import com.google.common.reflect.TypeToken;
 
-import dev.visdb.seesaw.core.ComboBox1;
-import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.SsComboBox1;
+import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.models.Item1;
 import dev.visdb.seesaw.navigate.RowsModel;
 
@@ -30,9 +30,9 @@ public class ComboBoxSnippets extends JFrame {
   // else, MyDbComboBox.Builder just works.
 
   // @start region=MyDbComboBox
-  static class MyDbComboBox extends DBComboBox2<Integer, String, Byte> {
+  static class MyDbComboBox extends SsDbComboBox2<Integer, String, Byte> {
     public static class Builder
-        extends DBComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
+        extends SsDbComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
       @Override
       protected Builder self() {
         return this;
@@ -56,12 +56,12 @@ public class ComboBoxSnippets extends JFrame {
   // @end region=MyDbComboBox
 
   // @start region=ExtendableDbComboBox
-  static class DbComboBox2Extra<D2, D3> extends DBComboBox2<Integer, String, D2> {
+  static class DbComboBox2Extra<D2, D3> extends SsDbComboBox2<Integer, String, D2> {
     private final D3 d3Value; // Note: not part of combo list item.
     private final TypeToken<D3> d3TypeToken;
 
     public abstract static class AbstractBuilder<D2, D3, T extends AbstractBuilder<D2, D3, T>>
-        extends DBComboBox2.AbstractBuilder<Integer, String, D2, T> {
+        extends SsDbComboBox2.AbstractBuilder<Integer, String, D2, T> {
       private D3 d3Value;
       // captures D3 for whatever runtime class extends this Abstractbuilder
       private final TypeToken<D3> d3TypeToken = new TypeToken<D3>(getClass()) {};
@@ -124,7 +124,7 @@ public class ComboBoxSnippets extends JFrame {
   }
 
   RowsModel rowsModel;
-  DBComboBox2<Long, String, Long> combo;
+  SsDbComboBox2<Long, String, Long> combo;
 
   // @start region=init
   /**
@@ -146,9 +146,9 @@ public class ComboBoxSnippets extends JFrame {
       // Query for the combobox to map part_id to part_name.
       String query = "SELECT * FROM part_data;";
 
-      // Create an instance of the DBComboBox2 with the connection object,
+      // Create an instance of the SsDbComboBox2 with the connection object,
       // query, and column names.
-      combo = new DBComboBox2
+      combo = new SsDbComboBox2
                   .Builder<Long, String, Long>() {} // <- "{ }" NEEDED
                   .connection(connection)
                   .query(query)
@@ -174,7 +174,7 @@ public class ComboBoxSnippets extends JFrame {
   @SuppressWarnings("unused")
   void autoGen() {
     // @start region=auto_gen
-    ComboBox1<Long, String> combobox = new ComboBox1<>() {};
+    SsComboBox1<Long, String> combobox = new SsComboBox1<>() {};
     List<String> options = List.of("111", "2222", "33333");
     combobox.setDisplayValues(options);
     // @end region=auto_gen
@@ -185,7 +185,7 @@ public class ComboBoxSnippets extends JFrame {
   @SuppressWarnings("unused")
   void customKey() {
     // @start region=custom_key
-    ComboBox1<Integer, String> combobox = new ComboBox1<>() {};
+    SsComboBox1<Integer, String> combobox = new SsComboBox1<>() {};
     List<String> options = List.of("111", "2222", "33333");
     // The keys used in "my_column".
     List<Integer> keys = List.of(1, 5, 7);
@@ -200,7 +200,7 @@ public class ComboBoxSnippets extends JFrame {
   /** x */
   @SuppressWarnings("serial")
   // @start region=chosen_item
-  public class ComboBoxIntString extends ComboBox1<Integer, String> {
+  public class ComboBoxIntString extends SsComboBox1<Integer, String> {
     public static class Item extends Item1<Integer, String> {
       public Item(Integer key, String displayValue) {
         super(key, displayValue);

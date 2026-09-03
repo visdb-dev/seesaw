@@ -42,17 +42,17 @@ import javax.sql.RowSet;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 /**
- * See {@link dev.visdb.seesaw.core.DataGrid}.
+ * See {@link dev.visdb.seesaw.SsTable}.
  */
 @SuppressWarnings("serial")
-public class SSDataGrid extends dev.visdb.seesaw.core.DataGrid {
+public class SSDataGrid extends dev.visdb.seesaw.SsTable {
   /**
-   * See {@link dev.visdb.seesaw.core.DataGrid}
+   * See {@link dev.visdb.seesaw.SsTable}
    */
   public SSDataGrid() {}
 
   /**
-   * See {@link dev.visdb.seesaw.core.DataGrid}
+   * See {@link dev.visdb.seesaw.SsTable}
    * @param rowSet
    * @deprecated use RowsModel
    */

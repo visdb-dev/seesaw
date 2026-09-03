@@ -64,7 +64,7 @@ import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.isJunitPrint;
+import static dev.visdb.seesaw.utils.SsUtils.isJunitPrint;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_UP;
 import static java.lang.System.Logger.Level.*;
@@ -82,7 +82,7 @@ import static javax.swing.KeyStroke.getKeyStroke;
  * <li>{@link #setWindowUpDownKeysEnable(boolean) }
  * <li>{@link #setUpDownKeysEnable(boolean) }
  * </ul>
- * These methods are accessible through {@link dev.visdb.seesaw.utils.DataNavigator} methods.
+ * These methods are accessible through {@link dev.visdb.seesaw.utils.SsDataNavigator} methods.
  * <p>
  * There's a Spinner API tweak such that {@code setModel()}
  * sends a {@code ChangeEvent}. This is convenient when considering the spinner

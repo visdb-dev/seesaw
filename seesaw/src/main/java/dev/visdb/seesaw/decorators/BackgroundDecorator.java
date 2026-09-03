@@ -49,12 +49,12 @@ import java.lang.System.Logger;
 import javax.swing.UIManager;
 
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent.ValidationResult;
+import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 import static java.lang.System.Logger.Level.*;
 
 /**
- * Decorate the background when SSComponent has focus, chose color dependent
+ * Decorate the background when SsComponent has focus, chose color dependent
  * on having valid data.
  */
 public class BackgroundDecorator extends FocusDecorator {
@@ -68,13 +68,13 @@ public class BackgroundDecorator extends FocusDecorator {
   /** Decorate the component using current state. */
   @Override
   public boolean decorate() {
-    final ValidationResult valid = getSSComponent().allValidate();
+    final ValidationResult valid = getSsComponent().allValidate();
     logger.log(TRACE,
                () -> String.format("%s focus: %s, compValid %s, allValid: %s",
                                    decoComp().getClass().getSimpleName(),
                                    focusComp().isFocusOwner(), valid.comp(), valid.all()));
 
-    ComponentState state = ComponentState.getComponentState(getSSComponent(), valid);
+    ComponentState state = ComponentState.getComponentState(getSsComponent(), valid);
     Color color = state.isError()      ? errorBackgroundColor
                   : state.isModified() ? modifiedBackgroundColor
                   : state.isFocused()  ? focusBackgroundColor

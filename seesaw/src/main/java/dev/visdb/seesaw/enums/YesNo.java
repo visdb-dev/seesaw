@@ -40,8 +40,8 @@ package dev.visdb.seesaw.enums;
 /**
  * Predefined yes/no options.
  *
- * @see dev.visdb.seesaw.core.ComboBox2#setDisplayValues(java.lang.Class)
- * @see dev.visdb.seesaw.core.List1#setDisplayValues(java.lang.Class)
+ * @see dev.visdb.seesaw.SsComboBox2#setDisplayValues(java.lang.Class)
+ * @see dev.visdb.seesaw.SsList1#setDisplayValues(java.lang.Class)
  * @since 4.0
  */
 public enum YesNo {

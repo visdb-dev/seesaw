@@ -18,15 +18,15 @@ package snippet_files;
 
 import java.text.ParseException;
 
-import dev.visdb.seesaw.formatting.SSMaskFormatterFactory;
-import dev.visdb.seesaw.formatting.SSMaskFormatterFactory.SSMaskFormatter;
+import dev.visdb.seesaw.formatting.MaskFormatterFactory;
+import dev.visdb.seesaw.formatting.MaskFormatterFactory.SSMaskFormatter;
 
 /**
  *
  */
 public class SSMaskFormatterFactorySnippets {
   // @start region=init1
-  static class CustomBuilder extends SSMaskFormatterFactory.Builder<CustomBuilder> {
+  static class CustomBuilder extends MaskFormatterFactory.Builder<CustomBuilder> {
     CustomBuilder(String mask) {
       super(mask);
     }
@@ -46,7 +46,7 @@ public class SSMaskFormatterFactorySnippets {
   }
 
   void createCustomFormatterFactory() {
-    SSMaskFormatterFactory ssmff = new CustomBuilder("...")
+    MaskFormatterFactory ssmff = new CustomBuilder("...")
                                        // ...ssFormat(SSFormat.CUSTOM)
                                        .build();
   }

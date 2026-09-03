@@ -47,7 +47,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 import dev.visdb.seesaw.datasources.DbSupport;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 /**
  * Simple assists for working with database. There is typically a shared
@@ -66,7 +66,7 @@ public class DbSupportBase implements DbSupport {
    * @param sharedConnection
    */
   public DbSupportBase(Connection sharedConnection) {
-    if (!SSUtils.isJunit())
+    if (!SsUtils.isJunit())
       Objects.requireNonNull(sharedConnection);
     this.sharedConnection = sharedConnection;
   }

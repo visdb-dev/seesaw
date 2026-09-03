@@ -40,7 +40,7 @@ import org.openide.util.lookup.Lookups;
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static java.lang.System.Logger.Level.ERROR;
 
@@ -60,7 +60,7 @@ public class DbSupportFactory {
    * to its metadata; put it into the CentralLookup.
    * It replaces any
    * {@code DbSupport} that might already be in there.
-   * See {@link SSUtils#dbSupport()} for best access method.
+   * See {@link SsUtils#dbSupport()} for best access method.
    * The connection is used as the shared connection and to
    * examine DatabaseMetaData.
    * @param sharedConnection

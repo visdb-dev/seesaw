@@ -70,7 +70,7 @@ public abstract class SimpleComboListSwingModel extends AbstractComboBoxListSwin
    * @param itemNumElems see super
    * @param itemList  see super
    */
-  public SimpleComboListSwingModel(int itemNumElems, List<SSListItem> itemList) {
+  public SimpleComboListSwingModel(int itemNumElems, List<ListItem> itemList) {
     super(itemNumElems, itemList);
   }
 

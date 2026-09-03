@@ -51,7 +51,7 @@ import org.netbeans.validation.api.ui.ValidationItem;
 import org.netbeans.validation.api.ui.ValidationStrategy;
 import org.netbeans.validation.api.ui.swing.SwingComponentDecorationFactory;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * Helpers for working with Simple Validation framework.
@@ -89,7 +89,7 @@ public class SVUtils {
   }
 
   public static ValidationItem decorator(JTextComponent jtc, StringValidator sval) {
-    SSComponent comp = (SSComponent) jtc;
+    SsComponent comp = (SsComponent) jtc;
     TextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(jtc, sval);
     SimpleValValidatorDecorator deco = new SimpleValValidatorDecorator(textVali);
     comp.setDecorator(deco);

@@ -58,7 +58,7 @@ import javax.swing.SwingUtilities;
 
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
@@ -484,7 +484,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
    */
   @Deprecated
   protected void setRowset(final RowSet _rowset) {
-    setRowsModel(SSUtils.findRowsModel(_rowset));
+    setRowsModel(SsUtils.findRowsModel(_rowset));
   }
 
   /**

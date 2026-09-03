@@ -43,7 +43,7 @@
 
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * Decorator that adjusts text style.
@@ -63,13 +63,13 @@ public interface TextDecorator extends AnyDecorator {
     public void decorateText() {}
 
     @Override
-    public void install(SSComponent component) {}
+    public void install(SsComponent component) {}
 
     @Override
     public void uninstall() {}
 
     @Override
-    public SSComponent getSSComponent() {
+    public SsComponent getSsComponent() {
       return null;
     }
   };

@@ -46,7 +46,7 @@ import javax.sql.RowSet;
 
 import dev.visdb.seesaw.datasources.RSC;
 
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 
 /**
  * abstract base of ColumnChangeStartEvent

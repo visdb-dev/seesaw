@@ -40,7 +40,7 @@ import java.sql.Timestamp;
 import javax.sql.RowSet;
 
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.ERROR;
@@ -61,7 +61,7 @@ public class RowSetOps_NOT_USED {
    * @return text representation of data in specified column
    * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
    */
-  public static String getColumnText_NOT_USED(SSComponent comp) {
+  public static String getColumnText_NOT_USED(SsComponent comp) {
     final RowSet rowSet = comp.getRowSet();
     final int cIdx = comp.getColumnIndex();
     String value = null;

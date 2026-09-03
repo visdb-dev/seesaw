@@ -51,18 +51,18 @@ import java.util.Locale;
 
 import javax.sql.RowSet;
 
-import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.datasources.RowSetOps.DbUpdate;
 import dev.visdb.seesaw.datasources.products.H2DbSupport;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 import static dev.visdb.seesaw.datasources.JdbcDataTypeConversionTables.vendorTypeMap;
 
 /**
  * Database specific operations and access mechanisms.
  * An implementation manages and uses a {@code sharedConnection},
- * See {@link dev.visdb.seesaw.utils.SSUtils#dbSupport()} for best access method.
+ * See {@link dev.visdb.seesaw.utils.SsUtils#dbSupport()} for best access method.
  */
 // This needs work, clean up. It evolved as someplace to put stuff that
 // shouldn't be in mainline code; and it provides a way to find out where those
@@ -95,7 +95,7 @@ public interface DbSupport {
 
   /**
    * Create a query that contains the row number of a non "order by" query.
-   * When used in conjunction with a {@link DBComboBox2} which is acting as
+   * When used in conjunction with a {@link SsDbComboBox2} which is acting as
    * a combobox navigator, the row number is used to avoid sequential searches
    * table searches in {@link dev.visdb.seesaw.utils.SyncManager}.
    * For example, given {@snippet lang="java":
@@ -185,13 +185,13 @@ public interface DbSupport {
 
   /**
    * Run the column's {@link DbReader} to get the value to return.
-   * See {@link SSComponent#getColumnReader()}.
+   * See {@link SsComponent#getColumnReader()}.
    *
    * @param comp
    * @return the value read by the DbReader
    * @throws java.sql.SQLException
    */
-  static Object runDbReader(SSComponent comp) throws SQLException {
+  static Object runDbReader(SsComponent comp) throws SQLException {
     // Note that the columnReader implementations typically ignores the
     // comp argument, but there for special cases.
     return comp.getColumnReader().apply(comp.getRowSet(), comp.getColumnIndex(), comp);
@@ -200,7 +200,7 @@ public interface DbSupport {
   /**
    * Run the column's {@link DbUpdater} to update the column with the
    * specified value.
-   * See {@link SSComponent#getColumnUpdater()}.
+   * See {@link SsComponent#getColumnUpdater()}.
    * Throws if nothing written.
    *
    * @param comp
@@ -208,7 +208,7 @@ public interface DbSupport {
    * @return actual item written to the database, after possible conversions.
    * @throws SQLException
    */
-  static DbUpdate runDbUpdater(SSComponent comp, Object value) throws SQLException {
+  static DbUpdate runDbUpdater(SsComponent comp, Object value) throws SQLException {
     // Note that the columnUpdater implementations typically ignores the
     // comp argument, but there for special cases.
     return runDbUpdater(comp, value, comp.getColumnUpdater());
@@ -227,7 +227,7 @@ public interface DbSupport {
    */
   // TODO: any reason to make this public?
   private static DbUpdate runDbUpdater(
-      SSComponent comp, Object value, DbUpdater<RowSet, Integer, SSComponent, Object> columnUpdater)
+      SsComponent comp, Object value, DbUpdater<RowSet, Integer, SsComponent, Object> columnUpdater)
       throws SQLException {
     return columnUpdater.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
   }

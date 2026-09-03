@@ -43,7 +43,7 @@
 package com.nqadmin.swingset;
 
 /**
- * See {@link dev.visdb.seesaw.core.table.SSTableModel}
+ * See {@link dev.visdb.seesaw.table.SsTableModel}
  */
 @SuppressWarnings("serial")
-public class SSTableModel extends dev.visdb.seesaw.core.table.SSTableModel {}
+public class SSTableModel extends dev.visdb.seesaw.table.SsTableModel {}

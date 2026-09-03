@@ -69,7 +69,7 @@ import org.h2.jdbcx.JdbcDataSource;
 
 import dev.visdb.seesaw.demo.MainClass.H2Trace;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -225,7 +225,7 @@ public class DataSourcePool {
 
     public MyConnection(Connection _delegate) {
       this.delegate = _delegate;
-      logger.log(TRACE, () -> sf("open connection: %s - %s", SSUtils.objectID(delegate), delegate));
+      logger.log(TRACE, () -> sf("open connection: %s - %s", SsUtils.objectID(delegate), delegate));
     }
 
     // Count the closes
@@ -234,7 +234,7 @@ public class DataSourcePool {
     public void close() throws SQLException {
       nClose++;
       logger.log(TRACE,
-                 () -> sf("close connection: %s - %s", SSUtils.objectID(delegate), delegate));
+                 () -> sf("close connection: %s - %s", SsUtils.objectID(delegate), delegate));
       delegate.close();
     }
 

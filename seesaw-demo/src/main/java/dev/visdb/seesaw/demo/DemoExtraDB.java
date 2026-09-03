@@ -42,7 +42,7 @@ import com.google.common.collect.MapMaker;
 
 import dev.visdb.seesaw.navigate.RowSetState;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.demo.H2Demo.dbUrl;
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -102,7 +102,7 @@ public class DemoExtraDB {
       if (rs != keepRS) {
         // TODO: Could monitor rowSet objects and check this when collected.
         if (RowSetState.isDirty(rs))
-          logger.log(Level.WARNING, () -> sf("deref dirty RowSet %s", SSUtils.objectID(rs)));
+          logger.log(Level.WARNING, () -> sf("deref dirty RowSet %s", SsUtils.objectID(rs)));
         it.remove();
       }
     }

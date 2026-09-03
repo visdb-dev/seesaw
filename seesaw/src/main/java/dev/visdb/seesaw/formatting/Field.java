@@ -33,7 +33,7 @@ package dev.visdb.seesaw.formatting;
  * Base class for formatted fields.
  */
 @SuppressWarnings("serial")
-public abstract class Field extends SSFormattedTextField {
+public abstract class Field extends SsFormattedTextField {
   /**
    * Constructor.
    * @param factory formatter factory

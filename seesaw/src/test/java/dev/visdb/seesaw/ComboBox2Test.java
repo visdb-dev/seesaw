@@ -1,0 +1,428 @@
+/* *****************************************************************************
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ * ****************************************************************************/
+package dev.visdb.seesaw;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import dev.visdb.seesaw.mock.Util;
+import dev.visdb.seesaw.models.Item1;
+import dev.visdb.seesaw.models.Item2;
+import dev.visdb.seesaw.models.KeyDisplayValueSwingModel;
+
+import static dev.visdb.seesaw.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * x
+ */
+public class ComboBox2Test {
+  /** x */
+  public ComboBox2Test() {}
+
+  /** x */
+  @BeforeAll
+  public static void setUpClass() {
+    Util.initLookup();
+  }
+
+  /** x */
+  @AfterAll
+  public static void tearDownClass() {}
+
+  /** x */
+  @BeforeEach
+  public void setUp() {}
+
+  /** x */
+  @AfterEach
+  public void tearDown() {}
+
+  /** x */
+  @SuppressWarnings("serial")
+  public class ComboBoxIntString extends SsComboBox1<Integer, String> {
+    /** x */
+    public ComboBoxIntString() {
+      super(new Builder<Integer, String>() {});
+    }
+  }
+
+  /** x */
+  @SuppressWarnings("serial")
+  public class ComboBoxIntStringItem extends SsComboBox1<Integer, String> {
+    /** x */
+    public ComboBoxIntStringItem() {
+      super(new Builder<Integer, String>() {});
+    }
+    /**
+     * For getChosenItem
+     */
+    public static class Item extends Item1<Integer, String> {
+      /**
+       * @param key
+       * @param displayValue
+       */
+      public Item(Integer key, String displayValue) {
+        super(key, displayValue);
+      }
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public Item getChosenItem() {
+      return new Item(getChosenKey(), getChosenDisplayValue());
+    }
+  }
+
+  /** x */
+  @SuppressWarnings("serial")
+  public class ComboBoxIntStringLongItem extends SsComboBox2<Integer, String, Long> {
+    /** x */
+    public ComboBoxIntStringLongItem() {
+      super(new Builder<Integer, String, Long>() {});
+    }
+
+    /**
+     * For getChosenItem
+     */
+    public static class Item extends Item2<Integer, String, Long> {
+      /**
+       * @param key
+       * @param displayValue
+       * @param displayValue2
+       */
+      public Item(Integer key, String displayValue, Long displayValue2) {
+        super(key, displayValue, displayValue2);
+      }
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public Item getChosenItem() {
+      // return new Item(getChosenKey(), getChosenDisplayValue(), null);
+      Optional<Item> item = getChosenItem((remodel, lItem) -> {
+        return new Item(remodel.getKey(lItem), remodel.getDisplayValue(lItem),
+            hasD2() ? remodel.getD2(lItem) : null);
+      });
+      return item.orElse(new Item(null, null, null));
+    }
+  }
+
+  /**
+   * x
+   * @param <X>
+   * @param <Y>
+   */
+  @SuppressWarnings("serial")
+  public class ComboBoxSub<X, Y> extends SsComboBox1<X, Y> {}
+
+  /**
+   * x
+   * @param <X>
+   * @param <Y>
+   * @param <Z>
+   */
+  @SuppressWarnings("serial")
+  public class ComboBox2Sub<X, Y, Z> extends SsComboBox2<X, Y, Z> {}
+
+  /**
+   * Test of setOptions method, of class SSBaseComboBox.
+   * Try 3 mapping types: Integer,Long,String.
+   * For each do regular and autogenerated mapkey.
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testCheckTypes() {
+    System.out.println("CheckTypes");
+    ComboBoxIntStringLongItem cb = new ComboBoxIntStringLongItem();
+    assertEquals(Integer.class, cb.getKeyType());
+    assertEquals(String.class, cb.getDisplayValueType());
+    assertEquals(Long.class, cb.getD2Type());
+
+    // "Non generic subclass required, like '%s<...>(){}'"
+    assertThrows(IllegalArgumentException.class, () -> new ComboBoxSub<>());
+    assertThrows(IllegalArgumentException.class, () -> new ComboBox2Sub<>());
+    new ComboBox2Sub.Builder<>() {}.build(); // type params all Object
+  }
+
+  /**
+   * Test of setOptions method, of class SSBaseComboBox.
+   * Try 3 mapping types: Integer,Long,String.
+   * For each do regular and autogenerated mapkey.
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testSetOptions_List_List() {
+    System.out.println("setOptions");
+
+    // Long
+    SsComboBox1<Long, String> cbl = new SsComboBox1.Builder<Long, String>() {}.build();
+    cbl.setDisplayValues(List.of("one", "two"), List.of(11L, 12L));
+    cbl.setAllowNull(false);
+    List<String> lsl = cbl.getDisplayValues();
+    List<Long> lml = cbl.getKeys();
+    assertEquals(List.of("one", "two"), lsl);
+    assertEquals(List.of(11L, 12L), lml);
+    assertFalse(cbl.isAutoGeneratedKeys());
+
+    cbl.setDisplayValues(List.of("onex", "twox"));
+    lsl = cbl.getDisplayValues();
+    lml = cbl.getKeys();
+    assertEquals(List.of("onex", "twox"), lsl);
+    assertEquals(List.of(0L, 1L), lml);
+    assertTrue(cbl.isAutoGeneratedKeys());
+    cbl = null;
+    Objects.isNull(cbl);
+
+    // Integer
+    SsComboBox1<Integer, String> cbi = new SsComboBox1.Builder<Integer, String>() {}.build();
+    cbi.setDisplayValues(List.of("one", "two"), List.of(11, 12));
+    cbi.setAllowNull(false);
+    List<String> lsi = cbi.getDisplayValues();
+    List<Integer> lmi = cbi.getKeys();
+    assertEquals(List.of("one", "two"), lsi);
+    assertEquals(List.of(11, 12), lmi);
+    assertFalse(cbi.isAutoGeneratedKeys());
+
+    cbi.setDisplayValues(List.of("onex", "twox"));
+    lsi = cbi.getDisplayValues();
+    lmi = cbi.getKeys();
+    assertEquals(List.of("onex", "twox"), lsi);
+    assertEquals(List.of(0, 1), lmi);
+    assertTrue(cbi.isAutoGeneratedKeys());
+
+    @SuppressWarnings("unchecked")
+    KeyDisplayValueSwingModel<Integer, String, Object> model
+        = (KeyDisplayValueSwingModel<Integer, String, Object>) asKeyDisplayValueSwingModel(
+            cbi.getModel());
+
+    // Check list gets discontected as needed.
+    cbi.setDisplayValues(model.getDisplayValues(), model.getKeys());
+    lsi = cbi.getDisplayValues();
+    lmi = cbi.getKeys();
+    assertEquals(List.of("onex", "twox"), lsi);
+    assertEquals(List.of(0, 1), lmi);
+    assertFalse(cbi.isAutoGeneratedKeys());
+
+    cbi = null;
+    Objects.isNull(cbi);
+
+    // String
+    SsComboBox1<String, String> cbs = new SsComboBox1.Builder<String, String>() {}.build();
+    cbs.setDisplayValues(List.of("one", "two"), List.of("11", "12"));
+    cbs.setAllowNull(false);
+    List<String> lss = cbs.getDisplayValues();
+    List<String> lms = cbs.getKeys();
+    assertEquals(List.of("one", "two"), lss);
+    assertEquals(List.of("11", "12"), lms);
+    assertFalse(cbs.isAutoGeneratedKeys());
+
+    {
+      SsComboBox1<String, String> cbsFinal = cbs;
+      assertThrows(IllegalArgumentException.class,
+                   () -> cbsFinal.setDisplayValues(List.of("onex", "twox")));
+    }
+    cbs = null;
+    Objects.isNull(cbs);
+  }
+
+  /**
+   *  getChosenItem.
+   */
+  @Test
+  public void testGetChosenItem() {
+    SsComboBox1<Integer, String> cbi = new SsComboBox1.Builder<Integer, String>() {}.build();
+    cbi.setDisplayValues(List.of("one", "two"), List.of(11, 12));
+    cbi.setAllowNull(false);
+    cbi.setChosenKey(11);
+    Item2<Integer, String, Object> item001 = cbi.getChosenItem();
+    assertEquals(11, item001.getKey());
+    assertEquals("one", item001.getDisplayValue());
+
+    ComboBoxIntString cbis = new ComboBoxIntString();
+    cbis.setDisplayValues(List.of("one", "two"), List.of(11, 12));
+    cbis.setChosenKey(11);
+    Item2<Integer, String, Object> item002 = cbis.getChosenItem();
+    assertEquals(11, item002.getKey());
+    assertEquals("one", item002.getDisplayValue());
+
+    ComboBoxIntStringItem cbisi = new ComboBoxIntStringItem();
+    cbisi.setDisplayValues(List.of("one", "two"), List.of(11, 12));
+    cbisi.setChosenKey(11);
+    ComboBoxIntStringItem.Item item003 = cbisi.getChosenItem();
+    assertEquals(11, item003.getKey());
+    assertEquals("one", item003.getDisplayValue());
+
+    ComboBoxIntStringLongItem cbisli = new ComboBoxIntStringLongItem();
+    cbisli.setDisplayValues(List.of("one", "two"), List.of(11, 12));
+    cbisli.setChosenKey(11);
+    ComboBoxIntStringLongItem.Item item004 = cbisli.getChosenItem();
+    assertEquals(11, item004.getKey());
+    assertEquals("one", item004.getDisplayValue());
+
+
+    cbisli = new ComboBoxIntStringLongItem();
+    cbisli.setDisplayValues(List.of("one", "two"), List.of(11, 12), List.of(1L, 2L));
+    cbisli.setChosenKey(11);
+    item004 = cbisli.getChosenItem();
+    assertEquals(11, item004.getKey());
+    assertEquals("one", item004.getDisplayValue());
+    assertEquals(1L, item004.getD2());
+  }
+
+  /**
+   * Test of adjustForNullItem method, of class SSBaseComboBox.
+   *
+   * Also try setSelectedOption()/setSelectedMapping(),
+   * getSelectedMapping()/getSelectedOption()
+   */
+  @Test
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public void testAdjustForNullItem() {
+    System.out.println("adjustForNullItem");
+
+    SsComboBox1<Long, String> cbl = new SsComboBox1.Builder<Long, String>() {}.build();
+    cbl.setDisplayValues(List.of("one", "two"), List.of(11L, 12L));
+    cbl.setAllowNull(false);
+    List<String> lsl = cbl.getDisplayValues();
+    List<Long> lml = cbl.getKeys();
+    assertEquals(List.of("one", "two"), lsl);
+    assertEquals(List.of(11L, 12L), lml);
+    assertFalse(cbl.isAutoGeneratedKeys());
+
+    // turn on allow null, this changes what's in the combobox
+    cbl.setAllowNull(true);
+
+    lsl = cbl.getDisplayValues();
+    lml = cbl.getKeys();
+    assertEquals(List.of("", "one", "two"), lsl);
+    // Need a list that starts with a null.
+    List<Long> ll01 = new ArrayList<>(List.of(11L, 12L));
+    ll01.add(0, null);
+    assertEquals(ll01, lml);
+
+    cbl = null;
+    Objects.isNull(cbl);
+
+    SsComboBox1<Integer, String> cbi = new SsComboBox1.Builder<Integer, String>() {}.build();
+    cbi.setAllowNull(true);
+
+    // autogenerated
+    cbi.setDisplayValues(List.of("onex", "twox"));
+    List<String> lsi = cbi.getDisplayValues();
+    List<Integer> lmi = cbi.getKeys();
+    assertEquals(List.of("", "onex", "twox"), lsi);
+    List<Integer> li01 = new ArrayList<>(List.of(0, 1));
+    li01.add(0, null);
+    assertEquals(li01, lmi);
+    assertTrue(cbi.isAutoGeneratedKeys());
+
+    cbi.setChosenDisplayValue("twox");
+    assertEquals(1, cbi.getChosenKey());
+    assertEquals("twox", cbi.getChosenDisplayValue());
+
+    cbi.setChosenKey(0);
+    assertEquals(0, cbi.getChosenKey());
+    assertEquals("onex", cbi.getChosenDisplayValue());
+
+    cbi = null;
+    Objects.isNull(cbi);
+  }
+
+  /**
+   * Test of Enum options
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testEnumOption() {
+    System.out.println("EnumOption");
+
+    enum E { ZERO, ONE, TWO }
+
+    SsComboBox1<Integer, String> cbi = new SsComboBox1.Builder<Integer, String>() {}.build();
+    cbi.setAllowNull(false);
+    cbi.setDisplayValues(E.class);
+    cbi.setChosenEnum(E.ONE);
+    assertEquals(E.ONE, cbi.getChosenEnum());
+    assertEquals(E.class, cbi.getEnumDisplayValue());
+    assertEquals(1, cbi.getChosenKey());
+    assertEquals("ONE", cbi.getChosenDisplayValue());
+
+    // Only integer key for enum.
+    SsComboBox1<String, String> cbs = new SsComboBox1.Builder<String, String>() {}.build();
+    assertThrows(IllegalArgumentException.class, () -> cbs.setDisplayValues(E.class));
+
+    // Only String option for enum.
+    SsComboBox1<Integer, Integer> cbii = new SsComboBox1.Builder<Integer, Integer>() {}.build();
+    assertThrows(IllegalArgumentException.class, () -> cbii.setDisplayValues(E.class));
+  }
+
+  /**
+   * Test of removeKey; Also, addDisplayValue.
+   */
+  @Test
+  @SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+  public void testRemoveMapping() {
+    System.out.println("RemoveMapping");
+
+    SsComboBox1<Integer, String> cbi = new SsComboBox1.Builder<Integer, String>() {}.build();
+    cbi.setDisplayValues(List.of("one", "two", "three"), List.of(11, 12, 13));
+    cbi.setAllowNull(false);
+    List<String> lsi = cbi.getDisplayValues();
+    List<Integer> lmi = cbi.getKeys();
+    assertEquals(List.of("one", "two", "three"), lsi);
+    assertEquals(List.of(11, 12, 13), lmi);
+    cbi.removeKey(12);
+    lsi = cbi.getDisplayValues();
+    lmi = cbi.getKeys();
+    assertEquals(List.of("one", "three"), lsi);
+    assertEquals(List.of(11, 13), lmi);
+
+    cbi.addDisplayValue("four", 14);
+    lsi = cbi.getDisplayValues();
+    lmi = cbi.getKeys();
+    assertEquals(List.of("one", "three", "four"), lsi);
+    assertEquals(List.of(11, 13, 14), lmi);
+  }
+}

@@ -56,12 +56,12 @@ import com.nqadmin.swingset.SSTextField;
 
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.formatting.SSDateField;
-import dev.visdb.seesaw.formatting.SSIntegerField;
+import dev.visdb.seesaw.formatting.SsDateField;
+import dev.visdb.seesaw.formatting.SsIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 
-import static dev.visdb.seesaw.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
+import static dev.visdb.seesaw.formatting.SsFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -95,8 +95,8 @@ public class Example3 extends JFrame {
   SSDBComboBox cmbSupplierName = null;
   SSDBComboBox cmbPartName = null;
 
-  SSIntegerField txtQuantity = new SSIntegerField();
-  SSDateField txtShipDate = new SSDateField(DATE_MMDDYYYY_SLASH);
+  SsIntegerField txtQuantity = new SsIntegerField();
+  SsDateField txtShipDate = new SsDateField(DATE_MMDDYYYY_SLASH);
 
   /**
    * database component declarations

@@ -42,7 +42,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * A validator allows a specialized validation condition on a per component
@@ -69,7 +69,7 @@ public interface Validator {
    * Install this validator into the component. Installs listeners
    * @param component the componenet
    */
-  default void install(SSComponent component){};
+  default void install(SsComponent component){};
 
   /** Remove validator/listeners from component. */
   default void uninstall(){};

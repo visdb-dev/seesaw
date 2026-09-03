@@ -29,7 +29,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * Any kind of decorator.
@@ -39,15 +39,15 @@ public interface AnyDecorator {
    * Install this decorator into the component. Installs listeners
    * @param component the componenet
    */
-  void install(SSComponent component);
+  void install(SsComponent component);
 
   /** Remove decorator/listeners from component. */
   void uninstall();
 
   /**
-   * Return the SSComponent associated with this decorator.
+   * Return the SsComponent associated with this decorator.
    *
    * @return the component
    */
-  SSComponent getSSComponent();
+  SsComponent getSsComponent();
 }

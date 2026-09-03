@@ -44,17 +44,16 @@ package com.nqadmin.swingset;
 
 import javax.sql.RowSet;
 
-import dev.visdb.seesaw.core.Slider;
-
+import dev.visdb.seesaw.SsSlider;
 import dev.visdb.seesaw.navigate.RowsModel;
 
-import static dev.visdb.seesaw.utils.SSUtils.findRowsModel;
+import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
 
 /**
  * Used to link a JSlider to a numeric column in a database.
  */
 @SuppressWarnings("serial")
-public class SSSlider extends Slider {
+public class SSSlider extends SsSlider {
   /**
    * Empty constructor needed for deserialization. Creates a horizontal slider
    * with the range 0 to 100.

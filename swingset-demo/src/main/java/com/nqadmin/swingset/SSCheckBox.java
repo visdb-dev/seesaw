@@ -44,11 +44,10 @@ package com.nqadmin.swingset;
 
 import javax.sql.RowSet;
 
-import dev.visdb.seesaw.core.CheckBox;
-
+import dev.visdb.seesaw.SsCheckBox;
 import dev.visdb.seesaw.navigate.RowsModel;
 
-import static dev.visdb.seesaw.utils.SSUtils.findRowsModel;
+import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
 
 /**
  * Used to display values stored in the database as a boolean.
@@ -62,7 +61,7 @@ import static dev.visdb.seesaw.utils.SSUtils.findRowsModel;
  * values returned for the checked and unchecked SSCheckBox states.
  */
 @SuppressWarnings("serial")
-public class SSCheckBox extends CheckBox {
+public class SSCheckBox extends SsCheckBox {
   /**
    * Creates an object of SSCheckBox.
    */

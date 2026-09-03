@@ -38,7 +38,7 @@
 package com.nqadmin.swingset;
 
 /**
- * The SSDataValue interface specifies methods for SSTableModel to retrieve the
+ * The SsDataValue interface specifies methods for SSTableModel to retrieve the
  * value for primary column in JTable.
  */
-public interface SSDataValue extends dev.visdb.seesaw.core.table.SSDataValue {}
+public interface SSDataValue extends dev.visdb.seesaw.table.SsDataValue {}

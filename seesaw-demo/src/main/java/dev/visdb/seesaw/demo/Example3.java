@@ -50,17 +50,17 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import dev.visdb.seesaw.core.DBComboBox2;
-import dev.visdb.seesaw.core.TextField;
+import dev.visdb.seesaw.SsDbComboBox2;
+import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.formatting.SSDateField;
-import dev.visdb.seesaw.formatting.SSIntegerField;
+import dev.visdb.seesaw.formatting.SsDateField;
+import dev.visdb.seesaw.formatting.SsIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.DataNavigator;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
 
-import static dev.visdb.seesaw.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
+import static dev.visdb.seesaw.formatting.SsFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -69,7 +69,7 @@ import static java.lang.System.Logger.Level.*;
  * DBComboBox2 are used to display supplier name and part name
  * based on queries against the supplier_data and part_data tables.
  * <p>
- * Record navigation is handled with a DataNavigator.
+Record navigation is handled with a SsDataNavigator.
  */
 @SuppressWarnings("serial")
 public class Example3 extends JFrame {
@@ -90,18 +90,18 @@ public class Example3 extends JFrame {
   /**
    * bound component declarations
    */
-  TextField txtSupplierPartID = new TextField();
-  DBComboBox2<Long, Object, Object> cmbSupplierName = null;
-  DBComboBox2<Long, Object, Object> cmbPartName = null;
+  SsTextField txtSupplierPartID = new SsTextField();
+  SsDbComboBox2<Long, Object, Object> cmbSupplierName = null;
+  SsDbComboBox2<Long, Object, Object> cmbPartName = null;
 
-  SSIntegerField txtQuantity = new SSIntegerField();
-  SSDateField txtShipDate = new SSDateField(DATE_MMDDYYYY_SLASH);
+  SsIntegerField txtQuantity = new SsIntegerField();
+  SsDateField txtShipDate = new SsDateField(DATE_MMDDYYYY_SLASH);
 
   /**
    * database component declarations
    */
   Connection connection = null;
-  DataNavigator navigator = null;
+  SsDataNavigator navigator = null;
   RowsModel rowsModel;
 
   @SuppressWarnings("unused")
@@ -135,7 +135,7 @@ public class Example3 extends JFrame {
       rowset.setCommand("SELECT * FROM supplier_part_data");
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
-      navigator = new DataNavigator(rowsModel);
+      navigator = new SsDataNavigator(rowsModel);
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }
@@ -143,7 +143,7 @@ public class Example3 extends JFrame {
     // SETUP DB COMBO QUERIES
     String query = "SELECT * FROM supplier_data;";
     // (connection, query, "supplier_id", "supplier_name");
-    cmbSupplierName = new DBComboBox2.Builder<Long, Object, Object>() {}
+    cmbSupplierName = new SsDbComboBox2.Builder<Long, Object, Object>() {}
                           .connection(connection)
                           .query(query)
                           .primaryKeyColumnName("supplier_id")
@@ -152,7 +152,7 @@ public class Example3 extends JFrame {
 
     query = "SELECT * FROM part_data;";
     //(connection, query, "part_id", "part_name");
-    cmbPartName = new DBComboBox2.Builder<Long, Object, Object>() {}
+    cmbPartName = new SsDbComboBox2.Builder<Long, Object, Object>() {}
                       .connection(connection)
                       .query(query)
                       .primaryKeyColumnName("part_id")

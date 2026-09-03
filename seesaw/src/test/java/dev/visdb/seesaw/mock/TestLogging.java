@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 /**
  * Logging for use during tests.
@@ -70,7 +70,7 @@ public class TestLogging {
   public static void load(Level _level) {
     Level level = _level == null ? Level.INFO : _level;
     testLogging(level);
-    System.setProperty(SSUtils.JUNIT_TEST_LOGGING, "true");
+    System.setProperty(SsUtils.JUNIT_TEST_LOGGING, "true");
   }
 
   /**

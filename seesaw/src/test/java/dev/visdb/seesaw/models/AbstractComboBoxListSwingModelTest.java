@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
@@ -35,8 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import dev.visdb.seesaw.mock.TestLogging;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,7 +57,7 @@ public class AbstractComboBoxListSwingModelTest {
     @SuppressWarnings("unused")
     ComboBoxModelProxy proxy;
 
-    public LI(int itemNumElems, List<SSListItem> itemList) {
+    public LI(int itemNumElems, List<ListItem> itemList) {
       super(itemNumElems, itemList);
       proxy = getProxyJunitTextOnly();
     }
@@ -132,7 +129,7 @@ public class AbstractComboBoxListSwingModelTest {
   LI listInfo;
 
   // The item list
-  List<SSListItem> itemList = new ArrayList<>();
+  List<ListItem> itemList = new ArrayList<>();
 
   // 4 lists, "original", of the same length
   List<Integer> l1 = new ArrayList<>();
@@ -152,8 +149,8 @@ public class AbstractComboBoxListSwingModelTest {
     return Arrays.copyOf(o, n);
   }
 
-  List<SSListItem> liCreateMany(int n) {
-    List<SSListItem> items = new ArrayList<>();
+  List<ListItem> liCreateMany(int n) {
+    List<ListItem> items = new ArrayList<>();
     for (int i = 0; i < l1.size(); i++) {
       items.add(listInfo.createListItem(liCreateArray(n, i)));
     }
@@ -170,7 +167,7 @@ public class AbstractComboBoxListSwingModelTest {
     //boolean expResult = true;
     boolean result = listInfo.getItemList().isEmpty();
     assertEquals(true, result);
-    SSListItem li = listInfo.createListItem(liCreateArray(3, 0));
+    ListItem li = listInfo.createListItem(liCreateArray(3, 0));
     itemList.add(li);
     result = listInfo.getItemList().isEmpty();
     assertEquals(false, result);
@@ -186,7 +183,7 @@ public class AbstractComboBoxListSwingModelTest {
     itemList.addAll(liCreateMany(3)); // 3 elems in list item
     int expResult = 2;
     // check that equals works (not just ==)
-    SSListItem li = listInfo.createListItem(liCreateArray(3, expResult));
+    ListItem li = listInfo.createListItem(liCreateArray(3, expResult));
     int result = listInfo.getItemList().indexOf(li);
     assertEquals(expResult, result);
   }
@@ -255,16 +252,16 @@ public class AbstractComboBoxListSwingModelTest {
     System.out.println("createListItem");
     //
     // Check out 5 elems in a listitem, other cases 2,3 are handled
-    // This is testing the array version of SSListItem
+    // This is testing the array version of ListItem
     //
     listInfo.setItemNumElems(5);
     Object[] elems5 = new Object[] {"a", "b", "c", "d", "e"};
-    SSListItem result = listInfo.createListItem(elems5);
+    ListItem result = listInfo.createListItem(elems5);
     Object[] elems6 = new Object[] {"a", "b", "c", "d", "e", "f"};
     assertThrows(IllegalArgumentException.class, () -> listInfo.createListItem(elems6));
 
     //
-    SSListItem result2 = listInfo.createListItem(elems5);
+    ListItem result2 = listInfo.createListItem(elems5);
     assertTrue(result.equals(result2));
 
     Object[] elems5a = new Object[] {"a", "b", "c", "d", "a"};
@@ -313,8 +310,8 @@ public class AbstractComboBoxListSwingModelTest {
       // verify the test item has the expected elements
       assertTrue(getElemEquals(elems, testItemIndex, remodel));
 
-      SSListItem testItem = linfo.createListItem((Object[]) elems);
-      SSListItem originalListItem = remodel.get(testItemIndex);
+      ListItem testItem = linfo.createListItem((Object[]) elems);
+      ListItem originalListItem = remodel.get(testItemIndex);
       assertTrue(testItem.equals(originalListItem));
 
       int modElemIndex = 2 % nElem;
@@ -327,11 +324,11 @@ public class AbstractComboBoxListSwingModelTest {
       // note, using the same reference for item in the list
       remodel.setElem(testItemIndex, modElemIndex, 99);
       // should be a clone, so must refetch
-      SSListItem newListItem = remodel.get(testItemIndex);
+      ListItem newListItem = remodel.get(testItemIndex);
       assertTrue(testItem.equals(newListItem));
 
       // try the clone directly
-      SSListItem cloneListItem = linfo.getClone(newListItem);
+      ListItem cloneListItem = linfo.getClone(newListItem);
       assertTrue(newListItem.equals(cloneListItem));
       assertTrue(newListItem != cloneListItem);
 

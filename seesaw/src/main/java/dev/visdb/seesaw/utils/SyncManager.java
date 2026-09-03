@@ -54,7 +54,7 @@ import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
-import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.datasources.ConvertType;
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.navigate.RowsModel;
@@ -66,13 +66,13 @@ import static java.lang.System.Logger.Level.*;
  * Used to synchronize a data navigator and a navigation ComboBox.
  * The combobox may contain the original row number, see
  * {@link DbSupport#createRownumQuery(String, String, String, String) },
- * {@link DBComboBox2#setD2ColumnName(String)}
+ * {@link SsDbComboBox2#setD2ColumnName(String)}
  * and {@link #setComboHasRowNum(boolean)}<br>
- * <b>Otherwise</b>: The DBComboBox2 and the RowSet queries should select the same
- * records and in the same order; if not, the SSSyncManager will spend a lot of
- * time looping through records to match.
+ * <b>Otherwise</b>: The SsDbComboBox2 and the RowSet queries should select the same
+records and in the same order; if not, the SSSyncManager will spend a lot of
+time looping through records to match.
  *
- * @param <K> java type of RowSet's key; same as {@literal <K>} in associated DBComboBox2
+ * @param <K> java type of RowSet's key; same as {@literal <K>} in associated SsDbComboBox2
  */
 public class SyncManager<K> {
   /**
@@ -325,18 +325,18 @@ public class SyncManager<K> {
 
   /**
    * # of records to step back if doing a sequential search because
-   * DBComboBox2 and RowSet results don't match.
+SsDbComboBox2 and RowSet results don't match.
    */
   private static final int OFFSET_TO_CHECK = 7;
 
   /**
-   * # of records of overlap to check if DBComboBox2 and RowSet results
-   * don't match due to record additions/deletions.
+   * # of records of overlap to check if SsDbComboBox2 and RowSet results
+don't match due to record additions/deletions.
    */
   private static final int OVERLAP_TO_CHECK = 7;
 
-  /** DBComboBox2 used for record navigation. */
-  private DBComboBox2<K, ?, ?> comboBox;
+  /** SsDbComboBox2 used for record navigation. */
+  private SsDbComboBox2<K, ?, ?> comboBox;
 
   /** Listener on combo box to detect combo-based navigations. */
   private final SyncComboListener comboListener = new SyncComboListener();
@@ -361,11 +361,11 @@ public class SyncManager<K> {
   /**
    * Creates a SSSyncManager with the specified combo box and data navigator.
    *
-   * @param comboBox   DBComboBox2 used for record navigation
+   * @param comboBox   SsDbComboBox2 used for record navigation
    * @param rowsModel  RowsModel to synchronize with navigation combo box
    */
   @SuppressWarnings("deprecation")
-  public SyncManager(DBComboBox2<K, ?, ?> comboBox, RowsModel rowsModel) {
+  public SyncManager(SsDbComboBox2<K, ?, ?> comboBox, RowsModel rowsModel) {
     this.comboBox = comboBox;
     this.rowsModel = rowsModel;
     rowsModel.setNavCombo(comboBox, this);
@@ -424,7 +424,7 @@ public class SyncManager<K> {
    * @deprecated just create another SSSyncManager
    */
   @Deprecated
-  public void setComboBox(DBComboBox2<K, ?, ?> comboBox) {
+  public void setComboBox(SsDbComboBox2<K, ?, ?> comboBox) {
     this.comboBox = comboBox;
   }
 

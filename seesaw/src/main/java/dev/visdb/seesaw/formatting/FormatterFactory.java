@@ -43,7 +43,7 @@ import javax.swing.text.DefaultFormatterFactory;
  */
 @SuppressWarnings("serial")
 public abstract class FormatterFactory extends DefaultFormatterFactory {
-  private final SSFormat ssFormat;
+  private final SsFormat ssFormat;
   private final AbstractFormatter converter;
   private final BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
@@ -56,12 +56,12 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
    */
   abstract protected static class Builder<T extends Builder<T>> {
     private AbstractFormatter converter = null;
-    private SSFormat ssFormat = null;
+    private SsFormat ssFormat = null;
     private BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
     /**
      * May be used by a formatter to assist string2Value and value2String.
-     * For example, the SS mask formatters work with strings, the converter
+     * For example, the Ss mask formatters work with strings, the converter
      * converts string to value; like a Date.
      * It's the last step in stringToValue; it produces the Value
      * in the formatted text field.
@@ -73,11 +73,11 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
       return self();
     }
     /**
-     * *  The {@link SSFormat} used when generating this format factory.
+     * *  The {@link SsFormat} used when generating this format factory.
      * @param val
      * @return  builder
      */
-    public T ssFormat(SSFormat val) {
+    public T ssFormat(SsFormat val) {
       ssFormat = val;
       return self();
     }
@@ -85,7 +85,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
      *  This overrides the default check for user input data present. The default
      * check is done using {@link FormatterAssist#userText(java.lang.String,
      * java.lang.String, java.lang.String, java.lang.Character)}. If set, this
-     * is used by {@link SSFormattedTextField#containsUserText() }.
+     * is used by {@link SsFormattedTextField#containsUserText() }.
      * @param val
      * @return  builder
      */
@@ -126,7 +126,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
    * The Format used to create factory.
    * @return format
    */
-  public SSFormat getSSFormat() {
+  public SsFormat getSSFormat() {
     return ssFormat;
   }
 
@@ -158,11 +158,11 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
 
   /** use setEditValid method to check that formatter should flip */
   @SuppressWarnings("serial")
-  protected static class SSNullFormatter extends DefaultFormatter {
+  protected static class NullFormatter extends DefaultFormatter {
     /**
      * The null formatter.
      */
-    public SSNullFormatter() {
+    public NullFormatter() {
       // DO NOT CHANGE
       setValueClass(String.class);
       // DO NOT CHANGE
@@ -183,14 +183,14 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
       // then set a value to flip to the  (presumably) edit formatter.
       final JFormattedTextField ftf = getFormattedTextField();
       Object value = ftf.getValue();
-      // May not need to check for SSNullFormatter, but things change :-)
-      if (value instanceof String stringValue && ftf.getFormatter() instanceof SSNullFormatter
+      // May not need to check for NullFormatter, but things change :-)
+      if (value instanceof String stringValue && ftf.getFormatter() instanceof NullFormatter
           && ftf.getFormatterFactory() instanceof FormatterFactory ff) {
         try {
           ff.switchToNonNullValue(ftf, stringValue);
           // If ftf is still the null formatter,
           // then Formatter didn't like the value; notify and get out.
-          if (ftf.getFormatter() instanceof SSNullFormatter) {
+          if (ftf.getFormatter() instanceof NullFormatter) {
             invalidEdit();
             return;
           }

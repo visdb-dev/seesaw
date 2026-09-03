@@ -192,14 +192,14 @@ public class ConvertTypeTest {
     assertEquals(BigDecimal.class, rv.getClass());
     assertEquals(BigDecimal.valueOf(123), rv);
 
-    assertThrows(SSSQLConversionException.class,
+    assertThrows(SqlConversionException.class,
                  () -> convertToType(String.valueOf(Byte.MAX_VALUE + 1), Byte.class));
-    assertThrows(SSSQLConversionException.class,
+    assertThrows(SqlConversionException.class,
                  () -> convertToType(String.valueOf(Short.MAX_VALUE + 1), Short.class));
-    assertThrows(SSSQLConversionException.class,
+    assertThrows(SqlConversionException.class,
                  () -> convertToType(String.valueOf((long) Integer.MAX_VALUE + 1), Integer.class));
     assertThrows(
-        SSSQLConversionException.class,
+        SqlConversionException.class,
         ()
             -> convertToType(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE).toString(),
                              Long.class));
@@ -223,17 +223,17 @@ public class ConvertTypeTest {
 
     rv = convertToType((long) Byte.MAX_VALUE, Byte.class);
     assertEquals(Byte.MAX_VALUE, rv);
-    assertThrows(SSSQLConversionException.class,
+    assertThrows(SqlConversionException.class,
                  () -> convertToType((long) (Byte.MAX_VALUE + 1), Byte.class));
 
     rv = convertToType((long) Short.MAX_VALUE, Short.class);
     assertEquals(Short.MAX_VALUE, rv);
-    assertThrows(SSSQLConversionException.class,
+    assertThrows(SqlConversionException.class,
                  () -> convertToType((long) (Short.MAX_VALUE + 1), Short.class));
 
     rv = convertToType((long) Integer.MAX_VALUE, Integer.class);
     assertEquals(Integer.MAX_VALUE, rv);
-    assertThrows(SSSQLConversionException.class,
+    assertThrows(SqlConversionException.class,
                  () -> convertToType((long) Integer.MAX_VALUE + 1, Integer.class));
 
     rv = convertToType(Long.MAX_VALUE, Long.class);
@@ -242,7 +242,7 @@ public class ConvertTypeTest {
     assertEquals(Long.MAX_VALUE, rv);
 
     assertThrows(
-        SSSQLConversionException.class,
+        SqlConversionException.class,
         () -> convertToType(BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.ONE), Long.class));
   }
 
@@ -263,7 +263,7 @@ public class ConvertTypeTest {
     assertEquals(true, convertToType(Integer.MAX_VALUE, JDBCType.BOOLEAN));
     assertEquals(true, convertToType(Long.MAX_VALUE, JDBCType.BIT));
     assertEquals(true, convertToType(BigDecimal.valueOf(Long.MAX_VALUE), JDBCType.BIT));
-    assertThrows(SSSQLConversionException.class,
+    assertThrows(SqlConversionException.class,
                  () -> convertToType(Double.MAX_VALUE, JDBCType.BIT));
 
     assertEquals(false, convertToType(false, JDBCType.BIT));
@@ -327,9 +327,9 @@ public class ConvertTypeTest {
     assertEquals(java.sql.Timestamp.class, rv.getClass());
     assertEquals(ts, rv);
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(ld, JDBCType.TIMESTAMP));
+    assertThrows(SqlConversionException.class, () -> convertToType(ld, JDBCType.TIMESTAMP));
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(lt, JDBCType.TIMESTAMP));
+    assertThrows(SqlConversionException.class, () -> convertToType(lt, JDBCType.TIMESTAMP));
 
     // to java.sql.DATE
     rv = convertToType(ud, JDBCType.DATE);
@@ -344,7 +344,7 @@ public class ConvertTypeTest {
     assertEquals(java.sql.Date.class, rv.getClass());
     assertEquals(d, rv);
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(t, JDBCType.DATE));
+    assertThrows(SqlConversionException.class, () -> convertToType(t, JDBCType.DATE));
 
     rv = convertToType(ldt, JDBCType.DATE);
     assertEquals(java.sql.Date.class, rv.getClass());
@@ -354,7 +354,7 @@ public class ConvertTypeTest {
     assertEquals(java.sql.Date.class, rv.getClass());
     assertEquals(d, rv);
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(lt, JDBCType.DATE));
+    assertThrows(SqlConversionException.class, () -> convertToType(lt, JDBCType.DATE));
 
     // to java.sql.TIME
     rv = convertToType(ud, JDBCType.TIME);
@@ -365,7 +365,7 @@ public class ConvertTypeTest {
     assertEquals(java.sql.Time.class, rv.getClass());
     assertEquals(t, rv);
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(d, JDBCType.TIME));
+    assertThrows(SqlConversionException.class, () -> convertToType(d, JDBCType.TIME));
 
     rv = convertToType(t, JDBCType.TIME);
     assertEquals(java.sql.Time.class, rv.getClass());
@@ -375,7 +375,7 @@ public class ConvertTypeTest {
     assertEquals(java.sql.Time.class, rv.getClass());
     assertEquals(t, rv);
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(ld, JDBCType.TIME));
+    assertThrows(SqlConversionException.class, () -> convertToType(ld, JDBCType.TIME));
 
     rv = convertToType(lt, JDBCType.TIME);
     assertEquals(java.sql.Time.class, rv.getClass());
@@ -411,23 +411,23 @@ public class ConvertTypeTest {
     assertEquals(LocalDateTime.class, rv.getClass());
     assertEquals(ld.atStartOfDay(), rv);
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(t, LocalDateTime.class));
+    assertThrows(SqlConversionException.class, () -> convertToType(t, LocalDateTime.class));
 
     // to LocalDate
     // TODO???
-    assertThrows(SSSQLConversionException.class, () -> convertToType(ts, LocalDate.class));
+    assertThrows(SqlConversionException.class, () -> convertToType(ts, LocalDate.class));
 
     rv = convertToType(d, LocalDate.class);
     assertEquals(LocalDate.class, rv.getClass());
     assertEquals(ld, rv);
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(t, LocalDate.class));
+    assertThrows(SqlConversionException.class, () -> convertToType(t, LocalDate.class));
 
     // to LocalTime
     // TODO???
-    assertThrows(SSSQLConversionException.class, () -> convertToType(ts, LocalTime.class));
+    assertThrows(SqlConversionException.class, () -> convertToType(ts, LocalTime.class));
 
-    assertThrows(SSSQLConversionException.class, () -> convertToType(d, LocalTime.class));
+    assertThrows(SqlConversionException.class, () -> convertToType(d, LocalTime.class));
 
     rv = convertToType(t, LocalTime.class);
     assertEquals(LocalTime.class, rv.getClass());

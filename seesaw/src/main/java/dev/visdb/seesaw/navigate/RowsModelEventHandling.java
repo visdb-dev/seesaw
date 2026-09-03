@@ -51,9 +51,9 @@ import static dev.visdb.seesaw.navigate.RowSetState.isAcceptingCachedRowSetChang
 import static dev.visdb.seesaw.navigate.RowsModel.getEventBus;
 import static dev.visdb.seesaw.navigate.RowsModel.post;
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.isJunit;
-import static dev.visdb.seesaw.utils.SSUtils.isJunitPrint;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.isJunit;
+import static dev.visdb.seesaw.utils.SsUtils.isJunitPrint;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 import static java.awt.EventQueue.isDispatchThread;
 import static java.lang.System.Logger.Level.*;
 

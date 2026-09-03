@@ -135,7 +135,7 @@ public class AbstractComboBoxListSwingModelEventTest {
   }
 
   // The item list
-  List<SSListItem> itemList = new ArrayList<>();
+  List<ListItem> itemList = new ArrayList<>();
 
   // 4 lists, "original", of the same length
   List<Integer> l1 = new ArrayList<>();
@@ -152,8 +152,8 @@ public class AbstractComboBoxListSwingModelEventTest {
     return Arrays.copyOf(o, n);
   }
 
-  List<SSListItem> liCreateMany(int n, LI listInfo) {
-    List<SSListItem> items = new ArrayList<>();
+  List<ListItem> liCreateMany(int n, LI listInfo) {
+    List<ListItem> items = new ArrayList<>();
     for (int i = 0; i < l1.size(); i++) {
       items.add(listInfo.createListItem(liCreateArray(n, i)));
     }
@@ -195,23 +195,23 @@ public class AbstractComboBoxListSwingModelEventTest {
   static int ADDED = 1;
   static int REMOVED = 2;
 
-  static SSListItem getAndRemove(LI li, int index) {
+  static ListItem getAndRemove(LI li, int index) {
     //SSListItem itemRemoved = remodel.remove(1);
-    SSListItem item = li.proxy.getElementAt(index);
+    ListItem item = li.proxy.getElementAt(index);
     li.proxy.removeElementAt(index);
     return item;
   }
 
-  static List<SSListItem> getItemList(LI li) {
-    List<SSListItem> list = new ArrayList<>();
+  static List<ListItem> getItemList(LI li) {
+    List<ListItem> list = new ArrayList<>();
     for (int i = 0, n = li.proxy.getSize(); i < n; i++) {
       list.add(li.proxy.getElementAt(i));
     }
     return list;
   }
 
-  static SSListItem getAndReplace(LI li, SSListItem item, int index) {
-    SSListItem oldItem = li.proxy.getElementAt(index);
+  static ListItem getAndReplace(LI li, ListItem item, int index) {
+    ListItem oldItem = li.proxy.getElementAt(index);
     li.proxy.removeElementAt(index);
     li.proxy.insertElementAt(item, index);
     return oldItem;
@@ -235,9 +235,9 @@ public class AbstractComboBoxListSwingModelEventTest {
     }
     assertTrue(events.isEmpty());
 
-    List<SSListItem> items = liCreateMany(li.getItemNumElems(), li);
+    List<ListItem> items = liCreateMany(li.getItemNumElems(), li);
     li.proxy.addAll(items);
-    SSListItem item2 = li.proxy.getElementAt(2);
+    ListItem item2 = li.proxy.getElementAt(2);
     assertEquals(items.get(2).toString(), item2.toString());
     li.verifyNoLocksHeld(null);
   }
@@ -253,9 +253,9 @@ public class AbstractComboBoxListSwingModelEventTest {
   @SuppressWarnings("NonPublicExported")
   public void testSetSelectedItem(LI li) {
     addListener(li);
-    SSListItem item;
+    ListItem item;
 
-    List<SSListItem> items = liCreateMany(li.getItemNumElems(), li);
+    List<ListItem> items = liCreateMany(li.getItemNumElems(), li);
 
     li.proxy.addElement(items.get(2));
     expectEvent(ADDED, 0, 0);
@@ -287,7 +287,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     }
     assertTrue(events.isEmpty());
 
-    List<SSListItem> items2 = liCreateMany(li.getItemNumElems(), li);
+    List<ListItem> items2 = liCreateMany(li.getItemNumElems(), li);
     li.proxy.addAll(2, items2);
     expectEvent(ADDED, 2, 6);
     // adding if not empty, does not get a selected event
@@ -310,7 +310,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     }
     assertTrue(events.isEmpty());
 
-    SSListItem selectedItem = li.proxy.getSelectedItem();
+    ListItem selectedItem = li.proxy.getSelectedItem();
     if (li.isComboBoxModel()) {
       assertEquals(item.toString(), selectedItem.toString());
     } else {
@@ -338,7 +338,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     assertTrue(li.proxy.getSize() == 0);
 
     // can't modify the list
-    List<SSListItem> il = getItemList(li);
+    List<ListItem> il = getItemList(li);
     assertTrue(il.isEmpty());
     // This is a copy of the list taken from the proxy model
     // assertThrows(UnsupportedOperationException.class, () -> il.add(null));
@@ -359,11 +359,11 @@ public class AbstractComboBoxListSwingModelEventTest {
     LI li = new LI(4);
     addListener(li);
     // split list into 2 + 1-item + 2
-    List<SSListItem> items1 = liCreateMany(li.getItemNumElems(), li);
-    List<SSListItem> items2 = liCreateMany(li.getItemNumElems(), li);
+    List<ListItem> items1 = liCreateMany(li.getItemNumElems(), li);
+    List<ListItem> items2 = liCreateMany(li.getItemNumElems(), li);
     items1 = new ArrayList<>(items1.subList(0, 2));
     items2.removeAll(items1);
-    SSListItem itemMiddle = items2.remove(0);
+    ListItem itemMiddle = items2.remove(0);
 
     li.proxy.addAll(items1);
     expectEvent(ADDED, 0, 1);
@@ -400,12 +400,12 @@ public class AbstractComboBoxListSwingModelEventTest {
   public void testRemove() {
     LI li = new LI(4);
     addListener(li);
-    List<SSListItem> items = liCreateMany(li.getItemNumElems(), li);
+    List<ListItem> items = liCreateMany(li.getItemNumElems(), li);
     li.proxy.addAll(items);
     events.clear();
 
-    SSListItem item = items.get(1);
-    SSListItem itemRemoved = getAndRemove(li, 1);
+    ListItem item = items.get(1);
+    ListItem itemRemoved = getAndRemove(li, 1);
     assertEquals(item, itemRemoved);
     expectEvent(REMOVED, 1, 1);
     // list contains 1,3,4,5
@@ -416,7 +416,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     // list 1,3,2,4,5
     assertTrue(events.isEmpty());
 
-    List<SSListItem> itemsCopy = new ArrayList<>(items);
+    List<ListItem> itemsCopy = new ArrayList<>(items);
     item = itemsCopy.remove(1);
     itemsCopy.add(2, item);
     assertEquals(itemsCopy, getItemList(li));
@@ -460,13 +460,13 @@ public class AbstractComboBoxListSwingModelEventTest {
   @SuppressWarnings("NonPublicExported")
   public void testRemoveSelected(LI li) {
     addListener(li);
-    List<SSListItem> items = liCreateMany(li.getItemNumElems(), li);
+    List<ListItem> items = liCreateMany(li.getItemNumElems(), li);
     li.proxy.addAll(items);
     events.clear();
 
-    SSListItem item = li.proxy.getElementAt(2); // 3
+    ListItem item = li.proxy.getElementAt(2); // 3
     li.proxy.setSelectedItem(item);
-    SSListItem selectedItem = li.proxy.getSelectedItem();
+    ListItem selectedItem = li.proxy.getSelectedItem();
     //assertEquals(li.isComboBoxModel() ? item : null, selectedItem);
     if (li.isComboBoxModel()) {
       assertEquals(item, selectedItem);
@@ -526,7 +526,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     }
     assertTrue(events.isEmpty());
 
-    List<SSListItem> itemsCopy = new ArrayList<>();
+    List<ListItem> itemsCopy = new ArrayList<>();
     itemsCopy.add(items.get(1)); // 2
     itemsCopy.add(items.get(3)); // 4
     assertEquals(itemsCopy, getItemList(li));
@@ -545,7 +545,7 @@ public class AbstractComboBoxListSwingModelEventTest {
     LI li = new LI(4);
     addListener(li);
     try (LI.Remodel remodel = li.getRemodel()) {
-      List<SSListItem> items = liCreateMany(li.getItemNumElems(), li);
+      List<ListItem> items = liCreateMany(li.getItemNumElems(), li);
       li.proxy.addAll(items);
       events.clear();
 

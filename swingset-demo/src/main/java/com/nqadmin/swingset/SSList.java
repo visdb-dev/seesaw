@@ -44,17 +44,16 @@ package com.nqadmin.swingset;
 
 import java.sql.JDBCType;
 
-import dev.visdb.seesaw.core.List1;
-
-import dev.visdb.seesaw.models.SSCollection;
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.SsList1;
+import dev.visdb.seesaw.models.DbCollection;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
- * See {@link List1}.
+ * See {@link SsList1}.
  */
 // TODO: Long or Integer?
 @SuppressWarnings("serial")
-public class SSList extends List1<Object, String> implements SSComponent {
+public class SSList extends SsList1<Object, String> implements SsComponent {
   /**
    * Creates an object of SSList with key type of {@code JDBCType.INTEGER}.
    */
@@ -65,8 +64,8 @@ public class SSList extends List1<Object, String> implements SSComponent {
   }
 
   /**
-   * Creates a List1 with default
-   * of {@link dev.visdb.seesaw.models.SSDbArray}
+   * Creates a SsList1 with default
+of {@link dev.visdb.seesaw.models.SSDbArray}
    * of specified jdbcType.
    *
    * @param jdbcType type of key of database elements
@@ -76,11 +75,11 @@ public class SSList extends List1<Object, String> implements SSComponent {
   }
 
   /**
-   * Creates a List1 with specified model.
+   * Creates a SsList1 with specified model.
    *
    * @param collectionModel model to read/write the database
    */
-  public SSList(SSCollection collectionModel) {
+  public SSList(DbCollection collectionModel) {
     super(collectionModel);
   }
 }

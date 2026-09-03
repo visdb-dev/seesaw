@@ -44,17 +44,17 @@ package com.nqadmin.swingset;
 
 import java.util.Optional;
 
-import dev.visdb.seesaw.core.ComboBox1;
+import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.models.Item1;
 
 /**
  * This class provides a ComboBox with an Integer key and String value.
- * See {@link dev.visdb.seesaw.core.ComboBox2} for detailed documentation.
+ * See {@link dev.visdb.seesaw.ComboBox2} for detailed documentation.
  */
 @SuppressWarnings("serial")
-public class SSComboBox extends ComboBox1<Integer, String> {
+public class SSComboBox extends SsComboBox1<Integer, String> {
   /** Builder */
-  public static class Builder extends ComboBox1.AbstractBuilder<Integer, String, Builder> {
+  public static class Builder extends SsComboBox1.AbstractBuilder<Integer, String, Builder> {
     /** self type idiom */
     @Override
     protected Builder self() {

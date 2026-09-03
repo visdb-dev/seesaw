@@ -51,12 +51,12 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import dev.visdb.seesaw.core.ComboBox1;
-import dev.visdb.seesaw.core.TextField;
+import dev.visdb.seesaw.SsComboBox1;
+import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.DataNavigator;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
 
 /**
@@ -64,7 +64,7 @@ import dev.visdb.seesaw.utils.JStuff;
  * SSTextFields are used to display supplier id, name,
  * and city. SSComboBox is used to display status.
  * <p>
- * Record navigation is handled with a DataNavigator.
+Record navigation is handled with a SsDataNavigator.
  */
 @SuppressWarnings("serial")
 public class Example2 extends JFrame {
@@ -84,18 +84,18 @@ public class Example2 extends JFrame {
   /**
    * bound component declarations
    */
-  TextField txtSupplierID = new TextField();
-  TextField txtSupplierName = new TextField();
-  TextField txtSupplierCity = new TextField();
+  SsTextField txtSupplierID = new SsTextField();
+  SsTextField txtSupplierName = new SsTextField();
+  SsTextField txtSupplierCity = new SsTextField();
   /** see {@link TestBaseComponents.MyComboBox} */
-  ComboBox1<Integer, String> cmbSupplierStatus
-      = new ComboBox1.Builder<Integer, String>() {}.build();
+  SsComboBox1<Integer, String> cmbSupplierStatus
+      = new SsComboBox1.Builder<Integer, String>() {}.build();
 
   /**
    * database component declarations
    */
   Connection connection = null;
-  DataNavigator navigator = null;
+  SsDataNavigator navigator = null;
   RowsModel rowsModel;
 
   /**
@@ -124,7 +124,7 @@ public class Example2 extends JFrame {
       rowset.setCommand("SELECT * FROM supplier_data");
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
-      navigator = new DataNavigator(rowsModel);
+      navigator = new SsDataNavigator(rowsModel);
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }

@@ -48,7 +48,7 @@ import java.util.function.Consumer;
 
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -101,7 +101,7 @@ public abstract class DbOpsImpl implements DbOps {
   /**
    * In the specified container, clear/initialize SSComponents.
    * Typically done for a new record/row. Uses
-   * {@link SSUtils#visitSSComponents(Container, Consumer) }
+   * {@link SsUtils#visitSsComponents(Container, Consumer) }
    * to run {@link dev.visdb.seesaw.utils.SSComponent#cleanField() }.
    * <p>
    * This is done for all SwingSet components,
@@ -115,7 +115,7 @@ public abstract class DbOpsImpl implements DbOps {
     logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
     if (container == null)
       return;
-    SSUtils.visitSSComponents(container, comp -> comp.cleanField());
+    SsUtils.visitSsComponents(container, comp -> comp.cleanField());
   }
 
   /**

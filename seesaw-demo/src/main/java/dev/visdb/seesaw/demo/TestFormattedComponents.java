@@ -50,22 +50,22 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import dev.visdb.seesaw.core.DBComboBox2;
-import dev.visdb.seesaw.core.TextField;
+import dev.visdb.seesaw.SsDbComboBox2;
+import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.formatting.SSCurrencyField;
-import dev.visdb.seesaw.formatting.SSDateField;
-import dev.visdb.seesaw.formatting.SSFormat;
-import dev.visdb.seesaw.formatting.SSFormattedTextField;
-import dev.visdb.seesaw.formatting.SSIntegerField;
-import dev.visdb.seesaw.formatting.SSNumericField;
-import dev.visdb.seesaw.formatting.SSPercentField;
-import dev.visdb.seesaw.formatting.SSSSNField;
-import dev.visdb.seesaw.formatting.SSTimeField;
-import dev.visdb.seesaw.formatting.SSTimestampField;
+import dev.visdb.seesaw.formatting.SsCurrencyField;
+import dev.visdb.seesaw.formatting.SsDateField;
+import dev.visdb.seesaw.formatting.SsFormat;
+import dev.visdb.seesaw.formatting.SsFormattedTextField;
+import dev.visdb.seesaw.formatting.SsIntegerField;
+import dev.visdb.seesaw.formatting.SsNumericField;
+import dev.visdb.seesaw.formatting.SsPercentField;
+import dev.visdb.seesaw.formatting.SsSSNField;
+import dev.visdb.seesaw.formatting.SsTimeField;
+import dev.visdb.seesaw.formatting.SsTimestampField;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.DataNavigator;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SyncManager;
 
@@ -75,8 +75,8 @@ import dev.visdb.seesaw.utils.SyncManager;
  * There is a separate example screen to demonstrate the
  * Base SwingSet Components.
  * <p>
- * IMPORTANT: The relationship of the DBComboBox2 and RowSet queries can have a
- * large negative impact on performance. See {@link SyncManager} for an
+IMPORTANT: The relationship of the SsDbComboBox2 and RowSet queries can have a
+large negative impact on performance. See {@link SyncManager} for an
  * explanation.
  */
 @SuppressWarnings("serial")
@@ -110,20 +110,20 @@ public class TestFormattedComponents extends JFrame {
   /**
    * bound component declarations
    */
-  TextField txtSwingSetFormattedTestPK = new TextField();
+  SsTextField txtSwingSetFormattedTestPK = new SsTextField();
   //SSCuitField fmtSSCuitField = new SSCuitField();
-  SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
-  SSCurrencyField fmtSSCurrencyFieldNull = new SSCurrencyField();
-  SSDateField fmtSSDateField = new SSDateField(SSFormat.DATE_MMDDYYYY_SLASH);
-  SSDateField fmtSSDateFieldNull = new SSDateField(SSFormat.DATE_YYYYMMDD_STROKE);
-  SSFormattedTextField fmtSSFormattedTextField = new SSFormattedTextField();
-  SSIntegerField fmtSSIntegerField = new SSIntegerField();
-  SSIntegerField fmtSSIntegerFieldNull = new SSIntegerField();
-  SSNumericField fmtSSNumericField = new SSNumericField();
-  SSPercentField fmtSSPercentField = new SSPercentField();
-  SSSSNField fmtSSSSNField = new SSSSNField();
-  SSTimeField fmtSSTimeField = new SSTimeField();
-  SSTimestampField fmtSSTimestampField = new SSTimestampField();
+  SsCurrencyField fmtSSCurrencyField = new SsCurrencyField();
+  SsCurrencyField fmtSSCurrencyFieldNull = new SsCurrencyField();
+  SsDateField fmtSSDateField = new SsDateField(SsFormat.DATE_MMDDYYYY_SLASH);
+  SsDateField fmtSSDateFieldNull = new SsDateField(SsFormat.DATE_YYYYMMDD_STROKE);
+  SsFormattedTextField fmtSSFormattedTextField = new SsFormattedTextField();
+  SsIntegerField fmtSSIntegerField = new SsIntegerField();
+  SsIntegerField fmtSSIntegerFieldNull = new SsIntegerField();
+  SsNumericField fmtSSNumericField = new SsNumericField();
+  SsPercentField fmtSSPercentField = new SsPercentField();
+  SsSSNField fmtSSSSNField = new SsSSNField();
+  SsTimeField fmtSSTimeField = new SsTimeField();
+  SsTimestampField fmtSSTimestampField = new SsTimestampField();
   DebugField fmtDebugField = new DebugField();
   DebugField fmtDebugFieldNull = new DebugField();
 
@@ -131,13 +131,13 @@ public class TestFormattedComponents extends JFrame {
    * database component declarations
    */
   Connection connection = null;
-  DataNavigator navigator = null;
+  SsDataNavigator navigator = null;
   RowsModel rowsModel;
 
   /**
    * combo navigator and sync manger
    */
-  DBComboBox2<Long, Object, Object> cmbSSDBComboNav; // SSDBComboBox used just for navigation
+  SsDbComboBox2<Long, Object, Object> cmbSSDBComboNav; // SSDBComboBox used just for navigation
   SyncManager<Long> syncManager;
 
   /**
@@ -166,7 +166,7 @@ public class TestFormattedComponents extends JFrame {
       rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
-      navigator = new DataNavigator(rowsModel);
+      navigator = new SsDataNavigator(rowsModel);
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }
@@ -174,7 +174,7 @@ public class TestFormattedComponents extends JFrame {
     // SETUP NAVIGATOR QUERY
     final String query = "SELECT * FROM swingset_formatted_test_data;";
     // (connection, query, "swingset_formatted_test_pk", "swingset_formatted_test_pk");
-    cmbSSDBComboNav = new DBComboBox2.Builder<Long, Object, Object>() {}
+    cmbSSDBComboNav = new SsDbComboBox2.Builder<Long, Object, Object>() {}
                           .connection(connection)
                           .query(query)
                           .primaryKeyColumnName("swingset_formatted_test_pk")

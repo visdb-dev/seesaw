@@ -52,14 +52,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 
+import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
-
-import dev.visdb.seesaw.datasources.DbOps;
 
 /**
  * TODO: Replace EventBUs with https://dagger.dev/ and RxJava
@@ -94,7 +93,7 @@ public class Utils {
    * @return true means save the backtrace in the Event.
    */
   static boolean recordEventBacktrace() {
-    return SSUtils.isJunit() || logger.isLoggable(DEBUG);
+    return SsUtils.isJunit() || logger.isLoggable(DEBUG);
   }
 
   private static void postFieldEvent(EventObjectBacktrace eo) {
@@ -113,10 +112,10 @@ public class Utils {
 
   /**
    * Post a column change event.
-   * @param source SSComponent modifying the column
+   * @param source SsComponent modifying the column
    * @param value new value
    */
-  public static void postColumnChangeStart(SSComponent source, Object value) {
+  public static void postColumnChangeStart(SsComponent source, Object value) {
     // May want to extend to handling local EventBus per Frame/Panel;
     // Use either/both source/rs to find a local eventBus.
     postFieldEvent(new ColumnChangeStartEvent(source, value));
@@ -124,10 +123,10 @@ public class Utils {
 
   /**
    * Post an error column change event.
-   * @param source SSComponent modifying the column
+   * @param source SsComponent modifying the column
    * @param value new value
    */
-  public static void postColumnChangeStartError(SSComponent source, Object value) {
+  public static void postColumnChangeStartError(SsComponent source, Object value) {
     ColumnChangeStartEvent ev = new ColumnChangeStartEvent(source, value, true);
     logger.log(DEBUG, () -> ev.toString());
     postFieldEvent(ev);
@@ -147,11 +146,11 @@ public class Utils {
 
   /**
    * Post an undo/redo event and if value an error.
-   * @param source SSComponent modifying the column
+   * @param source SsComponent modifying the column
    * @param value new value
    * @param isError value is an error
    */
-  public static void postColumnUndoRedo(SSComponent source, Object value, boolean isError) {
+  public static void postColumnUndoRedo(SsComponent source, Object value, boolean isError) {
     ColumnUndoRedoEvent ev = new ColumnUndoRedoEvent(source, value, isError);
     if (isError)
       logger.log(DEBUG, () -> ev.toString());
@@ -241,7 +240,7 @@ public class Utils {
   private static final int N_EVENTS = 50;
   private static final Queue<EventHistoryItem> latestEvents = new ArrayDeque<>();
   static void addToEventHistory(EventObjectBacktrace event) {
-    if (!SSUtils.isJunit() && !logger.isLoggable(DEBUG))
+    if (!SsUtils.isJunit() && !logger.isLoggable(DEBUG))
       return;
     while (latestEvents.size() >= N_EVENTS) latestEvents.remove();
     // Convert event to String so there are no references

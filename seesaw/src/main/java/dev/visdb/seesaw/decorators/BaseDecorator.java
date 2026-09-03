@@ -29,7 +29,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.utils.SSComponent.ValidationResult;
+import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 /**
  * Some handling for the TextDecorator; {@link #handleTextDecorator(ValidationResult)}
@@ -55,7 +55,7 @@ public abstract class BaseDecorator extends BaseAnyDecorator implements Decorato
   protected void handleTextDecorator(ValidationResult valid) {
     if (!decorateTextEnabled)
       return;
-    TextDecorator td = getSSComponent().getTextDecorator();
+    TextDecorator td = getSsComponent().getTextDecorator();
     assert td != null;
     if (td instanceof ComponentStateTextDecorator std)
       std.decorateText(valid);

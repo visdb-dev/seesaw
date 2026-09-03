@@ -58,14 +58,15 @@ import javax.swing.JToggleButton;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import dev.visdb.seesaw.core.DataGrid;
-import dev.visdb.seesaw.core.table.SSDataGridHandler;
-import dev.visdb.seesaw.core.table.SSDataValue;
-import dev.visdb.seesaw.core.table.SSTableModel;
+import dev.visdb.seesaw.SsTable;
+import dev.visdb.seesaw.table.SsTableModel;
 import dev.visdb.seesaw.datasources.RowSetOps;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
+
+import dev.visdb.seesaw.table.SsDataGridHandler;
+import dev.visdb.seesaw.table.SsDataValue;
 
 /**
  * Add some buttons at the bottom of a DataGrid example
@@ -76,20 +77,20 @@ import static java.lang.System.Logger.Level.*;
 class DataGridExampleSupport {
   private final Container uiContainer;
   private final RowSet rowset;
-  private final DataGrid dataGrid;
+  private final SsTable dataGrid;
   @SuppressWarnings("NonConstantLogger")
   private final Logger logger;
 
   /** assumes rowset has been set */
-  static void setup(Logger logger, Container uiContainer, RowSet rowset, DataGrid dataGrid,
-                    int primaryColumn, SSDataValue dataValue, String[] columnNames,
+  static void setup(Logger logger, Container uiContainer, RowSet rowset, SsTable dataGrid,
+                    int primaryColumn, SsDataValue dataValue, String[] columnNames,
                     Object[] defaultValues) throws SQLException {
     DataGridExampleSupport dges = new DataGridExampleSupport(logger, uiContainer, rowset, dataGrid);
     dges.init(primaryColumn, dataValue, columnNames, defaultValues);
   }
 
   private DataGridExampleSupport(Logger _logger, Container _uiContainer, RowSet _rowset,
-                                 DataGrid _dataGrid) {
+                                 SsTable _dataGrid) {
     if (!(_uiContainer.getLayout() instanceof BorderLayout)) {
       throw new IllegalArgumentException("uiContainer without BorderLayout");
     }
@@ -101,10 +102,10 @@ class DataGridExampleSupport {
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  private void init(int primaryColumn, SSDataValue dataValue, String[] columnNames,
+  private void init(int primaryColumn, SsDataValue dataValue, String[] columnNames,
                     Object[] defaultValues) throws SQLException {
     // stuff needed if there's going to be an insertion
-    dataGrid.getModel().setSSDataGridHandler(new DataGridHandler());
+    dataGrid.getModel().setSsDataGridHandler(new DataGridHandler());
     dataGrid.setPrimaryColumn(primaryColumn);
     dataGrid.setSSDataValue(dataValue);
     dataGrid.setDefaultValues(columnNames, defaultValues);
@@ -122,7 +123,7 @@ class DataGridExampleSupport {
   /**
    * Based on example4's SSDBNavImpl
    */
-  private class DataGridHandler implements SSDataGridHandler {
+  private class DataGridHandler implements SsDataGridHandler {
     @Override
     public boolean allowDeletion(int _row) {
       return true;
@@ -234,7 +235,7 @@ class DataGridExampleSupport {
         JOptionPane.showMessageDialog((Component) e.getSource(), msg, "Can not delete",
                                       JOptionPane.ERROR_MESSAGE);
       } else {
-        SSTableModel model = dataGrid.getModel();
+        SsTableModel model = dataGrid.getModel();
         model.deleteRow(row);
       }
     });

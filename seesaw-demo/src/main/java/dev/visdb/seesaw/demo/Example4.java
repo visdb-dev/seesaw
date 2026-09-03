@@ -54,15 +54,15 @@ import javax.swing.JLabel;
 
 import com.google.common.reflect.TypeToken;
 
-import dev.visdb.seesaw.core.ComboBox2;
-import dev.visdb.seesaw.core.DBComboBox2;
-import dev.visdb.seesaw.core.TextField;
+import dev.visdb.seesaw.SsComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
+import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.DataNavigator;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
 /**
@@ -70,24 +70,24 @@ import dev.visdb.seesaw.utils.SyncManager;
  * SSTextFields are used to display part id, name, weight,
  * and city. SSComboBox is used to display color.
  * <p>
- * Record navigation can be handled with a DataNavigator or
- * with a DBComboBox2.
- * <p>
+Record navigation can be handled with a SsDataNavigator or
+with a SsDbComboBox2.
+<p>
  * Since the navigation can take place by multiple methods, the navigation
  * controls have to be synchronized. This is accomplished with the
  * SyncManager.
  * <p>
  * IMPORTANT: If {@code DbSupport.createRownumQuery()} is not available,
- * the DBComboBox2 and the SSRowSet queries should select the same
- * records and in the same order. Otherwise the SyncManager will spend a lot of
- * time looping through records to match.
+the SsDbComboBox2 and the SSRowSet queries should select the same
+records and in the same order. Otherwise the SyncManager will spend a lot of
+time looping through records to match.
  */
 @SuppressWarnings("serial")
 public class Example4 extends JFrame {
   /** Logger */
   static final Logger logger = JStuff.getLogger();
 
-  static ComboBox2.ModelType comboModelType = ComboBox2.ModelType.GLAZED;
+  static SsComboBox2.ModelType comboModelType = SsComboBox2.ModelType.GLAZED;
 
   /**
    * screen label declarations
@@ -99,9 +99,9 @@ public class Example4 extends JFrame {
   JLabel lblPartWeight = new JLabel("Weight");
   JLabel lblPartCity = new JLabel("City");
 
-  static class MyComboBox2<D2> extends ComboBox2<Integer, String, D2> {
+  static class MyComboBox2<D2> extends SsComboBox2<Integer, String, D2> {
     public static class Builder<D2>
-        extends ComboBox2.AbstractBuilder<Integer, String, D2, Builder<D2>> {
+        extends SsComboBox2.AbstractBuilder<Integer, String, D2, Builder<D2>> {
       @Override
       protected Builder<D2> self() {
         return this;
@@ -116,9 +116,9 @@ public class Example4 extends JFrame {
     }
   }
 
-  static class MyDbComboBox extends DBComboBox2<Integer, String, Byte> {
+  static class MyDbComboBox extends SsDbComboBox2<Integer, String, Byte> {
     public static class Builder
-        extends DBComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
+        extends SsDbComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
       @Override
       protected Builder self() {
         return this;
@@ -135,12 +135,12 @@ public class Example4 extends JFrame {
 
   // Concrete class, additional generric type, with type capture, extendable
 
-  static class DbComboBox2Extra<D2, D3> extends DBComboBox2<Integer, String, D2> {
+  static class DbComboBox2Extra<D2, D3> extends SsDbComboBox2<Integer, String, D2> {
     private final D3 d3Value; // Note: not part of combo list item.
     private final TypeToken<D3> d3TypeToken;
 
     public abstract static class AbstractBuilder<D2, D3, T extends AbstractBuilder<D2, D3, T>>
-        extends DBComboBox2.AbstractBuilder<Integer, String, D2, T> {
+        extends SsDbComboBox2.AbstractBuilder<Integer, String, D2, T> {
       private D3 d3Value;
       // captures D3 for whatever runtime class extends this Abstractbuilder
       private final TypeToken<D3> d3TypeToken = new TypeToken<D3>(getClass()) {};
@@ -190,11 +190,11 @@ public class Example4 extends JFrame {
     new DbComboBox2Extra.Builder<Double, List<Double>>() {};
 
     @SuppressWarnings("unused")
-    DBComboBox2.Builder<Integer, String, Byte> b
-        = new DBComboBox2.Builder<Integer, String, Byte>() {};
+    SsDbComboBox2.Builder<Integer, String, Byte> b
+        = new SsDbComboBox2.Builder<Integer, String, Byte>() {};
 
     @SuppressWarnings("unused")
-    DBComboBox2<Integer, String, Byte> x1 = new DBComboBox2.Builder<Integer, String, Byte>() {
+    SsDbComboBox2<Integer, String, Byte> x1 = new SsDbComboBox2.Builder<Integer, String, Byte>() {
     }.primaryKeyColumnName("aaa").displayColumnName("bbb").build();
 
     MyDbComboBox dbCombo = new MyDbComboBox
@@ -222,22 +222,22 @@ public class Example4 extends JFrame {
   /**
    * bound component declarations
    */
-  TextField txtPartID = new TextField();
-  TextField txtPartName = new TextField();
+  SsTextField txtPartID = new SsTextField();
+  SsTextField txtPartName = new SsTextField();
   MyComboBox2<Byte> cmbPartColor
       = new MyComboBox2.Builder<Byte>() {}.modelType(comboModelType).build();
-  TextField txtPartWeight = new TextField();
-  TextField txtPartCity = new TextField();
+  SsTextField txtPartWeight = new SsTextField();
+  SsTextField txtPartCity = new SsTextField();
 
   /**
    * database component declarations
    */
   Connection connection = null;
-  DataNavigator navigator = null;
+  SsDataNavigator navigator = null;
   RowsModel rowsModel;
 
   /** combo navigator and sync manger */
-  DBComboBox2<Long, Object, Object> cmbSelectPart = null;
+  SsDbComboBox2<Long, Object, Object> cmbSelectPart = null;
   SyncManager<Long> syncManager;
 
   /**
@@ -268,7 +268,7 @@ public class Example4 extends JFrame {
       rowset.setCommand("SELECT * FROM part_data;");
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
-      navigator = new DataNavigator(rowsModel);
+      navigator = new SsDataNavigator(rowsModel);
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }
@@ -282,7 +282,7 @@ public class Example4 extends JFrame {
     SuppressWarnings("unused") String simpleQuery = "SELECT * FROM part_data;";
     String orderedQuery = "SELECT * FROM part_data order by part_name;";
     String query
-        = SSUtils.dbSupport().createRownumQuery("*", "rown", "part_data", "ORDER BY part_name");
+        = SsUtils.dbSupport().createRownumQuery("*", "rown", "part_data", "ORDER BY part_name");
 
     boolean comboHasRowNum = false;
 
@@ -292,7 +292,7 @@ public class Example4 extends JFrame {
       query = orderedQuery;
     }
 
-    DBComboBox2.Builder<Long, Object, Object> builder = new DBComboBox2.Builder<>() {};
+    SsDbComboBox2.Builder<Long, Object, Object> builder = new SsDbComboBox2.Builder<>() {};
     builder.connection(connection)
         .query(query)
         .primaryKeyColumnName("part_id")

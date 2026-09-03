@@ -32,10 +32,10 @@ package dev.visdb.seesaw.demo;
 import javax.swing.text.DefaultFormatterFactory;
 
 import dev.visdb.seesaw.formatting.Field;
-import dev.visdb.seesaw.formatting.SSFormat;
-import dev.visdb.seesaw.formatting.SSMaskFormatterFactory;
+import dev.visdb.seesaw.formatting.SsFormat;
+import dev.visdb.seesaw.formatting.MaskFormatterFactory;
 
-import static dev.visdb.seesaw.formatting.SSFormat.CUSTOM;
+import static dev.visdb.seesaw.formatting.SsFormat.CUSTOM;
 
 /**
  * A simple field for debug that is not in the formatting package.
@@ -53,7 +53,7 @@ public class DebugField extends Field {
    *  Creates a new instance of SSDateField with the specified format.
    *  @param format - an enum format to be used while the date field is in edit mode
    */
-  public DebugField(SSFormat format) {
+  public DebugField(SsFormat format) {
     this(createFormatterFactory(format));
   }
 
@@ -75,10 +75,10 @@ public class DebugField extends Field {
    * @param _format - Format to be used for date while in editing mode.
    * @return a DefaultFormatterFactory for the specified date format
    */
-  public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
-    SSFormat format = SSFormat.getActualFormat(_format);
+  public static DefaultFormatterFactory createFormatterFactory(SsFormat _format) {
+    SsFormat format = SsFormat.getActualFormat(_format);
     String formatMask = "###";
 
-    return new SSMaskFormatterFactory.Builder<>(formatMask).ssFormat(format).build();
+    return new MaskFormatterFactory.Builder<>(formatMask).ssFormat(format).build();
   }
 }

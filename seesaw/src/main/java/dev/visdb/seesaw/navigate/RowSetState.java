@@ -60,14 +60,14 @@ import org.openide.util.WeakListeners;
 import com.google.common.collect.MapMaker;
 
 import dev.visdb.seesaw.datasources.RSC;
-import dev.visdb.seesaw.datasources.SSSQLException;
-import dev.visdb.seesaw.utils.SSUtils;
-import dev.visdb.seesaw.utils.SSUtils.DebugRowSetListenerFlag;
+import dev.visdb.seesaw.datasources.SqlException;
+import dev.visdb.seesaw.utils.SsUtils;
+import dev.visdb.seesaw.utils.SsUtils.DebugRowSetListenerFlag;
 
 import static dev.visdb.seesaw.navigate.RowsEvent.RowSetEventType.*;
 import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 
 /**
  * Track some global state for a row set.
@@ -109,7 +109,7 @@ public class RowSetState {
     // Saving each RowSets column minimizes metadata access.
     // May want to cache more metadata info in the future.
     try {
-      List<String> names = SSUtils.getPrimaryKeyInfoForTable(rs, columnName)
+      List<String> names = SsUtils.getPrimaryKeyInfoForTable(rs, columnName)
                                .stream()
                                .map((ki) -> ki.columnName())
                                .toList();
@@ -217,7 +217,7 @@ public class RowSetState {
    */
   public static int count() {
     // Can't depend on size() method when weakKeys.
-    return SSUtils.size(rowSetState);
+    return SsUtils.size(rowSetState);
   }
 
   /**
@@ -387,11 +387,11 @@ public class RowSetState {
       if (afterEx == null)
         throw syncEx;
       else
-        throw new NOT_USED_SSSQLSyncProviderException("Exception after Sync", syncEx, afterEx);
+        throw new NOT_USED_SqlSyncProviderException("Exception after Sync", syncEx, afterEx);
     }
 
     if (syncEx != null || afterEx != null)
-      throw new NOT_USED_SSSQLSyncProviderException("handling aceptChanges", syncEx, afterEx);
+      throw new NOT_USED_SqlSyncProviderException("handling aceptChanges", syncEx, afterEx);
   }
 
   /**
@@ -404,7 +404,7 @@ public class RowSetState {
    */
   // TODO: handle flags argument to acceptCachedRowSetChanges.
   @SuppressWarnings("serial")
-  private static class NOT_USED_SSSQLSyncProviderException extends SSSQLException {
+  private static class NOT_USED_SqlSyncProviderException extends SqlException {
     private final Throwable causeAfter;
 
     /**
@@ -413,7 +413,7 @@ public class RowSetState {
      * @param cause
      * @param causeAfter
      */
-    public NOT_USED_SSSQLSyncProviderException(String reason, SyncProviderException cause,
+    public NOT_USED_SqlSyncProviderException(String reason, SyncProviderException cause,
                                                Throwable causeAfter) {
       super(reason, cause);
       this.causeAfter = causeAfter;

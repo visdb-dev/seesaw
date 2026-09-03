@@ -105,7 +105,7 @@ class DataGridExampleSupport {
   private void init(int primaryColumn, SSDataValue dataValue, String[] columnNames,
                     Object[] defaultValues) throws SQLException {
     // stuff needed if there's going to be an insertion
-    dataGrid.getModel().setSSDataGridHandler(new DataGridHandler());
+    dataGrid.getModel().setSsDataGridHandler(new DataGridHandler());
     dataGrid.setPrimaryColumn(primaryColumn);
     dataGrid.setSSDataValue(dataValue);
     dataGrid.setDefaultValues(columnNames, defaultValues);

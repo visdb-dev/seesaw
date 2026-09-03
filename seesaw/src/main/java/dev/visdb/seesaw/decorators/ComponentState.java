@@ -35,7 +35,7 @@ import java.awt.Component;
 import javax.swing.SwingUtilities;
 
 import dev.visdb.seesaw.navigate.Utils;
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * The state of a component, focused/dirty/modified.
@@ -86,8 +86,8 @@ public enum ComponentState {
    * @param valid
    * @return the component state
    */
-  public static ComponentState getComponentState(SSComponent comp,
-                                                 SSComponent.ValidationResult valid) {
+  public static ComponentState getComponentState(SsComponent comp,
+                                                 SsComponent.ValidationResult valid) {
     ComponentState borderState;
     if (valid.all())
       borderState = comp.isDirty() ? MODIFIED : CLEAN;

@@ -19,13 +19,13 @@ package snippet_files;
 import javax.swing.JCheckBox;
 
 import dev.visdb.seesaw.datasources.RowSetOps;
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * x
  */
 @SuppressWarnings("serial")
-public class DbReaderDbUpdater extends JCheckBox implements SSComponent {
+public class DbReaderDbUpdater extends JCheckBox implements SsComponent {
   @SuppressWarnings("unused")
   void F() {
     // @start region=setColumnReader
@@ -55,7 +55,7 @@ public class DbReaderDbUpdater extends JCheckBox implements SSComponent {
    * @return
    */
   @Override
-  public Hook getSSComponentHook() {
+  public Hook getSsComponentHook() {
     return null;
   }
 }

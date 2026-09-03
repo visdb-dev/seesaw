@@ -1,0 +1,755 @@
+/*******************************************************************************
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Contributors:
+ *   Prasanth R. Pasala
+ *   Brian E. Pangburn
+ *   Diego Gil
+ *   Man "Bee" Vo
+ *   Ernie R. Rael
+ ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
+package dev.visdb.seesaw.table;
+
+import java.awt.Component;
+import java.lang.System.Logger;
+import java.sql.JDBCType;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
+import javax.sql.RowSet;
+import javax.swing.JOptionPane;
+import javax.swing.table.AbstractTableModel;
+
+import dev.visdb.seesaw.datasources.DateTime;
+import dev.visdb.seesaw.datasources.RSC;
+import dev.visdb.seesaw.datasources.RowSetOps;
+import dev.visdb.seesaw.navigate.RowsModel;
+import dev.visdb.seesaw.utils.JStuff;
+
+import static dev.visdb.seesaw.datasources.DateTime.getSQLDateTimeObject;
+import static dev.visdb.seesaw.datasources.RowSetOps.updateColumnObjectDirect;
+import static dev.visdb.seesaw.utils.JStuff.sf;
+import static java.lang.System.Logger.Level.*;
+
+/**
+ * SsTableModel provides an implementation of the TableModel interface. The
+ * SsDataGrid uses this class for providing a grid view for a RowSet.
+ * SsTableModel can be used without the SsDataGrid (e.g. in conjunction with a
+ * JTable), but the cell renderers and hidden columns features of the SsDataGrid
+ * will not be available.
+ * <p>
+SsTableModel can be used with a JTable to get a Grid view of the data.
+ */
+@SuppressWarnings("serial")
+public class SsTableModel extends AbstractTableModel {
+  /**
+   * Log4j Logger for component
+   */
+  private static final Logger logger = JStuff.getLogger();
+
+  /**
+   * Indicator to determine if insertions are allowed.
+   */
+  private boolean allowInsertion = true;
+
+  /**
+   * Implementation of SsCellEditing interface used to determine dynamically if a
+given cell can be edited and to determine if a given value is valid.
+   */
+  private SsCellEditing cellEditing = null;
+
+  /**
+   * Number of columns in the RowSet.
+   */
+  protected transient int columnCount = 0;
+
+  private transient List<Class<?>> columnClasses = Collections.emptyList();
+
+  /**
+   * Window where messages should be displayed.
+   */
+  private transient Component component = null;
+
+  /**
+   * Implementation of DataGridHandler interface used to determine dynamically if
+   * a given row can be deleted, and what to do before and after a row is added or
+   * removed.
+   */
+  transient private SsDataGridHandler dataGridHandler = null;
+
+  /**
+   * Implementation of SsDataValue interface used to determine PK value for new
+rows.
+   */
+  transient private SsDataValue dataValue = null;
+
+  /**
+   * Map to store the default values of different columns.
+   */
+  private HashMap<Integer, Object> defaultValuesMap = null;
+
+  /**
+   * JTable headers.
+   */
+  private transient String[] headers = null;
+
+  /**
+   * Indicator to determine if the RowSet is on the insertion row.
+   */
+  private boolean inInsertRow = false;
+
+  /**
+   * Column containing primary key.
+   */
+  private int primaryColumn = -1;
+
+  /**
+   * Number of rows in the RowSet.
+   */
+  // TODO: Can the result set change and invalidate this?
+  private transient int rowCount = 0;
+
+  transient private RowSet rowset = null;
+  transient private RowsModel rowsModel = null;
+
+  /**
+   * List of uneditable columns.
+   */
+  private int[] uneditableColumns = null;
+
+  /**
+   * Constructs a SsTableModel object. If this contructor is used the
+   * setRowSet() method has to be used to set the RowSet before constructing
+   * the JTable.
+   */
+  public SsTableModel() {}
+
+  /**
+   * Constructs a SsTableModel object with the given RowSet. This will call the
+   * execute method on the given RowSet.
+   *
+   * @param rowset RowSet object whose records has to be displayed in JTable.
+   */
+  // TODO: If this constructor is used
+  //		 then it is unclear how this model
+  //		 and the rowset get hookup up to an SsDataGrid.
+  public SsTableModel(RowSet rowset) {
+    this();
+    this.rowset = rowset;
+    init(true);
+  }
+
+  /**
+   * Deletes the specified JTable row from the database.
+   * The rows are numbered as: 0, 1, * ..., n-1
+   *
+   * @param row the row number to delete.
+   *
+   * @return returns true on succesful deletion else false.
+   */
+  public boolean deleteRow(int row) {
+    if (dataGridHandler != null) {
+      dataGridHandler.performPreDeletionOps(row);
+    }
+    if (row < rowCount) {
+      try {
+        if ((dataGridHandler != null) && !dataGridHandler.allowDeletion(row)) {
+          return false;
+        }
+        rowset.absolute(row + 1);
+        RowSetOps.deleteRow(rowset);
+        rowCount--;
+        if (dataGridHandler != null) {
+          dataGridHandler.performPostDeletionOps(row);
+        }
+        fireTableRowsDeleted(row, row);
+        return true;
+      } catch (final SQLException se) {
+        logger.log(ERROR, "SQL Exception while deleting row.", se);
+        if (component != null) {
+          JOptionPane.showMessageDialog(component, "Error while deleting row.\n" + se.getMessage());
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Returns the type for the column specified for the current view.
+   *
+   * @param column the column in the view being queried
+   *
+   * @return type for the specified column (first column is 0)
+   */
+  @Override
+  public Class<?> getColumnClass(int column) {
+    try {
+      return RowSetOps.getClassColumnType(rowset, column + 1);
+    } catch (final SQLException se) {
+      logger.log(DEBUG, "SQL Exception.", se);
+      return super.getColumnClass(column);
+    }
+  }
+
+  /**
+   * Returns the number of columns in the model. A JTable uses this method to
+   * determine how many columns it should create and display by default.
+   *
+   * @return the number of columns in the SsTableModel
+   */
+  @Override
+  public int getColumnCount() {
+    return columnCount;
+  }
+
+  /**
+   * Returns the name of the column appearing in the view at column position
+   * column.
+   *
+   * @param columnNumber the column in the view being queried
+   *
+   * @return the name of the column at the position specified for the current vew
+   *         where column numbering begins at 0
+   */
+  @Override
+  public String getColumnName(int columnNumber) {
+    if (headers != null) {
+      if (columnNumber < headers.length) {
+        logger.log(DEBUG, () -> "Sending header " + headers[columnNumber]);
+        return headers[columnNumber];
+      }
+    }
+    logger.log(WARNING, "Not able to supply header name.");
+    return "";
+  }
+
+  /**
+   * Returns the default value inforce for the requested column.
+   * <p>
+   * The type of object is same as returned by getColumnClass in JTable.
+   *
+   * @param columnNumber the column number for which default value is needed.
+   *
+   * @return returns a object representing the default value.
+   */
+  public Object getDefaultValue(int columnNumber) {
+    Object value = null;
+    if (defaultValuesMap != null) {
+      value = defaultValuesMap.get(columnNumber);
+    }
+    return value;
+  }
+
+  /**
+   * Returns the number of rows in the model. A JTable uses this method to
+   * determine how many rows it should display.
+   *
+   * @return the number of rows in the SsTableModel
+   */
+  @Override
+  public int getRowCount() {
+    // RETURN THE NUMBER OF ROWS AS ONE GREATER THAN THOSE IN DATABASE
+    // ITS USED FOR INSERTING NEW ROWS
+    if (allowInsertion) {
+      return rowCount + 1;
+    }
+    // IF INSERTION IS NOT ALLOWED THEN RETURN THE ACTUAL ROW COUNT
+    return rowCount;
+  }
+
+  /**
+   * Returns the value for the cell at the specified row and column.
+   *
+   * @param row    the row whose value to be queried.
+   * @param column the column whose value to be queried.
+   *
+   * @return value at the requested cell.
+   */
+  @Override
+  public Object getValueAt(int row, int column) {
+    Object value = null;
+    if (row == rowCount) {
+      value = getDefaultValue(column);
+      return value;
+    }
+
+    try {
+      // ROW NUMBERS IN SSROWSET START FROM 1 WHERE AS ROW NUMBERING FOR JTABLE START
+      // FROM 0
+      rowset.absolute(row + 1);
+
+      // IF IT IS NULL RETURN NULL
+      if (rowset.getObject(column + 1) == null) {
+        return null;
+      }
+
+      // Column numbers in ssrowset start from 1 where as column numbering
+      // for jtable start from 0.
+      value = RowSetOps.getColumnObjectDirect(RSC.get(rowsModel, column + 1));
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception while retrieving value.", se);
+      if (component != null) {
+        JOptionPane.showMessageDialog(component,
+                                      "Error while retrieving value.\n" + se.getMessage());
+      }
+    }
+
+    return value;
+  }
+
+  /**
+   * Check if previous Java class column types are different from the rowset;
+   * save the new column types.
+   * @return true if different types
+   * @throws SQLException
+   */
+  private boolean columnTypesChanged() throws SQLException {
+    int newColumnCount = RowSetOps.getColumnCount(rowset);
+
+    List<Class<?>> colClasses = new ArrayList<>();
+    for (int col = 1; col <= newColumnCount; ++col) {
+      colClasses.add(RowSetOps.getClassColumnType(rowset, col));
+    }
+    if (colClasses.equals(columnClasses)) {
+      return false;
+    } else {
+      columnClasses = colClasses;
+      return true;
+    }
+  }
+
+  /**
+   * Initializes the SsTableModel. (Gets the column count and row count for the
+   * given RowSet.)
+   */
+  private void init(boolean inConstructor) {
+    try {
+      // If columnsChanged is true then will fireTableStructureChanged
+      boolean columnsChanged = columnTypesChanged();
+
+      columnCount = RowSetOps.getColumnCount(rowset);
+      rowset.last();
+      // ROWS IN THE SSROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE
+      // ROW COUNT
+      rowCount = rowset.getRow();
+      rowset.first();
+
+      if (!inConstructor) {
+        // *** Following code added 11-01-2004 per forum suggestion from Diego Gil (dags).
+        // IF DATA CHANGES, ALERT LISTENERS
+        if (columnsChanged) {
+          fireTableStructureChanged();
+        } else {
+          fireTableDataChanged();
+        }
+        // *** End addition
+      }
+
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception.", se);
+    }
+  }
+
+  /**
+   * Inserts a new row into the database. While doing so it inserts all the
+   * defaults provided by user and if the primary column is specified along with
+   * an SsDataValue implementation then the primary column value will be inserted.
+   *
+   * @param value  value entererd of a column
+   * @param column the column number for which the value is entered.
+   */
+  protected void insertRow(Object value, int column) {
+    if (value == null) {
+      return;
+    }
+    if (dataGridHandler != null) {
+      dataGridHandler.performPreInsertOps(rowCount);
+    }
+
+    try {
+      // IF NOT ON INSERT ROW MOVE TO INSERT ROW.
+      if (!inInsertRow) {
+        rowset.moveToInsertRow();
+        // SET THE DEFAULTS
+        setDefaults();
+        inInsertRow = true;
+        // IS SsDATAVALUE IS PROVIDED SET PRIMARY KEY VALUE
+        if (dataValue != null) {
+          setPrimaryColumn();
+        }
+      }
+
+      updateColumnObjectDirect(rowset, column + 1, value);
+
+      RowSetOps.insertRow(rowset);
+      if (rowCount != 0) {
+        rowset.moveToCurrentRow();
+      } else {
+        rowset.first();
+      }
+      rowset.refreshRow();
+
+      Supplier<String> text = () -> {
+        try {
+          return String.valueOf(rowset.getRow());
+        } catch (SQLException e) {
+          return "*** getRow() threw an SQLException ***";
+        }
+      };
+      logger.log(DEBUG, () -> sf("Row number of inserted row : %s", text.get()));
+
+      inInsertRow = false;
+      rowCount++;
+
+      if (dataGridHandler != null) {
+        dataGridHandler.performPostInsertOps(rowCount - 1);
+      }
+      // If allowInsertion then add another empty insert row.
+      int newRow = allowInsertion ? rowCount : rowCount - 1;
+      fireTableRowsInserted(newRow, newRow);
+
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception while inserting row.", se);
+      inInsertRow = false;
+      if (component != null) {
+        JOptionPane.showMessageDialog(component, "Error while inserting row.\n" + se.getMessage());
+      }
+    }
+
+    logger.log(DEBUG, "Successfully added row.");
+  }
+
+  /**
+   * Returns true if the cell at rowIndex and columnIndex is editable. Otherwise,
+   * a call to setValueAt() on the cell will not change the value of that cell.
+   *
+   * @param row    the row whose value to be queried
+   * @param column the column whose value to be queried
+   *
+   * @return editable indicator for cell at row and column specified
+   */
+  @Override
+  public boolean isCellEditable(int row, int column) {
+    if (uneditableColumns != null) {
+      for (int i = 0; i < uneditableColumns.length; i++) {
+        if (column == uneditableColumns[i]) {
+          return false;
+        }
+      }
+    }
+
+    if (cellEditing != null) {
+      return cellEditing.isCellEditable(row, column);
+    }
+
+    return true;
+  }
+
+  /**
+   * This function sets the default values for the present row.
+   */
+  protected void setDefaults() {
+    if (defaultValuesMap == null) {
+      return;
+    }
+
+    final Set<Integer> keySet = defaultValuesMap.keySet();
+    final Iterator<?> iterator = keySet.iterator();
+    try {
+      while (iterator.hasNext()) {
+        final Integer column = (Integer) iterator.next();
+
+        logger.log(DEBUG, () -> "Column number is:" + column);
+
+        // COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
+        //final int type = rowset.getColumnType(column.intValue() + 1);
+        updateColumnObjectDirect(rowset, column + 1, defaultValuesMap.get(column));
+
+      } // END OF WHILE
+
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception while setting defaults for row.", se);
+      if (component != null) {
+        JOptionPane.showMessageDialog(component,
+                                      "Error while setting defaults for row.\n" + se.getMessage());
+      }
+    }
+  } // end protected void setDefaults() {
+
+  /**
+   * Sets the default values for different columns. These values will be used
+   * while inserting a new row.
+   *
+   * @param columnNumbers the column numbers for which defaults are required
+   * @param values        the values for all the columns specified in first
+   *                       argument
+   */
+  public void setDefaultValues(int[] columnNumbers, Object[] values) {
+    if ((columnNumbers == null) || (values == null)) {
+      defaultValuesMap = null;
+    }
+
+    if (defaultValuesMap == null) {
+      defaultValuesMap = new HashMap<>();
+    } else {
+      defaultValuesMap.clear();
+    }
+    if ((columnNumbers != null) && (values != null)) {
+      for (int i = 0; i < columnNumbers.length; i++) {
+        defaultValuesMap.put(columnNumbers[i], values[i]);
+      }
+    }
+  }
+
+  /**
+   * Sets the headers for the JTable. This function has to be called before
+   * setting the RowSet for SsDataGrid.
+   *
+   * @param headers array of string objects representing the header for each
+   *                 column.
+   */
+  public void setHeaders(String[] headers) {
+    this.headers = Arrays.copyOf(headers, headers.length);
+  }
+
+  /**
+   * Sets row insertion indicator; fireEvent so insertion row
+   * is displayed. Note: must not be called directly, only through
+   * SsDataGrid.
+   *
+   * @param insert true if user can insert new rows, else false.
+   */
+  public void setInsertion(boolean insert) {
+    boolean change = allowInsertion != insert;
+    allowInsertion = insert;
+    // rowCount is the JTABLE index of the row after the database rows
+    if (change) {
+      if (insert)
+        fireTableRowsInserted(rowCount, rowCount);
+      else
+        fireTableRowsDeleted(rowCount, rowCount);
+    }
+  }
+
+  /**
+   * Sets the message window. This is used as parent component for pop up message
+   * dialogs.
+   *
+   * @param component the component that should be used for message dialogs.
+   */
+  public void setMessageWindow(Component component) {
+    this.component = component;
+  }
+
+  /**
+   * Updates the primary key column based on the SsDataValue implementation
+specified for the SsTableModel and the underlying SQL data type.
+   */
+  protected void setPrimaryColumn() {
+    try {
+      //final int type = rowset.getColumnType(primaryColumn + 1);
+      updateColumnObjectDirect(rowset, primaryColumn + 1, dataValue.getPrimaryColumnValue());
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception while insering Primary Key value.", se);
+      if (component != null) {
+        JOptionPane.showMessageDialog(
+            component, "Error while inserting Primary Key value.\n" + se.getMessage());
+      }
+    }
+  }
+
+  /**
+   * Sets the column number which is the primary column for the table. This is
+   * required if new rows have to be added to the JTable. For this to properly
+   * work the SsDataValue object should also be provided SsDataValue is used to
+   * get the value for the primary column.
+   *
+   * @param columnNumber the column which is the primary column.
+   */
+  public void setPrimaryColumn(int columnNumber) {
+    primaryColumn = columnNumber;
+  }
+
+  /**
+   * Sets the RowSet for SsTableModel to the given RowSet. This RowSet will
+   * be used to get the data for JTable.
+   *
+   * @param rowsModel
+   */
+  // TODO: handle RowsModel.setRowSet()
+  public void setRowsModel(RowsModel rowsModel) {
+    this.rowsModel = rowsModel;
+    this.rowset = rowsModel.getRowSet();
+    init(false);
+  }
+
+  /**
+   * Used to set an implementation of SsCellEditing interface which can be used to
+determine dynamically if a given cell can be edited and to determine if a
+given value is valid.
+   *
+   * @param cellEditing implementation of SsCellEditing interface.
+   */
+  public void setSsCellEditing(SsCellEditing cellEditing) {
+    this.cellEditing = cellEditing;
+  }
+
+  /**
+   * Used to set an implementation of SsDataGridHandler interface which can be
+used to determine dynamically if a given row can be deleted, and what should
+be done after row insertion, and deletion.
+   *
+   * @param dataGridHandler implementation of SsDataGridHandler interface.
+   */
+  public void setSsDataGridHandler(SsDataGridHandler dataGridHandler) {
+    this.dataGridHandler = dataGridHandler;
+  }
+
+  /**
+   * Sets the SsDataValue interface implemention. This interface specifies
+   * function to retrieve primary column values for a new row to be added.
+   *
+   * @param dataValue implementation of SsDataValue for determining PK
+   */
+  public void setSsDataValue(SsDataValue dataValue) {
+    this.dataValue = dataValue;
+  }
+
+  /**
+   * Sets the uneditable columns. The columns specified as uneditable will not be
+   * available for user to edit. This overrides the isCellEditable function in
+   * SsCellEditing.
+   *
+   * @param columnNumbers array specifying the column numbers which should be uneditable.
+   */
+  public void setUneditableColumns(int[] columnNumbers) {
+    uneditableColumns = Arrays.copyOf(columnNumbers, columnNumbers.length);
+  }
+
+  /**
+   * Sets the value in the cell at row and column to value.
+   *
+   * @param value  the new value
+   * @param row    the row whose value is to be changed
+   * @param column the column whose value is to be changed
+   */
+  @Override
+  public void setValueAt(Object value, int row, int column) {
+    // MAKE LOCAL COPY OF OBJECT FOR DATE MANIPULATIONS
+    Object valueCopy = value;
+
+    // GET THE TYPE OF THE COLUMN
+    JDBCType type;
+    try {
+      //type = rowset.getColumnType(column + 1);
+      type = RowSetOps.getJDBCColumnType(rowset, column + 1);
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception while updating value.", se);
+      if (component != null) {
+        JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
+      }
+      return;
+    }
+
+    // TODO Clean this up. Utilize java.util.Time.
+
+    // If copying values the date will come as string so convert it to date object.
+    if (DateTime.isHandledDateTimeJDBCType(type) && valueCopy instanceof String string) {
+      valueCopy = getSQLDateTimeObject(string, RSC.get(rowsModel, column + 1));
+    }
+
+    // IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER
+    // THAT AN UPDATE FOR CELL HAS BEEN REQUESTED.
+    if (cellEditing != null) {
+      // THE ROW AND COLUMN NUMBERING STARTS FROM 0 FOR JTABLE BUT THE COLUMNS AND
+      // ROWS ARE NUMBERED FROM 1 FOR SSROWSET.
+      boolean allowEdit;
+
+      // IF ITS NEW ROW SEND A NULL FOR THE OLD VALUE
+      if (row == rowCount) {
+        allowEdit = cellEditing.cellUpdateRequested(row, column, null, valueCopy);
+      } else {
+        allowEdit
+            = cellEditing.cellUpdateRequested(row, column, getValueAt(row, column), valueCopy);
+      }
+
+      // IF THE USER DOES NOT PERMIT THE UPDATE RETURN ELSE GO AHEAD AND UPDATE THE
+      // DATABASE.
+      if (!allowEdit) {
+        return;
+      }
+    }
+
+    // IF CHANGE IS MADE IN INSERT ROW ADD ROW TO THE DATABASE
+    // INSERTROW FUNCTION ALSO INCREMENTS THE ROW COUNT
+    if (row == rowCount) {
+      insertRow(valueCopy, column);
+      return;
+    }
+
+    var finalValueCopy = valueCopy;
+    logger.log(DEBUG, () -> "Set value at " + row + "  " + column + " with " + finalValueCopy);
+
+    try {
+      // YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
+      if (rowset.getRow() != (row + 1)) {
+        rowset.absolute(row + 1);
+      }
+      if (valueCopy == null) {
+        rowset.updateNull(column + 1);
+        return;
+      }
+
+      updateColumnObjectDirect(rowset, column + 1, valueCopy);
+
+      RowSetOps.updateRow(rowset);
+
+      logger.log(DEBUG, () -> sf("Updated value: %s.", getValueAt(row, column)));
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception while updating value.", se);
+      if (component != null) {
+        JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
+      }
+    }
+  }
+}

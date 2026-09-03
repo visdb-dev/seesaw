@@ -38,8 +38,8 @@ import javax.swing.SwingUtilities;
 
 import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.navigate.Utils.postColumnUndoRedo;
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -144,8 +144,8 @@ public enum UndoRedo {
    * @param comp ssComponent
    * @param cmd undo or redo
    */
-  // TODO: SSComponent vs RSC
-  public static void undoRedo(SSComponent comp, UndoRedo cmd) {
+  // TODO: SsComponent vs RSC
+  public static void undoRedo(SsComponent comp, UndoRedo cmd) {
     if (!isUndoRedoEnabled(comp))
       return;
     logger.log(
@@ -154,7 +154,7 @@ public enum UndoRedo {
     try {
       RowsModel rm;
       if (comp.getColumnName() == null || (rm = comp.getRowsModel()) == null) {
-        SSUtils.beep();
+        SsUtils.beep();
         return;
       }
 

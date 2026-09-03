@@ -35,11 +35,6 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
- * ****************************************************************************/
 
 package dev.visdb.seesaw.decorators;
 
@@ -58,8 +53,8 @@ import org.openide.util.LookupEvent;
 
 import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSComponent.ValidationResult;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -155,13 +150,13 @@ public class BorderDecorator extends FocusDecorator {
   /** Decorate the component using current state. */
   @Override
   public boolean decorate() {
-    final ValidationResult valid = getSSComponent().allValidate();
+    final ValidationResult valid = getSsComponent().allValidate();
     logger.log(TRACE,
                () -> String.format("%s focus: %s, compValid %s, allValid: %s",
                                    decoComp().getClass().getSimpleName(),
                                    focusComp().isFocusOwner(), valid.comp(), valid.all()));
     Border b;
-    ComponentState borderState = ComponentState.getComponentState(getSSComponent(), valid);
+    ComponentState borderState = ComponentState.getComponentState(getSsComponent(), valid);
     //debugCheck(borderState);
     b = getBorder(borderState);
 
@@ -174,7 +169,7 @@ public class BorderDecorator extends FocusDecorator {
 
   /** {@inheritDoc } */
   @Override
-  public void install(SSComponent component) {
+  public void install(SsComponent component) {
     super.install(component);
     setupDefaultBorder();
   }
@@ -255,9 +250,9 @@ public class BorderDecorator extends FocusDecorator {
   /**
    * For cases where the JComponent doesn't have a usable border.
    * @param comp
-   * @return border to use with the SSComponent
+   * @return border to use with the SsComponent
    */
-  public static Border createEmptyBorder(SSComponent comp) {
+  public static Border createEmptyBorder(SsComponent comp) {
     JComponent jc = (JComponent) comp;
     Border b = jc.getBorder();
     if (b instanceof CompoundBorder cb) {

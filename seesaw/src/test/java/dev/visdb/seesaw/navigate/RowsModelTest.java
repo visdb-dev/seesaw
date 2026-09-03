@@ -46,7 +46,7 @@ import org.junit.jupiter.api.Test;
 
 import com.raelity.lib.eventbus.WeakEventBus;
 
-import dev.visdb.seesaw.core.TextField;
+import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
 import dev.visdb.seesaw.mock.H2;
@@ -56,7 +56,7 @@ import dev.visdb.seesaw.navigate.EQ.BusReceiver;
 
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.getLoggerName;
-import static dev.visdb.seesaw.utils.SSUtils.isJunit;
+import static dev.visdb.seesaw.utils.SsUtils.isJunit;
 import static java.util.logging.Level.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -146,22 +146,22 @@ public class RowsModelTest {
     RowsModel rowsModel = RowsModel.create(rs1, null);
     RowSet rs2 = TinyRS.getRS2_5();
 
-    TextField[] p_tf = new TextField[1];
+    SsTextField[] p_tf = new SsTextField[1];
     String[] p_s = new String[1];
 
     assertTrue(EQ.invokeWait("tick0", s -> LOG.log(INFO, s), null, () -> {
-      p_tf[0] = new TextField(rowsModel, "c_char");
+      p_tf[0] = new SsTextField(rowsModel, "c_char");
       p_s[0] = p_tf[0].getText();
     }));
     assertEquals(0, events.size()); // rowsModel.getRowSet() is null, no events
-    TextField tf = p_tf[0];
+    SsTextField tf = p_tf[0];
     assertEquals("a1", p_s[0]);
 
     assertTrue(
         EQ.invokeLatchWait("tick1", s -> LOG.log(INFO, s), null, () -> rowsModel.setRowSet(rs2)));
     assertEquals(1, events.size());
 
-    // Change TextField's updateSSComponent as
+    // Change SsTextField's updateSSComponent as
     //			setText(text);
     //			if ("a2".equals(text))
     //				throw new IllegalStateException("Fake Exception");
@@ -190,8 +190,8 @@ public class RowsModelTest {
     RowSet rs2 = H2.createSimpleSupplierData(8, 6, 1);
 
     RowsModel rowsModel = RowsModel.create(null, null);
-    TextField tf = new TextField();
-    TextField tf2 = new TextField();
+    SsTextField tf = new SsTextField();
+    SsTextField tf2 = new SsTextField();
     DbNav _dbNav = null;
     try {
       _dbNav = new DbNav(tf, rowsModel);
@@ -233,7 +233,7 @@ public class RowsModelTest {
 
     // Back to the originally scheduled programming.
 
-    // Check that bound TextField updates after rowsModel.setRowSet.
+    // Check that bound SsTextField updates after rowsModel.setRowSet.
 
     int idInt;
     String id;
@@ -270,7 +270,7 @@ public class RowsModelTest {
     H2.clean();
 
     RowsModel rowsModel = RowsModel.create(null, null);
-    TextField tf = new TextField();
+    SsTextField tf = new SsTextField();
     DbNav _dbNav = null;
     try {
       _dbNav = new DbNav(tf, rowsModel);
@@ -311,7 +311,7 @@ public class RowsModelTest {
     RowSet rs1NN = TinyRS.getRS1NotNull();
 
     RowsModel rowsModelNN = RowsModel.create(null, null);
-    TextField tfNN = new TextField();
+    SsTextField tfNN = new SsTextField();
 
     _dbNav = null;
     try {
@@ -370,8 +370,8 @@ public class RowsModelTest {
     assertTrue(exs.isEmpty());
     DbNav dbNav = _dbNav;
 
-    TextField tfKey = new TextField();
-    TextField tfInt = new TextField();
+    SsTextField tfKey = new SsTextField();
+    SsTextField tfInt = new SsTextField();
     assertTrue(EQ.invokeWait("tick1", s -> LOG.log(INFO, s), null, () -> {
       jpanel.add(tfKey);
       jpanel.add(tfInt);

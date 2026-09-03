@@ -90,18 +90,19 @@ import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.decorators.TextStyles;
-import dev.visdb.seesaw.models.SSCollection;
-import dev.visdb.seesaw.models.SSDbArray;
+import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.CentralLookup;
-import dev.visdb.seesaw.utils.DataNavigator;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
 
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompDim.*;
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompID.*;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
+
+import dev.visdb.seesaw.models.DbCollection;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * This example demonstrates all of the Base SwingSet Components
@@ -146,7 +147,7 @@ public class TestBaseComponents extends JFrame {
 
   private Map<CompID, CompInfo> compInfos = new EnumMap<>(CompID.class);
   private EnumSet<CompID> activeComps = EnumSet.allOf(CompID.class);
-  // compInfo is typically both a JComponent and SSComponent.
+  // compInfo is typically both a JComponent and SsComponent.
   // TODO?: Could have both fields for the few cases where separate,
   //        typically a list wrapped in a scrollPane.
   private record CompInfo(String col, JComponent comp, JLabel label, CompDim dim, CompID compID) {
@@ -304,10 +305,10 @@ public class TestBaseComponents extends JFrame {
    * @return collection model to use for lists based on underlying database
    */
   @SuppressWarnings("unused")
-  private SSCollection getCollectionModel() {
+  private DbCollection getCollectionModel() {
     @SuppressWarnings("unchecked")
-    Supplier<SSCollection> supl = (Supplier<SSCollection>) hints.get("collectionModel");
-    return supl == null ? new SSDbArray(JDBCType.INTEGER) : supl.get();
+    Supplier<DbCollection> supl = (Supplier<DbCollection>) hints.get("collectionModel");
+    return supl == null ? new DbArray(JDBCType.INTEGER) : supl.get();
   }
 
   /**
@@ -328,7 +329,7 @@ public class TestBaseComponents extends JFrame {
     hints = _hints;
 
     lstSSList = new SSList(getCollectionModel());
-    //lstSSList = new SSList(JDBCType.INTEGER); // SSCollection.getSuitableDbCollection()
+    //lstSSList = new SSList(JDBCType.INTEGER); // DbCollection.getSuitableDbCollection()
 
     // lstSSList2 = new SSList(new SSDbStringCollection(
     // 		JDBCType.INTEGER, SSDbStringCollection.COMMA_SEP));
@@ -373,7 +374,7 @@ public class TestBaseComponents extends JFrame {
       rowset.execute();
       rowsModel = RowsModel.create(rowset, null);
       // navigator = new SSDataNavigator(rowsModel);
-      navigator = new SSDataNavigator(rowsModel, DataNavigator.Lines.TWO);
+      navigator = new SSDataNavigator(rowsModel, SsDataNavigator.Lines.TWO);
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }
@@ -466,7 +467,7 @@ public class TestBaseComponents extends JFrame {
     }
 
     // Bind the components to their database columns.
-    // Note, this needs to happen before scrollPane might repace SSComponent.
+    // Note, this needs to happen before scrollPane might repace SsComponent.
     buildGui_bind();
 
     if (activeComps.contains(DB_COMBO)) {
@@ -670,7 +671,7 @@ public class TestBaseComponents extends JFrame {
   private void buildGui_bind() {
     for (CompInfo comp : getActiveCompInfo()) {
       if (comp.col != null)
-        rowsModel.bind((SSComponent) comp.comp, comp.col);
+        rowsModel.bind((SsComponent) comp.comp, comp.col);
     }
   }
 

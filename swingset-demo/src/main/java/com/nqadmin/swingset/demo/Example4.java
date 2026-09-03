@@ -58,13 +58,13 @@ import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
-import dev.visdb.seesaw.core.ComboBox2;
-import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.SsComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 /**
  * This example displays data from the part_data table.
@@ -88,7 +88,7 @@ public class Example4 extends JFrame {
   /** Logger */
   static final Logger logger = JStuff.getLogger();
 
-  static ComboBox2.ModelType comboModelType = ComboBox2.ModelType.GLAZED;
+  static SsComboBox2.ModelType comboModelType = SsComboBox2.ModelType.GLAZED;
 
   /**
    * screen label declarations
@@ -100,9 +100,9 @@ public class Example4 extends JFrame {
   JLabel lblPartWeight = new JLabel("Weight");
   JLabel lblPartCity = new JLabel("City");
 
-  static class MyComboBox2<D2> extends ComboBox2<Integer, String, D2> {
+  static class MyComboBox2<D2> extends SsComboBox2<Integer, String, D2> {
     public static class Builder<D2>
-        extends ComboBox2.AbstractBuilder<Integer, String, D2, Builder<D2>> {
+        extends SsComboBox2.AbstractBuilder<Integer, String, D2, Builder<D2>> {
       @Override
       protected Builder<D2> self() {
         return this;
@@ -117,9 +117,9 @@ public class Example4 extends JFrame {
     }
   }
 
-  static class MyDbComboBox extends DBComboBox2<Integer, String, Byte> {
+  static class MyDbComboBox extends SsDbComboBox2<Integer, String, Byte> {
     public static class Builder
-        extends DBComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
+        extends SsDbComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
       @Override
       protected Builder self() {
         return this;
@@ -136,12 +136,12 @@ public class Example4 extends JFrame {
 
   // Concrete class, additional generric type, with type capture, extendable
 
-  static class DbComboBox2Extra<D2, D3> extends DBComboBox2<Integer, String, D2> {
+  static class DbComboBox2Extra<D2, D3> extends SsDbComboBox2<Integer, String, D2> {
     private final D3 d3Value; // Note: not part of combo list item.
     private final TypeToken<D3> d3TypeToken;
 
     public abstract static class AbstractBuilder<D2, D3, T extends AbstractBuilder<D2, D3, T>>
-        extends DBComboBox2.AbstractBuilder<Integer, String, D2, T> {
+        extends SsDbComboBox2.AbstractBuilder<Integer, String, D2, T> {
       private D3 d3Value;
       // captures D3 for whatever runtime class extends this Abstractbuilder
       private final TypeToken<D3> d3TypeToken = new TypeToken<D3>(getClass()) {};
@@ -191,11 +191,11 @@ public class Example4 extends JFrame {
     new DbComboBox2Extra.Builder<Double, List<Double>>() {};
 
     @SuppressWarnings("unused")
-    DBComboBox2.Builder<Integer, String, Byte> b
-        = new DBComboBox2.Builder<Integer, String, Byte>() {};
+    SsDbComboBox2.Builder<Integer, String, Byte> b
+        = new SsDbComboBox2.Builder<Integer, String, Byte>() {};
 
     @SuppressWarnings("unused")
-    DBComboBox2<Integer, String, Byte> x1 = new DBComboBox2.Builder<Integer, String, Byte>() {
+    SsDbComboBox2<Integer, String, Byte> x1 = new SsDbComboBox2.Builder<Integer, String, Byte>() {
     }.primaryKeyColumnName("aaa").displayColumnName("bbb").build();
 
     MyDbComboBox dbCombo = new MyDbComboBox
@@ -283,7 +283,7 @@ public class Example4 extends JFrame {
     SuppressWarnings("unused") String simpleQuery = "SELECT * FROM part_data;";
     String orderedQuery = "SELECT * FROM part_data order by part_name;";
     String query
-        = SSUtils.dbSupport().createRownumQuery("*", "rown", "part_data", "ORDER BY part_name");
+        = SsUtils.dbSupport().createRownumQuery("*", "rown", "part_data", "ORDER BY part_name");
 
     boolean comboHasRowNum = false;
 

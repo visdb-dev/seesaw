@@ -31,7 +31,7 @@ package dev.visdb.seesaw.decorators;
 
 import javax.swing.JComponent;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 
@@ -39,14 +39,14 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
  * Used for both Decorator and TextDecorator.
  */
 public abstract class BaseAnyDecorator implements AnyDecorator {
-  private SSComponent ssComponent;
+  private SsComponent ssComponent;
 
   /**
    * Install this decorator into the component. Installs listeners
    * @param component the component
    */
   @Override
-  public void install(SSComponent component) {
+  public void install(SsComponent component) {
     if (this.ssComponent != null)
       throw new IllegalStateException(sf("'%s' allready installed in '%s'",
                                          this.getClass().getSimpleName(),
@@ -61,31 +61,31 @@ public abstract class BaseAnyDecorator implements AnyDecorator {
   }
 
   /**
-   * Return the SSComponent associated with this decorator.
+   * Return the SsComponent associated with this decorator.
    *
    * @return the component
    */
   @Override
-  public final SSComponent getSSComponent() {
+  public final SsComponent getSsComponent() {
     return ssComponent;
   }
 
   /**
-   * Convenience method to get the SSComponent cast as a JComponent.
+   * Convenience method to get the SsComponent cast as a JComponent.
    *
-   * @return the SSComponent as a JComponent
+   * @return the SsComponent as a JComponent
    */
   protected final JComponent jComp() {
-    return (JComponent) getSSComponent();
+    return (JComponent) getSsComponent();
   }
 
   /**
    * Return the JComponent that gets decorated and TextDecorated.
-   * It may not be the same as whats returned by {@link #getSSComponent() }.
+   * It may not be the same as whats returned by {@link #getSsComponent() }.
    *
    * @return the JComponent
    */
   protected final JComponent decoComp() {
-    return getSSComponent().getDecorateTarget();
+    return getSsComponent().getDecorateTarget();
   }
 }

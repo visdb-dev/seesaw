@@ -23,27 +23,27 @@ import java.util.EventListener;
 
 import javax.swing.JCheckBox;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * x
  */
 @SuppressWarnings("serial")
 // @start region=hook_example
-public class MyCheckBox extends JCheckBox implements SSComponent {
+public class MyCheckBox extends JCheckBox implements SsComponent {
   class MyCheckBoxListener implements ItemListener {
     @Override
     public void itemStateChanged(ItemEvent ie) {
       // update the database with the new value
       try {
-        dbChange(() -> setColumnObject( isSelected())); // @link substring="setColumnObject" target="SSComponent#setColumnObject" @link substring="dbChange" target="SSComponent#dbChange"
+        dbChange(() -> setColumnObject( isSelected())); // @link substring="setColumnObject" target="SsComponent#setColumnObject" @link substring="dbChange" target="SsComponent#dbChange"
       } catch (SQLException ex) {
         log(xxx);
       } // @replace regex='xxx' replacement="..."
     }
   }
   MyCheckBox() {
-    finishSSCommon(); // @link substring="finishSSCommon" target="SSComponent#finishSSCommon"
+    finishSsCommon(); // @link substring="finishSsCommon" target="SsComponent#finishSsCommon"
   }
   @Override
   public void cleanField() {
@@ -52,24 +52,24 @@ public class MyCheckBox extends JCheckBox implements SSComponent {
   // ...
   private Hook hook;
   @Override
-  public final Hook getSSComponentHook() {
+  public final Hook getSsComponentHook() {
     if (hook == null)
       hook = new Hook(this) {
         @Override
-        protected void updateSSComponent() {
+        protected void updateSsComponent() {
           Boolean value = getColumnObject(Boolean.class);
           setSelected(value == null ? false : value);
         }
         @Override
-        protected MyCheckBoxListener getSSComponentListener() {
+        protected MyCheckBoxListener getSsComponentListener() {
           return new MyCheckBoxListener();
         }
         @Override
-        protected void addSSComponentListener(EventListener eventListener) {
+        protected void addSsComponentListener(EventListener eventListener) {
           addItemListener((ItemListener) eventListener);
         }
         @Override
-        protected void removeSSComponentListener(EventListener eventListener) {
+        protected void removeSsComponentListener(EventListener eventListener) {
           removeItemListener((ItemListener) eventListener);
         }
       };

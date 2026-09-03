@@ -59,7 +59,7 @@ import com.google.common.collect.MapMaker;
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
-import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.RowSetOps;
@@ -67,14 +67,14 @@ import dev.visdb.seesaw.navigate.RowsEvent.OperatorKind;
 import dev.visdb.seesaw.navigate.RowsEvent.RowSetEventType;
 import dev.visdb.seesaw.navigate.UndoRedo.Change;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 import static java.lang.System.Logger.Level.*;
 
 //TODO: Handle CachedRowSet Paging
@@ -167,7 +167,7 @@ final class NavigateState {
   // TODO: Consider
   // The usage of these static access functions should probably
   // be reduced, if not eliminated, in favor of including a navAction
-  // reference in the SSComponent.
+  // reference in the SsComponent.
   //
 
   // TODO: Should the static methods have instance counterparts,
@@ -223,7 +223,7 @@ final class NavigateState {
    */
   static int count() {
     // Can't depend on size() method when weakKeys.
-    return SSUtils.size(navigateState);
+    return SsUtils.size(navigateState);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ final class NavigateState {
       logger.log(TRACE, () -> ev.toString());
       try {
         // TODO what about ev.getSource == null ?
-        ((SSComponent) ev.getSource()).addUndoableChange(ev);
+        ((SsComponent) ev.getSource()).addUndoableChange(ev);
         // TODO: don't do the rest of this stuff if exception?
       } catch (SQLException ex) {
         logger.log(ERROR, "Undo/redo exception", ex);
@@ -350,7 +350,7 @@ final class NavigateState {
 
     boolean compsChange = sz != errorComponents.size();
     if (compsChange) {
-      if (rsc instanceof SSComponent comp)
+      if (rsc instanceof SsComponent comp)
         comp.decorate();
       else
         throw new IllegalStateException("Not SSComponent");
@@ -382,7 +382,7 @@ final class NavigateState {
    * <p>
    * TODO Consider writing a PropertyChangeListener for onInsertRow instead.
    */
-  private DBComboBox2<?, ?, ?> navCombo = null;
+  private SsDbComboBox2<?, ?, ?> navCombo = null;
 
   private SyncManager<?> syncer = null;
 
@@ -510,7 +510,7 @@ final class NavigateState {
     // try {
     // 	return getRowSet().getRow();
     // } catch (SQLException ex) {
-    // 	SSUtils.randomSQLException(ex, logger);
+    // 	SsUtils.randomSQLException(ex, logger);
     // 	return 0;
     // }
   }
@@ -566,13 +566,13 @@ final class NavigateState {
    * @throws java.sql.SQLException
    */
   // TODO: Should this be public? NO, go through the static method in this class
-  // TODO: SSComponent vs RSC
-  Change doUndoRedo(SSComponent comp, UndoRedo cmd) throws SQLException {
+  // TODO: SsComponent vs RSC
+  Change doUndoRedo(SsComponent comp, UndoRedo cmd) throws SQLException {
     if (!UndoRedo.isUndoRedoEnabled(comp))
       throw new IllegalStateException("UNDO/REDO disabled");
     Change change = undoRow.undoRedoChange(comp, cmd);
     if (change == UndoRedo.NO_CHANGE)
-      SSUtils.beep();
+      SsUtils.beep();
     else {
       if (change.isError())
         errorComponents.add(comp);
@@ -813,7 +813,7 @@ final class NavigateState {
     updateActionState();
   }
 
-  boolean hasError(SSComponent comp) {
+  boolean hasError(SsComponent comp) {
     return errorComponents.contains(comp);
   }
 
@@ -841,7 +841,7 @@ when the insert button is pressed to perform custom actions.
   }
 
   // TODO: handle multipble navCombo?
-  <K> void setNavCombo(DBComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
+  <K> void setNavCombo(SsDbComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
     Objects.requireNonNull(navCombo);
     // TODO: Objects.requireNonNull(syncer);
     if (this.navCombo != null)
@@ -854,7 +854,7 @@ when the insert button is pressed to perform custom actions.
    * @return the navCombo
    */
   // TODO: what's this about
-  /*public*/ DBComboBox2<?, ?, ?> getNavCombo() {
+  /*public*/ SsDbComboBox2<?, ?, ?> getNavCombo() {
     return navCombo;
   }
 

@@ -57,22 +57,24 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
-import dev.visdb.seesaw.core.ComboBox2.MissingDisplayValueControl;
-import dev.visdb.seesaw.models.SSListItem;
-import dev.visdb.seesaw.models.SSListItemFormat;
+import dev.visdb.seesaw.SsComboBox2.MissingDisplayValueControl;
+import dev.visdb.seesaw.models.ListItemFormat;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
+import dev.visdb.seesaw.models.ListItem;
+
 /**
  * Demonstrate some advanced features of SSCombobox
- * and using Navigator actions.<ul>
- <li>Using a custom ListItemFormat for null/missing Option</li>
- <li>MissingDisplayValueControl</li>
- <li>Assigning navigator actions to function keys</li>
- <li>Buttons that invoke navigation actions</li>
- </ul>
+ * and using Navigator actions.
+ * <ul>
+ * <li>Using a custom ListItemFormat for null/missing Option</li>
+ * <li>MissingDisplayValueControl</li>
+ * <li>Assigning navigator actions to function keys</li>
+ * <li>Buttons that invoke navigation actions</li>
+ * </ul>
  */
 @SuppressWarnings("serial")
 public class Example4Advanced extends Example4 {
@@ -105,9 +107,9 @@ public class Example4Advanced extends Example4 {
     // Use a custom message when a null/missing Option
     // is encountered in an SSComboBox.
     // NOTE: the default message is "# - Option Not Found"
-    cmbPartColor.setListItemFormat(new SSListItemFormat() {
+    cmbPartColor.setListItemFormat(new ListItemFormat() {
       @Override
-      protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
+      protected void appendValue(StringBuffer _sb, int _elemIndex, ListItem _listItem) {
         if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
             && getElem(_elemIndex, _listItem) == null) {
           Object key = getElem(cmbPartColor.getKeyFormatIndex(), _listItem);
@@ -273,9 +275,9 @@ public class Example4Advanced extends Example4 {
     int captureCountChange = countChange;
     logger.log(INFO, sf("change%s formatter: %d", tag, countChange));
     EventQueue.invokeLater(() -> {
-      cmbPartColor.setListItemFormat(new SSListItemFormat() {
+      cmbPartColor.setListItemFormat(new ListItemFormat() {
         @Override
-        protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
+        protected void appendValue(StringBuffer _sb, int _elemIndex, ListItem _listItem) {
           if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
               && getElem(_elemIndex, _listItem) == null
               && !Objects.equals(cmbPartColor.getNullItem(), _listItem)) {

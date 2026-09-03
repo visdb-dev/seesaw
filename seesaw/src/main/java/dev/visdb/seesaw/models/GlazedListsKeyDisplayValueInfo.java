@@ -52,15 +52,15 @@ import ca.odell.glazedlists.EventList;
  * @since 4.0.0
  */
 public class GlazedListsKeyDisplayValueInfo<K, D, D2> extends KeyDisplayValueSwingModel<K, D, D2> {
-  private final EventList<SSListItem> eventList;
+  private final EventList<ListItem> eventList;
   private boolean hasReturnedEventList;
 
   /**
    * Create an empty ComboInfo.
-   * @param d2Flag true says to provide an options2 field in SSListItem
+   * @param d2Flag true says to provide an options2 field in ListItem
    * @param eventList which is installed into AutoCompleteSupport
    */
-  public GlazedListsKeyDisplayValueInfo(HasD2 d2Flag, EventList<SSListItem> eventList) {
+  public GlazedListsKeyDisplayValueInfo(HasD2 d2Flag, EventList<ListItem> eventList) {
     super(d2Flag, eventList);
     this.eventList = eventList;
   }
@@ -73,8 +73,8 @@ public class GlazedListsKeyDisplayValueInfo<K, D, D2> extends KeyDisplayValueSwi
    * for a read only reference.
    * @return GlazedLists event list.
    */
-  protected EventList<SSListItem> getEventList() {
-    EventList<SSListItem> temp = hasReturnedEventList ? null : eventList;
+  protected EventList<ListItem> getEventList() {
+    EventList<ListItem> temp = hasReturnedEventList ? null : eventList;
     hasReturnedEventList = true;
     return temp;
   }

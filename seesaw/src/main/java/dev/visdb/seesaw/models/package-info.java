@@ -44,7 +44,7 @@
  * </ul>
  * <h2>Database Collection Models</h2>
  * These models abstract away the storage specifics; they all
- * implement {@link dev.visdb.seesaw.models.SSCollection}.
+ * implement {@link dev.visdb.seesaw.models.DbCollection}.
  * they generally read and write to database.
  * There are subclasses that present data
  * as an array or set independent of how it might be stored in a data.
@@ -54,7 +54,7 @@
  * These models, sub-classes of
  * {@link dev.visdb.seesaw.models.AbstractComboBoxListSwingModel},
  * generally revolve around managing
- * {@link dev.visdb.seesaw.models.SSListItem}s. An {@code SSListItem}
+ * {@link dev.visdb.seesaw.models.ListItem}s. An {@code ListItem}
  * is generally the item which is visible in a {@code JComboBox}
  * or {@code JList}. Additionally these classes implement ListModel
  * and MutableComboBoxModel; they can be installed into either.

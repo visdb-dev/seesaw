@@ -49,7 +49,7 @@ import dev.visdb.seesaw.navigate.EQ.BusReceiver;
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.navigate.RowsEvent.OperatorKind.*;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
-import static dev.visdb.seesaw.utils.SSUtils.isJunit;
+import static dev.visdb.seesaw.utils.SsUtils.isJunit;
 import static org.junit.jupiter.api.Assertions.*;
 
 // Google AI : junit 5 eventqueue

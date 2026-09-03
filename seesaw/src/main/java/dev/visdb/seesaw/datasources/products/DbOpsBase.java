@@ -41,24 +41,24 @@ import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.navigate.DbOpsChangeEvent;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.navigate.Utils.postDbOpsChange;
 import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Implementation of DbOps that implements performPreInsertOps() to
- * clear/initialize the various SSComponents on a screen before the
- * user edits the new record;
- * implements the {@code performPost*Ops} methods
+ * clear/initialize the various SsComponents on a screen before the
+ * user edits the new record.
+ * Implements the {@code performPost*Ops} methods
  * to use metadata to decide whether or not to re-execute the RowSset command;
  * handles state for the {@code allow*} methods.
  * <p>
  * {@code DbOps} is associated with a RowsModel/RowSet, see
  * {@link dev.visdb.seesaw.navigate.RowsModel#create(javax.sql.RowSet, dev.visdb.seesaw.datasources.DbOps) RowsModel(RowSet, DbOps)}.
  * {@link #performPreInsertOps()} searches the container provided to the
- * constructor to find the {@link SSComponent}s to clean.
+ * constructor to find the {@link SsComponent}s to clean.
  */
 public class DbOpsBase implements DbOps {
   /** Logger for component */
@@ -178,10 +178,10 @@ public class DbOpsBase implements DbOps {
   }
 
   /**
-   * In the specified container, clear/initialize SSComponents.
+   * In the specified container, clear/initialize SsComponents.
    * Typically done for a new record/row. Uses
-   * {@link SSUtils#visitSSComponents(Container, Consumer) }
-   * to run {@link SSComponent#cleanField() }.
+   * {@link SsUtils#visitSsComponents(Container, Consumer) }
+   * to run {@link SsComponent#cleanField() }.
    * <p>
    * This is done for all SwingSet components,
    * for example text fields, and text areas,
@@ -191,9 +191,9 @@ public class DbOpsBase implements DbOps {
    * @param container container in which to recursively initialize components
    */
   protected void cleanComponents(Container container) {
-    logger.log(DEBUG, "Clear/clean container SSComponents recursively.");
+    logger.log(DEBUG, "Clear/clean container SsComponents recursively.");
     if (container == null)
       return;
-    SSUtils.visitSSComponents(container, comp -> comp.cleanField());
+    SsUtils.visitSsComponents(container, comp -> comp.cleanField());
   }
 }

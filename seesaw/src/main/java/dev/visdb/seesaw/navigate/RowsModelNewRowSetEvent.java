@@ -32,7 +32,7 @@ package dev.visdb.seesaw.navigate;
 import javax.sql.RowSet;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 
 /**
  * This event signals the source {@link RowsModel} has a different

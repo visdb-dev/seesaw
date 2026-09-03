@@ -45,18 +45,18 @@ package com.nqadmin.swingset;
 import java.sql.Connection;
 import java.util.Optional;
 
-import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.models.Item2;
 
 /**
- * See {@link DBComboBox2}.
+ * See {@link SsDbComboBox2}.
  */
 @SuppressWarnings("serial")
-public class SSDBComboBox extends DBComboBox2<Long, Object, Object> {
+public class SSDBComboBox extends SsDbComboBox2<Long, Object, Object> {
   /**
    * Builder.
    */
-  public static class Builder extends DBComboBox2.AbstractBuilder<Long, Object, Object, Builder> {
+  public static class Builder extends SsDbComboBox2.AbstractBuilder<Long, Object, Object, Builder> {
     /** defaults to ModelTYpe.GLAZED */
     public Builder() {
       modelType(ModelType.GLAZED);

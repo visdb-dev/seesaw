@@ -89,20 +89,21 @@ import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.RowSetOps.ForceConflict;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
-import dev.visdb.seesaw.models.SSCollection;
-import dev.visdb.seesaw.models.SSDbStringCollection;
+import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.LookupDefaults;
-import dev.visdb.seesaw.utils.SSUtils;
-import dev.visdb.seesaw.utils.SSVersion;
+import dev.visdb.seesaw.utils.SsUtils;
+import dev.visdb.seesaw.utils.Version;
 import gnu.getopt.Getopt;
 
 import static dev.visdb.seesaw.demo.DemoUtil.configureJavaUtilLogger;
 import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
+
+import dev.visdb.seesaw.models.DbCollection;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -131,7 +132,7 @@ public class MainClass extends JFrame {
   static {
     if (Boolean.FALSE) {
       // Get rid of unused warnings
-      Objects.nonNull(new SSUtils.DebugRowSetListenerFlag());
+      Objects.nonNull(new SsUtils.DebugRowSetListenerFlag());
       Objects.nonNull(new ForceConflict(0));
       Objects.nonNull(new H2Trace(""));
       Objects.nonNull(new MainClass().new LogManListener());
@@ -754,10 +755,9 @@ public class MainClass extends JFrame {
     @Override
     public void run() {
       super.run();
-      globalHints.put(
-          "collectionModel",
-          (Supplier<SSCollection>) ()
-              -> new SSDbStringCollection(JDBCType.INTEGER, SSDbStringCollection.COMMA_SEP));
+      globalHints.put("collectionModel",
+          (Supplier<DbCollection>) ()
+              -> new DbStringCollection(JDBCType.INTEGER, DbStringCollection.COMMA_SEP));
       // () -> new SSStringArrayModel(JDBCType.INTEGER));
     }
 
@@ -865,7 +865,7 @@ public class MainClass extends JFrame {
     //lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
     //SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
     //lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
-    //lkup.add(new SSUtils.DebugRowSetListenerFlag());
+    //lkup.add(new SsUtils.DebugRowSetListenerFlag());
 
     // Enable this to force CachedRowSet conflict
     //lkup.add(new ForceConflict(1));
@@ -876,7 +876,7 @@ public class MainClass extends JFrame {
     System.err.printf("java:%s vm:%s date:%s os:%s\n", System.getProperty("java.version"),
                       System.getProperty("java.vm.version"),
                       System.getProperty("java.version.date"), System.getProperty("os.name"));
-    System.err.printf("SwingSet: %s\n", SSVersion.get().toString());
+    System.err.printf("SwingSet: %s\n", Version.get().toString());
 
     try {
       for (SyncProvider sp : Collections.list(SyncFactory.getRegisteredProviders())) {

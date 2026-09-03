@@ -56,7 +56,7 @@ import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
 import com.raelity.lib.eventbus.WeakEventBus;
 
-import dev.visdb.seesaw.core.DBComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.RowSetOps;
@@ -68,17 +68,17 @@ import dev.visdb.seesaw.navigate.RowsModelEventHandling.SimpleEvents;
 import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.LookupDefaults;
-import dev.visdb.seesaw.utils.SSComponent;
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.navigate.RowsModelEventHandling.postAsync;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.JDBCTypeMismatch;
-import static dev.visdb.seesaw.utils.SSUtils.NullabilityMismatch;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.JDBCTypeMismatch;
+import static dev.visdb.seesaw.utils.SsUtils.NullabilityMismatch;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -114,7 +114,7 @@ public final class RowsModel {
       = new MapMaker().weakKeys().makeMap();
 
   // Track the component bound column names.
-  private final Map<SSComponent, String> bindings = new MapMaker().weakKeys().makeMap();
+  private final Map<SsComponent, String> bindings = new MapMaker().weakKeys().makeMap();
 
   private NavigateState navState;
   private final RowsActions rowsActions;
@@ -208,7 +208,7 @@ public final class RowsModel {
   private RowsModel(RowSet rs, DbOps dbOps) {
     Objects.requireNonNull(dbOps);
     // TODO: get rid of junit test after tests are fully RowsModel ported.
-    if (!SSUtils.isJunit() && rs != null && !verifyExecuted(rs))
+    if (!SsUtils.isJunit() && rs != null && !verifyExecuted(rs))
       logger.log(Level.ERROR, "RowSet not executed", new Exception());
     logger.log(Level.INFO, () -> sf("new RowsModel %s for %s", objectID(this), objectID(rs)));
 
@@ -315,10 +315,9 @@ public final class RowsModel {
         Window win = SwingUtilities.getWindowAncestor(parent);
         parent = win != null ? win : parent;
       }
-      int response = JOptionPane.showConfirmDialog(
-          parent,
+      int response = JOptionPane.showConfirmDialog(parent,
           sf("Setting new RowSet discards\nuncommitted modifications\nto table \"%s\"",
-             SSUtils.tableName(getRowSet())),
+             SsUtils.tableName(getRowSet())),
           null, JOptionPane.OK_CANCEL_OPTION);
       // TODO: Note the rowSet's undo/redo still has the modifications.
       //       Really discard?
@@ -337,8 +336,8 @@ public final class RowsModel {
 
       // Check for component binding compatibility here
       // to avoid exception buried in event handler.
-      for (Map.Entry<SSComponent, String> entry : bindings.entrySet()) {
-        SSComponent comp = entry.getKey();
+      for (Map.Entry<SsComponent, String> entry : bindings.entrySet()) {
+        SsComponent comp = entry.getKey();
         if (!comp.isFullyBound())
           continue;
 
@@ -378,13 +377,13 @@ public final class RowsModel {
    * Establish bindings.
    * @param binds
    */
-  public void bind(Map<SSComponent, String> binds) {
-    for (Map.Entry<SSComponent, String> binding : binds.entrySet()) {
+  public void bind(Map<SsComponent, String> binds) {
+    for (Map.Entry<SsComponent, String> binding : binds.entrySet()) {
       bind(binding.getKey(), binding.getValue());
     }
   }
 
-  private String bindPairName(SSComponent comp, String columnName) {
+  private String bindPairName(SsComponent comp, String columnName) {
     return sf("<%s,%s>", objectID(comp), columnName);
   }
 
@@ -395,9 +394,9 @@ public final class RowsModel {
    */
   // TODO: deprecate in favor of bind(Map)
   @SuppressWarnings("deprecation")
-  public void bind(SSComponent comp, String columnName) {
+  public void bind(SsComponent comp, String columnName) {
     // Check that there's no existing binding for comp or columnName.
-    for (Map.Entry<SSComponent, String> entry : bindings.entrySet()) {
+    for (Map.Entry<SsComponent, String> entry : bindings.entrySet()) {
       if (Objects.equals(comp, entry.getKey())) {
         throw new IllegalArgumentException(sf(
             "SSComponent of %s already bound in RowsModel %s of %s", bindPairName(comp, columnName),
@@ -621,7 +620,7 @@ public final class RowsModel {
    * @param comp
    * @return is dirty
    */
-  public boolean isDirty(SSComponent comp) {
+  public boolean isDirty(SsComponent comp) {
     return getNavState() != null && getNavState().undoRow.isDirty(comp);
   }
 
@@ -670,7 +669,7 @@ public final class RowsModel {
    * @param comp
    * @return true if the component is in an error state
    */
-  public boolean hasError(SSComponent comp) {
+  public boolean hasError(SsComponent comp) {
     // TODO: check if row set has component's column name?
     // if (!bindings.containsKey(comp))
     // 	throw new IllegalArgumentException("Component not bound in RowsModel");
@@ -684,7 +683,7 @@ public final class RowsModel {
    * @param comp
    * @param isError
    */
-  public void adjustErrorState(SSComponent comp, boolean isError) {
+  public void adjustErrorState(SsComponent comp, boolean isError) {
     getNavState().adjustErrorComponentState(comp, isError);
   }
 
@@ -951,7 +950,7 @@ public final class RowsModel {
    */
   public static int count() {
     // Can't depend on size() method when weakKeys.
-    return SSUtils.size(activeRowModels);
+    return SsUtils.size(activeRowModels);
   }
 
   /**
@@ -1051,7 +1050,7 @@ public final class RowsModel {
    * @deprecated this shouldn't be public
    */
   @Deprecated
-  public void setNavCombo(DBComboBox2<?, ?, ?> navCombo) {
+  public void setNavCombo(SsDbComboBox2<?, ?, ?> navCombo) {
     setNavCombo(navCombo, null);
   }
 
@@ -1062,7 +1061,7 @@ public final class RowsModel {
    * @deprecated this shouldn't be public
    */
   @Deprecated
-  public <K> void setNavCombo(DBComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
+  public <K> void setNavCombo(SsDbComboBox2<K, ?, ?> navCombo, SyncManager<K> syncer) {
     navState.setNavCombo(navCombo, syncer);
   }
 
@@ -1072,7 +1071,7 @@ public final class RowsModel {
    */
   // TODO: what's this about? Remove it.
   @Deprecated
-  public DBComboBox2<?, ?, ?> getNavCombo() {
+  public SsDbComboBox2<?, ?, ?> getNavCombo() {
     return navState.getNavCombo();
   }
 }

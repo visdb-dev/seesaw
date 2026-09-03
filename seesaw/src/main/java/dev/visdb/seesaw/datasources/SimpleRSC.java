@@ -52,7 +52,7 @@ import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.datasources.ConvertType.findJavaTypeClass;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -118,7 +118,7 @@ public class SimpleRSC implements RSC {
     try {
       return RowSetOps.getJDBCColumnType(getRowSet(), index);
     } catch (SQLException ex) {
-      throw new SSSQLRuntimeException(ex);
+      throw new SqlRuntimeException(ex);
     }
   }
 
@@ -137,7 +137,7 @@ public class SimpleRSC implements RSC {
       }
     } catch (final SQLException ex) {
       logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
-      throw new SSSQLRuntimeException(ex);
+      throw new SqlRuntimeException(ex);
     }
 
     return value;
@@ -155,7 +155,7 @@ public class SimpleRSC implements RSC {
       }
     } catch (final SQLException ex) {
       logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
-      throw new SSSQLRuntimeException(ex);
+      throw new SqlRuntimeException(ex);
     }
 
     return value;
@@ -204,7 +204,7 @@ public class SimpleRSC implements RSC {
       return getRowSet().getMetaData().getColumnCount();
     } catch (final SQLException ex) {
       logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
-      throw new SSSQLRuntimeException(ex);
+      throw new SqlRuntimeException(ex);
     }
   }
 

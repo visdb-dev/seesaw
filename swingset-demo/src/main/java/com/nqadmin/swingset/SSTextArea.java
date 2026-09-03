@@ -44,17 +44,16 @@ package com.nqadmin.swingset;
 
 import javax.sql.RowSet;
 
-import dev.visdb.seesaw.core.TextArea;
-
+import dev.visdb.seesaw.SsTextArea;
 import dev.visdb.seesaw.navigate.RowsModel;
 
-import static dev.visdb.seesaw.utils.SSUtils.findRowsModel;
+import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
 
 /**
  * SSTextArea extends the JTextArea to add RowSet binding.
  */
 @SuppressWarnings("serial")
-public class SSTextArea extends TextArea {
+public class SSTextArea extends SsTextArea {
   /**
    * Empty constructor needed for deserialization.
    */

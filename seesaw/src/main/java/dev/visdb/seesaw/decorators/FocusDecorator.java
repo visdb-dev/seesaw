@@ -49,16 +49,16 @@ import java.awt.event.FocusListener;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
-import dev.visdb.seesaw.navigate.FocusChangeEvent;
-import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
-
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
+import dev.visdb.seesaw.navigate.FocusChangeEvent;
+import dev.visdb.seesaw.utils.JStuff;
+import dev.visdb.seesaw.utils.SsComponent;
+
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.objectID;
+import static dev.visdb.seesaw.utils.SsUtils.objectID;
 import static javax.swing.SwingUtilities.isDescendingFrom;
 
 /**
@@ -79,7 +79,7 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
 
   /** {@inheritDoc} */
   @Override
-  public void install(SSComponent comp) {
+  public void install(SsComponent comp) {
     super.install(comp);
     if (!comp.isComposite())
       focusComp().addFocusListener(this);
@@ -102,13 +102,13 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
   }
 
   /**
-   * Return the Component that gets focus when the associated SSComponent
-   * is focused.
+   * Return the Component that gets focus when the associated SsComponent
+is focused.
    *
    * @return focus target
    */
   protected Component focusComp() {
-    return getSSComponent().getFocusTarget();
+    return getSsComponent().getFocusTarget();
   }
 
   @SuppressWarnings("NonConstantLogger")
@@ -134,19 +134,19 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
   }
 
   /**
-   * If the component is of the SSComponent, then decorate().
+   * If the component is of the SsComponent, then decorate().
    * @param c
    */
   protected void checkFocusChange(Component c) {
-    if (c instanceof SSComponent && c != getSSComponent()) {
+    if (c instanceof SsComponent && c != getSsComponent()) {
       logger().log(Level.TRACE, sf("Quick exit: focused '%s', ssComp '%s'", objectID(c),
-                                   objectID(getSSComponent())));
+                                   objectID(getSsComponent())));
       return;
     }
     if (logger().isLoggable(Level.DEBUG))
       dumpCheckFocusInfo(c);
 
-    if (c != null && isDescendingFrom(c, (Component) getSSComponent())) {
+    if (c != null && isDescendingFrom(c, (Component) getSsComponent())) {
       decorate();
     }
   }
@@ -160,6 +160,6 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
         nam = c.getClass().getName();
     }
     logger().log(Level.TRACE, sf("focused %s, SSComp %s", c == null ? "null" : nam,
-                                 getSSComponent().getClass().getSimpleName()));
+                                 getSsComponent().getClass().getSimpleName()));
   }
 }

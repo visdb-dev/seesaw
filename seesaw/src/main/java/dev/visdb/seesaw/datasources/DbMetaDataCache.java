@@ -33,14 +33,14 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import dev.visdb.seesaw.utils.SSUtils;
+import dev.visdb.seesaw.utils.SsUtils;
 
 /**
  * Metadata cache. Only static and Driver info, capabilities, and limits should
  * be referenced. Information that is subject to change as the database is
  * running should not be referenced.
  * <p>
- * <b>NOTE:</b> There's only one database, found in SSUtils.dbSupport.getSharedConnection.
+ * <b>NOTE:</b> There's only one database, found in SsUtils.dbSupport.getSharedConnection.
  *
  */
 public class DbMetaDataCache {
@@ -73,7 +73,7 @@ public class DbMetaDataCache {
    */
   public static DatabaseMetaData get() throws SQLException {
     if (metaData == null) {
-      Connection shconn = SSUtils.dbSupport().getSharedConnection();
+      Connection shconn = SsUtils.dbSupport().getSharedConnection();
       if (shconn == null)
         return null;
       metaData = shconn.getMetaData();

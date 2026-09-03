@@ -50,7 +50,7 @@ import dev.visdb.seesaw.navigate.EQ.BusReceiver;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
 import static dev.visdb.seesaw.utils.JStuff.getLoggerName;
 import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SSUtils.isJunit;
+import static dev.visdb.seesaw.utils.SsUtils.isJunit;
 import static java.util.logging.Level.*;
 import static org.junit.jupiter.api.Assertions.*;
 

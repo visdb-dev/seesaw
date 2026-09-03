@@ -82,6 +82,33 @@ public enum RowsAction {
   ACT_ROW_SET_EVENT(true, true),
   ;
 
+  /**
+   * Enumeration for navigation buttons.
+   */
+  public enum Navigation {
+    /** Go to the first record in the RowSet */
+    First(3),
+    /** Go to the last record in the RowSet */
+    Last(4),
+    /** Go to the next record in the RowSet */
+    Next(1),
+    /** Go to the previous record in the RowSet */
+    Previous(2);
+
+    private final int value;
+
+    Navigation(int newValue) {
+      value = newValue;
+    }
+
+    /**
+     * @return integer corresponding to enumerated value
+     */
+    public int getValue() {
+      return value;
+    }
+  }
+
   private final boolean force;
   private final boolean virtual;
 

@@ -48,8 +48,8 @@ import javax.swing.SwingUtilities;
 
 import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.navigate.NavigateState.RowPositioning;
+import dev.visdb.seesaw.navigate.RowsAction.Navigation;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSEnums.Navigation;
 
 import static dev.visdb.seesaw.navigate.RowSetState.setInserting;
 import static dev.visdb.seesaw.navigate.RowsAction.*;

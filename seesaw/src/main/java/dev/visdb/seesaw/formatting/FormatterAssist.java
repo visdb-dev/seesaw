@@ -40,13 +40,13 @@ import javax.swing.text.MaskFormatter;
 
 import com.google.common.collect.ImmutableList;
 
-import dev.visdb.seesaw.formatting.FormatterFactory.SSNullFormatter;
+import dev.visdb.seesaw.formatting.FormatterFactory.NullFormatter;
 
-import static dev.visdb.seesaw.formatting.SSMaskFormatterFactory.SSMaskFormatter.FORMATTING_CHARS;
+import static dev.visdb.seesaw.formatting.MaskFormatterFactory.SSMaskFormatter.FORMATTING_CHARS;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
- * Common things for working with {@link SSFormattedTextField} and their
+ * Common things for working with {@link SsFormattedTextField} and their
  * {@linkplain AbstractFormatter}'s. Particularly for implementing
  * AllowNull aware {@linkplain AbstractFormatterFactory}s.
  * This mostly has default implementations and static methods.
@@ -56,7 +56,7 @@ interface FormatterAssist {
    * The Format associated with the FormattedTextField.
    * @return format
    */
-  SSFormat getSSFormat();
+  SsFormat getSSFormat();
 
   default AbstractFormatter getConverter() {
     return null;
@@ -90,7 +90,7 @@ interface FormatterAssist {
   default void assistSetEditValidMaySwitchNull(JFormattedTextField ftf) {
     // Check for empty string input.
     // If empty and allows null, flip to NullFormatter
-    if (ftf instanceof SSFormattedTextField ssftf) {
+    if (ftf instanceof SsFormattedTextField ssftf) {
       // If doesn't allow null, don't even consider switching value
       if (!ssftf.getAllowNull()) {
         return;
@@ -110,12 +110,12 @@ interface FormatterAssist {
    *
    * @param ftf
    */
-  static void adjustNullFormatter(SSFormattedTextField ftf) {
+  static void adjustNullFormatter(SsFormattedTextField ftf) {
     if (ftf.getFormatterFactory() instanceof FormatterFactory ff) {
       boolean allowNull = ftf.getAllowNull();
       boolean hasNullFormatter = ff.getNullFormatter() != null;
       if (allowNull ^ hasNullFormatter) {
-        ff.setNullFormatter(allowNull ? new SSNullFormatter() : null);
+        ff.setNullFormatter(allowNull ? new NullFormatter() : null);
       }
     }
   }

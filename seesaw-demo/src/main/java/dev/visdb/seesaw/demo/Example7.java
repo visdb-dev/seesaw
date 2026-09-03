@@ -47,7 +47,7 @@ import java.sql.Statement;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 
-import dev.visdb.seesaw.core.DataGrid;
+import dev.visdb.seesaw.SsTable;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 
@@ -68,7 +68,7 @@ public class Example7 extends JFrame {
   /**
    * data grid
    */
-  DataGrid dataGrid = null;
+  SsTable dataGrid = null;
   RowsModel rowsModel;
 
   /**
@@ -114,7 +114,7 @@ public class Example7 extends JFrame {
       rowsModel = RowsModel.create(rowset, null);
 
       // SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
-      dataGrid = new DataGrid();
+      dataGrid = new SsTable();
       dataGrid.setHeaders(
           new String[] {"Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date"});
       dataGrid.setRowsModel(rowsModel);

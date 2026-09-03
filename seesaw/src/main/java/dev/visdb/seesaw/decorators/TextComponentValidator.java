@@ -46,7 +46,7 @@ import java.util.function.Function;
 
 import javax.swing.text.JTextComponent;
 
-import dev.visdb.seesaw.utils.SSComponent;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * Validator with convenience methods for working with {@linkplain JTextComponent}.
@@ -54,7 +54,7 @@ import dev.visdb.seesaw.utils.SSComponent;
  */
 public abstract class TextComponentValidator implements Validator {
   /** this component */
-  private SSComponent component;
+  private SsComponent component;
 
   /**
    * Create a validator for use with a {@linkplain JTextComponent};
@@ -73,7 +73,7 @@ public abstract class TextComponentValidator implements Validator {
    * @throws IllegalArgumentException if component is not a JTextComponent
    */
   @Override
-  public void install(SSComponent component) {
+  public void install(SsComponent component) {
     if (!(component instanceof JTextComponent)) {
       throw new IllegalArgumentException("Must be a JTextComponent");
     }
@@ -88,13 +88,13 @@ public abstract class TextComponentValidator implements Validator {
    * Return the component associated with this validator
    * @return the component
    */
-  public SSComponent getComponent() {
+  public SsComponent getComponent() {
     return component;
   }
 
   /**
-   * Return the SSComponent as a JComponent.
-   * @return the SSComponent
+   * Return the SsComponent as a JComponent.
+   * @return the SsComponent
    */
   protected final JTextComponent jc() {
     return (JTextComponent) component;

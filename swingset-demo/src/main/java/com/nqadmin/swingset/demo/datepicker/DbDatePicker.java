@@ -29,16 +29,17 @@ import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SSComponent;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.sql.JDBCType.DATE;
 
+import dev.visdb.seesaw.utils.SsComponent;
+
 /**
  * Date picker that gets it's value from a database column and sends
  * date changes back to the database. Undo/redo and more is supported,
- * see {@link SSComponent}.
+ * see {@link SsComponent}.
  * The datapick is based on
  * <a href="https://github.com/LGoodDatePicker/LGoodDatePicker">LGoodDatePicker</a>.
  * <p>
@@ -46,7 +47,7 @@ import static java.sql.JDBCType.DATE;
  * part of the SS library.
  */
 @SuppressWarnings("serial")
-public class DbDatePicker extends DatePicker implements SSComponent {
+public class DbDatePicker extends DatePicker implements SsComponent {
   private class DbDatePickerListener implements EventListener, DateChangeListener {
     /** {@inheritDoc} */
     @Override
@@ -81,7 +82,7 @@ public class DbDatePicker extends DatePicker implements SSComponent {
   public DbDatePicker() {
     super(initialSettings());
 
-    finishSSCommon();
+    finishSsCommon();
   }
 
   private static DatePickerSettings initialSettings() {
@@ -138,11 +139,11 @@ public class DbDatePicker extends DatePicker implements SSComponent {
 
   /** {@inheritDoc } */
   @Override
-  public final Hook getSSComponentHook() {
+  public final Hook getSsComponentHook() {
     if (hook == null)
       hook = new Hook(this) {
         @Override
-        protected void updateSSComponent() {
+        protected void updateSsComponent() {
           logger.log(DEBUG,
                      () -> sf("%s: getBoundColumnText() - %s", getColumnForLog(), getColumnText()));
           LocalDate value = getColumnObject(LocalDate.class);
@@ -150,17 +151,17 @@ public class DbDatePicker extends DatePicker implements SSComponent {
         }
 
         @Override
-        protected EventListener getSSComponentListener() {
+        protected EventListener getSsComponentListener() {
           return new DbDatePickerListener();
         }
 
         @Override
-        protected void addSSComponentListener(EventListener eventListener) {
+        protected void addSsComponentListener(EventListener eventListener) {
           addDateChangeListener((DateChangeListener) eventListener);
         }
 
         @Override
-        protected void removeSSComponentListener(EventListener eventListener) {
+        protected void removeSsComponentListener(EventListener eventListener) {
           removeDateChangeListener((DateChangeListener) eventListener);
         }
       };

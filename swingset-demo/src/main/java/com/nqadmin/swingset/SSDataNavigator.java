@@ -47,21 +47,21 @@ import java.awt.Dimension;
 import javax.sql.RowSet;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.DataNavigator;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 
-import static dev.visdb.seesaw.utils.SSUtils.findRowsModel;
+import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
 
 import dev.visdb.seesaw.datasources.DbOps;
 
 /**
- * See {@link DataNavigator}.
+ * See {@link SsDataNavigator}.
  */
 // NOTE: NavigateState.setAutoCommit() is not public and never referenced.
 // When auto commit mode is enabled, the navigation buttons remain enabled;
 // a navigation automatically commits any changes. Once navigation takes place
 // changes can't be reverted using Undo button (has to be done manually by the user).
 @SuppressWarnings("serial")
-public class SSDataNavigator extends DataNavigator {
+public class SSDataNavigator extends SsDataNavigator {
   /**
    * Constructs the SSDataNavigator with the given RowsModel.
    *
