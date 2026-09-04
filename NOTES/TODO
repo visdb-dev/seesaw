@@ -1,6 +1,22 @@
 
 ================================================================================
 
+JavaFx components.
+
+<!-- 240 8, 270 11, 290 17, 310 21 -->
+<!-- <version.netbeans>RELEASE290</version.netbeans> -->
+
+$ jdeps --ignore-missing-deps --multi-release base --list-deps target/seesaw-5.0.0-SNAPSHOT.jar 
+
+================================================================================
+
+To get rid of "#" line comments
+    String json = jsonc.replaceAll("(?m)^\\s*#.*$", "");
+
+================================================================================
+Have a global editor policy interface; implementations: swing, vim, emacs.
+================================================================================
+
 Names case conversion. Per dbms/platform plugin. Maybe only needed for metadata
 access. For example, H2 converts column_name to COLUMN_NAME. Currently using
 map with case insensitive key. See RowSetState TreeMap
@@ -37,6 +53,9 @@ Partition bestFit/updateZoom to move some of it into ZoomCanvas.
 
 setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
 Something in RowSetOps/SSComponent. Why is it needed? 2026/05
+
+RowSetOps.updateColumnObject(SSComponent, Object). Why does it convert and not
+use updateObject. See comments.
 
 ================================================================================
 
@@ -89,6 +108,15 @@ TextStyles
     - jackson handles both yaml and json.
     - Isn't json now a subset of yaml?
 
+Come up with a big set of default styles.
+    - See TestBaseComponent.setupOurTextStyles for a few.
+
+TODO: Read styles from resource file, use a reader?
+      Or use those as defaults, but then probably need to be
+      singles so the name can be checked. Could expose TextStyles methods
+        - returns a Map<name, Map<String,String>>
+        - param a Map<name, Map<String,String>>
+
 decorateText/TextDecorator
     Issues with preffered size? Adjust size dyncamically?
     Setting sizes while setting up components seems best.
@@ -111,10 +139,27 @@ Could
 
 ================================================================================
 
+Grid - date/time popup for editing
 
 ================================================================================
 
 Currently disabled. SSCommon.isRestoreOnError().  Inconsistently used:
+
+================================================================================
+DbOpsCreator, DbOpsBase
+-----------------------
+
+SSSyncManager move to navigate, make constructor package?
+
+Should other DbOps have a RowsModel param?
+
+Have a customizer that can create both DbSupport and DbOpsCustomizer?
+Get rid of  one or the other? DbSupport extends DbOpsCustomizer?
+
+Have default DbOps per database, one param could be "create key",
+maybe takes a table. Probably best to override PreInsert.
+
+Have DbOps incorporate handling of SyncManager? see TestFormattedComponents
 
 ================================================================================
 
@@ -221,6 +266,18 @@ KeyDisplayValueSwingModel document EventList lock and general locking
 maybe also in AbstractComboBoxListSwingModel
 KeyDisplayValueSwingModel.isD2Enabled(), versus hasD2()
 
+=== published/public javadoc
+https://visdb-dev.github.io/seesaw/
+See JAVADOC_DEPLOY_CHECK
+
+================================================================================
+
+visdb-dev/seesaw GitHub repository
+
+Insights > dependency graph > Dependabot
+
+More checkout under Advanced security
+
 ================================================================================
 
 document
@@ -243,6 +300,18 @@ best practices, use named constraints for better error messages
 
 ================================================================================
 
+A global way to specify locking List without recompiling.
+
+Maybe there needes to be a Remodel-reused flag, so remodel is kept open
+as long as there are active locks.
+See KeyDisplayValueSwingModel.remodelReleaseWriteLock()
+
+Maybe have a builder of sorts to specify locking rules...
+
+Implement Inspect, like Remodel, that uses readLock. (only matters glazed list)
+
+================================================================================
+
 SSListItemFormat SSFormat handling.
 
 DBComboBox2
@@ -251,6 +320,23 @@ DBComboBox2
       then combobox2 would not need to override setallownull. BUT TEST.
     - dateFormat needs work. Use SSFormat.
     - get rid of "fire..."
+
+================================================================================
+
+Fix List1 inconsistent remodel and getChosenItem? See comment in List1.java.
+
+TODO: fixup SimpleComboListswingModel so remodel handling more like
+      KeyDisplayValueSwingModel. Maybe make it an inbetween class
+      extended by KeyDis...
+
+
+
+In Item2::Item2(K key, D displayValue) there's a debug IllegalStateException.
+  @SuppressWarnings("unchecked")
+  Item2(K key, D displayValue) {
+    this(key, displayValue, (D2) NO_D2);
+    //if(Boolean.TRUE) throw new IllegalStateException();
+  }
 
 ================================================================================
 
@@ -374,23 +460,6 @@ Examine, for CachedRowSet, SSUtils get/set PrimaryKey stuff, key_seq misused I t
 Many databases have extended metadata for example. lookup stuff for keys info.
 
 ================================================================================
-
-Convert/move to core
-
-    SSDBNavImpl, SSDBNav - rewrite use meta data
-
-    SSCellEditing.java
-    SSDataGridAdapter.java
-    SSDataGridHandle.java
-    SSDataGrid.java
-    SSDataValue.java
-    SSTableKeyAdapter.java
-    SSTableModel.java
-
-    SSDataNavigator???
-
-SSTextSupport --> TextSupport
-
 ================================================================================
 
 What happens if on insert row and do an execute?
