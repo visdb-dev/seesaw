@@ -1,0 +1,10 @@
+dev.visdb.seesaw
+dev.visdb.seesaw.datasources
+dev.visdb.seesaw.datasources.products
+dev.visdb.seesaw.decorators
+dev.visdb.seesaw.enums
+dev.visdb.seesaw.formatting
+dev.visdb.seesaw.models
+dev.visdb.seesaw.navigate
+dev.visdb.seesaw.table
+dev.visdb.seesaw.utils
