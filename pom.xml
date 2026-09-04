@@ -64,7 +64,7 @@
     <!--        Test -->
     <version.junit-jupiter>5.14.1</version.junit-jupiter>
     <version.assertj>3.27.7</version.assertj>
-    <version.mockito>5.14.2</version.mockito>
+    <version.mockito>5.23.0</version.mockito>
 
     <!-- Plugins -->
     <version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
