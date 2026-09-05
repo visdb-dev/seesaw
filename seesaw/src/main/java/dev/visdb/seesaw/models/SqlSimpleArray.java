@@ -1,6 +1,5 @@
-/*******************************************************************************
- * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+/* *****************************************************************************
+ * Copyright (C) 2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,18 +26,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
- ******************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package dev.visdb.seesaw.models;
 
@@ -51,21 +38,21 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Implementation of SQL array for SsList; most methods unsupported.
+ * Implementation of JDBC array that holds data; most methods unsupported.
+ * Useful to update an array in a Table.
  * Array data is not copied/safe.
  */
-
-public class SsJDBCArray implements Array {
+public class SqlSimpleArray implements Array {
   /**
    * Underlying database type name for array elements
    */
   final private JDBCType baseType;
-
+  
   /**
    * an array containing elements for an sql array
    */
   private Object data;
-
+  
   /**
    * Creates SsJDBCArray with the object array and data base type.
    * <em>The data is not copied</em>; the caller should not modify the array.
@@ -73,26 +60,26 @@ public class SsJDBCArray implements Array {
    * @param data     object array of SsJDBCArray
    * @param baseType Array elements database type
    */
-  public SsJDBCArray(Object data, JDBCType baseType) {
+  public SqlSimpleArray(Object data, JDBCType baseType) {
     Objects.requireNonNull(data);
     if (!data.getClass().isArray())
       throw new IllegalArgumentException("Must be an array");
     this.data = data;
     this.baseType = baseType;
   }
-
+  
   /** {@inheritDoc } */
   @Override
   public void free() throws SQLException {
     data = null;
   }
-
+  
   /** {@inheritDoc } */
   @Override
   public Object getArray() throws SQLException {
     return data;
   }
-
+  
   /**
    * throws UnsupportedOperationException
    * {@inheritDoc }
@@ -101,7 +88,7 @@ public class SsJDBCArray implements Array {
   public Object getArray(long index, int count) throws SQLException {
     throw new UnsupportedOperationException();
   }
-
+  
   /**
    * throws UnsupportedOperationException
    * {@inheritDoc }
@@ -110,7 +97,7 @@ public class SsJDBCArray implements Array {
   public Object getArray(long index, int count, Map<String, Class<?>> map) throws SQLException {
     throw new UnsupportedOperationException();
   }
-
+  
   /**
    * throws UnsupportedOperationException
    * {@inheritDoc }
@@ -119,19 +106,19 @@ public class SsJDBCArray implements Array {
   public Object getArray(Map<String, Class<?>> map) throws SQLException {
     throw new UnsupportedOperationException();
   }
-
+  
   /** {@inheritDoc } */
   @Override
   public int getBaseType() throws SQLException {
     return baseType.getVendorTypeNumber();
   }
-
+  
   /** {@inheritDoc } */
   @Override
   public String getBaseTypeName() throws SQLException {
     return baseType.getName();
   }
-
+  
   /**
    * throws UnsupportedOperationException
    * {@inheritDoc }
@@ -140,7 +127,7 @@ public class SsJDBCArray implements Array {
   public ResultSet getResultSet() throws SQLException {
     throw new UnsupportedOperationException();
   }
-
+  
   /**
    * throws UnsupportedOperationException
    * {@inheritDoc }
@@ -149,7 +136,7 @@ public class SsJDBCArray implements Array {
   public ResultSet getResultSet(long index, int count) throws SQLException {
     throw new UnsupportedOperationException();
   }
-
+  
   /**
    * throws UnsupportedOperationException
    * {@inheritDoc }
@@ -159,7 +146,7 @@ public class SsJDBCArray implements Array {
       throws SQLException {
     throw new UnsupportedOperationException();
   }
-
+  
   /**
    * throws UnsupportedOperationException
    * {@inheritDoc }
@@ -168,14 +155,14 @@ public class SsJDBCArray implements Array {
   public ResultSet getResultSet(Map<String, Class<?>> map) throws SQLException {
     throw new UnsupportedOperationException();
   }
-
+  
   /**
    * Returns a string value with comma separated values. e.g. "{100,200,300}"
    * @return
    */
   @Override
   public String toString() {
-    String text = "SsJDBCArray " + Arrays.asList(data);
+    String text = "SqlSimpleArray " + Arrays.asList(data);
     return text;
   }
 }

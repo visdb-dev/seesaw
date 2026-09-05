@@ -1,11 +1,14 @@
 ### (documentation in progress)
 # Seesaw database aware components
 
+[javadoc](https://visdb-dev.github.io/seesaw/).
+
 ## DESCRIPTION
 
 
 
-Seesaw is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
+Seesaw is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components. It is a rewrite of most of the original [SwingSet](https://github.com/bpangburn/swingset) with several new features; there is a [wrapper](https://github.com/errael/swingset) that uses seesaw to provide the SwingSet API.
+
 
 The Seesaw feature-set currently includes:
 

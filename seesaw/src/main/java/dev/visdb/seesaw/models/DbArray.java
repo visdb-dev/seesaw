@@ -44,7 +44,11 @@ package dev.visdb.seesaw.models;
 
 import java.sql.Array;
 import java.sql.JDBCType;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 
 import dev.visdb.seesaw.utils.SsComponent;
 
@@ -81,7 +85,7 @@ public class DbArray extends DbAbstractCollection {
     if (!data.getClass().isArray())
       throw new IllegalArgumentException("Must be an array");
 
-    SsJDBCArray array = new SsJDBCArray(data, getJDBCType());
+    SqlSimpleArray array = new SqlSimpleArray(data, getJDBCType());
     comp.setColumnArray(array);
   }
 }

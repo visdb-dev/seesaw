@@ -138,33 +138,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <!-- Hopefully we can comment this out now that we're requiring Java 11+.
-    <profile>
-            <id>java-9-plus</id>
-            <activation>
-                    <jdk>[1.9,)</jdk>
-            </activation>
-            <build>
-                    <pluginManagement>
-                            <plugins>
-                                    <plugin>
-                                            <groupId>org.apache.maven.plugins</groupId>
-                                            <artifactId>maven-javadoc-plugin</artifactId>
-                                            <configuration>
-                                                    <additionalOptions>-html5</additionalOptions>
-                                                    <doclint>all,-missing,-html</doclint>
-                                                    <links>
-                                                            <link>
-                                                                    https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
-                                                    </links>
-                                            </configuration>
-                                    </plugin>
-                            </plugins>
-                    </pluginManagement>
-            </build>
-    </profile>
-    -->
-  </profiles>
-
 </project>
