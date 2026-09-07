@@ -51,7 +51,7 @@
     <version.jackson>3.2.2</version.jackson>
     <!--        Demo -->
     <version.log4j>2.26.1</version.log4j>
-    <version.h2>2.4.240</version.h2>
+    <version.h2>2.5.250</version.h2>
     <version.java-getopt>1.0.13</version.java-getopt>
     <version.raelity-lib>1.2.0</version.raelity-lib>
     <version.simplevalidation>1.14.1</version.simplevalidation>
