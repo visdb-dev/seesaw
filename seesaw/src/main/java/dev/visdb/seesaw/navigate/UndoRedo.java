@@ -32,6 +32,7 @@ package dev.visdb.seesaw.navigate;
 import java.lang.System.Logger;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.sql.RowSet;
 import javax.swing.SwingUtilities;
@@ -63,11 +64,29 @@ public enum UndoRedo {
    * when rs.updateNull was used.
    */
   public record Change(Object codedValue, boolean isError) {
+    /** Treat JDBCType.NULL as identical to null */
     public Object value() {
       return codedValue == JDBCType.NULL ? null : codedValue;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (!(obj instanceof Change other)) return false;
+      
+      Object thisVal = this.value(); // handle NULL
+      Object otherVal = other.value(); // handle NULL
+      
+      // Chain value check with standard field checks
+      return Objects.equals(thisVal, otherVal)
+          && this.isError == other.isError;
+    }
+    
+    @Override
+    public int hashCode() {
+      return Objects.hash(value(), isError);
+    }
   }
-  ;
 
   static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
 

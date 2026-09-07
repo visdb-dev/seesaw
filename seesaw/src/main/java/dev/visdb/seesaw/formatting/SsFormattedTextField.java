@@ -187,8 +187,12 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
      */
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
-      if (pce.getPropertyName().equals("value"))
-        handleValuePropertyChange(pce);
+      if (pce.getPropertyName().equals("value")) {
+        // if either value is a null, even if old == new, the property change is fired,
+        // so check here and skip if both are null
+        if (!Objects.equals(pce.getOldValue(), pce.getNewValue()))
+          handleValuePropertyChange(pce);
+      }
     }
   }
 
