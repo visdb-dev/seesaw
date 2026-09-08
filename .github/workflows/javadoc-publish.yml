@@ -4,34 +4,88 @@ on:
   push:
     branches:
       - main  # or master
+  workflow_dispatch: # enable the manual trigger
 
+# Grants direct cloud delivery access without requiring a git branch
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+# Stops older runs if you push code changes back-to-back
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   publish:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7 # Checked and verified current 
 
       - name: Set up JDK
-        uses: actions/setup-java@v6
+        uses: actions/setup-java@v6 # Checked and verified current 
         with:
           java-version: '25' 
           distribution: 'temurin'
           cache: 'maven'     
 
       - name: Generate Javadoc
-        # 🤫 2. '-B' for batch mode to hide the progress bars
         run: mvn javadoc:javadoc -P release -pl :seesaw -am -B 
 
+      # Modern GitHub configuration to bypass Jekyll processing 
+      - name: Setup Pages
+        uses: actions/configure-pages@v6 # Audited and bumped to v6
+
+      # Compresses your javadoc output directory into a cloud artifact
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3 # Audited and maintained at v3
+
+      # Feeds the artifact straight to your github.io hosting server
       - name: Deploy to GitHub Pages 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: seesaw/target/reports/apidocs
-          branch: gh-pages
-          nojekyll: true # to avoid possible problems, e.g. underscore directories
+        id: deployment
+        uses: actions/deploy-pages@v5 # Audited and bumped to v5
+
+
+# WORKS
+# name: Deploy Javadoc to GitHub Pages
+# 
+# on:
+#   push:
+#     branches:
+#       - main  # or master
+# 
+# permissions:
+#   contents: write
+# 
+# jobs:
+#   publish:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v7
+# 
+#       - name: Set up JDK
+#         uses: actions/setup-java@v6
+#         with:
+#           java-version: '25' 
+#           distribution: 'temurin'
+#           cache: 'maven'     
+# 
+#       - name: Generate Javadoc
+#         # 🤫 2. '-B' for batch mode to hide the progress bars
+#         run: mvn javadoc:javadoc -P release -pl :seesaw -am -B 
+# 
+#       - name: Deploy to GitHub Pages 🚀
+#         uses: JamesIves/github-pages-deploy-action@v4
+#         with:
+#           folder: seesaw/target/reports/apidocs
+#           branch: gh-pages
+#           nojekyll: true # to avoid possible problems, e.g. underscore directories
 
 # name: Deploy Javadoc
 # 
