@@ -13,43 +13,14 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <!-- Keep your existing demo coordinates -->
-  <groupId>dev.visdb.seesaw.demo</groupId>
   <artifactId>seesaw-demo</artifactId>
   <packaging>jar</packaging>
 
-  <name>seesaw-demo</name>
-  <description>Demo for SeeSaw</description>
-  <url>https://github.com/errael/visdb</url>
+  <name>${group_abbrev}:${project.artifactId}</name>
 
   <properties>
-    <!-- Never publish demo artifacts to Maven Central -->
-    <maven.deploy.skip>true</maven.deploy.skip>
     <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
   </properties>
-
-  <licenses>
-    <license>
-      <name>BSD 3-Clause</name>
-      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <id>errael</id>
-      <name>Ernie R Rael</name>
-      <email>errael@raelity.com</email>
-      <organization>Raelity Engineering</organization>
-      <organizationUrl>http://raelity.com</organizationUrl>
-    </developer>
-  </developers>
-
-  <scm>
-    <url>https://github.com/errael/swingset</url>
-    <connection>scm:git:git@github.com:errael/swingset.git</connection>
-    <developerConnection>scm:git:git@github.com:errael/swingset.git</developerConnection>
-  </scm>
 
   <dependencies>
     <dependency>
@@ -148,6 +119,21 @@
         </executions>
       </plugin>
 
+      <!-- Never publish demo artifacts to Maven Central -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <configuration>
+          <skipPublishing>true</skipPublishing>
+        </configuration>
+        <!--
+        <executions>
+          <execution>
+            <phase>deploy</phase>
+          </execution>
+        </executions>
+        -->
+      </plugin>
     </plugins>
   </build>
 
