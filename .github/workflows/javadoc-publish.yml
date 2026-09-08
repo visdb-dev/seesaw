@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main  # or master
-  workflow_dispatch: # enable the manual trigger
+  workflow_dispatch: # enable manual trigger
 
 # Grants direct cloud delivery access without requiring a git branch
 permissions:
@@ -25,10 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7 # Checked and verified current 
+        uses: actions/checkout@v7
 
       - name: Set up JDK
-        uses: actions/setup-java@v6 # Checked and verified current 
+        uses: actions/setup-java@v6
         with:
           java-version: '25' 
           distribution: 'temurin'
@@ -39,16 +39,19 @@ jobs:
 
       # Modern GitHub configuration to bypass Jekyll processing 
       - name: Setup Pages
-        uses: actions/configure-pages@v6 # Audited and bumped to v6
+        uses: actions/configure-pages@v6
 
       # Compresses your javadoc output directory into a cloud artifact
       - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3 # Audited and maintained at v3
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'seesaw/target/reports/apidocs'
+          retention-days: 1
 
       # Feeds the artifact straight to your github.io hosting server
       - name: Deploy to GitHub Pages 🚀
         id: deployment
-        uses: actions/deploy-pages@v5 # Audited and bumped to v5
+        uses: actions/deploy-pages@v5
 
 
 # WORKS
