@@ -11,20 +11,57 @@
   <version>0.5.0</version>
   <packaging>pom</packaging>
 
-  <name>seesaw-parent</name>
-  <url>https://github.com/errael/visdb</url>
+  <name>${group_abbrev}:${project.artifactId}</name>
 
-  <scm>
-    <url>https://github.com/errael/swingset</url>
-    <connection>scm:git:git@github.com:errael/swingset.git</connection>
-    <developerConnection>scm:git:git@github.com:errael/swingset.git</developerConnection>
-    <tag>HEAD</tag>
+  <description>
+    Seesaw library:
+    Java swing database aware components.
+    Supports multiple databases through plugins.
+  </description>
+
+  <url child.project.url.inherit.append.path="false">
+    https://github.com/visdb-dev/seesaw
+  </url>
+  <scm child.scm.url.inherit.append.path="false" >
+    <url>https://github.com/visdb-dev/seesaw</url>
   </scm>
+
+
+<!--
+<scm child.scm.connection.inherit.append.path="false" 
+     child.scm.developerConnection.inherit.append.path="false" 
+     child.scm.url.inherit.append.path="false">
+    <connection>scm:git:git://://github.com</connection>
+    <developerConnection>scm:git:ssh://://github.com</developerConnection>
+    <url>https://github.com</url>
+</scm>
+-->
 
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/errael/swingset/issues</url>
+    <url>https://github.com/visdb-dev/seesaw/issues</url>
   </issueManagement>
+
+  <licenses>
+    <license>
+      <name>BSD 3-Clause</name>
+      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Raelity Engineering</name>
+    <url>http://raelity.com</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <name>Ernie Rael</name>
+      <email>errael@raelity.com</email>
+      <organization>Raelity Engineering</organization>
+      <organizationUrl>http://raelity.com</organizationUrl>
+    </developer>
+  </developers>
 
   <modules>
     <module>seesaw</module>
@@ -33,6 +70,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <group_abbrev>dev.visdb</group_abbrev>
+    <snippet_path>${project.basedir}/src/test/java/snippet_files</snippet_path>
+
 
     <!-- Toolchain -->
     <version.maven>3.9.6</version.maven>
@@ -74,19 +115,20 @@
     <version.maven-surefire-plugin>3.5.6</version.maven-surefire-plugin>
     <version.maven-failsafe-plugin>3.5.6</version.maven-failsafe-plugin>
     <version.maven-jar-plugin>3.5.1</version.maven-jar-plugin>
+    <version.maven-install-plugin>3.1.4</version.maven-install-plugin>
+    <version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
+    <version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
+
+    <!-- Publish Plugins -->
+    <version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
+    <version.central-publishing-maven-plugin>0.11.0</version.central-publishing-maven-plugin>
     <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
     <version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
-    <version.maven-install-plugin>3.1.4</version.maven-install-plugin>
-    <version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
-    <version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
     <version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
-    <version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
+    <version.flatten-maven-plugin>1.8.0</version.flatten-maven-plugin>
 
     <!-- Security -->
     <version.dependency-check-maven>13.0.0</version.dependency-check-maven>
-
-    <!-- Sonatype Central Publishing -->
-    <version.central-publishing-maven-plugin>0.11.0</version.central-publishing-maven-plugin>
   </properties>
 
   <dependencyManagement>
@@ -253,7 +295,7 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.maven-compiler-plugin}</version>
           <dependencies>
-            <dependency>
+            <dependency>                                    <!-- frgaal -->
               <groupId>org.frgaal</groupId>
               <artifactId>compiler-maven-plugin</artifactId>
               <version>${version.frgaal}</version>
@@ -261,7 +303,7 @@
           </dependencies>
           <configuration>
             <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
-            <compilerId>frgaal</compilerId>
+            <compilerId>frgaal</compilerId>                 <!-- frgaal -->
             <source>${java-source}</source>
             <target>${java-target}</target>
             <compilerArgs>
@@ -286,6 +328,8 @@
             -->
           </configuration>
         </plugin>
+
+        <!-- need multi-release for frgaal -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
@@ -298,32 +342,6 @@
             </archive>
           </configuration>
         </plugin>
-        <!-- -->
-        <!-- End frgaal -->
-
-        <!-- Included elsewhere with frgaal
-        <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${version.maven-compiler-plugin}</version>
-                <configuration>
-                        <release>${java-release}</release>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>com.raelity.lib</groupId>
-                                <artifactId>weak-event-bus-receiver</artifactId>
-                                <version>${version.weak-event-bus-receiver}</version>
-                            </path>
-                        </annotationProcessorPaths>
-                </configuration>
-        </plugin>
-
-        <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${version.maven-jar-plugin}</version>
-        </plugin>
-        -->
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -339,38 +357,14 @@
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${version.maven-source-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${version.maven-javadoc-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
           <version>${version.maven-install-plugin}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>${version.maven-deploy-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <version>${version.maven-site-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>${version.maven-gpg-plugin}</version>
         </plugin>
 
         <plugin>
@@ -390,17 +384,7 @@
           </configuration>
         </plugin>
 
-        <!-- Central Publishing (managed; executed only in -Prelease) -->
-        <plugin>
-          <groupId>org.sonatype.central</groupId>
-          <artifactId>central-publishing-maven-plugin</artifactId>
-          <version>${version.central-publishing-maven-plugin}</version>
-          <extensions>true</extensions>
-          <configuration>
-            <publishingServerId>central</publishingServerId>
-            <autoPublish>true</autoPublish>
-          </configuration>
-        </plugin>
+        <!-- antrun -->
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -423,6 +407,120 @@
           </executions>
         </plugin>
 
+        <!-- Central Publishing (managed; executed only in -Prelease) -->
+
+        <!-- Standard Deploy: Declared here so it's easy to configure everywhere -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <version>${version.maven-deploy-plugin}</version>
+        </plugin>
+
+        <!-- Maven Central Plugin: Handles portal uploads -->
+        <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>${version.central-publishing-maven-plugin}</version>
+            <extensions>true</extensions>
+            <configuration>
+                <publishingServerId>central</publishingServerId>
+                <!-- Make sure all modules OK before publishing -->
+                <autoPublish>false</autoPublish>
+                <waitUntil>validated</waitUntil>
+            </configuration>
+        </plugin>
+
+        <!-- Required by Central: Source JAR generation -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>${version.maven-source-plugin}</version>
+            <executions>
+                <execution>
+                    <id>attach-sources</id>
+                    <goals>
+                        <goal>jar-no-fork</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Required by Central: Javadoc JAR generation -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>${version.maven-javadoc-plugin}</version>
+            <configuration> <!-- EXTRA -->
+              <release>${version.java}</release>
+              <failOnError>false</failOnError>
+              <sourcetab>4</sourcetab>
+              <!-- - -snippet-path ${project.basedir}/src/test/java/snippet_files -->
+              <additionalOptions>
+                  <additionalOption>
+                      --snippet-path ${snippet_path}
+                  </additionalOption>
+              </additionalOptions>
+              <!-- TODO: don't supress "missing" -->
+              <!-- TODO: don't supress "html" -->
+              <doclint>all,-missing,-html</doclint>
+              <links>
+                <link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
+              </links>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>attach-javadocs</id>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Required by Central: GPG Cryptographic Signing -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${version.maven-gpg-plugin}</version>
+            <executions>
+                <execution>
+                    <id>sign-artifacts</id>
+                    <phase>verify</phase>
+                    <goals>
+                        <goal>sign</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Resolves parent properties/variables before uploading -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>flatten-maven-plugin</artifactId>
+            <version>${version.flatten-maven-plugin}</version>
+            <configuration>
+              <flattenMode>oss</flattenMode>
+              <pomElements>
+                <name>expand</name>
+              </pomElements>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>flatten</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                        <goal>flatten</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>flatten.clean</id>
+                    <phase>clean</phase>
+                    <goals>
+                        <goal>clean</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -481,73 +579,36 @@
       <id>release</id>
       <build>
         <plugins>
+            <!-- 1. Turn off standard deployment entirely -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
 
-          <!-- Attach sources -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- Attach javadocs -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <release>${version.java}</release>
-              <failOnError>false</failOnError>
-              <additionalOptions>
-                -html5
-                --snippet-path ${snippet_path}
-                -sourcetab 4
-              </additionalOptions>
-              <!-- TODO: don't supress "missing" -->
-              <!-- TODO: don't supress "html" -->
-              <doclint>all,-missing,-html</doclint>
-              <links>
-                <link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
-              </links>
-            </configuration>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- Sign -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- Publish via Central Portal -->
-          <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-          </plugin>
-
+            <!-- 2. Activate all requirements for Central publishing -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
         </plugins>
       </build>
     </profile>

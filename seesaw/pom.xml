@@ -13,41 +13,13 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <properties>
-    <snippet_path>
-      ${project.basedir}/../seesaw-demo/src/main/java/snippet_files
-    </snippet_path>
-  </properties>
-
   <artifactId>seesaw</artifactId>
   <packaging>jar</packaging>
 
-  <name>seesaw</name>
-  <description>SeeSaw library</description>
-  <url>https://github.com/errael/visdb</url>
+  <name>${group_abbrev}:${project.artifactId}</name>
 
-  <licenses>
-    <license>
-      <name>BSD 3-Clause</name>
-      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <id>errael</id>
-      <name>Ernie R Rael</name>
-      <email>errael@raelity.com</email>
-      <organization>Raelity Engineering</organization>
-      <organizationUrl>http://raelity.com</organizationUrl>
-    </developer>
-  </developers>
-
-  <scm>
-    <url>https://github.com/errael/swingset</url>
-    <connection>scm:git:git@github.com:errael/swingset.git</connection>
-    <developerConnection>scm:git:git@github.com:errael/swingset.git</developerConnection>
-  </scm>
+  <properties>
+  </properties>
 
   <dependencies>
     <dependency>
