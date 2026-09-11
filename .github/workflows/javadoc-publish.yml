@@ -43,7 +43,7 @@ jobs:
 
       # Compresses your javadoc output directory into a cloud artifact
       - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: 'seesaw/target/reports/apidocs'
           retention-days: 1
