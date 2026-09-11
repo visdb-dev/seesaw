@@ -8,7 +8,7 @@
 
   <groupId>dev.visdb.seesaw</groupId>
   <artifactId>seesaw-parent</artifactId>
-  <version>0.5.0</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
 
   <name>${group_abbrev}:${project.artifactId}</name>
@@ -22,25 +22,11 @@
   <url child.project.url.inherit.append.path="false">
     https://github.com/visdb-dev/seesaw
   </url>
-  <scm child.scm.url.inherit.append.path="false" >
-    <url>https://github.com/visdb-dev/seesaw</url>
-  </scm>
 
-
-<!--
-<scm child.scm.connection.inherit.append.path="false" 
-     child.scm.developerConnection.inherit.append.path="false" 
-     child.scm.url.inherit.append.path="false">
-    <connection>scm:git:git://://github.com</connection>
-    <developerConnection>scm:git:ssh://://github.com</developerConnection>
-    <url>https://github.com</url>
-</scm>
--->
-
-  <issueManagement>
-    <system>GitHub</system>
-    <url>https://github.com/visdb-dev/seesaw/issues</url>
-  </issueManagement>
+  <modules>
+    <module>seesaw</module>
+    <module>seesaw-demo</module>
+  </modules>
 
   <licenses>
     <license>
@@ -63,13 +49,27 @@
     </developer>
   </developers>
 
-  <modules>
-    <module>seesaw</module>
-    <module>seesaw-demo</module>
-  </modules>
+  <!-- contributors go here -->
+
+  <scm child.scm.url.inherit.append.path="false"
+       child.scm.connection.inherit.append.path="false"
+       child.scm.developerConnection.inherit.append.path="false">
+    <url>https://github.com/visdb-dev/seesaw</url>
+    <connection>scm:git:https://github.com/visdb-dev/seesaw.git</connection>
+    <developerConnection>scm:git:git@github.com:visdb-dev/seesaw.git</developerConnection>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/visdb-dev/seesaw/issues</url>
+  </issueManagement>
+
+  <!-- ciManagement -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <revision>0.5.0</revision>
 
     <group_abbrev>dev.visdb</group_abbrev>
     <snippet_path>${project.basedir}/src/test/java/snippet_files</snippet_path>
@@ -92,7 +92,7 @@
     <version.jackson>3.2.2</version.jackson>
     <!--        Demo -->
     <version.log4j>2.26.1</version.log4j>
-    <version.h2>2.4.240</version.h2>
+    <version.h2>2.5.250</version.h2>
     <version.java-getopt>1.0.13</version.java-getopt>
     <version.raelity-lib>1.2.0</version.raelity-lib>
     <version.simplevalidation>1.14.1</version.simplevalidation>
@@ -111,9 +111,9 @@
     <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
     <version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
     <version.maven-resources-plugin>3.5.0</version.maven-resources-plugin>
-    <version.maven-compiler-plugin>3.15.0</version.maven-compiler-plugin>
-    <version.maven-surefire-plugin>3.5.6</version.maven-surefire-plugin>
-    <version.maven-failsafe-plugin>3.5.6</version.maven-failsafe-plugin>
+    <version.maven-compiler-plugin>3.16.0</version.maven-compiler-plugin>
+    <version.maven-surefire-plugin>3.6.0</version.maven-surefire-plugin>
+    <version.maven-failsafe-plugin>3.6.0</version.maven-failsafe-plugin>
     <version.maven-jar-plugin>3.5.1</version.maven-jar-plugin>
     <version.maven-install-plugin>3.1.4</version.maven-install-plugin>
     <version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
@@ -121,7 +121,15 @@
 
     <!-- Publish Plugins -->
     <version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
+    <version.njord>0.9.10</version.njord>
+    <!-- Bypasses the distributionManagement requirement seamlessly -->
+<!--
+-->
+    <njord.publisher>sonatype-central-portal</njord.publisher>
+    <njord.releaseUrl>njord:template:release-sca</njord.releaseUrl>
+    <!--
     <version.central-publishing-maven-plugin>0.11.0</version.central-publishing-maven-plugin>
+    -->
     <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
     <version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
     <version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
@@ -264,10 +272,39 @@
     </dependencies>
   </dependencyManagement>
 
+  <!-- the following is not easy to take out of here
+       AI says the following is key:
+          mvn njord:status -DaltDeploymentRepository
+              =sonatype-central-portal::default::https://localhost
+  -->
+  <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-central-portal</id>
+      <name>My Project Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>sonatype-central-portal</id>
+      <name>My Project Releases</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+  </distributionManagement>
+
   <build>
+    <extensions>
+      <extension>
+        <groupId>eu.maveniverse.maven.njord</groupId>
+        <artifactId>extension3</artifactId>
+        <version>${version.njord}</version>
+      </extension>
+    </extensions>
     <pluginManagement>
       <plugins>
-
+        <plugin>
+          <groupId>eu.maveniverse.maven.plugins</groupId>
+          <artifactId>njord</artifactId>
+          <version>${version.njord}</version>
+        </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
@@ -389,7 +426,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.2.0</version>
           <executions>
             <execution>
               <id>display-variable-value</id>
@@ -417,6 +454,7 @@
         </plugin>
 
         <!-- Maven Central Plugin: Handles portal uploads -->
+        <!--
         <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
@@ -424,11 +462,12 @@
             <extensions>true</extensions>
             <configuration>
                 <publishingServerId>central</publishingServerId>
-                <!-- Make sure all modules OK before publishing -->
+                Make sure all modules OK before publishing
                 <autoPublish>false</autoPublish>
                 <waitUntil>validated</waitUntil>
             </configuration>
         </plugin>
+        -->
 
         <!-- Required by Central: Source JAR generation -->
         <plugin>
@@ -500,6 +539,7 @@
             <version>${version.flatten-maven-plugin}</version>
             <configuration>
               <flattenMode>oss</flattenMode>
+              <updatePomFile>true</updatePomFile> <!-- for local install -->
               <pomElements>
                 <name>expand</name>
               </pomElements>
@@ -524,8 +564,13 @@
       </plugins>
     </pluginManagement>
 
-    <!-- Always-on enforcer -->
     <plugins>
+      <!-- for install -->
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>flatten-maven-plugin</artifactId>
+      </plugin>
+      <!-- Always-on enforcer -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -553,7 +598,6 @@
   </build>
 
   <profiles>
-
     <profile>
       <id>security-scan</id>
       <build>
@@ -579,19 +623,13 @@
       <id>release</id>
       <build>
         <plugins>
-            <!-- 1. Turn off standard deployment entirely -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
-
-            <!-- 2. Activate all requirements for Central publishing -->
             <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
+              <groupId>eu.maveniverse.maven.plugins</groupId>
+              <artifactId>njord</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -612,7 +650,6 @@
         </plugins>
       </build>
     </profile>
-
   </profiles>
 
 </project>

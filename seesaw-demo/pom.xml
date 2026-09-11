@@ -9,7 +9,7 @@
   <parent>
     <groupId>dev.visdb.seesaw</groupId>
     <artifactId>seesaw-parent</artifactId>
-    <version>0.5.0</version>
+    <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -19,6 +19,7 @@
   <name>${group_abbrev}:${project.artifactId}</name>
 
   <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
     <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
   </properties>
 
@@ -117,22 +118,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-
-      <!-- Never publish demo artifacts to Maven Central -->
-      <plugin>
-        <groupId>org.sonatype.central</groupId>
-        <artifactId>central-publishing-maven-plugin</artifactId>
-        <configuration>
-          <skipPublishing>true</skipPublishing>
-        </configuration>
-        <!--
-        <executions>
-          <execution>
-            <phase>deploy</phase>
-          </execution>
-        </executions>
-        -->
       </plugin>
     </plugins>
   </build>
