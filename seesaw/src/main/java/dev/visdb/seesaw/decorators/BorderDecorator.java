@@ -177,8 +177,8 @@ public class BorderDecorator extends FocusDecorator {
   /** {@inheritDoc } */
   @Override
   public void uninstall() {
-    super.uninstall();
     defaultBorder = null;
+    super.uninstall();
   }
 
   /**

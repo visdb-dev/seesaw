@@ -19,6 +19,7 @@
   <name>${group_abbrev}:${project.artifactId}</name>
 
   <properties>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
     <maven.deploy.skip>true</maven.deploy.skip>
     <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
   </properties>
@@ -32,17 +33,14 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
     </dependency>
-
     <dependency>
       <groupId>gnu.getopt</groupId>
       <artifactId>java-getopt</artifactId>
     </dependency>
-
     <dependency>
       <groupId>com.raelity</groupId>
       <artifactId>raelity-lib</artifactId>
     </dependency>
-
     <!--
             log4j-jpl: "The Log4j 2 JDK Logging Adapter allow
             to route all System.Logger events to Log4j 2 APIs."
@@ -54,35 +52,24 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-jpl</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
     </dependency>
-
     <dependency>
-      <!-- TODO: don't include simplevalidation -->
       <groupId>com.raelity.logman</groupId>
       <artifactId>logman-lib</artifactId>
     </dependency>
-
-    <!-- pick up simplevalidation from logman-lib
     <dependency>
-      <groupId>com.mastfrog</groupId>
-      <artifactId>simplevalidation-standalone</artifactId>
+      <groupId>dev.visdb.seesaw.contrib</groupId>
+      <artifactId>lgooddatepicker</artifactId>
+      <version>${revision}</version>
     </dependency>
-    -->
-
     <dependency>
-      <groupId>com.github.lgooddatepicker</groupId>
-      <artifactId>LGoodDatePicker</artifactId>
+      <groupId>dev.visdb.seesaw.contrib</groupId>
+      <artifactId>simplevalidation</artifactId>
+      <version>${revision}</version>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
-      <artifactId>LGoodDatePicker</artifactId>
-    </dependency>
-    -->
   </dependencies>
 
   <build>

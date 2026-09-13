@@ -35,55 +35,18 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2026, Ernie R. Rael. All rights reserved.
- * ****************************************************************************/
-package dev.visdb.seesaw.demo.simpval;
+package dev.visdb.seesaw.contrib.simplevalidation;
 
-import dev.visdb.seesaw.decorators.BaseDecorator;
-import dev.visdb.seesaw.decorators.Decorator;
-import dev.visdb.seesaw.decorators.Validator;
+import org.netbeans.validation.api.AbstractValidator;
 
 /**
- * A combined validator/decorator using the Simple Validation framework.
+ * A validator that handles a string.
  */
-public class SimpleValValidatorDecorator extends BaseDecorator {
-  private final TextComponentValidationItem valItem;
-  /** decorator name */
-  public static final Decorator.DecoratorStyle SIMPLE_VALIDATOR
-      = new Decorator.DecoratorStyle("SIMPLE_VALIDATOR");
-
-  public SimpleValValidatorDecorator(TextComponentValidationItem valItem) {
-    this.valItem = valItem;
-    this.validator = () -> valItem.validate();
-  }
-
-  @Override
-  public boolean decorate() {
-    valItem.performValidation();
-    return !valItem.hasFatalProblem();
-  }
-
-  // TODO: this does decoration as well. Does SwingSet need a split architecture?
-  private final Validator validator;
-
+public abstract class StringValidator extends AbstractValidator<String> {
   /**
-   * Get the SwingSet validator.
-   * TODO: Note that this does decoration as well.
-   * @return
+   * Specify the validator handles a string.
    */
-  public Validator getValidator() {
-    return validator;
-  }
-
-  /**
-   * SimpleValidatorDecorator style
-   * @return
-   */
-  @Override
-  public Decorator.DecoratorStyle getDecoratorStyle() {
-    return SIMPLE_VALIDATOR;
+  protected StringValidator() {
+    super(String.class);
   }
 }

@@ -35,13 +35,15 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
-package dev.visdb.seesaw.demo.simpval;
+package dev.visdb.seesaw.contrib.simplevalidation;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+
+import dev.visdb.seesaw.utils.SsComponent;
 
 import org.netbeans.validation.api.Problems;
 import org.netbeans.validation.api.Validator;
@@ -50,8 +52,6 @@ import org.netbeans.validation.api.conversion.Converter;
 import org.netbeans.validation.api.ui.ValidationItem;
 import org.netbeans.validation.api.ui.ValidationStrategy;
 import org.netbeans.validation.api.ui.swing.SwingComponentDecorationFactory;
-
-import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * Helpers for working with Simple Validation framework.

@@ -26,6 +26,7 @@
   <modules>
     <module>seesaw</module>
     <module>seesaw-demo</module>
+    <module>contrib</module>
   </modules>
 
   <licenses>
@@ -69,11 +70,12 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <revision>0.5.0</revision>
+    <revision>0.5.1</revision>
+    <group_abbrev>visdb</group_abbrev>
 
-    <group_abbrev>dev.visdb</group_abbrev>
-    <snippet_path>${project.basedir}/src/test/java/snippet_files</snippet_path>
-
+    <snippet_path>
+        ${maven.multiModuleProjectDirectory}/seesaw/src/test/java/snippet_files
+    </snippet_path>
 
     <!-- Toolchain -->
     <version.maven>3.9.6</version.maven>
@@ -95,11 +97,6 @@
     <version.h2>2.5.250</version.h2>
     <version.java-getopt>1.0.13</version.java-getopt>
     <version.raelity-lib>1.2.0</version.raelity-lib>
-    <version.simplevalidation>1.14.1</version.simplevalidation>
-    <version.ldatepicker>11.2.1</version.ldatepicker>
-    <!--
-    <version.raelity_ldatepicker>11.2.300</version.ldatepicker>
-    -->
     <version.logman>2.3.1</version.logman>
     <!--        Test -->
     <version.junit-jupiter>6.1.3</version.junit-jupiter>
@@ -122,14 +119,9 @@
     <!-- Publish Plugins -->
     <version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
     <version.njord>0.9.10</version.njord>
-    <!-- Bypasses the distributionManagement requirement seamlessly -->
-<!--
--->
     <njord.publisher>sonatype-central-portal</njord.publisher>
     <njord.releaseUrl>njord:template:release-sca</njord.releaseUrl>
-    <!--
-    <version.central-publishing-maven-plugin>0.11.0</version.central-publishing-maven-plugin>
-    -->
+
     <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
     <version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
     <version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
@@ -208,25 +200,6 @@
         <artifactId>raelity-lib</artifactId>
         <version>${version.raelity-lib}</version>
       </dependency>
-
-      <dependency>
-        <groupId>com.mastfrog</groupId>
-        <artifactId>simplevalidation-standalone</artifactId>
-        <version>${version.simplevalidation}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.github.lgooddatepicker</groupId>
-        <artifactId>LGoodDatePicker</artifactId>
-        <version>${version.ldatepicker}</version>
-      </dependency>
-      <!--
-      <dependency>
-          <groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
-          <artifactId>LGoodDatePicker</artifactId>
-          <version>${version.raelity_ldatepicker}</version>
-      </dependency>
-      -->
       <dependency>
         <groupId>com.raelity.logman</groupId>
         <artifactId>logman-lib</artifactId>
@@ -453,22 +426,6 @@
             <version>${version.maven-deploy-plugin}</version>
         </plugin>
 
-        <!-- Maven Central Plugin: Handles portal uploads -->
-        <!--
-        <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>${version.central-publishing-maven-plugin}</version>
-            <extensions>true</extensions>
-            <configuration>
-                <publishingServerId>central</publishingServerId>
-                Make sure all modules OK before publishing
-                <autoPublish>false</autoPublish>
-                <waitUntil>validated</waitUntil>
-            </configuration>
-        </plugin>
-        -->
-
         <!-- Required by Central: Source JAR generation -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -493,7 +450,6 @@
               <release>${version.java}</release>
               <failOnError>false</failOnError>
               <sourcetab>4</sourcetab>
-              <!-- - -snippet-path ${project.basedir}/src/test/java/snippet_files -->
               <additionalOptions>
                   <additionalOption>
                       --snippet-path ${snippet_path}
@@ -509,6 +465,7 @@
             <executions>
                 <execution>
                     <id>attach-javadocs</id>
+                    <phase>package</phase>
                     <goals>
                         <goal>jar</goal>
                     </goals>
@@ -589,7 +546,10 @@
                 <requireJavaVersion>
                   <version>[17,)</version>
                 </requireJavaVersion>
+                <dependencyConvergence/>
               </rules>
+              <failFast>false</failFast>
+              <fail>true</fail>
             </configuration>
           </execution>
         </executions>

@@ -268,6 +268,9 @@ KeyDisplayValueSwingModel document EventList lock and general locking
 maybe also in AbstractComboBoxListSwingModel
 KeyDisplayValueSwingModel.isD2Enabled(), versus hasD2()
 
+javadoc/wiki that describe input undo/redo, ESC
+javadoc/wiki how to build a formatted component.
+
 === published/public javadoc
 https://visdb-dev.github.io/seesaw/
 See JAVADOC_DEPLOY_CHECK

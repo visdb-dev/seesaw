@@ -93,12 +93,12 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
   /** {@inheritDoc} */
   @Override
   public void uninstall() {
-    super.uninstall();
     focusComp().removeFocusListener(this);
     if (busReceiver != null) {
       WeakEventBus.unregister(busReceiver, getGlobalEventBus());
       busReceiver = null;
     }
+    super.uninstall();
   }
 
   /**

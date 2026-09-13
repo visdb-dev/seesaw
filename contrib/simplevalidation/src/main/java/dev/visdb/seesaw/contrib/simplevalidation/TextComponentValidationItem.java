@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.visdb.seesaw.demo.simpval;
+package dev.visdb.seesaw.contrib.simplevalidation;
 
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;

@@ -1,6 +1,6 @@
 /*
  * Portions created by Ernie Rael are
- * Copyright (C) 2024-2026 Ernie Rael.  All Rights Reserved.
+ * Copyright (C) 2026 Ernie Rael.  All Rights Reserved.
  *
  * The contents of this file are subject to the Mozilla Public
  * License Version 1.1 (the "License"); you may not use this file
@@ -14,7 +14,8 @@
  *
  * Contributor(s): Ernie Rael <errael@raelity.com>
  */
-package dev.visdb.seesaw.demo.datepicker;
+
+package dev.visdb.seesaw.contrib.lgooddatepicker;
 
 import java.lang.System.Logger;
 import java.sql.JDBCType;
@@ -26,28 +27,26 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
-
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
+import dev.visdb.seesaw.utils.SsComponent;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.sql.JDBCType.DATE;
 
-import dev.visdb.seesaw.utils.SsComponent;
-
 /**
  * Date picker that gets it's value from a database column and sends
  * date changes back to the database. Undo/redo and more is supported,
  * see {@link SsComponent}.
- * The datapick is based on
+ * The datapicker is based on
  * <a href="https://github.com/LGoodDatePicker/LGoodDatePicker">LGoodDatePicker</a>.
  * <p>
  * It is an example of building a component that inter-operates with SS but is not
  * part of the SS library.
  */
 @SuppressWarnings("serial")
-public class DbDatePicker extends DatePicker implements SsComponent {
+public class SsLGoodDatePicker extends DatePicker implements SsComponent {
   private class DbDatePickerListener implements EventListener, DateChangeListener {
     /** {@inheritDoc} */
     @Override
@@ -71,7 +70,7 @@ public class DbDatePicker extends DatePicker implements SsComponent {
    *                        be bound
    */
   @SuppressWarnings("LeakingThisInConstructor")
-  public DbDatePicker(RowsModel rowsModel, String boundColumnName) {
+  public SsLGoodDatePicker(RowsModel rowsModel, String boundColumnName) {
     this();
     rowsModel.bind(this, boundColumnName);
   }
@@ -79,7 +78,7 @@ public class DbDatePicker extends DatePicker implements SsComponent {
   /**
    * Create date picker.
    */
-  public DbDatePicker() {
+  public SsLGoodDatePicker() {
     super(initialSettings());
 
     finishSsCommon();

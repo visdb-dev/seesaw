@@ -79,6 +79,7 @@ import dev.visdb.seesaw.SsList1;
 import dev.visdb.seesaw.SsSlider;
 import dev.visdb.seesaw.SsTextArea;
 import dev.visdb.seesaw.SsTextField;
+import dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
@@ -86,7 +87,6 @@ import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.decorators.TextStyles;
-import dev.visdb.seesaw.demo.datepicker.DbDatePicker;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.CentralLookup;
@@ -293,7 +293,7 @@ public class TestBaseComponents extends JFrame {
   SsTextArea txtSSTextArea = new SsTextArea();
   SsTextField txtSSTextField = new SsTextField();
   SsTextField txtSSTextFieldB = new SsTextField();
-  DbDatePicker dpDatePicker = new DbDatePicker();
+  SsLGoodDatePicker dpDatePicker = new SsLGoodDatePicker();
 
   /**
    * database component declarations

@@ -65,12 +65,12 @@ import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import dev.visdb.seesaw.SsTextField;
+import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
+import dev.visdb.seesaw.contrib.simplevalidation.StringValidator;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.TextComponentValidator;
-import dev.visdb.seesaw.demo.simpval.SVUtils;
-import dev.visdb.seesaw.demo.simpval.StringValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.SsDataNavigator;
@@ -178,6 +178,7 @@ public class Example1 extends JFrame {
 
     // Set a validator.
     final boolean USE_SIMPLE_VALIDATION = false;
+    // Example is better for SimpleValidation screenshots; this has too many buttons.
     //TextComponentValidationItem valSupplierName = null;
     ValidationItem decoSupplierName = null;
     Function<String, Boolean> validateSupplierName = (str) -> {
@@ -236,8 +237,10 @@ public class Example1 extends JFrame {
     }
 
     // Bind the components to the RowsModel and the database columns.
-    rowsModel.bind(Map.of(txtSupplierID, "supplier_id", txtSupplierName, "supplier_name",
-                          txtSupplierCity, "city", txtSupplierStatus, "status"));
+    rowsModel.bind(Map.of(txtSupplierID, "supplier_id",
+                          txtSupplierName, "supplier_name",
+                          txtSupplierCity, "city",
+                          txtSupplierStatus, "status"));
 
     // Set label dimensions.
     lblSupplierID.setPreferredSize(MainClass.labelDim);
@@ -302,6 +305,7 @@ public class Example1 extends JFrame {
     } else {
       uiPanel = (JPanel) contentPane;
     }
+
     // Make the jframe visible.
     frame.add(uiPanel);
     frame.pack();
