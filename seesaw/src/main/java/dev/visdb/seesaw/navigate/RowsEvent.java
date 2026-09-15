@@ -233,3 +233,4 @@ public class RowsEvent extends EventObjectBacktrace implements RowsModelEvent {
               rowSetEventTypes);
   }
 }
+// vi: sw=2 ts=8

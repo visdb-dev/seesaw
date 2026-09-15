@@ -449,3 +449,4 @@ public class BorderDecorator extends FocusDecorator {
     return DecoratorStyle.BORDER;
   }
 }
+// vi: sw=2 ts=8

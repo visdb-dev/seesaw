@@ -52,3 +52,4 @@ public abstract class Field extends SsFormattedTextField {
     return getValue() != null || getAllowNull();
   }
 }
+// vi: sw=2 ts=8

@@ -82,3 +82,4 @@ public interface SsDataGridHandler {
    */
   public void performPreInsertOps(int row);
 }
+// vi: sw=2 ts=8

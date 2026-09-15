@@ -281,3 +281,4 @@ public class RowNumberSpinner extends JSpinner {
     im.put(getKeyStroke(VK_DOWN, 0), enable ? null : "none");
   }
 }
+// vi: sw=2 ts=8

@@ -58,13 +58,12 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
 import dev.visdb.seesaw.SsComboBox2.MissingDisplayValueControl;
+import dev.visdb.seesaw.models.ListItem;
 import dev.visdb.seesaw.models.ListItemFormat;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
-
-import dev.visdb.seesaw.models.ListItem;
 
 /**
  * Demonstrate some advanced features of SSCombobox
@@ -293,3 +292,4 @@ public class Example4Advanced extends Example4 {
     });
   }
 }
+// vi: sw=2 ts=8

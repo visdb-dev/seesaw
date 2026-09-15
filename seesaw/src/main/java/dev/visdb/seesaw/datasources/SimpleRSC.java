@@ -215,3 +215,4 @@ public class SimpleRSC implements RSC {
                          objectID(getRowSet()), name, index);
   }
 }
+// vi: sw=2 ts=8

@@ -220,3 +220,4 @@ final class UndoRow {
     }
   }
 }
+// vi: sw=2 ts=8

@@ -272,3 +272,4 @@ public class Version implements Comparable<Version> {
     return Objects.equals(this.versionSequence, other.versionSequence);
   }
 }
+// vi: sw=2 ts=8

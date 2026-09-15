@@ -376,3 +376,4 @@ public interface DbSupport {
     return cleanName;
   }
 }
+// vi: sw=2 ts=8

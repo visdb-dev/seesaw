@@ -111,6 +111,7 @@ public class SsCheckBox extends JCheckBox implements SsComponent {
    * @param columnName name of the column to which this check box should be
    *                         bound
    */
+  @SuppressWarnings("LeakingThisInConstructor")
   public SsCheckBox(RowsModel rowsModel, String columnName) {
     this(null);
     rowsModel.bind(this, columnName);
@@ -127,6 +128,7 @@ public class SsCheckBox extends JCheckBox implements SsComponent {
                () -> sf("original border: %s", BorderDecorator.asString(getBorder(), this)));
     // JCheckBox disables painting the borders.
     // Replace the JCheckBox border with an empty border.
+    @SuppressWarnings("LeakingThisInConstructor")
     Border b = BorderDecorator.createEmptyBorder(this);
     setBorder(b);
     setBorderPainted(true);
@@ -194,3 +196,4 @@ public class SsCheckBox extends JCheckBox implements SsComponent {
   }
 
 } // end public class SsCheckBox
+// vi: sw=2 ts=8

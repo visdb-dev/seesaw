@@ -66,3 +66,4 @@ public class SqlException extends SQLException {
     super(reason, cause);
   }
 }
+// vi: sw=2 ts=8

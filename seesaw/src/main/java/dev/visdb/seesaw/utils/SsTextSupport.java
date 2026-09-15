@@ -375,3 +375,4 @@ public class SsTextSupport {
 
   } // end protected class SsDocumentListener
 }
+// vi: sw=2 ts=8

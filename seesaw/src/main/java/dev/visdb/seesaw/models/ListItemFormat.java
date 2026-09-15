@@ -317,3 +317,4 @@ public class ListItemFormat extends Format {
     sb.append(elem.toString());
   }
 }
+// vi: sw=2 ts=8

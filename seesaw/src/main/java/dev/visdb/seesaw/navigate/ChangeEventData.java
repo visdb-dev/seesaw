@@ -53,3 +53,4 @@ public interface ChangeEventData {
    */
   boolean isError();
 }
+// vi: sw=2 ts=8

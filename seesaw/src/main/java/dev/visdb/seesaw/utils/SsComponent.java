@@ -1006,3 +1006,4 @@ in the SsComponent's constructor, but before bind.
     getSsCommon().decorateText();
   }
 }
+// vi: sw=2 ts=8

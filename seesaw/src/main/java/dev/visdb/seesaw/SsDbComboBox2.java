@@ -597,3 +597,4 @@ public class SsDbComboBox2<K, D, D2> extends SsComboBox2<K, D, D2> {
   }
 
 } // end public class DBComboBox
+// vi: sw=2 ts=8

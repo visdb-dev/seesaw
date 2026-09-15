@@ -426,3 +426,4 @@ public class ComboBox2Test {
     assertEquals(List.of(11, 13, 14), lmi);
   }
 }
+// vi: sw=2 ts=8

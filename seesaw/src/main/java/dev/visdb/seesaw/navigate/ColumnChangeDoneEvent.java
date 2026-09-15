@@ -43,3 +43,4 @@ public class ColumnChangeDoneEvent extends ColumnChangeEvent {
     super(ev);
   }
 }
+// vi: sw=2 ts=8

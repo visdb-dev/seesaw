@@ -237,3 +237,4 @@ public class TrivialCtxFactory implements InitialContextFactory {
     }
   }
 }
+// vi: sw=2 ts=8

@@ -213,3 +213,4 @@ public enum UndoRedo {
     ev.getSource().getRowsModel().getUndoRow().addChange(ev);
   }
 }
+// vi: sw=2 ts=8

@@ -50,3 +50,4 @@ package dev.visdb.seesaw.models;
  * Compatible with GlazedLists AutoComplete feature.
  */
 public interface ListItem {}
+// vi: sw=2 ts=8

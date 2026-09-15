@@ -814,3 +814,4 @@ public class ConvertType {
     return value;
   }
 }
+// vi: sw=2 ts=8

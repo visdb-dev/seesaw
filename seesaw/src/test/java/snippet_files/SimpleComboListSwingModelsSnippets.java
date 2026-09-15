@@ -82,3 +82,4 @@ public class SimpleComboListSwingModelsSnippets {
   }
   // @end region=init1
 }
+// vi: sw=2 ts=8

@@ -217,3 +217,4 @@ public class ComboBoxSnippets extends JFrame {
   }
   // @end region=chosen_item
 }
+// vi: sw=2 ts=8

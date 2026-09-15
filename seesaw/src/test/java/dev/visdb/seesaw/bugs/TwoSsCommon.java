@@ -94,3 +94,4 @@ public class TwoSsCommon {
     assertTrue(testImage.xxx == testImage.getSsCommon());
   }
 }
+// vi: sw=2 ts=8

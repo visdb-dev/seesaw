@@ -109,3 +109,4 @@ public class DbSupportFactory {
     return dbSupport;
   }
 }
+// vi: sw=2 ts=8

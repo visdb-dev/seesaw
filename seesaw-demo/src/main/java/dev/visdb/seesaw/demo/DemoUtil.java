@@ -830,3 +830,4 @@ public class DemoUtil {
     return ok;
   }
 }
+// vi: sw=2 ts=8

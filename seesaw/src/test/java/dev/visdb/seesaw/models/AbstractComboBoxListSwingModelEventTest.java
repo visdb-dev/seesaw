@@ -567,3 +567,4 @@ public class AbstractComboBoxListSwingModelEventTest {
   // 	assertTrue(events.isEmpty());
   // }
 }
+// vi: sw=2 ts=8

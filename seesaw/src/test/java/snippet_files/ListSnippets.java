@@ -44,3 +44,4 @@ bind the list selection to a column in the RowsModel.
   }
   // @end region=init1
 }
+// vi: sw=2 ts=8

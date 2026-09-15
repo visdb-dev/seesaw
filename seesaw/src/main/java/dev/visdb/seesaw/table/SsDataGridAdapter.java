@@ -99,3 +99,4 @@ public abstract class SsDataGridAdapter implements SsDataGridHandler {
     // do nothing
   }
 }
+// vi: sw=2 ts=8

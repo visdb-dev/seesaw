@@ -144,3 +144,4 @@ public interface Decorator extends AnyDecorator {
     public void setDecorateTextEnabled(boolean flag) {}
   };
 }
+// vi: sw=2 ts=8

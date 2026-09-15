@@ -97,3 +97,4 @@ public class SsComboBox1<K, D> extends SsComboBox2<K, D, Object> {
     return item.orElse(new Item1<>(null, null));
   }
 }
+// vi: sw=2 ts=8

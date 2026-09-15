@@ -165,3 +165,4 @@ read/write of the component's table column.
     }
   }
 }
+// vi: sw=2 ts=8

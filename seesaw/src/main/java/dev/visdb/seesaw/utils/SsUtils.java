@@ -494,3 +494,4 @@ public class SsUtils {
     return !System.getProperty(JUNIT_TEST_LOGGING).equals("true");
   }
 }
+// vi: sw=2 ts=8

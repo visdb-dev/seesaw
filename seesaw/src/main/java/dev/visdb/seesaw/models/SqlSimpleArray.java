@@ -166,3 +166,4 @@ public class SqlSimpleArray implements Array {
     return text;
   }
 }
+// vi: sw=2 ts=8

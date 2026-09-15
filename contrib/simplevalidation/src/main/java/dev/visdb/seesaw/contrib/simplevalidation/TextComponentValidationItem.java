@@ -140,3 +140,4 @@ public class TextComponentValidationItem extends ValidationListener<JTextCompone
       }
   */
 }
+// vi: sw=2 ts=8

@@ -59,3 +59,4 @@ public class DbReaderDbUpdater extends JCheckBox implements SsComponent {
     return null;
   }
 }
+// vi: sw=2 ts=8

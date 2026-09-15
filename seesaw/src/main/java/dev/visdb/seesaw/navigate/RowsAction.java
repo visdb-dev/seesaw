@@ -151,3 +151,4 @@ public enum RowsAction {
    */
   public static final String OK_SKIP_CURSOR_MOVE = "MAY_SKIP_GOTOROW";
 }
+// vi: sw=2 ts=8

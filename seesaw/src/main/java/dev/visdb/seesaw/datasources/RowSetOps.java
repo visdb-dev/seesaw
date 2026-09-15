@@ -1071,3 +1071,4 @@ public class RowSetOps {
                                              getJDBCColumnType(rowSet, columnIndex));
   }
 }
+// vi: sw=2 ts=8

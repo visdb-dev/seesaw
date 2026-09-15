@@ -1723,3 +1723,4 @@ public class SsTable extends JTable {
 
 } // end public class SsTable extends JTable {
 //  vi: ts=4 sw=4
+// vi: sw=2 ts=8

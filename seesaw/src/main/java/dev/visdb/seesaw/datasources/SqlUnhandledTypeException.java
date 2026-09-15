@@ -77,3 +77,4 @@ public class SqlUnhandledTypeException extends SqlException {
     super(reason, cause);
   }
 }
+// vi: sw=2 ts=8

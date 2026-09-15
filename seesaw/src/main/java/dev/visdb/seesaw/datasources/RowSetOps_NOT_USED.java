@@ -194,3 +194,4 @@ public class RowSetOps_NOT_USED {
 
   private RowSetOps_NOT_USED() {}
 }
+// vi: sw=2 ts=8

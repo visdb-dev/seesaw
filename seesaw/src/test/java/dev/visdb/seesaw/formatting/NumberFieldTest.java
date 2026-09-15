@@ -306,3 +306,4 @@ public class NumberFieldTest {
   // 	fail("The test case is a prototype.");
   // }
 }
+// vi: sw=2 ts=8

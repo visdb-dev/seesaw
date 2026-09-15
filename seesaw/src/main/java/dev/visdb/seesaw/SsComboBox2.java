@@ -1793,3 +1793,4 @@ passing through SSCommon.addSsComponentListener()
               SsUtils.ssComponentToString(this));
   }
 }
+// vi: sw=2 ts=8

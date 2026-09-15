@@ -57,8 +57,8 @@ import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.formatting.SsDateField;
 import dev.visdb.seesaw.formatting.SsIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 
 import static dev.visdb.seesaw.formatting.SsFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
@@ -274,3 +274,4 @@ public class Example3 extends JFrame {
     };
   }
 }
+// vi: sw=2 ts=8

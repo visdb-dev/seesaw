@@ -74,7 +74,7 @@
     <group_abbrev>visdb</group_abbrev>
 
     <snippet_path>
-        ${maven.multiModuleProjectDirectory}/seesaw/src/test/java/snippet_files
+      ${maven.multiModuleProjectDirectory}/seesaw/src/test/java/snippet_files
     </snippet_path>
 
     <!-- Toolchain -->
@@ -106,6 +106,7 @@
     <!-- Plugins -->
     <version.versions-maven-plugin>2.21.0</version.versions-maven-plugin>
     <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
+    <version.extra-enforcer-rules>1.12.1</version.extra-enforcer-rules>
     <version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
     <version.maven-resources-plugin>3.5.0</version.maven-resources-plugin>
     <version.maven-compiler-plugin>3.16.0</version.maven-compiler-plugin>
@@ -147,9 +148,9 @@
         <version>${version.glazedlists}</version>
       </dependency>
       <dependency>
-          <groupId>com.raelity.3rdparty.org.netbeans</groupId>
-          <artifactId>util-lookup</artifactId>
-          <version>${version.util-lookup}</version>
+        <groupId>com.raelity.3rdparty.org.netbeans</groupId>
+        <artifactId>util-lookup</artifactId>
+        <version>${version.util-lookup}</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -225,10 +226,10 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>org.assertj</groupId>
-          <artifactId>assertj-core</artifactId>
-          <version>${version.assertj}</version>
-          <scope>test</scope>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
@@ -421,102 +422,102 @@
 
         <!-- Standard Deploy: Declared here so it's easy to configure everywhere -->
         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <version>${version.maven-deploy-plugin}</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${version.maven-deploy-plugin}</version>
         </plugin>
 
         <!-- Required by Central: Source JAR generation -->
         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>${version.maven-source-plugin}</version>
-            <executions>
-                <execution>
-                    <id>attach-sources</id>
-                    <goals>
-                        <goal>jar-no-fork</goal>
-                    </goals>
-                </execution>
-            </executions>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${version.maven-source-plugin}</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <!-- Required by Central: Javadoc JAR generation -->
         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>${version.maven-javadoc-plugin}</version>
-            <configuration> <!-- EXTRA -->
-              <release>${version.java}</release>
-              <failOnError>false</failOnError>
-              <sourcetab>4</sourcetab>
-              <additionalOptions>
-                  <additionalOption>
-                      --snippet-path ${snippet_path}
-                  </additionalOption>
-              </additionalOptions>
-              <!-- TODO: don't supress "missing" -->
-              <!-- TODO: don't supress "html" -->
-              <doclint>all,-missing,-html</doclint>
-              <links>
-                <link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
-              </links>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>attach-javadocs</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>jar</goal>
-                    </goals>
-                </execution>
-            </executions>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${version.maven-javadoc-plugin}</version>
+          <configuration> <!-- EXTRA -->
+            <release>${version.java}</release>
+            <failOnError>false</failOnError>
+            <sourcetab>4</sourcetab>
+            <additionalOptions>
+              <additionalOption>
+                --snippet-path ${snippet_path}
+              </additionalOption>
+            </additionalOptions>
+            <!-- TODO: don't supress "missing" -->
+            <!-- TODO: don't supress "html" -->
+            <doclint>all,-missing,-html</doclint>
+            <links>
+              <link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
+            </links>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <!-- Required by Central: GPG Cryptographic Signing -->
         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>${version.maven-gpg-plugin}</version>
-            <executions>
-                <execution>
-                    <id>sign-artifacts</id>
-                    <phase>verify</phase>
-                    <goals>
-                        <goal>sign</goal>
-                    </goals>
-                </execution>
-            </executions>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${version.maven-gpg-plugin}</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <!-- Resolves parent properties/variables before uploading -->
         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>flatten-maven-plugin</artifactId>
-            <version>${version.flatten-maven-plugin}</version>
-            <configuration>
-              <flattenMode>oss</flattenMode>
-              <updatePomFile>true</updatePomFile> <!-- for local install -->
-              <pomElements>
-                <name>expand</name>
-              </pomElements>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>flatten</id>
-                    <phase>process-resources</phase>
-                    <goals>
-                        <goal>flatten</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>flatten.clean</id>
-                    <phase>clean</phase>
-                    <goals>
-                        <goal>clean</goal>
-                    </goals>
-                </execution>
-            </executions>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>flatten-maven-plugin</artifactId>
+          <version>${version.flatten-maven-plugin}</version>
+          <configuration>
+            <flattenMode>oss</flattenMode>
+            <updatePomFile>true</updatePomFile> <!-- for local install -->
+            <pomElements>
+              <name>expand</name>
+            </pomElements>
+          </configuration>
+          <executions>
+            <execution>
+              <id>flatten</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>flatten</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>flatten.clean</id>
+              <phase>clean</phase>
+              <goals>
+                <goal>clean</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -524,10 +525,11 @@
     <plugins>
       <!-- for install -->
       <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>flatten-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
       </plugin>
       <!-- Always-on enforcer -->
+      <!-- https://www.mojohaus.org/extra-enforcer-rules/banDuplicateClasses.html -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -547,12 +549,36 @@
                   <version>[17,)</version>
                 </requireJavaVersion>
                 <dependencyConvergence/>
+                <banDuplicateClasses>
+                  <ignoreClasses>
+                    <!--
+                    example of ignoring one specific class
+                    <ignoreClass>com.xyz.i18n.Messages</ignoreClass>
+                    -->
+                    <ignoreClass>org.openide.util.*</ignoreClass>
+                  </ignoreClasses>
+                  <scopes>
+                    <scope>compile</scope>
+                    <scope>provided</scope>
+                  </scopes>
+                  <findAllDuplicates>true</findAllDuplicates>
+                  <!-- Note there are several errors without the following -->
+                  <!-- With it, still errors around org/openide/util -->
+                  <ignoreWhenIdentical>true</ignoreWhenIdentical>
+                </banDuplicateClasses>
               </rules>
               <failFast>false</failFast>
               <fail>true</fail>
             </configuration>
           </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
+            <version>${version.extra-enforcer-rules}</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
@@ -583,33 +609,34 @@
       <id>release</id>
       <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>eu.maveniverse.maven.plugins</groupId>
-              <artifactId>njord</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-            </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>eu.maveniverse.maven.plugins</groupId>
+            <artifactId>njord</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>flatten-maven-plugin</artifactId>
+          </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
 
 </project>
+<!-- vi: set sw=2 ts=8: -->

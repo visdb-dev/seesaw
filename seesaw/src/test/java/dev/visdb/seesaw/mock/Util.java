@@ -47,3 +47,4 @@ public class Util {
 
   private Util() {}
 }
+// vi: sw=2 ts=8

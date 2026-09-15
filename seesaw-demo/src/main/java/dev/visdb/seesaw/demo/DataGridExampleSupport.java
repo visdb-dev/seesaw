@@ -59,14 +59,13 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import dev.visdb.seesaw.SsTable;
-import dev.visdb.seesaw.table.SsTableModel;
 import dev.visdb.seesaw.datasources.RowSetOps;
+import dev.visdb.seesaw.table.SsDataGridHandler;
+import dev.visdb.seesaw.table.SsDataValue;
+import dev.visdb.seesaw.table.SsTableModel;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
-
-import dev.visdb.seesaw.table.SsDataGridHandler;
-import dev.visdb.seesaw.table.SsDataValue;
 
 /**
  * Add some buttons at the bottom of a DataGrid example
@@ -304,3 +303,4 @@ class DataGridExampleSupport {
     }
   }
 }
+// vi: sw=2 ts=8

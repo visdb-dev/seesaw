@@ -56,3 +56,4 @@ public class ColumnChangeStartEvent extends ColumnChangeEvent {
     super(source, value, error);
   }
 }
+// vi: sw=2 ts=8

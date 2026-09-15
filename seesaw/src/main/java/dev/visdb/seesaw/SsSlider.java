@@ -129,6 +129,7 @@ public class SsSlider extends JSlider implements SsComponent {
    *                         bound
    * @throws java.sql.SQLException SQLException
    */
+  @SuppressWarnings("LeakingThisInConstructor")
   public SsSlider(RowsModel rowsModel, String columnName) throws java.sql.SQLException {
     this();
     rowsModel.bind(this, columnName);
@@ -202,3 +203,4 @@ public class SsSlider extends JSlider implements SsComponent {
               SsUtils.ssComponentToString(this));
   }
 } // end public class SsSlider extends JSlider
+// vi: sw=2 ts=8

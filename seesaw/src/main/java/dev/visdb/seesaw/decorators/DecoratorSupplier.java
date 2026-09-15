@@ -72,3 +72,4 @@ public class DecoratorSupplier {
     return style;
   }
 }
+// vi: sw=2 ts=8

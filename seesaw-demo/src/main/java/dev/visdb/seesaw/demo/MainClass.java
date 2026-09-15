@@ -89,6 +89,7 @@ import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.RowSetOps.ForceConflict;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
+import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.CentralLookup;
@@ -102,8 +103,6 @@ import static dev.visdb.seesaw.demo.DemoUtil.configureJavaUtilLogger;
 import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
-
-import dev.visdb.seesaw.models.DbCollection;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -985,3 +984,4 @@ public class MainClass extends JFrame {
     SwingUtilities.invokeLater(() -> new MainClass());
   }
 } // end public class MainClass extends JFrame {
+// vi: sw=2 ts=8

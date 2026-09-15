@@ -81,3 +81,4 @@ public class DbMetaDataCache {
     return metaData;
   }
 }
+// vi: sw=2 ts=8

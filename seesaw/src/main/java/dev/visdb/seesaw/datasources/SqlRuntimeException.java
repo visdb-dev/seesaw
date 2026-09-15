@@ -66,3 +66,4 @@ public class SqlRuntimeException extends RuntimeException {
     super(cause);
   }
 }
+// vi: sw=2 ts=8

@@ -121,3 +121,4 @@ public class BackgroundDecorator extends FocusDecorator {
     return DecoratorStyle.BACKGROUND;
   }
 }
+// vi: sw=2 ts=8

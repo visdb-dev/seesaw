@@ -64,3 +64,4 @@ public interface DbSupportCreator {
    */
   DbSupport create(Connection sharedConnection, DatabaseMetaData dbMeta);
 }
+// vi: sw=2 ts=8

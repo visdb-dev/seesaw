@@ -578,3 +578,4 @@ public class SsList1<K, D> extends JList<ListItem> implements SsComponent {
               SsUtils.ssComponentToString(this));
   }
 }
+// vi: sw=2 ts=8

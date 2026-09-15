@@ -75,3 +75,4 @@ public class SqlInternalException extends SqlException {
     super(cause);
   }
 }
+// vi: sw=2 ts=8

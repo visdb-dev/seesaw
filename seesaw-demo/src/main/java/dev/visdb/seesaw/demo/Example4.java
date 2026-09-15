@@ -60,8 +60,8 @@ import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
@@ -495,3 +495,4 @@ public class Example4 extends JFrame {
 
   void cmbPartColorChangeOptions() {}
 }
+// vi: sw=2 ts=8

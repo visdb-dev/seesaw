@@ -52,3 +52,4 @@ public class H2DbSupportCreator implements DbSupportCreator {
     return new H2DbSupport(sharedConnection);
   }
 }
+// vi: sw=2 ts=8

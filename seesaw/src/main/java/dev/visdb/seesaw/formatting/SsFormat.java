@@ -132,3 +132,4 @@ public enum SsFormat {
     return type;
   }
 }
+// vi: sw=2 ts=8

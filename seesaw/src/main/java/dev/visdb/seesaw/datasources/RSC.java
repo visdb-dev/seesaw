@@ -172,3 +172,4 @@ public interface RSC {
    */
   String getColumnForLog();
 }
+// vi: sw=2 ts=8

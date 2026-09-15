@@ -27,6 +27,7 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
+
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
@@ -167,3 +168,4 @@ public class SsLGoodDatePicker extends DatePicker implements SsComponent {
     return hook;
   }
 }
+// vi: sw=2 ts=8

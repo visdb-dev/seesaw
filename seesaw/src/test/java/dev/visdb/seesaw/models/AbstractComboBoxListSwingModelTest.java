@@ -415,3 +415,4 @@ public class AbstractComboBoxListSwingModelTest {
     assertEquals(4, listInfo.checkCreatedLists());
   }
 }
+// vi: sw=2 ts=8

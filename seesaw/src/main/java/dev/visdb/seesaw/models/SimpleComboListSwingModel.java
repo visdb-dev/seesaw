@@ -115,3 +115,4 @@ public abstract class SimpleComboListSwingModel extends AbstractComboBoxListSwin
     return remodel;
   }
 }
+// vi: sw=2 ts=8

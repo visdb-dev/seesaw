@@ -66,3 +66,4 @@ public class FocusChangeEvent {
     return pce;
   }
 }
+// vi: sw=2 ts=8

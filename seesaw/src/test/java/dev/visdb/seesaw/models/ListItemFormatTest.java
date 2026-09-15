@@ -308,3 +308,4 @@ public class ListItemFormatTest {
     assertEquals(currentFormat, f3);
   }
 }
+// vi: sw=2 ts=8

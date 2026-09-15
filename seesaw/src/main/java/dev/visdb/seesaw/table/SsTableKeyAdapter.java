@@ -400,3 +400,4 @@ public class SsTableKeyAdapter extends KeyAdapter {
     this.forSsDataGrid = forSsDataGrid;
   }
 }
+// vi: sw=2 ts=8

@@ -284,3 +284,4 @@ public class EQ {
     EventQueue.invokeAndWait(() -> { cmsg.accept(msg); });
   }
 }
+// vi: sw=2 ts=8

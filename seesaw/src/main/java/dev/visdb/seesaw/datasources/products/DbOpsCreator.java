@@ -54,3 +54,4 @@ public interface DbOpsCreator {
    */
   DbOps create(RowSet rs, RowsModel rowsModel);
 }
+// vi: sw=2 ts=8

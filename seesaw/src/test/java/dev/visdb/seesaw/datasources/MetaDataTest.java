@@ -199,3 +199,4 @@ public class MetaDataTest {
     System.out.println("" + o);
   }
 }
+// vi: sw=2 ts=8

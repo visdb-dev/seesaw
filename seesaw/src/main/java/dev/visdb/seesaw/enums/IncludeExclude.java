@@ -66,3 +66,4 @@ public enum IncludeExclude {
     return displayValue;
   }
 }
+// vi: sw=2 ts=8

@@ -53,3 +53,4 @@ public class Item1<K, D> extends Item2<K, D, Object> {
   //   super(listItem, false);
   // }
 }
+// vi: sw=2 ts=8

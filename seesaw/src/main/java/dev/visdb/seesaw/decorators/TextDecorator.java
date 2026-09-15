@@ -74,3 +74,4 @@ public interface TextDecorator extends AnyDecorator {
     }
   };
 }
+// vi: sw=2 ts=8

@@ -13,18 +13,6 @@ You can copy and paste the single properties, into the pom.xml file and the IDE 
 That way multiple projects can share the same settings (useful for formatting rules for example).
 Any value defined here will override the pom.xml file value but is only applicable to the current project.
 -->
-        <org-netbeans-modules-editor-indent.text.x-yaml.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.x-yaml.CodeStyle.project.enable-indent>
-        <org-netbeans-modules-editor-indent.text.xml.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.xml.CodeStyle.project.enable-indent>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enable-indent>
-        <org-netbeans-modules-editor-indent.text.html.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.html.CodeStyle.project.enable-indent>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>words</org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>2</org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>2</org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>8</org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
-        <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>java;javax;org;com;*;static *</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_AssignmentIssues_2e_assignmentToMethodParam.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_AssignmentIssues_2e_assignmentToMethodParam.enabled>
         <org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_RAWTYPES.hintSeverity>HINT</org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_RAWTYPES.hintSeverity>
         <org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_RAWTYPES.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_RAWTYPES.enabled>
@@ -40,7 +28,6 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_perf_2e_Tiny_2e_stringEqualsEmpty.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_perf_2e_Tiny_2e_stringEqualsEmpty.enabled>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_suggestions_2e_ConvertIfToSwitch.iftoswitch_2e_generate_2e_default>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_suggestions_2e_ConvertIfToSwitch.iftoswitch_2e_generate_2e_default>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_suggestions_2e_ConvertIfToSwitch.iftoswitch_2e_branch_2e_threshold>3</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_suggestions_2e_ConvertIfToSwitch.iftoswitch_2e_branch_2e_threshold>
-        <org-netbeans-spi-editor-hints-projects.perProjectHintSettingsEnabled>true</org-netbeans-spi-editor-hints-projects.perProjectHintSettingsEnabled>
         <org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DEPRECATED.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DEPRECATED.enabled>
         <org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_UNNECESSARY_5f_CAST.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_UNNECESSARY_5f_CAST.enabled>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_bugs_2e_BroadCatchBlock_2e_broadCatch.catch_2e_umbrella>false</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_bugs_2e_BroadCatchBlock_2e_broadCatch.catch_2e_umbrella>
@@ -67,11 +54,6 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_StaticImport.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_StaticImport.enabled>
         <org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DIVISION_5f_BY_5f_ZERO.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DIVISION_5f_BY_5f_ZERO.enabled>
         <netbeans.hint.licensePath>${project.basedir}/LICENSE.ftl</netbeans.hint.licensePath>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantDoWhileBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantDoWhileBraces>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantIfBraces>ELIMINATE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantIfBraces>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantForBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantForBraces>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantWhileBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantWhileBraces>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_suggestions_2e_ConstantNameHint.hintSeverity>HINT</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_suggestions_2e_ConstantNameHint.hintSeverity>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-rethrow>false</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-rethrow>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-java-lang-System-Logger>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-java-lang-System-Logger>
@@ -81,7 +63,5 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-org-openide-util-Exceptions>false</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-org-openide-util-Exceptions>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-printStackTrace>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_errors_2e_ErrorFixesFakeHintSURROUND_5f_WITH_5f_TRY_5f_CATCH.surround-try-catch-printStackTrace>
         <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_PrintStackTrace.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_PrintStackTrace.enabled>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineMethodParams>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineMethodParams>
     </properties>
 </project-shared-configuration>

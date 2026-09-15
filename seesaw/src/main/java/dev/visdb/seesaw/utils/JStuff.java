@@ -111,3 +111,4 @@ public class JStuff {
     return meth;
   }
 }
+// vi: sw=2 ts=8

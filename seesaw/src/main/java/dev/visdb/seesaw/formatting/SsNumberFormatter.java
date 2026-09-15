@@ -108,3 +108,4 @@ public class SsNumberFormatter extends NumberFormatter implements FormatterAssis
     // TODO: handle a converter, see SSMaskFormatterFactory
   }
 }
+// vi: sw=2 ts=8

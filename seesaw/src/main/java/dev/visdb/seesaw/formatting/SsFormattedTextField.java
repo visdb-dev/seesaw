@@ -663,3 +663,4 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
               SsUtils.ssComponentToString(this));
   }
 }
+// vi: sw=2 ts=8

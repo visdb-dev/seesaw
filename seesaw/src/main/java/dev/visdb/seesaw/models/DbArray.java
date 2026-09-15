@@ -44,11 +44,7 @@ package dev.visdb.seesaw.models;
 
 import java.sql.Array;
 import java.sql.JDBCType;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
 
 import dev.visdb.seesaw.utils.SsComponent;
 
@@ -89,3 +85,4 @@ public class DbArray extends DbAbstractCollection {
     comp.setColumnArray(array);
   }
 }
+// vi: sw=2 ts=8

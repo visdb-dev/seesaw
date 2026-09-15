@@ -97,3 +97,4 @@ public class H2DbSupport extends DbSupportBase {
     return elemtype;
   }
 }
+// vi: sw=2 ts=8

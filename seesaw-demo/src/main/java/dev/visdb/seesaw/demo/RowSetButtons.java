@@ -285,3 +285,4 @@ public abstract class RowSetButtons extends JPanel {
       throw new IllegalStateException("d-del");
   }
 }
+// vi: sw=2 ts=8

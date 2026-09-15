@@ -80,3 +80,4 @@ public class MyCheckBox extends JCheckBox implements SsComponent {
   int xxx;
   void log(int x) {}
 }
+// vi: sw=2 ts=8

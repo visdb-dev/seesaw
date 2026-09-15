@@ -50,3 +50,4 @@ public abstract class StringValidator extends AbstractValidator<String> {
     super(String.class);
   }
 }
+// vi: sw=2 ts=8

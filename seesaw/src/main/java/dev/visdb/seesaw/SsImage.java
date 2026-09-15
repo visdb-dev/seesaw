@@ -208,6 +208,7 @@ public class SsImage extends JPanel implements SsComponent, ScrollPaneConstants 
    * @param columnName - column in the rowSet to which the component should
    *                         be bound.
    */
+  @SuppressWarnings("LeakingThisInConstructor")
   public SsImage(RowsModel rowsModel, String columnName) {
     this();
     rowsModel.bind(this, columnName);
@@ -1065,3 +1066,4 @@ public class SsImage extends JPanel implements SsComponent, ScrollPaneConstants 
     }
   }
 }
+// vi: sw=2 ts=8

@@ -337,3 +337,4 @@ public abstract class NumberField extends Field {
     return new Params(l.get(0), l.get(1), l.get(2), nullFormatterError);
   }
 }
+// vi: sw=2 ts=8

@@ -203,3 +203,4 @@ public interface DbOps {
    */
   default void performPostUpdateOps(RowsModel rm) throws SQLException {}
 }
+// vi: sw=2 ts=8

@@ -132,6 +132,7 @@ public class SsLabel extends JLabel implements SsComponent {
    * @param rowsModel          datasource to be used.
    * @param columnName name of the column to which this label should be bound
    */
+  @SuppressWarnings("LeakingThisInConstructor")
   public SsLabel(RowsModel rowsModel, String columnName) {
     this();
     rowsModel.bind(this, columnName);
@@ -189,3 +190,4 @@ public class SsLabel extends JLabel implements SsComponent {
               SsUtils.ssComponentToString(this));
   }
 } // end public class SsLabel extends JLabel {
+// vi: sw=2 ts=8

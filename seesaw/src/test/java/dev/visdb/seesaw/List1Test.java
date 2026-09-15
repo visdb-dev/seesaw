@@ -195,3 +195,4 @@ Also getChosenDisplayValues.
     optionModel.verifyNoLocksHeld(remodel);
   }
 }
+// vi: sw=2 ts=8

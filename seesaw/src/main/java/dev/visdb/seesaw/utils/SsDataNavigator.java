@@ -421,3 +421,4 @@ public class SsDataNavigator extends JPanel {
                    refreshButton, addButton, deleteButton);
   }
 }
+// vi: sw=2 ts=8

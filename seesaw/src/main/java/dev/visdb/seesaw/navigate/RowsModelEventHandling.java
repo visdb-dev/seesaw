@@ -457,3 +457,4 @@ public class RowsModelEventHandling {
       logger.log(ERROR, "Should be EDT", new Throwable());
   }
 }
+// vi: sw=2 ts=8

@@ -32,8 +32,8 @@ package dev.visdb.seesaw.demo;
 import javax.swing.text.DefaultFormatterFactory;
 
 import dev.visdb.seesaw.formatting.Field;
-import dev.visdb.seesaw.formatting.SsFormat;
 import dev.visdb.seesaw.formatting.MaskFormatterFactory;
+import dev.visdb.seesaw.formatting.SsFormat;
 
 import static dev.visdb.seesaw.formatting.SsFormat.CUSTOM;
 
@@ -82,3 +82,4 @@ public class DebugField extends Field {
     return new MaskFormatterFactory.Builder<>(formatMask).ssFormat(format).build();
   }
 }
+// vi: sw=2 ts=8

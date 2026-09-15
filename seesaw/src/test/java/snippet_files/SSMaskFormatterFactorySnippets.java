@@ -52,3 +52,4 @@ public class SSMaskFormatterFactorySnippets {
   }
   // @end region=init1
 }
+// vi: sw=2 ts=8

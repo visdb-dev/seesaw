@@ -550,3 +550,4 @@ public class KeyDisplayValueSwingModel<K, D, D2> extends AbstractComboBoxListSwi
     }
   }
 }
+// vi: sw=2 ts=8

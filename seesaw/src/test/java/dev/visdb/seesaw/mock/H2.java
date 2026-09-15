@@ -198,3 +198,4 @@ public class H2 {
     return sb.toString();
   }
 }
+// vi: sw=2 ts=8

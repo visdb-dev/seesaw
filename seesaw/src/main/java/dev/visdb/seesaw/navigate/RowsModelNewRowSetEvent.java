@@ -87,3 +87,4 @@ public class RowsModelNewRowSetEvent extends EventObjectBacktrace implements Row
               objectID(getNewRowSet()), objectID(getOldRowSet()));
   }
 }
+// vi: sw=2 ts=8

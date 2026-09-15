@@ -161,3 +161,4 @@ abstract class ColumnChangeEvent extends EventObjectBacktrace implements ChangeE
     return sb.toString();
   }
 }
+// vi: sw=2 ts=8

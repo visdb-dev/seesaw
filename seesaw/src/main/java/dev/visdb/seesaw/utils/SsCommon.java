@@ -1430,3 +1430,4 @@ final class SsCommon {
     textDecorator.decorateText();
   }
 }
+// vi: sw=2 ts=8

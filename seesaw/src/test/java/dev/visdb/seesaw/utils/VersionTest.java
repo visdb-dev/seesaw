@@ -131,3 +131,4 @@ public class VersionTest {
     assertTrue(vsnap.compareTo(vrc1) < 0);
   }
 }
+// vi: sw=2 ts=8

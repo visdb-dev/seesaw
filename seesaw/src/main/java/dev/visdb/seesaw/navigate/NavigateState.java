@@ -1134,3 +1134,4 @@ when the insert button is pressed to perform custom actions.
     return true;
   }
 }
+// vi: sw=2 ts=8

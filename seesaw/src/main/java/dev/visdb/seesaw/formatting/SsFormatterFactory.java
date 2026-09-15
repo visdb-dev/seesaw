@@ -173,3 +173,4 @@ public class SsFormatterFactory extends FormatterFactory {
     }
   }
 }
+// vi: sw=2 ts=8

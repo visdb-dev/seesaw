@@ -79,3 +79,4 @@ public interface Validator {
    */
   public static Validator nullValidator = () -> true;
 }
+// vi: sw=2 ts=8

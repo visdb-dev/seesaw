@@ -174,3 +174,4 @@ public class LookupDefaults {
         }
         """;
 }
+// vi: sw=2 ts=8

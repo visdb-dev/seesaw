@@ -88,19 +88,18 @@ import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.models.DbArray;
+import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.CentralLookup;
-import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
+import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.SyncManager;
 
 import static dev.visdb.seesaw.demo.TestBaseComponents.CompDim.*;
 import static dev.visdb.seesaw.demo.TestBaseComponents.CompID.*;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
-
-import dev.visdb.seesaw.models.DbCollection;
-import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * This example demonstrates all of the Base SwingSet Components
@@ -800,3 +799,4 @@ public class TestBaseComponents extends JFrame {
     //		txtSSTextField.setText(null);
   }
 }
+// vi: sw=2 ts=8

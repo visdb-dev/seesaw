@@ -33,3 +33,4 @@ package dev.visdb.seesaw.decorators;
  * The only thing missing is decorateText.
  */
 public abstract class BaseTextDecorator extends BaseAnyDecorator implements TextDecorator {}
+// vi: sw=2 ts=8

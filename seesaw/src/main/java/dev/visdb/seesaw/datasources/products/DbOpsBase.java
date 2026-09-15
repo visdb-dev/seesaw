@@ -197,3 +197,4 @@ public class DbOpsBase implements DbOps {
     SsUtils.visitSsComponents(container, comp -> comp.cleanField());
   }
 }
+// vi: sw=2 ts=8

@@ -87,3 +87,4 @@ public class SimpleValValidatorDecorator extends BaseDecorator {
     return SIMPLE_VALIDATOR;
   }
 }
+// vi: sw=2 ts=8

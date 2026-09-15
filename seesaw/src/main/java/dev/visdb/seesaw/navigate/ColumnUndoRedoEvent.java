@@ -98,3 +98,4 @@ public class ColumnUndoRedoEvent extends EventObjectBacktrace implements ChangeE
     return error;
   }
 }
+// vi: sw=2 ts=8

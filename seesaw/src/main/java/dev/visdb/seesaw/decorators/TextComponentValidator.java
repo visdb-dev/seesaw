@@ -118,3 +118,4 @@ public abstract class TextComponentValidator implements Validator {
     }
   }
 }
+// vi: sw=2 ts=8

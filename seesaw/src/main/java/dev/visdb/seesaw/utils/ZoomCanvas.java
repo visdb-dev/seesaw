@@ -591,3 +591,4 @@ public class ZoomCanvas extends JPanel {
     return new Point((int) Math.floor(targetX), (int) Math.floor(targetY));
   }
 }
+// vi: sw=2 ts=8

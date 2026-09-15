@@ -209,3 +209,4 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
     }
   }
 }
+// vi: sw=2 ts=8

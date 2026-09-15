@@ -63,3 +63,4 @@ public abstract class BaseDecorator extends BaseAnyDecorator implements Decorato
       td.decorateText();
   }
 }
+// vi: sw=2 ts=8

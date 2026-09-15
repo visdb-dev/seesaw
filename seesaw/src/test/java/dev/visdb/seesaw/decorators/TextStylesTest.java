@@ -1039,3 +1039,4 @@ also a test of memento.
                     """;
   }
 }
+// vi: sw=2 ts=8

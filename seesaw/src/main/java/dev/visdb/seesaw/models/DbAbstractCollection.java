@@ -73,3 +73,4 @@ public abstract class DbAbstractCollection implements DbCollection {
     return jdbcType;
   }
 }
+// vi: sw=2 ts=8

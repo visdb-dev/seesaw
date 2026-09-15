@@ -96,6 +96,7 @@ public class SsTextField extends JTextField implements SsComponent {
   }
 
   /** All the constructors feed through here */
+  @SuppressWarnings("LeakingThisInConstructor")
   private SsTextField(String text, RowsModel rowsModel, String columnName) {
     super(text);
     finishSsCommon();
@@ -183,3 +184,4 @@ public class SsTextField extends JTextField implements SsComponent {
   }
 
 } // end public class SsTextField extends JTextField {
+// vi: sw=2 ts=8

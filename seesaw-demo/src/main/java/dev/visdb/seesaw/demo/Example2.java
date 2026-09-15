@@ -66,8 +66,8 @@ import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
+import dev.visdb.seesaw.utils.SsDataNavigator;
 
 /**
  * This example displays data from the supplier_data table.
@@ -286,3 +286,4 @@ public class Example2 extends JFrame {
     };
   }
 }
+// vi: sw=2 ts=8

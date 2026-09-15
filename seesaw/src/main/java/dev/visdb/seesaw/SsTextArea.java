@@ -97,6 +97,7 @@ public class SsTextArea extends JTextArea implements SsComponent {
    * @param rowsModel          datasource to be used.
    * @param columnName name of the column to which this text area should be bound
    */
+  @SuppressWarnings("LeakingThisInConstructor")
   public SsTextArea(RowsModel rowsModel, String columnName) {
     this();
     rowsModel.bind(this, columnName);
@@ -163,3 +164,4 @@ public class SsTextArea extends JTextArea implements SsComponent {
               SsUtils.ssComponentToString(this));
   }
 } // end public class SsTextArea extends JTextArea {
+// vi: sw=2 ts=8

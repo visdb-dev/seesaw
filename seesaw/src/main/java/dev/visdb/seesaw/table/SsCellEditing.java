@@ -78,3 +78,4 @@ implemented).
   }
 
 } // end public interface SsCellEditing {
+// vi: sw=2 ts=8

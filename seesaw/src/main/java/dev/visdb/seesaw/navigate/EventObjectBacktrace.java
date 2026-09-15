@@ -55,3 +55,4 @@ public class EventObjectBacktrace extends EventObject {
     return backtrace;
   }
 }
+// vi: sw=2 ts=8

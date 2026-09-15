@@ -20,3 +20,4 @@ public class SqlNullException extends SqlException {
     super(reason);
   }
 }
+// vi: sw=2 ts=8
