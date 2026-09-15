@@ -21,6 +21,7 @@
   <properties>
     <maven.javadoc.skip>true</maven.javadoc.skip>
     <maven.deploy.skip>true</maven.deploy.skip>
+    <version.logman>2.3.1</version.logman>
     <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
   </properties>
 
@@ -58,7 +59,17 @@
     </dependency>
     <dependency>
       <groupId>com.raelity.logman</groupId>
-      <artifactId>logman-lib</artifactId>
+      <!--
+           core doesn't include simplevalidation,swing-outline it's "<provided>".
+           simplivalidation comes from contrib's simplevalidation.
+      -->
+      <artifactId>logman-core</artifactId>
+      <version>${version.logman}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.netbeans.api</groupId>
+      <artifactId>org-netbeans-swing-outline</artifactId>
+      <version>RELEASE110</version>
     </dependency>
     <dependency>
       <groupId>dev.visdb.seesaw.contrib</groupId>

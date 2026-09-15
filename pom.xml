@@ -97,7 +97,7 @@
     <version.h2>2.5.250</version.h2>
     <version.java-getopt>1.0.13</version.java-getopt>
     <version.raelity-lib>1.2.0</version.raelity-lib>
-    <version.logman>2.3.1</version.logman>
+    <version.simplevalidation>1.14.1</version.simplevalidation>
     <!--        Test -->
     <version.junit-jupiter>6.1.3</version.junit-jupiter>
     <version.assertj>3.27.7</version.assertj>
@@ -182,6 +182,23 @@
         <artifactId>jackson-dataformat-properties</artifactId>
         <version>${version.jackson}</version>
       </dependency>
+      <!-- used by contrib's simplevalidation and seesaw-demo's logman -->
+      <dependency>
+        <groupId>com.mastfrog</groupId>
+        <artifactId>simplevalidation</artifactId>
+        <version>${version.simplevalidation}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.mastfrog</groupId>
+        <artifactId>simplevalidation-swing</artifactId>
+        <version>${version.simplevalidation}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.mastfrog</groupId>
+            <artifactId>nbstubs</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 
       <!-- Demo-only deps -->
       <dependency>
@@ -189,35 +206,27 @@
         <artifactId>h2</artifactId>
         <version>${version.h2}</version>
       </dependency>
-
       <dependency>
         <groupId>gnu.getopt</groupId>
         <artifactId>java-getopt</artifactId>
         <version>${version.java-getopt}</version>
       </dependency>
-
       <dependency>
         <groupId>com.raelity</groupId>
         <artifactId>raelity-lib</artifactId>
         <version>${version.raelity-lib}</version>
       </dependency>
       <dependency>
-        <groupId>com.raelity.logman</groupId>
-        <artifactId>logman-lib</artifactId>
-        <version>${version.logman}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-jpl</artifactId>
         <version>${version.log4j}</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-core</artifactId>
         <version>${version.log4j}</version>
       </dependency>
+
       <!-- Tests -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
@@ -555,16 +564,19 @@
                     example of ignoring one specific class
                     <ignoreClass>com.xyz.i18n.Messages</ignoreClass>
                     -->
+                    <!--
+                    example of wildcard ignore
                     <ignoreClass>org.openide.util.*</ignoreClass>
+                    -->
                   </ignoreClasses>
                   <scopes>
                     <scope>compile</scope>
                     <scope>provided</scope>
                   </scopes>
                   <findAllDuplicates>true</findAllDuplicates>
-                  <!-- Note there are several errors without the following -->
-                  <!-- With it, still errors around org/openide/util -->
+                  <!--
                   <ignoreWhenIdentical>true</ignoreWhenIdentical>
+                  -->
                 </banDuplicateClasses>
               </rules>
               <failFast>false</failFast>

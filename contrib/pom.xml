@@ -27,7 +27,7 @@
     <group_abbrev>visdb.contrib</group_abbrev>
 
     <version.ldatepicker>11.2.1</version.ldatepicker>
-    <version.simplevalidation>1.14.1</version.simplevalidation>
+    <!-- simplevalidation in seesaw-parent -->
   </properties>
 
   <dependencyManagement>
@@ -39,15 +39,11 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- simplevalidation is defined in seesaw-parent -->
       <dependency>
         <groupId>com.github.lgooddatepicker</groupId>
         <artifactId>LGoodDatePicker</artifactId>
         <version>${version.ldatepicker}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.mastfrog</groupId>
-        <artifactId>simplevalidation-standalone</artifactId>
-        <version>${version.simplevalidation}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
