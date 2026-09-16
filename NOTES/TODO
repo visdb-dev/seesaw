@@ -141,7 +141,27 @@ Could
 
 ================================================================================
 
-Grid - date/time popup for editing
+SsTable (DataGrid)
+
+- In DataGrid.bind(), callExecute. Is callExecute needed?
+- date/time popup for editing
+- SsTable Cell state border.
+- Does grid commit each cell as it is changed?
+  Other strategies? Commit per row.
+- Does grid have validators? How about grid cells go yellow, commit happens
+  when row looses focus? Can a grid cell ever be red? 
+  In DataGrid there are currently setBorder Black/Red.
+- Get rid of interface SSDataGridHandler, use DbOps? SSDataGridAdaptor use DbOpsBase?
+  Probably not, they're different part of this search for insertion
+  maybe call "interface SsTableOps/DbTableOps"
+- Should DataGrid extend or have SSComponent/SSCommon features. Maybe an interface
+  between SSComponent and RSC? No. Seems each column would need it, SSFormat,
+  allowNull... But without bind, set/get methods, ?
+- ssTable's SSFormat, in particular Date, Time, Timestamp display and edit.
+- In grid's class DefaultEditor
+    FocusGained - cast "(JTextField)" was "(SSTextField)"
+    constructor - "super(new TextField())" was "super(new SSTextField())"
+        Does this need to be seesaw?
 
 ================================================================================
 

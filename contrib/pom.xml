@@ -21,6 +21,7 @@
   <modules>
     <module>lgooddatepicker</module>
     <module>simplevalidation</module>
+    <module>contrib-docs</module>
   </modules>
 
   <properties>

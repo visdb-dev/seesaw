@@ -35,7 +35,7 @@ jobs:
           cache: 'maven'     
 
       - name: Generate Javadoc
-        run: mvn javadoc:javadoc -P release -pl :seesaw -am -B 
+        run: mvn javadoc:aggregate -B 
 
       # Modern GitHub configuration to bypass Jekyll processing 
       - name: Setup Pages
@@ -45,7 +45,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: 'seesaw/target/reports/apidocs'
+          path: 'target/reports/apidocs'
           retention-days: 1
 
       # Feeds the artifact straight to your github.io hosting server
