@@ -52,6 +52,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.EnumMap;
 import java.util.EventListener;
 import java.util.HashSet;
 import java.util.Map;
@@ -100,6 +101,7 @@ import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.navigate.RowsModelNewRowSetEvent;
 import dev.visdb.seesaw.navigate.UndoRedo;
 import dev.visdb.seesaw.navigate.UndoRedo.Change;
+import dev.visdb.seesaw.utils.SsComponent.Validation;
 
 import static dev.visdb.seesaw.navigate.RowSetState.isAcceptingCachedRowSetChanges;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
@@ -1339,6 +1341,9 @@ final class SsCommon {
     // Invoke the per instance pluginValidator.
     return pluginValidator.validate();
   }
+
+  EnumMap<Validation, Supplier<String>> validationErrorMsg = new EnumMap<>(Validation.class);
+
 
   ///////////////////////////////////////////////////////////////////////////
   //

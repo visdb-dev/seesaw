@@ -1,0 +1,11 @@
+SeeSaw is a fork of SwingSet.
+      SeeSaw - https://github.com/visdb-dev/seesaw
+    SwingSet - https://github.com/bpangburn/swingset
+
+The original project, SwingSet, is licensed under BSD 3-Clause. The contents of
+the file LICENSES/BSD-3-Clause.txt was copied from SwingSet on Sep 20 2026.
+
+New files added to SeeSaw are licensed under MPL-2.0.
+
+The SeeSaw fork began in January of 2024.
+It is bookmarked BASE-SS-5 in the SeeSaw source code repository.

@@ -9,7 +9,11 @@
  * is a library for validation and decoration of swing components.
  * There are many builtin validators, see
  * {@link org.netbeans.validation.api.builtin.stringvalidation.StringValidators}.
- * <br/>
+ * For example URL_MUST_BE_VALID, EMAIL_ADDESS, REQUIRE_NON_NEGATIVE_NUMBER,
+ * FILE_MUST_EXIST, disallowChars(char[] chars). Note that validators may be
+ * chained, see
+ * {@link org.netbeans.validation.api.ValidatorUtils#merge(org.netbeans.validation.api.Validator...) }.
+ * <p>
  * Example
  * <p>
  * <img src="doc-files/SimpleValidation.png" alt="Simple Validation image"

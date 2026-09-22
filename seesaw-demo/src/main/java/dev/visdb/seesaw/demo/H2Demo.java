@@ -108,24 +108,24 @@ public class H2Demo {
 
   /** The default sql script to initialize the database */
   public static final String SQL_INIT = """
-		DROP TABLE IF EXISTS tbl;
-		DROP SEQUENCE IF EXISTS tbl_seq;
-
-		/* tbl */
-		CREATE SEQUENCE IF NOT EXISTS tbl_seq START WITH 1000;
-		CREATE TABLE IF NOT EXISTS tbl 
-		( 
-			tbl_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
-			c_text VARCHAR(50),
-			c_int INT,
-			c_date DATE,
-			c_time TIME,
-			c_timestamp TIMESTAMP,
-			c_list INTEGER ARRAY /* ARRAY is typed for 2.x+, arbitrary range 2-8 */
-		);
-
-		MERGE INTO tbl VALUES ( 1,'text-1',3,'2000-01-11','11:11:11','2222-01-11',ARRAY[1,2,3]) ;
-		MERGE INTO tbl VALUES ( 2,'text-2',7,'2000-02-22','22:22:22','2222-02-22',ARRAY[3,4,5]) ;
+    DROP TABLE IF EXISTS tbl;
+    DROP SEQUENCE IF EXISTS tbl_seq;
+    
+    /* tbl */
+    CREATE SEQUENCE IF NOT EXISTS tbl_seq START WITH 1000;
+    CREATE TABLE IF NOT EXISTS tbl 
+    ( 
+      tbl_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
+      c_text VARCHAR(50),
+      c_int INT,
+      c_date DATE,
+      c_time TIME,
+      c_timestamp TIMESTAMP,
+      c_list INTEGER ARRAY /* ARRAY is typed for 2.x+, arbitrary range 2-8 */
+    );
+    
+    MERGE INTO tbl VALUES ( 1,'text-1',3,'2000-01-11','11:11:11','2222-01-11',ARRAY[1,2,3]) ;
+    MERGE INTO tbl VALUES ( 2,'text-2',7,'2000-02-22','22:22:22','2222-02-22',ARRAY[3,4,5]) ;
 
         """;
 }

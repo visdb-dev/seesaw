@@ -59,14 +59,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.netbeans.validation.api.ui.ValidationGroup;
 import org.netbeans.validation.api.ui.ValidationItem;
-import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
-import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
-import dev.visdb.seesaw.contrib.simplevalidation.StringValidator;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
@@ -191,10 +187,9 @@ public class Example1 extends JFrame {
       txtSupplierCity.setPluginValidator(
           TextComponentValidator.create((str) -> !str.matches(".*X")));
     } else {
-      SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
-      StringValidator validator = SVUtils.getStringValidator(
+      decoSupplierName = SVUtils.setDecoratorValidator(
+          txtSupplierName, "Supplier Name",
           validateSupplierName, () -> "Supplier can not end with 'oops..'");
-      decoSupplierName = SVUtils.setDecoratorValidator(txtSupplierName, validator);
     }
 
     RowSetButtons rsButtons = new RowSetButtons() {
@@ -297,11 +292,7 @@ public class Example1 extends JFrame {
     // Set up the simple validation panel.
     JPanel uiPanel;
     if (USE_SIMPLE_VALIDATION) {
-      ValidationPanel valiPanel = new ValidationPanel();
-      valiPanel.setInnerComponent(contentPane);
-      ValidationGroup group = valiPanel.getValidationGroup();
-      group.addItem(decoSupplierName, false);
-      uiPanel = valiPanel;
+      uiPanel = SVUtils.createValidationPanel(contentPane, decoSupplierName);
     } else {
       uiPanel = (JPanel) contentPane;
     }

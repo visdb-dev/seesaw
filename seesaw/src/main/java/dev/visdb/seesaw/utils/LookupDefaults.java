@@ -91,7 +91,7 @@ public class LookupDefaults {
     CentralLookup lkup = CentralLookup.getDefault();
 
     //
-    // There should be a DecoratorStyle.
+    // Make sure there's a default DecoratorStyle.
     //
     Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
     if (style == null)
