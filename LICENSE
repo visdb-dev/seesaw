@@ -1,3 +1,10 @@
+This project is multi-licensed. Individual source files are governed 
+by either the MPL 2.0 or the BSD 3-Clause license. 
+
+The full text for each license can be found here:
+- LICENSES/BSD-3-Clause.txt
+- LICENSES/MPL-2.0.txt
+
 SeeSaw is a fork of SwingSet.
       SeeSaw - https://github.com/visdb-dev/seesaw
     SwingSet - https://github.com/bpangburn/swingset

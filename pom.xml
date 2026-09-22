@@ -31,12 +31,12 @@
 
   <licenses>
     <license>
-      <name>Mozilla Public License Version 2.0</name>
+      <name>MPL-2.0</name>
       <url>https://mozilla.org</url>
       <distribution>repo</distribution>
     </license>
     <license>
-        <name>BSD 3-Clause "New" or "Revised" License</name>
+        <name>BSD-3-Clause</name>
         <url>https://opensource.org</url>
         <distribution>repo</distribution>
     </license>
