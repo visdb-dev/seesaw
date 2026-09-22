@@ -31,8 +31,14 @@
 
   <licenses>
     <license>
-      <name>BSD 3-Clause</name>
-      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+      <name>Mozilla Public License Version 2.0</name>
+      <url>https://mozilla.org</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+        <name>BSD 3-Clause "New" or "Revised" License</name>
+        <url>https://opensource.org</url>
+        <distribution>repo</distribution>
     </license>
   </licenses>
 
@@ -77,6 +83,7 @@
       ${maven.multiModuleProjectDirectory}/seesaw-demo/src/test/java/snippet_files
     </snippet_path>
 
+    <version.maven-checkstyle-plugin>3.6.0</version.maven-checkstyle-plugin>
     <!-- Toolchain -->
     <version.maven>3.9.6</version.maven>
     <java-release>25</java-release>
@@ -293,17 +300,35 @@
           <artifactId>versions-maven-plugin</artifactId>
           <version>${version.versions-maven-plugin}</version>
         </plugin>
-
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
           <version>${version.maven-clean-plugin}</version>
         </plugin>
-
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${version.maven-resources-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${version.maven-checkstyle-plugin}</version>
+          <configuration>
+            <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>true</failsOnError>
+            <includeTestSourceDirectory>false</includeTestSourceDirectory>
+          </configuration>
+          <executions>
+            <execution>
+              <id>validate</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <!-- <arg>-proc:full</arg> needed starting jdk23  -->
@@ -533,7 +558,14 @@
     </pluginManagement>
 
     <plugins>
-      <!-- for install -->
+      <!-- Removed or commented out: Checkstyle will not run during normal builds -->
+      <!--
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      -->
+      <!-- flatten for install -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>

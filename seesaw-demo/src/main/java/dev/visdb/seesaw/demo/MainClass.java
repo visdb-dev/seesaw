@@ -812,35 +812,35 @@ public class MainClass extends JFrame {
   private static void usage() {
     // TODO: specify don't load images
     String usage = """
-				
-				Run the SwingSet demo. With no options/args use the self contained
-				in memory database.
-				
-				CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
-				
-				    -h             help
-				    -v             verbose; output initialization sql as executed
-				    -d             dump/create sql scripts in local directory, exit
-				    -n             do NOT initialize database, just run demo
-				    -i             do NOT load images
-				    -p fname       properties file for jdbc database connection
-				                   'DB_URL', 'DB_DRIVER_CLASS' keys required
-				    -s sqlScript   sql file to initialize database, multiple OK
-				
-				If specified, dbms-server in {mysql}
-				Internal mysql properties use database swingset_demo_suppliers_and_parts.
-				After the sql files are run, the images are loaded, unless '-i'.
-				Use '-n -p props' to run demo with a previously initialized database.
-				Use '-d' or '-d mysql' to create local files with sql initialization.
-				See swingset-demo/README.txt for more information.
-				
-				Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
-				    java -jar ss.jar -d   # dump sql that creates in memory database
-				    java -jar ss.jar -d mysql   # dump sql to create mysql database
-				    java -cp jdbc_driver:ss.jar dev.visdb.seesaw.demo.MainClass \\
-				        -p db_props -s initializer.sql
-				
-				""";
+
+            Run the SwingSet demo. With no options/args use the self contained
+            in memory database.
+            
+            CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
+            
+                -h             help
+                -v             verbose; output initialization sql as executed
+                -d             dump/create sql scripts in local directory, exit
+                -n             do NOT initialize database, just run demo
+                -i             do NOT load images
+                -p fname       properties file for jdbc database connection
+                               'DB_URL', 'DB_DRIVER_CLASS' keys required
+                -s sqlScript   sql file to initialize database, multiple OK
+            
+            If specified, dbms-server in {mysql}
+            Internal mysql properties use database swingset_demo_suppliers_and_parts.
+            After the sql files are run, the images are loaded, unless '-i'.
+            Use '-n -p props' to run demo with a previously initialized database.
+            Use '-d' or '-d mysql' to create local files with sql initialization.
+            See swingset-demo/README.txt for more information.
+            
+            Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
+                java -jar ss.jar -d   # dump sql that creates in memory database
+                java -jar ss.jar -d mysql   # dump sql to create mysql database
+                java -cp jdbc_driver:ss.jar dev.visdb.seesaw.demo.MainClass \\
+                    -p db_props -s initializer.sql
+            
+            """;
     usage = usage.replace("CMD_NAME", cmdName);
     System.err.println(usage);
     System.exit(1);

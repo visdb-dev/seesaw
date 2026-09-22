@@ -46,7 +46,9 @@ import java.awt.Component;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.EnumMap;
 import java.util.EventListener;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.sql.RowSet;
@@ -869,6 +871,51 @@ in the SsComponent's constructor, but before bind.
   }
 
   /**
+   * There are levels of validation; they execute in order.
+   * BASE and COMPONENT are specified through overriding.
+   * COLUMN database related error. PLUGIN may be set per
+   * instantiated component.
+   */
+  public enum Validation {
+    /** */
+    BASE("BaseValidate"),
+    /** */
+    COMPONENT("ComponentValidate"),
+    /** */
+    COLUMN("ColumnValidate"),
+    /** */
+    PLUGIN("PluginValidate");
+
+    final String toString;
+
+    private Validation(String toString) { this.toString = toString; }
+
+    /** {@inheritDoc } */
+    @Override
+    public String toString() {
+      return toString;
+    }
+  }
+
+  /**
+   * Retrieve the error msg. Should only be invoked if there was an error.
+   * @param validation
+   * @return
+   */
+  default String validationMsg(Validation validation) {
+    Supplier<String> msg = getSsCommon().validationErrorMsg.get(validation);
+    return msg != null ? msg.get() : (validation.toString() + " failed");
+  }
+
+  /** set an error message for the specified validation.
+   * @param validation
+   * @param msg
+   */
+  default void setValidationMsg(Validation validation, Supplier<String> msg) {
+    getSsCommon().validationErrorMsg.put(validation, msg);
+  }
+
+  /**
    * Install the specified pluginValidator into this component.
    * Each instance can have a unique validator.
    * This is run after all the other validations succeed.
@@ -908,12 +955,32 @@ in the SsComponent's constructor, but before bind.
    *
    * @param base result of baseValidate()
    * @param comp result of base and componentValidate()
-   * @param other this component is the target of an error event,
+   * @param other false if this component is the target of an error event,
    * see {@link RowsModel#hasError(SsComponent) }
    * @param plugin result of pluginValidate
-   * @param all true if everything validated
    */
-  record ValidationResult(boolean base, boolean comp, boolean other, boolean plugin, boolean all) {}
+  record ValidationResult(boolean base, boolean comp, boolean other, boolean plugin) {
+    public Optional<Validation> firstFail() {
+      Validation fail = null;
+      if (!base) fail = Validation.BASE;
+      else if (!comp) fail = Validation.COMPONENT;
+      else if (!other) fail = Validation.COLUMN;
+      else if (!plugin) fail = Validation.PLUGIN;
+      return Optional.ofNullable(fail);
+    }
+    public boolean result(Validation which) {
+      return switch (which) {
+        case BASE -> base;
+        case COMPONENT -> comp;
+        case COLUMN -> other;
+        case PLUGIN -> plugin;
+      };
+    }
+    /** @return true if everything validated */
+    public boolean all() {
+      return plugin;
+    }
+  }
 
   /**
    * Run the validators: baseValidate, componentValidate,
@@ -933,7 +1000,7 @@ in the SsComponent's constructor, but before bind.
     }
     boolean pluginValid = otherValid && getSsCommon().pluginValidate();
 
-    return new ValidationResult(baseValid, compValid, otherValid, pluginValid, pluginValid);
+    return new ValidationResult(baseValid, compValid, otherValid, pluginValid);
   }
 
   /**

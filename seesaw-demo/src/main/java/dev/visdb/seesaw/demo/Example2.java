@@ -54,10 +54,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.netbeans.validation.api.ui.ValidationGroup;
 import org.netbeans.validation.api.ui.ValidationItem;
-import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
-import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.SsTextField;
@@ -141,14 +138,10 @@ public class Example2 extends JFrame {
     ValidationItem decoSupplierName = null;
     ValidationItem decoSupplierCity = null;
     if (USE_SIMPLE_VALIDATION) {
-      SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
-      decoSupplierName = SVUtils.setDecoratorValidator(txtSupplierName,
-          SVUtils.getStringValidator(
-                  validateSupplierName, () -> "Supplier name can not end with 'oops..'"));
-      SwingValidationGroup.setComponentName(txtSupplierCity, "Supplier City");
-      decoSupplierCity = SVUtils.setDecoratorValidator(txtSupplierCity,
-          SVUtils.getStringValidator(
-                  validateSupplierCity, () -> "City can not end in 'X'"));
+      decoSupplierName = SVUtils.setDecoratorValidator(txtSupplierName, "Supplier Name",
+          validateSupplierName, () -> "Supplier name can not end with 'oops..'");
+      decoSupplierCity = SVUtils.setDecoratorValidator(txtSupplierCity, "Supplier City",
+          validateSupplierCity, () -> "City can not end in 'X'");
     } else {
       txtSupplierName.setPluginValidator(TextComponentValidator.create(validateSupplierName));
       txtSupplierCity.setPluginValidator(
@@ -234,20 +227,15 @@ public class Example2 extends JFrame {
     // Set up the simple validation panel.
     JPanel uiPanel;
     if (USE_SIMPLE_VALIDATION) {
-      ValidationPanel valiPanel = new ValidationPanel();
-      valiPanel.setInnerComponent(contentPane);
-      ValidationGroup group = valiPanel.getValidationGroup();
-      group.addItem(decoSupplierName, false);
-      group.addItem(decoSupplierCity, false);
-      uiPanel = valiPanel;
+      uiPanel = SVUtils.createValidationPanel(contentPane, decoSupplierName, decoSupplierCity);
     } else {
       uiPanel = (JPanel) contentPane;
     }
 
-    // MAKE THE JFRAME VISIBLE
+    // Make the jframe visible
     frame.add(uiPanel);
-    frame.setVisible(true);
     frame.pack();
+    frame.setVisible(true);
   }
 
   private DbOps createDbNav() {

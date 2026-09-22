@@ -82,7 +82,9 @@ public abstract class TextComponentValidator implements Validator {
 
   /** {@inheritDoc} */
   @Override
-  public void uninstall() {}
+  public void uninstall() {
+    this.component = null;
+  }
 
   /**
    * Return the component associated with this validator

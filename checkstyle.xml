@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+          "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+          "https://checkstyle.org">
+
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+
+    <module name="TreeWalker">
+        <module name="SuppressionXpathSingleFilter">
+            <property name="checks" value="RegexpSinglelineJava"/>
+            <property name="query" value="//TEXT_BLOCK_CONTENT"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="^\s*\t"/>
+            <property name="message" value="TAB. Use spaces for indentation."/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+    </module>
+</module>
+
+    <!--
+    <module name="SuppressionCommentFilter">
+        <property name="offCommentFormat" value="CHECKSTYLE.OFF: (\w+)"/>
+        <property name="onCommentFormat" value="CHECKSTYLE.ON: (\w+)"/>
+        <property name="checkFormat" value="$1"/>
+    </module>
+    -->
+
+    <!--
+    <module name="XpathFilter">
+        <property name="filePattern" value="\.java$"/>
+        <property name="query" value="//TEXT_BLOCK_CONTENT"/>
+    </module>
+    -->
+
+<!--
+            <property name="message" value="Leading whitespace must not contain tab characters. Use spaces for indentation."/>
+-->

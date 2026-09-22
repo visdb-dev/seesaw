@@ -35,19 +35,59 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package dev.visdb.seesaw.contrib.simplevalidation;
 
-import org.netbeans.validation.api.AbstractValidator;
+import org.netbeans.validation.api.Problem;
+
+import dev.visdb.seesaw.decorators.BaseDecorator;
+import dev.visdb.seesaw.decorators.Decorator;
 
 /**
- * A validator that handles a string.
+ * A combined decorator/validator using the 
+ * <a href="https://github.com/timboudreau/simplevalidation">Simple Validation</a>
+ * framework.
  */
-public abstract class StringValidator extends AbstractValidator<String> {
+public class SimpleValidationDecorator extends BaseDecorator {
+  /** decorator name */
+  public static final Decorator.DecoratorStyle SIMPLE_VALIDATOR
+      = new Decorator.DecoratorStyle("SIMPLE_VALIDATOR");
+
+  private final TextComponentValidationItem valItem;
+  // TODO: this does decoration as well. Does SeeSaw need a split architecture?
+
   /**
-   * Specify the validator handles a string.
+   * Create SimpleValidationDecorator which uses TextComponentValidationItem
+   * for decoration/validation.
+   * @param valItem
    */
-  protected StringValidator() {
-    super(String.class);
+  public SimpleValidationDecorator(TextComponentValidationItem valItem) {
+    this.valItem = valItem;
+  }
+
+  /**
+   * Decorate the component using current state.
+   * @throws IllegalStateException if component doesn't match validation item.
+   */
+  @Override
+  public boolean decorate() {
+    if (getSsComponent() != valItem.getComponent())
+      throw new IllegalStateException("decorating the wrong component");
+    Problem problem = valItem.performValidation();
+    return problem == null || !problem.isFatal();
+  }
+
+  /**
+   * SimpleValidatorDecorator style
+   * @return
+   */
+  @Override
+  public Decorator.DecoratorStyle getDecoratorStyle() {
+    return SIMPLE_VALIDATOR;
   }
 }
 // vi: sw=2 ts=8
