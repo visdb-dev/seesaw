@@ -49,6 +49,7 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.SsTextField;
@@ -59,6 +60,7 @@ import dev.visdb.seesaw.formatting.SsIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.formatting.SsFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
@@ -194,12 +196,14 @@ public class Example3 extends JFrame {
     txtShipDate.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
-    contentPane.setLayout(new GridBagLayout());
+    final Container contentPane = new JPanel(new GridBagLayout());
+    setContentPane(SsUtils.createDecoratorPanel(contentPane));
     final GridBagConstraints constraints = new GridBagConstraints();
 
     constraints.gridx = 0;
     constraints.gridy = 0;
+    // constraints.weightx = .40;
+    // constraints.anchor = GridBagConstraints.WEST;
     contentPane.add(lblSupplierPartID, constraints);
     constraints.gridy = 1;
     contentPane.add(lblSupplierName, constraints);
@@ -212,6 +216,9 @@ public class Example3 extends JFrame {
 
     constraints.gridx = 1;
     constraints.gridy = 0;
+    // constraints.weightx = .60;
+    // constraints.anchor = GridBagConstraints.CENTER;
+    // constraints.fill = GridBagConstraints.HORIZONTAL;
     contentPane.add(txtSupplierPartID, constraints);
     constraints.gridy = 1;
     contentPane.add(cmbSupplierName, constraints);

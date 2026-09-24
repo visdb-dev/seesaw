@@ -94,6 +94,7 @@ import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
 import static dev.visdb.seesaw.demo.TestBaseComponents.CompDim.*;
@@ -526,8 +527,10 @@ public class TestBaseComponents extends JFrame {
 
     // Add the components, there's a special case with the list scroll panes.
     buildGui_add(mainPane, lstScrollPane, lstScrollPane2);
-    add(mainPane);
-    add(navigator, BorderLayout.SOUTH);
+    JPanel borderPanel = new JPanel(new BorderLayout());
+    borderPanel.add(mainPane, BorderLayout.CENTER);
+    borderPanel.add(navigator, BorderLayout.SOUTH);
+    setContentPane(SsUtils.createDecoratorPanel(borderPanel));
 
     pack();
 
