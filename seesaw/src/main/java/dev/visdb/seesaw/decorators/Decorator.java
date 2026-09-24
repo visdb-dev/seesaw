@@ -50,6 +50,11 @@ import dev.visdb.seesaw.utils.SsComponent;
  * Typically both component and its validator are checked.
  */
 public interface Decorator extends AnyDecorator {
+  /** JComponent ClientProperty key */
+  public static final Object SEE_SAW_PANEL_KEY = new Object() {
+    @Override public String toString() { return "SEE_SAW_PANEL"; }
+  };
+
   /**
    * Decorator style primarily used with {@link DecoratorSupplier}.
    */

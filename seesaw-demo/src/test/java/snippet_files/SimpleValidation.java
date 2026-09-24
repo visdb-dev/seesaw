@@ -17,11 +17,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 // @start region=validation_example_import
+
 import org.netbeans.validation.api.ui.ValidationItem;
 
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 // @end region=validation_example_import
 import dev.visdb.seesaw.SsTextField;
+import dev.visdb.seesaw.utils.SsUtils;
 
 public class SimpleValidation {
   // @start region=validation_example
@@ -45,11 +47,12 @@ public class SimpleValidation {
     uiPanel.add(txtSupplierCity);
     
     // Wrap the uiPanel in a ValidationPanel.
-    JPanel validationPanel = SVUtils.createValidationPanel(
+    JPanel validationPanel = SVUtils.createDecoratorPanel(
         uiPanel, decoSupplierName, decoSupplierCity);
     
     // Put the ValidiationPanel in the frame's contentPane.
-    frame.add(validationPanel);
+    frame.setContentPane(validationPanel);
+    assert uiPanel == SsUtils.getInnerComponent(frame.getContentPane());
   }
   // @end region=validation_example
 }

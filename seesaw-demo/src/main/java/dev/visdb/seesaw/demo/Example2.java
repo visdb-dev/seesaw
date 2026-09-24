@@ -65,6 +65,7 @@ import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.utils.SsUtils;
 
 /**
  * This example displays data from the supplier_data table.
@@ -186,54 +187,52 @@ public class Example2 extends JFrame {
     cmbSupplierStatus.setPreferredSize(MainClass.ssDim);
 
     // Setup the container and layout the components
-    //final Container contentPane = getContentPane();
-    final Container contentPane = new JPanel();
-    contentPane.setLayout(new GridBagLayout());
+    final Container uiPanel = new JPanel(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
 
     constraints.gridx = 0;
     constraints.gridy = 0;
     constraints.weightx = .40;
     constraints.anchor = GridBagConstraints.WEST;
-    contentPane.add(lblSupplierID, constraints);
+    uiPanel.add(lblSupplierID, constraints);
     constraints.gridy = 1;
-    contentPane.add(lblSupplierName, constraints);
+    uiPanel.add(lblSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(lblSupplierCity, constraints);
+    uiPanel.add(lblSupplierCity, constraints);
     constraints.gridy = 3;
-    contentPane.add(lblSupplierStatus, constraints);
+    uiPanel.add(lblSupplierStatus, constraints);
 
     constraints.gridx = 1;
     constraints.gridy = 0;
     constraints.weightx = .60;
     constraints.anchor = GridBagConstraints.CENTER;
     constraints.fill = GridBagConstraints.HORIZONTAL;
-    contentPane.add(txtSupplierID, constraints);
+    uiPanel.add(txtSupplierID, constraints);
     constraints.gridy = 1;
-    contentPane.add(txtSupplierName, constraints);
+    uiPanel.add(txtSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(txtSupplierCity, constraints);
+    uiPanel.add(txtSupplierCity, constraints);
     constraints.gridy = 3;
-    contentPane.add(cmbSupplierStatus, constraints);
+    uiPanel.add(cmbSupplierStatus, constraints);
 
     constraints.gridx = 0;
     constraints.gridy = 4;
     constraints.gridwidth = 2;
-    contentPane.add(navigator, constraints);
+    uiPanel.add(navigator, constraints);
 
     // DISABLE THE PRIMARY KEY
     txtSupplierID.setEnabled(false);
 
     // Set up the simple validation panel.
-    JPanel uiPanel;
+    JPanel decoratorPanel;
     if (USE_SIMPLE_VALIDATION) {
-      uiPanel = SVUtils.createValidationPanel(contentPane, decoSupplierName, decoSupplierCity);
+      decoratorPanel = SVUtils.createDecoratorPanel(uiPanel, decoSupplierName, decoSupplierCity);
     } else {
-      uiPanel = (JPanel) contentPane;
+      decoratorPanel = SsUtils.createDecoratorPanel(uiPanel);
     }
+    frame.setContentPane(decoratorPanel);
 
     // Make the jframe visible
-    frame.add(uiPanel);
     frame.pack();
     frame.setVisible(true);
   }

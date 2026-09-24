@@ -71,6 +71,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
+import org.openide.util.lookup.Lookups;
+
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
@@ -1363,9 +1365,10 @@ final class SsCommon {
       decoratorStyle = Decorator.DecoratorStyle.BORDER;
     }
 
-    var decos = lkup.lookupAll(DecoratorSupplier.class);
+    var decos = Lookups.forPath(DecoratorSupplier.DECORATOR_PATH)
+        .lookupAll(DecoratorSupplier.class);
     for (var deco : decos) {
-      if (deco.getDecoratorStyle().equals(decoratorStyle))
+      if (deco.getDecoratorStyle() == decoratorStyle)
         return deco.get();
     }
     logger.log(Level.ERROR, sf("Style '%s' not found in lookup", decoratorStyle));

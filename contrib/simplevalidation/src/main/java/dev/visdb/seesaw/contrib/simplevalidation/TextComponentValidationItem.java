@@ -29,27 +29,23 @@ import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
  * SeeSaw invokes as needed.
  * Derived from validation.api.ui.JTextComponentValidationListenerImpl 
  */
+// Copied from:
+//      validation/api/ui/JTextComponentValidationListenerImpl.java
 // TODO: Make this independent of Document, just use a string?
 //		 Set the string on every change to text, after change needs validation?
-//public class TextComponentValidationItem extends ValidationListener<JTextComponent>
-//implements DocumentListener, FocusListener, Runnable
 public class TextComponentValidationItem extends ValidationListener<JTextComponent> {
-  private Validator<Document> validator;
+  private final Validator<Document> validator;
 
   /**
    * Create ValidationItem for on demand only for the specified component.
    * @param component
-   * @param strategy
    * @param validationUI
    * @param validator 
    */
-  public TextComponentValidationItem(JTextComponent component, ValidationStrategy strategy,
-                                     ValidationUI validationUI, Validator<Document> validator) {
+  public TextComponentValidationItem(JTextComponent component, ValidationUI validationUI,
+                                     Validator<Document> validator) {
     super(JTextComponent.class, validationUI, component);
     this.validator = validator;
-    if (strategy == null) {
-      throw new NullPointerException("strategy null");
-    }
   }
 
   /**
@@ -76,68 +72,4 @@ public class TextComponentValidationItem extends ValidationListener<JTextCompone
                        component.getDocument());
   }
 }
-
-/* WAS AT END OF Contructor, just before performValidaiton.
-        component.addPropertyChangeListener("enabled", new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                performValidation();
-            }
-        });
-        switch (strategy) {
-            case DEFAULT:
-            case ON_CHANGE_OR_ACTION:
-                component.getDocument().addDocumentListener(this);
-                break;
-            case INPUT_VERIFIER:
-                component.setInputVerifier( new InputVerifier() {
-                    @Override
-                    public boolean verify(JComponent input) {
-                                                performValidation();
-                                                return !hasFatalProblem;
-                    }
-                });
-                break;
-            case ON_FOCUS_LOSS:
-                component.addFocusListener(this);
-                break;
-        }
-*/
-/*
-    @Override
-    public void focusLost(FocusEvent e) {
-        performValidation();
-    }
-
-    @Override
-    public void focusGained(FocusEvent e) {
-    }
-
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        removeUpdate(e);
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        //Documents can be legally updated from another thread,
-        //but we will not run validation outside the EDT
-        if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(this);
-        } else {
-            performValidation();
-        }
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        removeUpdate(e);
-    }
-
-    // See removeUpdate..
-    @Override
-    public void run() {
-        performValidation();
-    }
-*/
-
 // vi: sw=2 ts=8

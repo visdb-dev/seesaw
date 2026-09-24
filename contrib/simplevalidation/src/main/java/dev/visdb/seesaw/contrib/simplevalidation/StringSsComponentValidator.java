@@ -108,7 +108,8 @@ public class StringSsComponentValidator extends AbstractValidator<String> {
       problems.append(comp.validationMsg(fail.get()));
       return;
     }
-    // AT LEAST FOR NOW plugin can't fail; check it here.
+    // pluginValidate can't fail since it has a nullValidator.
+    // Check validateCondition here.
     if (!validationCondition.apply(model)) {
       problems.append(problemDescription.get());
     }
