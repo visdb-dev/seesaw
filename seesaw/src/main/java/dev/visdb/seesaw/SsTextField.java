@@ -50,6 +50,7 @@ import java.util.EventListener;
 import javax.swing.JTextField;
 
 import dev.visdb.seesaw.navigate.RowsModel;
+import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsTextSupport;
@@ -102,6 +103,38 @@ public class SsTextField extends JTextField implements SsComponent {
     finishSsCommon();
     if (rowsModel != null)
       rowsModel.bind(this, columnName);
+    debug = CentralLookup.defLookup(DebugBaseComponentValidate.class) != null;
+  }
+
+  // For DEBUG only.
+  private final boolean debug;
+  /** Put one of these into CentralLookup to enable the debugging */
+  public interface DebugBaseComponentValidate {}
+
+  /**
+   * @return 
+   */
+  @Override
+  public boolean baseValidate() {
+    if (debug) {
+      String text = getText();
+      return text == null || !text.endsWith("YY");
+    }
+    return true;
+  }
+  /**
+   * @return 
+   */
+  @Override
+  public boolean componentValidate() {
+    if (debug) {
+      if (validationMsg(Validation.COMPONENT).equals(Validation.COMPONENT.toString()+" failed"))
+        setValidationMsg(Validation.COMPONENT,
+                       () -> sf("Component validation of '%s' failed", getColumnName()));
+      String text = getText();
+      return text == null || !text.endsWith("ZZ");
+    }
+    return true;
   }
 
   // /**

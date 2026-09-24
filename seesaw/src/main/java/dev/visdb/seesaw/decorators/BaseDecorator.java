@@ -12,6 +12,8 @@ package dev.visdb.seesaw.decorators;
 
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
+import static dev.visdb.seesaw.utils.JStuff.sf;
+
 /**
  * Some handling for the TextDecorator; {@link #handleTextDecorator(ValidationResult)}
  * should be called at the end of subclass' decorate().
@@ -42,6 +44,14 @@ public abstract class BaseDecorator extends BaseAnyDecorator implements Decorato
       std.decorateText(valid);
     else
       td.decorateText();
+  }
+
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public String toString() {
+    return sf("Decorator{%s}", getDecoratorStyle());
   }
 }
 // vi: sw=2 ts=8

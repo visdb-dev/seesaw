@@ -53,9 +53,6 @@ import dev.visdb.seesaw.decorators.Decorator;
  * framework.
  */
 public class SimpleValidationDecorator extends BaseDecorator {
-  /** decorator name */
-  public static final Decorator.DecoratorStyle SIMPLE_VALIDATOR
-      = new Decorator.DecoratorStyle("SIMPLE_VALIDATOR");
 
   private final TextComponentValidationItem valItem;
   // TODO: this does decoration as well. Does SeeSaw need a split architecture?
@@ -87,7 +84,7 @@ public class SimpleValidationDecorator extends BaseDecorator {
    */
   @Override
   public Decorator.DecoratorStyle getDecoratorStyle() {
-    return SIMPLE_VALIDATOR;
+    return SVUtils.SV_DECORATOR_STYLE;
   }
 }
 // vi: sw=2 ts=8

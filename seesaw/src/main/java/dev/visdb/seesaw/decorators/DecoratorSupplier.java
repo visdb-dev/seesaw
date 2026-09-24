@@ -4,53 +4,48 @@
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org.
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * Contributor(s): Ernie Rael <errael@raelity.com>
  * ****************************************************************************/
+
 package dev.visdb.seesaw.decorators;
 
-import java.util.function.Supplier;
+import java.awt.Component;
+
+import javax.swing.JPanel;
 
 /**
- * Like a factory for Decorator.
+ * Typically extend {@link DecoratorSupplierBase}.
+ * {@snippet lang="java" class=SomeDecoratorSupplier region=decorator_supplier_1}
+ * <p>
+ * If you want to provide your own DecoratorSupplier for a given style
+ * then add a position param, less than max int, to the ServerProvider
+ * declaration.
  */
-public class DecoratorSupplier {
-  private final Supplier<Decorator> supplier;
-  private final Decorator.DecoratorStyle style;
-
+public interface DecoratorSupplier {
+  /** these named services go here */
+  public static String DECORATOR_PATH = "SS/Decorator";
   /**
-   * create a decorator supplier
-   * @param supplier
-   */
-  public DecoratorSupplier(Supplier<Decorator> supplier) {
-    this(supplier, supplier.get().getDecoratorStyle());
-  }
-
-  /**
-   * create a decorator supplier
-   * @param supplier
-   * @param style
-   */
-  public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style) {
-    this.supplier = supplier;
-    this.style = style;
-  }
-
-  /**
-   * Create and return a decorator.
+   * Create and return a decorator of the expected type.
    * @return decorator
    */
-  public Decorator get() {
-    return supplier.get();
-  }
+  Decorator get();
+
+  /**
+   * Register the given panel for use with SeeSaw decorators. The uiPanel
+   * is used to create the gui. The returned parentPanel wraps the uiPanel
+   * and is typically added to a frame. For example
+   * {@snippet lang="java" class=Decorators region=decorator_panel_1}
+   * @param uiPanel
+   * @return
+   */
+  JPanel createDecoratorPanel(Component uiPanel);
 
   /**
    * Decorator style.
    * @return decorator style
    */
-  public Decorator.DecoratorStyle getDecoratorStyle() {
-    return style;
-  }
+  Decorator.DecoratorStyle getDecoratorStyle();
 }
 // vi: sw=2 ts=8

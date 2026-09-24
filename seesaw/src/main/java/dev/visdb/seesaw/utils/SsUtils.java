@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Toolkit;
@@ -74,8 +75,12 @@ import javax.swing.JTabbedPane;
 
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
+import org.openide.util.lookup.Lookups;
 
 import dev.visdb.seesaw.datasources.DbSupport;
+import dev.visdb.seesaw.decorators.Decorator;
+import dev.visdb.seesaw.decorators.Decorator.DecoratorStyle;
+import dev.visdb.seesaw.decorators.DecoratorSupplier;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -92,6 +97,66 @@ public class SsUtils {
    */
   public static void updateSsComponent_HACK(SsComponent comp) {
     comp.getSsCommon().updateSsComponent();
+  }
+
+  /**
+   * Register the given panel for use with SeeSaw decorators that is
+   * compatible with the current DecoratorStyle. The uiPanel
+   * is used to create the gui. The returned parentPanel wraps the uiPanel
+   * and is typically added to a frame. For example
+   * {@snippet lang="java" class=Decorators region=decorator_panel_1}
+   * @param uiPanel
+   * @return
+   */
+  public static JPanel createDecoratorPanel(Component uiPanel) {
+    DecoratorStyle style = CentralLookup.getDefault().lookup(Decorator.DecoratorStyle.class);
+    var decos = Lookups.forPath(DecoratorSupplier.DECORATOR_PATH)
+        .lookupAll(DecoratorSupplier.class);
+    DecoratorSupplier decoratorSupplier = null;
+    for (var deco : decos) {
+      if (deco.getDecoratorStyle() == style) {
+        decoratorSupplier = deco;
+        break;
+      }
+    }
+    if (decoratorSupplier == null)
+      throw new IllegalStateException(sf("Decorator supplier not found for '%s'", style));
+    return decoratorSupplier.createDecoratorPanel(uiPanel);
+  }
+
+  /** Return the component wrapped by the decorator panel.
+   * @param decoratorPanel
+   * @return the inner/ui panel
+   */
+  public static JPanel getInnerComponent(Component decoratorPanel) {
+    if (decoratorPanel instanceof JPanel jp
+        && jp.getClientProperty(Decorator.SEE_SAW_PANEL_KEY) != null
+        && jp.getLayout() instanceof BorderLayout b)
+      return (JPanel)b.getLayoutComponent(jp, BorderLayout.CENTER);
+    return null;
+  }
+  
+  /**
+   * Convenience method for searching above {@code comp} in the
+   * component hierarchy and returns the first JComponent, must be a JPanel,
+   * that has * ClientProperty {@code Decorator.SEE_SAW_PANEL_KEY}.
+   * Returns {@code null} if not found.
+   *
+   * @param comp the component
+   *
+   * @return the ancestor of the {@code comp}, or {@code null} if not found.
+   */
+  public static JPanel findDecoratorPanel(Component comp) {
+    if (comp == null)
+      return null;
+    
+    Container parent = comp.getParent();
+    while(parent != null
+        && !(parent instanceof JPanel jp
+             && jp.getClientProperty(Decorator.SEE_SAW_PANEL_KEY) != null)) {
+      parent = parent.getParent();
+    }
+    return (JPanel)parent;
   }
 
   /**
@@ -125,6 +190,7 @@ public class SsUtils {
   }
 
   /** Put this in the global lookup to create debug row set listeners */
+  @SuppressWarnings("ClassMayBeInterface")
   public static class DebugRowSetListenerFlag {}
 
   /**

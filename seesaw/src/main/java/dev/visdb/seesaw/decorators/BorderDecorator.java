@@ -39,6 +39,7 @@
 package dev.visdb.seesaw.decorators;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Insets;
 import java.lang.System.Logger;
 import java.util.Objects;
@@ -55,6 +56,7 @@ import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -155,6 +157,8 @@ public class BorderDecorator extends FocusDecorator {
                () -> String.format("%s focus: %s, compValid %s, allValid: %s",
                                    decoComp().getClass().getSimpleName(),
                                    focusComp().isFocusOwner(), valid.comp(), valid.all()));
+    if (SsUtils.findDecoratorPanel((Component)getSsComponent()) == null)
+      return valid.all();
     Border b;
     ComponentState borderState = ComponentState.getComponentState(getSsComponent(), valid);
     //debugCheck(borderState);

@@ -85,10 +85,13 @@ import org.h2.tools.RunScript;
 
 import com.raelity.lib.ui.Screens;
 
+import dev.visdb.seesaw.SsTextField;
+import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.RowSetOps.ForceConflict;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
+import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.navigate.Utils;
@@ -138,6 +141,7 @@ public class MainClass extends JFrame {
     }
   }
 
+  @SuppressWarnings("ClassMayBeInterface")
   static class LoadDemoImages {}
   // https://h2database.com/html/features.html#trace_options
   // lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
@@ -153,6 +157,7 @@ public class MainClass extends JFrame {
       return flags;
     }
   }
+  @SuppressWarnings("ClassMayBeInterface")
   static class H2Workaround {}
 
   /**
@@ -362,7 +367,7 @@ public class MainClass extends JFrame {
   /**
    * Constructor for MainClass
    */
-  @SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
+  @SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor", "UseOfSystemOutOrSystemErr"})
   public MainClass() {
     // SETUP WINDOW
     super("SeeSaw Demo");
@@ -861,6 +866,14 @@ public class MainClass extends JFrame {
     CentralLookup lkup = CentralLookup.getDefault();
     lkup.add(new LoadDemoImages());
     lkup.add(new H2Trace());
+
+    if(Boolean.FALSE) lkup.add(new SsTextField.DebugBaseComponentValidate() {});
+
+    if(Boolean.FALSE) lkup.replace(Decorator.DecoratorStyle.class,
+                                   SVUtils.SV_DECORATOR_STYLE);
+    if(Boolean.FALSE) lkup.replace(Decorator.DecoratorStyle.class,
+                                   Decorator.DecoratorStyle.BACKGROUND);
+
     //lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
     //SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
     //lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15

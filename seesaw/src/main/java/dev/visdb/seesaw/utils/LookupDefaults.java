@@ -18,12 +18,15 @@ import java.lang.System.Logger.Level;
 
 import javax.swing.SwingWorker;
 
-import dev.visdb.seesaw.decorators.BackgroundDecorator;
+import org.openide.util.lookup.Lookups;
+
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.DecoratorSupplier;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.navigate.Utils;
+
+import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
  * This class is used internally to initialize CentralLookup defaults
@@ -71,36 +74,24 @@ public class LookupDefaults {
 
     CentralLookup lkup = CentralLookup.getDefault();
 
-    //
     // Make sure there's a default DecoratorStyle.
-    //
-    Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
-    if (style == null)
+    if (lkup.lookup(Decorator.DecoratorStyle.class) == null)
       lkup.add(Decorator.DecoratorStyle.BORDER);
 
-    //
-    // There should be BORDER and BACKGROUND decorators.
-    //
-    var decos = lkup.lookupAll(DecoratorSupplier.class);
-
-    boolean hasBorder = false;
-    boolean hasBackground = false;
-    for (var deco : decos) {
-      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BORDER))
-        hasBorder = true;
-      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BACKGROUND))
-        hasBackground = true;
-    }
-    if (!hasBorder)
-      lkup.add(new DecoratorSupplier(() -> { return new BorderDecorator(); }));
-    if (!hasBackground)
-      lkup.add(new DecoratorSupplier(() -> { return new BackgroundDecorator(); }));
-
-    //
     // There should be a BorderDecoratorPaint.
-    //
     if (lkup.lookup(BorderDecorator.BorderDecoratorPaint.class) == null)
       lkup.add(new BorderDecorator.BorderDecoratorPaint());
+
+    // BORDER and BACKGROUND decorators are available by path.
+
+    // For debug.
+    var decos = Lookups.forPath(DecoratorSupplier.DECORATOR_PATH)
+        .lookupAll(DecoratorSupplier.class);
+    for(DecoratorSupplier deco : decos) {
+      logger.log(Level.INFO, sf("Available DecoratorSupplier: '%s'", deco));
+    }
+
+
 
     initialized = true;
   }
