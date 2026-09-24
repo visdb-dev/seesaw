@@ -51,6 +51,7 @@ import java.util.List;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import com.google.common.reflect.TypeToken;
 
@@ -366,12 +367,14 @@ public class Example4 extends JFrame {
     txtPartCity.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
+    final Container contentPane = new JPanel(new GridBagLayout());
+    setContentPane(SsUtils.createDecoratorPanel(contentPane));
     final GridBagConstraints constraints = new GridBagConstraints();
-    contentPane.setLayout(new GridBagLayout());
 
     constraints.gridx = 0;
     constraints.gridy = 0;
+    // constraints.weightx = .40;
+    // constraints.anchor = GridBagConstraints.WEST;
     contentPane.add(lblSelectPart, constraints);
     constraints.gridy = 1;
     contentPane.add(lblPartID, constraints);
@@ -386,6 +389,9 @@ public class Example4 extends JFrame {
 
     constraints.gridx = 1;
     constraints.gridy = 0;
+    // constraints.weightx = .60;
+    // constraints.anchor = GridBagConstraints.CENTER;
+    // constraints.fill = GridBagConstraints.HORIZONTAL;
     contentPane.add(cmbSelectPart, constraints);
     constraints.gridy = 1;
     contentPane.add(txtPartID, constraints);
