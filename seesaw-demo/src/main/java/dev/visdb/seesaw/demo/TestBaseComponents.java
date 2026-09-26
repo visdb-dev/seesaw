@@ -523,13 +523,18 @@ public class TestBaseComponents extends JFrame {
     txtTestPK.setEnabled(false);
 
     // Setup the container and layout the components.
-    JPanel mainPane = new JPanel(new GridBagLayout());
+    JPanel uiPanel = new JPanel(new GridBagLayout());
 
     // Add the components, there's a special case with the list scroll panes.
-    buildGui_add(mainPane, lstScrollPane, lstScrollPane2);
+    buildGui_add(uiPanel, lstScrollPane, lstScrollPane2);
+
+    // In this class, instead of putting the navigator in the grid,
+    // put it in the SOUTH of a BorderLayout
     JPanel borderPanel = new JPanel(new BorderLayout());
-    borderPanel.add(mainPane, BorderLayout.CENTER);
+    borderPanel.add(uiPanel, BorderLayout.CENTER);
     borderPanel.add(navigator, BorderLayout.SOUTH);
+
+    // Put a decorator panel in the frame.
     setContentPane(SsUtils.createDecoratorPanel(borderPanel));
 
     pack();
@@ -541,6 +546,7 @@ public class TestBaseComponents extends JFrame {
     // is platform dependent. This listener caps the size.
     addComponentListener(new ComponentAdapter() {
       @Override
+      @SuppressWarnings("UseOfSystemOutOrSystemErr")
       public void componentResized(ComponentEvent e) {
         int w = getWidth();
         int h = getHeight();
@@ -550,7 +556,7 @@ public class TestBaseComponents extends JFrame {
           int maxW = Math.max(minWidth, w);
           int maxH = Math.max(minHeight, h);
           setSize(maxW, maxH);
-          System.err.printf("W %d, H %d, getW %d, getH %d\n", maxW, maxH, getWidth(), getHeight());
+          //System.err.printf("W %d, H %d, getW %d, getH %d\n", maxW, maxH, getWidth(), getHeight());
         }
       }
     });
@@ -716,14 +722,14 @@ public class TestBaseComponents extends JFrame {
     }
   }
 
-  private void buildGui_add(JComponent mainPane, JScrollPane jspList, JScrollPane jspList2) {
+  private void buildGui_add(JComponent uiPanel, JScrollPane jspList, JScrollPane jspList2) {
     GridBagConstraints gridPos = new GridBagConstraints();
     gridPos.gridx = 0;
     gridPos.gridy = 0;
 
     for (CompInfo compInfo : getActiveCompInfo()) {
       gridPos.gridx = 0;
-      mainPane.add(compInfo.label, createConstraints(gridPos, null));
+      uiPanel.add(compInfo.label, createConstraints(gridPos, null));
 
       gridPos.gridx = 1;
       GridBagConstraints extra = null;
@@ -741,7 +747,7 @@ public class TestBaseComponents extends JFrame {
         }
         default -> jComp;
       };
-      mainPane.add(jComp, createConstraints(gridPos, extra));
+      uiPanel.add(jComp, createConstraints(gridPos, extra));
       gridPos.gridy++;
     }
   }

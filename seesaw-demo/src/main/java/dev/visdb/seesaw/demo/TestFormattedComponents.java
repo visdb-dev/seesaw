@@ -93,7 +93,6 @@ public class TestFormattedComponents extends JFrame {
    */
   JLabel lblSSDBComboNav = new JLabel("DBComboNav"); // SSDBComboBox used just for navigation
   JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
-  //JLabel lblSSCuitField = new JLabel("SSCuitField");
   JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
   JLabel lblSSCurrencyFieldNull = new JLabel("SSCurrencyFieldNull");
   JLabel lblSSDateField = new JLabel("SSDateField");
@@ -113,7 +112,6 @@ public class TestFormattedComponents extends JFrame {
    * bound component declarations
    */
   SsTextField txtSwingSetFormattedTestPK = new SsTextField();
-  //SSCuitField fmtSSCuitField = new SSCuitField();
   SsCurrencyField fmtSSCurrencyField = new SsCurrencyField();
   SsCurrencyField fmtSSCurrencyFieldNull = new SsCurrencyField();
   SsDateField fmtSSDateField = new SsDateField(SsFormat.DATE_MMDDYYYY_SLASH);
@@ -205,7 +203,6 @@ public class TestFormattedComponents extends JFrame {
     // SETUP BOUND COMPONENTS
     rowsModel.bind(txtSwingSetFormattedTestPK, "swingset_formatted_test_pk");
 
-    //fmtSSCuitField.bind(rowsModel, "ss_cuit_field");
     rowsModel.bind(fmtSSCurrencyField, "ss_currency_field");
     rowsModel.bind(fmtSSCurrencyFieldNull, "ss_currency_field_null");
     rowsModel.bind(fmtSSDateField, "ss_date_field");
@@ -229,7 +226,6 @@ public class TestFormattedComponents extends JFrame {
 
     lblSwingSetFormattedTestPK.setPreferredSize(MainClass.labelDim);
 
-    //lblSSCuitField.setPreferredSize(MainClass.labelDim);
     lblSSCurrencyField.setPreferredSize(MainClass.labelDim);
     lblSSCurrencyFieldNull.setPreferredSize(MainClass.labelDim);
     lblSSDateField.setPreferredSize(MainClass.labelDim);
@@ -250,7 +246,6 @@ public class TestFormattedComponents extends JFrame {
 
     txtSwingSetFormattedTestPK.setPreferredSize(MainClass.ssDim);
 
-    //fmtSSCuitField.setPreferredSize(MainClass.ssDim);
     fmtSSCurrencyField.setPreferredSize(MainClass.ssDim);
     fmtSSCurrencyFieldNull.setPreferredSize(MainClass.ssDim);
     fmtSSDateField.setPreferredSize(MainClass.ssDim);
@@ -267,48 +262,46 @@ public class TestFormattedComponents extends JFrame {
     fmtDebugFieldNull.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = new JPanel(new GridBagLayout());
-    setContentPane(SsUtils.createDecoratorPanel(contentPane));
-    final GridBagConstraints constraints = new GridBagConstraints();
+    final Container uiPanel = new JPanel(new GridBagLayout());
+    setContentPane(SsUtils.createDecoratorPanel(uiPanel));
 
+    final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
     // constraints.weightx = .40;
     // constraints.anchor = GridBagConstraints.WEST;
 
-    contentPane.add(lblSSDBComboNav, constraints);
+    uiPanel.add(lblSSDBComboNav, constraints);
     constraints.gridy++;
-    contentPane.add(lblSwingSetFormattedTestPK, constraints);
+    uiPanel.add(lblSwingSetFormattedTestPK, constraints);
     constraints.gridy++;
-    //contentPane.add(lblSSCuitField, constraints);
-    //constraints.gridy++;
-    contentPane.add(lblSSCurrencyField, constraints);
+    uiPanel.add(lblSSCurrencyField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSCurrencyFieldNull, constraints);
+    uiPanel.add(lblSSCurrencyFieldNull, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSDateField, constraints);
+    uiPanel.add(lblSSDateField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSDateFieldNull, constraints);
+    uiPanel.add(lblSSDateFieldNull, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSFormattedTextField, constraints);
+    uiPanel.add(lblSSFormattedTextField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSIntegerField, constraints);
+    uiPanel.add(lblSSIntegerField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSIntegerFieldNull, constraints);
+    uiPanel.add(lblSSIntegerFieldNull, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSNumericField, constraints);
+    uiPanel.add(lblSSNumericField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSPercentField, constraints);
+    uiPanel.add(lblSSPercentField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSSSNField, constraints);
+    uiPanel.add(lblSSSSNField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSTimeField, constraints);
+    uiPanel.add(lblSSTimeField, constraints);
     constraints.gridy++;
-    contentPane.add(lblSSTimestampField, constraints);
+    uiPanel.add(lblSSTimestampField, constraints);
     constraints.gridy++;
-    contentPane.add(lblDebugField, constraints);
+    uiPanel.add(lblDebugField, constraints);
     constraints.gridy++;
-    contentPane.add(lblDebugFieldNull, constraints);
+    uiPanel.add(lblDebugFieldNull, constraints);
 
     constraints.gridx = 1;
     constraints.gridy = 0;
@@ -316,44 +309,42 @@ public class TestFormattedComponents extends JFrame {
     // constraints.anchor = GridBagConstraints.CENTER;
     // constraints.fill = GridBagConstraints.HORIZONTAL;
 
-    contentPane.add(cmbSSDBComboNav, constraints);
+    uiPanel.add(cmbSSDBComboNav, constraints);
     constraints.gridy++;
-    contentPane.add(txtSwingSetFormattedTestPK, constraints);
+    uiPanel.add(txtSwingSetFormattedTestPK, constraints);
     constraints.gridy++;
-    //contentPane.add(fmtSSCuitField, constraints);
-    //constraints.gridy++;
-    contentPane.add(fmtSSCurrencyField, constraints);
+    uiPanel.add(fmtSSCurrencyField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSCurrencyFieldNull, constraints);
+    uiPanel.add(fmtSSCurrencyFieldNull, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSDateField, constraints);
+    uiPanel.add(fmtSSDateField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSDateFieldNull, constraints);
+    uiPanel.add(fmtSSDateFieldNull, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSFormattedTextField, constraints);
+    uiPanel.add(fmtSSFormattedTextField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSIntegerField, constraints);
+    uiPanel.add(fmtSSIntegerField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSIntegerFieldNull, constraints);
+    uiPanel.add(fmtSSIntegerFieldNull, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSNumericField, constraints);
+    uiPanel.add(fmtSSNumericField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSPercentField, constraints);
+    uiPanel.add(fmtSSPercentField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSSSNField, constraints);
+    uiPanel.add(fmtSSSSNField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSTimeField, constraints);
+    uiPanel.add(fmtSSTimeField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtSSTimestampField, constraints);
+    uiPanel.add(fmtSSTimestampField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtDebugField, constraints);
+    uiPanel.add(fmtDebugField, constraints);
     constraints.gridy++;
-    contentPane.add(fmtDebugFieldNull, constraints);
+    uiPanel.add(fmtDebugFieldNull, constraints);
 
     constraints.gridx = 0;
     constraints.gridy++;
     constraints.gridwidth = 2;
-    contentPane.add(navigator, constraints);
+    uiPanel.add(navigator, constraints);
 
     // DISABLE THE PRIMARY KEY
     txtSwingSetFormattedTestPK.setEnabled(false);

@@ -26,14 +26,16 @@ import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 
 /**
  * Hook into SimpleValidation framework; validate on demand, not as a listener.
- * SeeSaw invokes as needed.
+ * That is the key difference from a typical validation listener,
+ * this does not add itself as a listener.
+ * SeeSaw decorator invokes this as needed.
  * Derived from validation.api.ui.JTextComponentValidationListenerImpl 
  */
 // Copied from:
 //      validation/api/ui/JTextComponentValidationListenerImpl.java
 // TODO: Make this independent of Document, just use a string?
 //		 Set the string on every change to text, after change needs validation?
-public class TextComponentValidationItem extends ValidationListener<JTextComponent> {
+public class JTextComponentValidationOnDemand extends ValidationListener<JTextComponent> {
   private final Validator<Document> validator;
 
   /**
@@ -42,12 +44,20 @@ public class TextComponentValidationItem extends ValidationListener<JTextCompone
    * @param validationUI
    * @param validator 
    */
-  public TextComponentValidationItem(JTextComponent component, ValidationUI validationUI,
+  public JTextComponentValidationOnDemand(JTextComponent component, ValidationUI validationUI,
                                      Validator<Document> validator) {
     super(JTextComponent.class, validationUI, component);
     this.validator = validator;
   }
 
+  /**
+   * Throw an IllegalStateException if component does not match the target.
+   * @param component
+   */
+  public void verifyComponent(Object component) {
+    if (component != getTarget())
+      throw new IllegalStateException("decorating the wrong component");
+  }
   /**
    * @return The JTextComponent that this ValidationItem is hooked to.
    */

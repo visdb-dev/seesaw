@@ -46,14 +46,15 @@ import java.awt.Component;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
-import java.util.EnumMap;
 import java.util.EventListener;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
+import javax.swing.text.JTextComponent;
 
 import dev.visdb.seesaw.SsCheckBox;
 import dev.visdb.seesaw.datasources.DbSupport.DbReader;
@@ -960,6 +961,9 @@ in the SsComponent's constructor, but before bind.
    * @param plugin result of pluginValidate
    */
   record ValidationResult(boolean base, boolean comp, boolean other, boolean plugin) {
+    /**
+     * The first validation that failed.
+     */
     public Optional<Validation> firstFail() {
       Validation fail = null;
       if (!base) fail = Validation.BASE;

@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.contrib.simplevalidation;
 
+
 import org.netbeans.validation.api.Problem;
 
 import dev.visdb.seesaw.decorators.BaseDecorator;
@@ -54,15 +55,14 @@ import dev.visdb.seesaw.decorators.Decorator;
  */
 public class SimpleValidationDecorator extends BaseDecorator {
 
-  private final TextComponentValidationItem valItem;
-  // TODO: this does decoration as well. Does SeeSaw need a split architecture?
+  private final JTextComponentValidationOnDemand valItem;
 
   /**
-   * Create SimpleValidationDecorator which uses TextComponentValidationItem
+   * Create SimpleValidationDecorator which uses JTextComponentValidationOnDemand
    * for decoration/validation.
    * @param valItem
    */
-  public SimpleValidationDecorator(TextComponentValidationItem valItem) {
+  public SimpleValidationDecorator(JTextComponentValidationOnDemand valItem) {
     this.valItem = valItem;
   }
 
@@ -72,8 +72,7 @@ public class SimpleValidationDecorator extends BaseDecorator {
    */
   @Override
   public boolean decorate() {
-    if (getSsComponent() != valItem.getComponent())
-      throw new IllegalStateException("decorating the wrong component");
+    valItem.verifyComponent(getSsComponent());
     Problem problem = valItem.performValidation();
     return problem == null || !problem.isFatal();
   }

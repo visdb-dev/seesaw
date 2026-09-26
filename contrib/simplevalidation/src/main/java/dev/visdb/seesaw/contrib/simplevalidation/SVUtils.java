@@ -42,7 +42,10 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.contrib.simplevalidation;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -53,15 +56,20 @@ import javax.swing.text.JTextComponent;
 
 import org.netbeans.validation.api.Validator;
 import org.netbeans.validation.api.ValidatorUtils;
+import org.netbeans.validation.api.builtin.stringvalidation.StringValidators;
 import org.netbeans.validation.api.conversion.Converter;
 import org.netbeans.validation.api.ui.ValidationGroup;
 import org.netbeans.validation.api.ui.ValidationItem;
+import org.netbeans.validation.api.ui.ValidationListener;
+import org.netbeans.validation.api.ui.ValidationUI;
 import org.netbeans.validation.api.ui.swing.SwingComponentDecorationFactory;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import dev.visdb.seesaw.decorators.Decorator;
+import dev.visdb.seesaw.utils.CentralLookup;
 import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
 
 /**
  * Helpers for working with Simple Validation framework.
@@ -74,68 +82,73 @@ public class SVUtils {
       = new Decorator.DecoratorStyle("SV_DECORATOR_STYLE");
 
   /**
-   * Should probably be from a factory.
+   * Create an on demand {@link ValidationListener} for a {@code JTextComponent};
+   * it does no listening.
    * @param jtc
    * @param validators
    * @return
    */
   @SafeVarargs
-  public static TextComponentValidationItem createDefaultTextValidator(
+  public static JTextComponentValidationOnDemand createTextValidationOnDemand(
       JTextComponent jtc, Validator<String>... validators) {
     Validator<String> merged = ValidatorUtils.merge(validators);
     Validator<Document> validator = Converter.find(String.class, Document.class).convert(merged);
-    TextComponentValidationItem valItem = new TextComponentValidationItem(
-        jtc, SwingComponentDecorationFactory.getDefault().decorationFor(jtc), validator);
+    JTextComponentValidationOnDemand valItem = new JTextComponentValidationOnDemand(
+        jtc, decorationFor((SsComponent)jtc), validator);
     return valItem;
   }
 
-  /**
-   * Set the decorator for the SsComponent. The pluginValidator equivelent
-   * is embedded in StringSsComponentValidator.
-   * Use this form when building complex string validators, see 
-   * {@link StringSsComponentValidator},
-   * {@link org.netbeans.validation.api.Validator }.
-   * {@link org.netbeans.validation.api.builtin.stringvalidation.StringValidators} and
-   * {@link org.netbeans.validation.api.ValidatorUtils#merge(org.netbeans.validation.api.Validator...) }.
-   * @param jtc must be an SsComponent.
-   * @param sval
-   * @return ValidationItem to assign to the {@link ValidationGroup}.
-   */
-  private static ValidationItem setDecoratorValidator(JTextComponent jtc, Validator<String> sval) {
+  @SafeVarargs
+  private static ValidationItem setDecoratorValidator(JTextComponent jtc,
+                                                      Validator<String>... validators) {
     SsComponent comp = (SsComponent) jtc;
-    TextComponentValidationItem textVali = createDefaultTextValidator(jtc, sval);
+    JTextComponentValidationOnDemand textVali = createTextValidationOnDemand(jtc, validators);
     SimpleValidationDecorator deco = new SimpleValidationDecorator(textVali);
     comp.setDecorator(deco);
     return textVali;
   }
 
   /**
-   * Set decorator for the SsComponent; assign name.
-   * Note that JTextComponent.getName() is used, dynamically, if name is null or not set.
-   * Create the validator used by the decorator using condition and problemDesc;
-   * for more information see
-   * {@link StringSsComponentValidator},
-   * {@link org.netbeans.validation.api.Validator }.
-   * {@link org.netbeans.validation.api.builtin.stringvalidation.StringValidators} and
-   * {@link org.netbeans.validation.api.ValidatorUtils#merge(org.netbeans.validation.api.Validator...) }.
+   * Set decorator on the text SsComponent; assign name.
+   * Create a validator, {@link StringSsComponentValidator},
+   * using validationCondition and problemDescription. Merge this validator with the param validators
+   * to create the validation,
+   * {@link #createTextValidationOnDemand(JTextComponent, Validator...) }
+   * used by the decorator.
+   * For more information see
+   * {@link Validator }, {@link StringValidators} and {@link ValidatorUtils#merge(Validator...) }.
+   * Note that JTextComponent.getName() is used, dynamically, if name is null
+   * or not otherwise set.
+   * <p>
+   * <b> If SsComponent.setDecoratorTarget is used then this should be called after.</b>
    * @param jtc must be an SsComponent.
    * @param name
-   * @param condition see {@link StringSsComponentValidator#StringSsComponentValidator(java.util.function.Function, java.util.function.Supplier, dev.visdb.seesaw.utils.SsComponent) StringSsComponentValidator(validationCondition, problemDescription, ssComponent)}
-   * @param problemDesc see {@link StringSsComponentValidator#StringSsComponentValidator(java.util.function.Function, java.util.function.Supplier, dev.visdb.seesaw.utils.SsComponent)  StringSsComponentValidator(validationCondition, problemDescription, ssComponent)}
+   * @param validationCondition see {@link StringSsComponentValidator#StringSsComponentValidator(Function, Supplier, SsComponent)}
+   * @param problemDescription see {@link StringSsComponentValidator#StringSsComponentValidator(Function, Supplier, SsComponent)}
+   * @param validators
    * @return ValidationItem to assign to the {@link ValidationGroup}.
    */
+  // TODO: Might want DecorationFactory that takes a Supplier<JComponent>
+  //       then can avoid the mess in DefaultValidationDecorator.
+  @SafeVarargs
   public static ValidationItem setDecoratorValidator(JTextComponent jtc, String name,
-                                                     Function<String, Boolean> condition,
-                                                     Supplier<String> problemDesc) {
+                                                     Function<String, Boolean> validationCondition,
+                                                     Supplier<String> problemDescription,
+                                                     Validator<String>... validators) {
     SwingValidationGroup.setComponentName(jtc, name);
-    StringSsComponentValidator sval = new StringSsComponentValidator(condition, problemDesc, (SsComponent)jtc);
-    return setDecoratorValidator(jtc, sval);
+    StringSsComponentValidator stringVali = new StringSsComponentValidator(validationCondition,
+                                                                           problemDescription,
+                                                                           (SsComponent)jtc);
+    Validator<String>[] newValidatorArray = Arrays.copyOf(validators, validators.length + 1);
+    newValidatorArray[newValidatorArray.length - 1] = stringVali;
+    return setDecoratorValidator(jtc, newValidatorArray);
   }
 
 
   /**
    * A convenience method to create a JPanel that displays validation
-   * problems associated with the validation items.
+   * problems associated with the validation items. The validation items
+   * are added to the ValidationPanel's validation group.
    * The disableUI is false.
    * @param c  UI which is displayed above the problem label
    * @param validationItems items to add to the {@code ValidationGroup}
@@ -153,7 +166,7 @@ public class SVUtils {
    * @param validationItems items to add to the ValidationGroup
    * @return validation panel
    */
-  public static ValidationPanel createDecoratorPanel(Component c, boolean disableUI,
+  static ValidationPanel createDecoratorPanel(Component c, boolean disableUI,
                                              ValidationItem... validationItems) {
     ValidationPanel valiPanel = createDecoratorPanel(c);
     ValidationGroup group = valiPanel.getValidationGroup();
@@ -176,7 +189,27 @@ public class SVUtils {
     ValidationPanel parentPanel = new ValidationPanel();
     parentPanel.setInnerComponent(uiPanel);
     parentPanel.putClientProperty(Decorator.SEE_SAW_PANEL_KEY, SV_DECORATOR_STYLE);
+    var adj = CentralLookup.defLookup(DecoratorPanelAdjustSOUTH.class);
+    if (adj != null) {
+      Component p = ((BorderLayout)parentPanel.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
+      Dimension d = p.getPreferredSize();
+      // HACK
+      d.height += adj.d.height;
+      d.width += adj.d.width;
+      p.setPreferredSize(d);
+    }
     return parentPanel;
+  }
+
+  /**
+   * An SsComponent may decorate and alternate
+   * @param ssComp
+   * @return 
+   */
+  // TODO: Might want DecorationFactory that takes a Supplier<JComponent>
+  //       then can avoid the mess in DefaultValidationDecorator.
+  public static ValidationUI decorationFor(SsComponent ssComp) {
+    return SwingComponentDecorationFactory.getDefault().decorationFor(ssComp.getDecorateTarget());
   }
 }
 // vi: sw=2 ts=8
