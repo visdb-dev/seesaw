@@ -367,47 +367,47 @@ public class Example4 extends JFrame {
     txtPartCity.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = new JPanel(new GridBagLayout());
-    setContentPane(SsUtils.createDecoratorPanel(contentPane));
-    final GridBagConstraints constraints = new GridBagConstraints();
+    final Container uiPanel = new JPanel(new GridBagLayout());
+    setContentPane(SsUtils.createDecoratorPanel(uiPanel));
 
+    final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
     // constraints.weightx = .40;
     // constraints.anchor = GridBagConstraints.WEST;
-    contentPane.add(lblSelectPart, constraints);
+    uiPanel.add(lblSelectPart, constraints);
     constraints.gridy = 1;
-    contentPane.add(lblPartID, constraints);
+    uiPanel.add(lblPartID, constraints);
     constraints.gridy = 2;
-    contentPane.add(lblPartName, constraints);
+    uiPanel.add(lblPartName, constraints);
     constraints.gridy = 3;
-    contentPane.add(lblPartColor, constraints);
+    uiPanel.add(lblPartColor, constraints);
     constraints.gridy = 4;
-    contentPane.add(lblPartWeight, constraints);
+    uiPanel.add(lblPartWeight, constraints);
     constraints.gridy = 5;
-    contentPane.add(lblPartCity, constraints);
+    uiPanel.add(lblPartCity, constraints);
 
     constraints.gridx = 1;
     constraints.gridy = 0;
     // constraints.weightx = .60;
     // constraints.anchor = GridBagConstraints.CENTER;
     // constraints.fill = GridBagConstraints.HORIZONTAL;
-    contentPane.add(cmbSelectPart, constraints);
+    uiPanel.add(cmbSelectPart, constraints);
     constraints.gridy = 1;
-    contentPane.add(txtPartID, constraints);
+    uiPanel.add(txtPartID, constraints);
     constraints.gridy = 2;
-    contentPane.add(txtPartName, constraints);
+    uiPanel.add(txtPartName, constraints);
     constraints.gridy = 3;
-    contentPane.add(cmbPartColor, constraints);
+    uiPanel.add(cmbPartColor, constraints);
     constraints.gridy = 4;
-    contentPane.add(txtPartWeight, constraints);
+    uiPanel.add(txtPartWeight, constraints);
     constraints.gridy = 5;
-    contentPane.add(txtPartCity, constraints);
+    uiPanel.add(txtPartCity, constraints);
 
     constraints.gridx = 0;
     constraints.gridy = 6;
     constraints.gridwidth = 2;
-    contentPane.add(navigator, constraints);
+    uiPanel.add(navigator, constraints);
 
     constraints.gridy = 7;
     constraints.gridwidth = 1;

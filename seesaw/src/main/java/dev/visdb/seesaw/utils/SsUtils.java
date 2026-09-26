@@ -45,6 +45,7 @@ package dev.visdb.seesaw.utils;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
 import java.lang.System.Logger;
@@ -122,6 +123,22 @@ public class SsUtils {
     if (decoratorSupplier == null)
       throw new IllegalStateException(sf("Decorator supplier not found for '%s'", style));
     return decoratorSupplier.createDecoratorPanel(uiPanel);
+  }
+
+  /**
+   * This HACK is used to adjust the decorator label to avoid layout wiggles
+   * for some Look&Feel. Put one of these in Central lookup as needed.
+   */
+  public static class DecoratorPanelAdjustSOUTH {
+    /** The adjustment */
+    public final Dimension d;
+
+    /** Create an adjustment.
+     * @param d the adjustment
+     */
+    public DecoratorPanelAdjustSOUTH(Dimension d) {
+      this.d = d;
+    }
   }
 
   /** Return the component wrapped by the decorator panel.

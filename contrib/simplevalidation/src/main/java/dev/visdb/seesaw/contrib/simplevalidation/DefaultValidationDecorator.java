@@ -14,7 +14,7 @@ package dev.visdb.seesaw.contrib.simplevalidation;
 import javax.swing.JComponent;
 
 import org.netbeans.validation.api.Problem;
-import org.netbeans.validation.api.ui.swing.SwingComponentDecorationFactory;
+import org.netbeans.validation.api.ui.ValidationListener;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import dev.visdb.seesaw.decorators.BaseDecorator;
@@ -30,15 +30,14 @@ public class DefaultValidationDecorator extends BaseDecorator {
   public DefaultValidationDecorator() {
   }
   
-  private DefaultSsComponentValidationItem valItem;
+  private ValidationListener<SsComponent> valItem;
+  private JComponent decoratorTarget;
 
-  /** create ValidationItem */
+  /** create ValidationItem
+   * @param ssComp */
   @Override
-  public void install(SsComponent component) {
-    super.install(component);
-    valItem = new DefaultSsComponentValidationItem(component,
-        SwingComponentDecorationFactory.getDefault().decorationFor((JComponent)component),
-        new DefaultSsComponentValidator(component));
+  public void install(SsComponent ssComp) {
+    super.install(ssComp);
   }
 
   /**
@@ -47,7 +46,7 @@ public class DefaultValidationDecorator extends BaseDecorator {
   @Override
   public void uninstall() {
     ValidationPanel valiPanel = SVUtils.findDecoratorPanel((JComponent)getSsComponent());
-    if (valiPanel != null)
+    if (valiPanel != null && valItem != null)
       valiPanel.getValidationGroup().remove(valItem);
     super.uninstall();
   }
@@ -60,24 +59,40 @@ public class DefaultValidationDecorator extends BaseDecorator {
    */
   @Override
   public boolean decorate() {
-    if (getSsComponent() != valItem.getComponent())
-      throw new IllegalStateException("decorating the wrong component");
-    if (!isValItemAdded())
+    if (!isValItemOK())
       return true;
     Problem problem = valItem.performValidation();
     return problem == null || !problem.isFatal();
   }
 
-  private boolean isValItemAdded() {
-    if (foundValidationPanel)
+  // TODO: Might want DecorationFactory that takes a Supplier<JComponent>
+  //       then can avoid this mess.
+  private boolean isValItemOK() {
+    // decoratorTarget may be set an anytime; check if it has changed
+    JComponent currentDecoratorTarget = getSsComponent().getDecorateTarget();
+    boolean newTarget = currentDecoratorTarget != decoratorTarget;
+    if (foundValidationPanel && !newTarget)
       return true;
     ValidationPanel valiPanel = SVUtils.findDecoratorPanel((JComponent)getSsComponent());
-    if (valiPanel != null) {
-      // TODO: just set disableIU to false
-      valiPanel.getValidationGroup().addItem(valItem, false);
-      foundValidationPanel = true;
+    if (valiPanel == null)
+      return false;
+
+    if (newTarget || valItem == null)
+      newValItem(valiPanel, currentDecoratorTarget);
+
+    foundValidationPanel = true;
+    return true;
+  }
+
+  // valiPanel must exist
+  private void newValItem(ValidationPanel valiPanel, JComponent decoratorTarget) {
+    SsComponent ssComp = getSsComponent();
+    if (valItem != null) {
+      valiPanel.getValidationGroup().remove(valItem);
     }
-    return foundValidationPanel;
+    this.decoratorTarget = decoratorTarget;
+    valItem = ValidationItemFactory.get(ssComp, decoratorTarget);
+    valiPanel.getValidationGroup().addItem(valItem, false);
   }
   
   /**

@@ -61,8 +61,9 @@ import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
  * It has a validationCondition, like a pluginValidator,
  * and description, that handles a string.
  * It sets the SsComponent's pluginValidator to nullValidator.
- * It does SsComponent.allValidate.
+ * It does SsComponent.allValidate().
  */
+// TODO: handle condition taken from pluginValidate.
 // TODO: Turn this into an SsComponentValidator.
 //       Should this be Validator<SsComponent>?
 //       Needs converter SsComponent to text or to Document.
@@ -89,12 +90,12 @@ public class StringSsComponentValidator extends AbstractValidator<String> {
   
   /**
    * Validate using this' validationCondition and problemDescription.
+   * The model is ignored, the relevant information derives from SsComponent.allValidate()
    * @param problems
    * @param compName
    * @param model
    */
   // TODO: use compName in message.
-  // TODO: handle condition in pluginValidate.
   // TODO: detect/prevent warnings in problems?
   @Override
   public void validate(Problems problems, String compName, String model) {

@@ -869,7 +869,7 @@ public class MainClass extends JFrame {
 
     if(Boolean.FALSE) lkup.add(new SsTextField.DebugBaseComponentValidate() {});
 
-    if(Boolean.FALSE) lkup.replace(Decorator.DecoratorStyle.class,
+    if(Boolean.TRUE) lkup.replace(Decorator.DecoratorStyle.class,
                                    SVUtils.SV_DECORATOR_STYLE);
     if(Boolean.FALSE) lkup.replace(Decorator.DecoratorStyle.class,
                                    Decorator.DecoratorStyle.BACKGROUND);

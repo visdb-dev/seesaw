@@ -320,6 +320,7 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
    * This is only so that the no arg constructor acts as expected.
    * Any custom formatter is expected to decorate as needed.
    */
+  @SuppressWarnings("CloneableImplementsClone")
   private static class DecoratingFormatter extends DefaultFormatter {
     private SsFormattedTextField ftf;
 

@@ -196,43 +196,43 @@ public class Example3 extends JFrame {
     txtShipDate.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = new JPanel(new GridBagLayout());
-    setContentPane(SsUtils.createDecoratorPanel(contentPane));
-    final GridBagConstraints constraints = new GridBagConstraints();
+    final Container uiPanel = new JPanel(new GridBagLayout());
+    setContentPane(SsUtils.createDecoratorPanel(uiPanel));
 
+    final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
     // constraints.weightx = .40;
     // constraints.anchor = GridBagConstraints.WEST;
-    contentPane.add(lblSupplierPartID, constraints);
+    uiPanel.add(lblSupplierPartID, constraints);
     constraints.gridy = 1;
-    contentPane.add(lblSupplierName, constraints);
+    uiPanel.add(lblSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(lblPartName, constraints);
+    uiPanel.add(lblPartName, constraints);
     constraints.gridy = 3;
-    contentPane.add(lblQuantity, constraints);
+    uiPanel.add(lblQuantity, constraints);
     constraints.gridy = 4;
-    contentPane.add(lblShipDate, constraints);
+    uiPanel.add(lblShipDate, constraints);
 
     constraints.gridx = 1;
     constraints.gridy = 0;
     // constraints.weightx = .60;
     // constraints.anchor = GridBagConstraints.CENTER;
     // constraints.fill = GridBagConstraints.HORIZONTAL;
-    contentPane.add(txtSupplierPartID, constraints);
+    uiPanel.add(txtSupplierPartID, constraints);
     constraints.gridy = 1;
-    contentPane.add(cmbSupplierName, constraints);
+    uiPanel.add(cmbSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(cmbPartName, constraints);
+    uiPanel.add(cmbPartName, constraints);
     constraints.gridy = 3;
-    contentPane.add(txtQuantity, constraints);
+    uiPanel.add(txtQuantity, constraints);
     constraints.gridy = 4;
-    contentPane.add(txtShipDate, constraints);
+    uiPanel.add(txtShipDate, constraints);
 
     constraints.gridx = 0;
     constraints.gridy = 5;
     constraints.gridwidth = 2;
-    contentPane.add(navigator, constraints);
+    uiPanel.add(navigator, constraints);
 
     // DISABLE THE PRIMARY KEY
     txtSupplierPartID.setEnabled(false);

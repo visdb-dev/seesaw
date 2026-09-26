@@ -10,6 +10,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.Reader;
@@ -25,6 +26,7 @@ import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.DecoratorSupplier;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.navigate.Utils;
+import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 
@@ -91,6 +93,13 @@ public class LookupDefaults {
       logger.log(Level.INFO, sf("Available DecoratorSupplier: '%s'", deco));
     }
 
+    // HACK for SimpleValidation, seems to be an off by one issue
+    // TODO: could include style, allow multiple, then spin through
+    //       looking for an adjustment that matches our style.
+    //       But, for now, there's only SV that cares about this.
+    if (lkup.lookup(DecoratorPanelAdjustSOUTH.class) == null) {
+      lkup.add(new DecoratorPanelAdjustSOUTH(new Dimension(0, 1)));
+    }
 
 
     initialized = true;
