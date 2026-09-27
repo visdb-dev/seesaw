@@ -20,7 +20,6 @@ import org.netbeans.validation.api.Problems;
 import org.netbeans.validation.api.Severity;
 import org.netbeans.validation.api.ui.ValidationListener;
 import org.netbeans.validation.api.ui.ValidationUI;
-import org.netbeans.validation.api.ui.swing.SwingComponentDecorationFactory;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 
 import dev.visdb.seesaw.decorators.ComponentState;
@@ -90,6 +89,9 @@ class ValidationItemFactory {
       Optional<Validation> fail = vr.firstFail();
       if (fail.isPresent())
         problems.append(ssComp.validationMsg(fail.get()));
+
+      // This is normally at the end of the SeeSaw decorator.
+      ssComp.handleTextDecorator(vr);
     }
   }
 

@@ -166,7 +166,7 @@ public class BorderDecorator extends FocusDecorator {
 
     decoComp().setBorder(b);
 
-    handleTextDecorator(valid);
+    getSsComponent().handleTextDecorator(valid);
 
     return valid.all();
   }

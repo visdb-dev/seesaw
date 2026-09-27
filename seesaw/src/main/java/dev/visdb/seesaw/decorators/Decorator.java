@@ -90,17 +90,6 @@ public interface Decorator extends AnyDecorator {
   DecoratorStyle getDecoratorStyle();
 
   /**
-   * Decorators typically invoke a component's TextDecorator as as well;
-   * use this method to control that behavior.
-   * <p>
-   * A Decorator should default to true.
-   * A decorator may choose to never decorate text; should document this.
-   *
-   * @param flag
-   */
-  void setDecorateTextEnabled(boolean flag);
-
-  /**
    * A decorator that does nothing.
    */
   public static Decorator nullDecorator = new Decorator() {
@@ -128,9 +117,6 @@ public interface Decorator extends AnyDecorator {
     public SsComponent getSsComponent() {
       return null;
     }
-
-    @Override
-    public void setDecorateTextEnabled(boolean flag) {}
   };
 }
 // vi: sw=2 ts=8

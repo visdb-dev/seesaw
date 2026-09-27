@@ -264,7 +264,7 @@ public class TestBaseComponents extends JFrame {
   JLabel lblSSSlider = new JLabel("Slider");
   JLabel lblSSTextArea = new JLabel("TextArea");
   JLabel lblSSTextField = new JLabel("TextField");
-  JLabel lblSSTextFieldB = new JLabel("SSTextFieldB");
+  JLabel lblSSTextFieldB = new JLabel("TextFieldB");
   JLabel lblDatePicker = new JLabel("DbDatePicker");
 
   //

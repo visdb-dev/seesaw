@@ -90,6 +90,7 @@ import dev.visdb.seesaw.datasources.SqlInternalException;
 import dev.visdb.seesaw.datasources.SqlNullException;
 import dev.visdb.seesaw.datasources.SqlRuntimeException;
 import dev.visdb.seesaw.decorators.BorderDecorator;
+import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.DecoratorSupplier;
 import dev.visdb.seesaw.decorators.TextDecorator;
@@ -104,6 +105,7 @@ import dev.visdb.seesaw.navigate.RowsModelNewRowSetEvent;
 import dev.visdb.seesaw.navigate.UndoRedo;
 import dev.visdb.seesaw.navigate.UndoRedo.Change;
 import dev.visdb.seesaw.utils.SsComponent.Validation;
+import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 import static dev.visdb.seesaw.navigate.RowSetState.isAcceptingCachedRowSetChanges;
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
@@ -1415,6 +1417,16 @@ final class SsCommon {
     return TextDecorator.nullTextDecorator;
   }
 
+  private boolean textDecoratorEnabled = true;
+
+  boolean isTextDecoratorEnabled() {
+    return textDecoratorEnabled;
+  }
+
+  void setTextDecoratorEnabled(boolean flag) {
+    textDecoratorEnabled = flag;
+  }
+
   private TextDecorator textDecorator;
   /**
    * Return the decorator used by this component.
@@ -1434,8 +1446,19 @@ final class SsCommon {
     textDecorator = textDeco;
   }
 
-  void decorateText() {
-    textDecorator.decorateText();
+  /**
+   * Deal with a TextDecorator for this component.
+   * @param valid
+   */
+  void handleTextDecorator(ValidationResult valid) {
+    if (!isTextDecoratorEnabled())
+      return;
+    TextDecorator td = getTextDecorator();
+    assert td != null;
+    if (td instanceof ComponentStateTextDecorator std)
+      std.decorateText(valid);
+    else
+      td.decorateText();
   }
 }
 // vi: sw=2 ts=8

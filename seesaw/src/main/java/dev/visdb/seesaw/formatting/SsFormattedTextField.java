@@ -163,7 +163,7 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
           ftf.setValue(null); // Note: "verifyingText" skips pce.
         // Update text decoration, e.g. red for negative.
         if (ok)
-          decorateText();
+          forceTextDecoration();
       } catch (final Exception e) {
         // TODO: Not right. What runtime exceptions should be looked for?
         logger.log(Level.ERROR, () -> getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
@@ -543,8 +543,12 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
       logger.log(Level.ERROR, sf("%s: Exception updating rowset.", getColumnForLog(), sqe));
       setValue(null);
     }
-    decorateText(); // For example: color red for negative number
+    forceTextDecoration();// For example: color red for negative number
     decorate();
+  }
+
+  private void forceTextDecoration() {
+    getTextDecorator().decorateText();
   }
 
   /**
@@ -588,7 +592,7 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
   @Override
   public TextDecorator createDefaultTextDecorator() {
     // SsFormattedTextField handles its own text decoration
-    getDecorator().setDecorateTextEnabled(false);
+    setTextDecoratorEnabled(false);
     return new NegativeNumberTextDecorator();
   }
 
