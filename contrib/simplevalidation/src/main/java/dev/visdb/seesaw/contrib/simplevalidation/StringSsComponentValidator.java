@@ -70,22 +70,22 @@ import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 public class StringSsComponentValidator extends AbstractValidator<String> {
   private final Function<String, Boolean> validationCondition;
   private final Supplier<String> problemDescription;
-  private final SsComponent comp;
+  private final SsComponent ssComp;
 
   /**
    * Create a validator that handles a string.
    * @param validationCondition returns true if string is valid.
    * @param problemDescription produces error message if validationCondition is false.
-   * @param comp how weird is it to have this here?
+   * @param ssComp how weird is it to have this here?
    */
   public StringSsComponentValidator(Function<String, Boolean> validationCondition,
 				    Supplier<String> problemDescription,
-				    SsComponent comp) {
+				    SsComponent ssComp) {
     super(String.class);
     this.validationCondition = Objects.requireNonNull(validationCondition);
     this.problemDescription = Objects.requireNonNull(problemDescription);
-    this.comp = Objects.requireNonNull(comp);
-    comp.setPluginValidator(dev.visdb.seesaw.decorators.Validator.nullValidator);
+    this.ssComp = Objects.requireNonNull(ssComp);
+    ssComp.setPluginValidator(dev.visdb.seesaw.decorators.Validator.nullValidator);
   }
   
   /**
@@ -99,21 +99,26 @@ public class StringSsComponentValidator extends AbstractValidator<String> {
   // TODO: detect/prevent warnings in problems?
   @Override
   public void validate(Problems problems, String compName, String model) {
-    ValidationResult vr = comp.allValidate();
-    ComponentState borderState = ComponentState.getComponentState(comp, vr);
+    ValidationResult vr = ssComp.allValidate();
+    ComponentState borderState = ComponentState.getComponentState(ssComp, vr);
     if (borderState.isModified())
       problems.append("modified", Severity.INFO);
     
     Optional<Validation> fail = vr.firstFail();
     if (fail.isPresent()) {
-      problems.append(comp.validationMsg(fail.get()));
-      return;
+      problems.append(ssComp.validationMsg(fail.get()));
+    } else {
+      // pluginValidate can't fail since it has a nullValidator.
+      // Check validateCondition here.
+      if (!validationCondition.apply(model)) {
+        problems.append(problemDescription.get());
+        // Need to recreate the ValidationResult marking plugin validate failed.
+        vr = new ValidationResult(true, true, true, false);
+      }
     }
-    // pluginValidate can't fail since it has a nullValidator.
-    // Check validateCondition here.
-    if (!validationCondition.apply(model)) {
-      problems.append(problemDescription.get());
-    }
+
+    // This is normally at the end of the SeeSaw decorator.
+    ssComp.handleTextDecorator(vr);
   }
 }
 // vi: sw=2 ts=8

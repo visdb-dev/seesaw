@@ -85,7 +85,7 @@ public class BackgroundDecorator extends FocusDecorator {
                                        : standardBackgroundColor;
     decoComp().setBackground(color);
 
-    handleTextDecorator(valid);
+    getSsComponent().handleTextDecorator(valid);
 
     return valid.all();
   }

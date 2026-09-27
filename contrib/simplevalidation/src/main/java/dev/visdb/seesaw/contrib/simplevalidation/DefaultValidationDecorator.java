@@ -33,13 +33,6 @@ public class DefaultValidationDecorator extends BaseDecorator {
   private ValidationListener<SsComponent> valItem;
   private JComponent decoratorTarget;
 
-  /** create ValidationItem
-   * @param ssComp */
-  @Override
-  public void install(SsComponent ssComp) {
-    super.install(ssComp);
-  }
-
   /**
    * Remove the ValidationItem from ValidationPanel.
    */

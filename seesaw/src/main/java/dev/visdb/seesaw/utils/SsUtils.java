@@ -127,7 +127,7 @@ public class SsUtils {
 
   /**
    * This HACK is used to adjust the decorator label to avoid layout wiggles
-   * for some Look&Feel. Put one of these in Central lookup as needed.
+   * for some {@literal Look&Feel}. Put one of these in Central lookup as needed.
    */
   public static class DecoratorPanelAdjustSOUTH {
     /** The adjustment */

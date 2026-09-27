@@ -87,7 +87,7 @@ import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
  * See {@link Hook} for a complete example.
  * <p>
  * The basic components for application use and/or subclassing are found in
- * <a href="../core/package-summary.html">core components</a>.
+ * <a href="../package-summary.html">core components</a>.
  * They are subclassed into a
  * <a href="../package-summary.html">compatibility layer</a>
  * as a replacement for the
@@ -300,7 +300,8 @@ public interface SsComponent extends RSC {
    * This is overriden to return true by components that are made up of
    * other components; and some of those contained components might get
    * the focus. Examples are
-   * {@link dev.visdb.seesaw.SsImage} and DbDatePicker.
+   * {@link dev.visdb.seesaw.SsImage} and
+   * {@link dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker}.
    * @return
    */
   // isComposite component usually has
@@ -1057,6 +1058,25 @@ in the SsComponent's constructor, but before bind.
   }
 
   /**
+   * Flag specifying if the Decorator should invoke the TextDecorator.
+   * @return flag
+   */
+  default boolean isTextDecoratorEnabled() {
+    return getSsCommon().isTextDecoratorEnabled();
+  }
+
+  /**
+   * Decorators typically invoke a component's TextDecorator as as well;
+   * use this method to control that behavior. Enabled defaults true.
+   * <p>
+   * A decorator may choose to never decorate text; should document this.
+   * @param flag
+   */
+  default void setTextDecoratorEnabled(boolean flag) {
+    getSsCommon().setTextDecoratorEnabled(flag);
+  }
+
+  /**
    * Return the text decorator used by this component.
    * @return the textDecorator
    */
@@ -1072,9 +1092,12 @@ in the SsComponent's constructor, but before bind.
     getSsCommon().setTextDecorator(textDeco);
   }
 
-  /** Run the decorator */
-  default void decorateText() {
-    getSsCommon().decorateText();
+  /**
+   * Run the textDecorator as possible.
+   * @param valid 
+   */
+  default void handleTextDecorator(ValidationResult valid) {
+    getSsCommon().handleTextDecorator(valid);
   }
 }
 // vi: sw=2 ts=8
