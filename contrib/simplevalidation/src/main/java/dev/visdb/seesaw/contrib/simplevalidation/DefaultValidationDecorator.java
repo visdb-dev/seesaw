@@ -38,7 +38,7 @@ public class DefaultValidationDecorator extends BaseDecorator {
    */
   @Override
   public void uninstall() {
-    ValidationPanel valiPanel = SVUtils.findDecoratorPanel((JComponent)getSsComponent());
+    ValidationPanel valiPanel = SVUtils.findDecoratorPanel(getSsComponent());
     if (valiPanel != null && valItem != null)
       valiPanel.getValidationGroup().remove(valItem);
     super.uninstall();
@@ -66,7 +66,7 @@ public class DefaultValidationDecorator extends BaseDecorator {
     boolean newTarget = currentDecoratorTarget != decoratorTarget;
     if (foundValidationPanel && !newTarget)
       return true;
-    ValidationPanel valiPanel = SVUtils.findDecoratorPanel((JComponent)getSsComponent());
+    ValidationPanel valiPanel = SVUtils.findDecoratorPanel(getSsComponent());
     if (valiPanel == null)
       return false;
 

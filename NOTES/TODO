@@ -1,5 +1,23 @@
 
-Contrib artifact(s), like DataPicker, Simple validation decorators.
+BUG: In testBaseComponents, edit TextField "oops",
+
+    TextField has "plugin" error, TextFieldB has "other" error.
+    Looks like B is picking state up from A.
+    Maybe this error state should be associate with the column, not component.
+    Hmm, maybe validators should be with column, not component, as well.
+    (would this prevent specialized validations (what's that even mean)?
+    IT SHOULD BE COLUMN)
+    Validate should only be done once for the column.
+
+    The following looks interesting for handling this
+        SsCommon.setColumn does postColumnChangeStart
+            NaviagateState handleColumnChangeStart
+                adjustErrorComponentState(ev.getRSC(), ev.isError());
+                Utils.postColumnChangeDone(ev);
+
+        Then
+            SsCommon.handleColumnChangeDone
+                // Looking for same RowSet, same Column, different component.
 
 ================================================================================
 

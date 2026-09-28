@@ -13,6 +13,7 @@ package dev.visdb.seesaw.contrib.simplevalidation;
 
 
 import java.awt.Component;
+import java.awt.Container;
 
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 import org.openide.util.lookup.ServiceProvider;
@@ -38,7 +39,7 @@ public class SimpleValidationDecoratorSupplier extends DecoratorSupplierBase {
    */
   @Override
   public ValidationPanel createDecoratorPanel(Component uiPanel) {
-    return SVUtils.createDecoratorPanel(uiPanel);
+    return SVUtils.createDecoratorPanel((Container)uiPanel);
   }
 }
 // vi: sw=2 ts=8

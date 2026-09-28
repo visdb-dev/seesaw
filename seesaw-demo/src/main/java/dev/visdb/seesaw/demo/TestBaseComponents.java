@@ -90,7 +90,7 @@ import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsDataNavigator;
@@ -369,9 +369,8 @@ public class TestBaseComponents extends JFrame {
 
     // TEST DbOpsCreator
     DbOpsCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
-    CentralLookup lkup = CentralLookup.getDefault();
-    DbOpsCreator prevCreator = lkup.lookup(DbOpsCreator.class);
-    lkup.replace(DbOpsCreator.class, creator);
+    DbOpsCreator prevCreator = Globals.getOption(DbOpsCreator.class);
+    Globals.setOption(DbOpsCreator.class, creator);
 
     // initialize database connection and components
     try {
@@ -390,10 +389,9 @@ public class TestBaseComponents extends JFrame {
     if (!name.equals("TestBaseComponentsDbOps")) {
       throw new IllegalStateException(sf("wrong customizer %s", name));
     }
-    lkup.remove(creator);
-    if (prevCreator != null) {
-      lkup.add(prevCreator);
-    }
+
+    if (prevCreator != null)
+      Globals.setOption(DbOpsCreator.class, prevCreator);
 
     if (!activeComps.contains(NAV)) {
       cmbSSDBComboNav = null;

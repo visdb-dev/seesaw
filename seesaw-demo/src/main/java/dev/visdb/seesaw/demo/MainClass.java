@@ -95,7 +95,7 @@ import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.navigate.Utils;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.LookupDefaults;
 import dev.visdb.seesaw.utils.SsUtils;
@@ -103,7 +103,6 @@ import dev.visdb.seesaw.utils.Version;
 import gnu.getopt.Getopt;
 
 import static dev.visdb.seesaw.demo.DemoUtil.configureJavaUtilLogger;
-import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
@@ -141,10 +140,9 @@ public class MainClass extends JFrame {
     }
   }
 
-  @SuppressWarnings("ClassMayBeInterface")
-  static class LoadDemoImages {}
+  static interface LoadDemoImages {}
   // https://h2database.com/html/features.html#trace_options
-  // lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+  // Globals.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
   static class H2Trace {
     private final String flags;
     H2Trace() {
@@ -406,10 +404,10 @@ public class MainClass extends JFrame {
     } catch (SQLException ex) {
     }
 
-    DbSupport supp = DbSupportFactory.addDbSupportToLookup(dbConnection);
+    DbSupport supp = DbSupportFactory.setDbSupportGlobalOption(dbConnection);
     if (supp == null) {
       logger.log(Level.ERROR, sf("No SSDBSupport found for '%s'", databaseID));
-      CentralLookup.getDefault().replace(DbSupport.class, new DbSupportBase(dbConnection) {});
+      Globals.setOption(DbSupport.class, new DbSupportBase(dbConnection) {});
     }
 
     // ADD ACTION LISTENERS FOR BUTTONS
@@ -535,7 +533,7 @@ public class MainClass extends JFrame {
 
       if (USE_IN_MEMORY_DATABASE) {
         result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME
-                                             + defLookup(H2Trace.class).getTraceUrlFlags());
+                  + Globals.getOption(H2Trace.class).getTraceUrlFlags());
         logger.log(INFO, "Established connection to in-memory database.");
       } else {
         // ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
@@ -818,34 +816,34 @@ public class MainClass extends JFrame {
     // TODO: specify don't load images
     String usage = """
 
-            Run the SwingSet demo. With no options/args use the self contained
-            in memory database.
-            
-            CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
-            
-                -h             help
-                -v             verbose; output initialization sql as executed
-                -d             dump/create sql scripts in local directory, exit
-                -n             do NOT initialize database, just run demo
-                -i             do NOT load images
-                -p fname       properties file for jdbc database connection
-                               'DB_URL', 'DB_DRIVER_CLASS' keys required
-                -s sqlScript   sql file to initialize database, multiple OK
-            
-            If specified, dbms-server in {mysql}
-            Internal mysql properties use database swingset_demo_suppliers_and_parts.
-            After the sql files are run, the images are loaded, unless '-i'.
-            Use '-n -p props' to run demo with a previously initialized database.
-            Use '-d' or '-d mysql' to create local files with sql initialization.
-            See swingset-demo/README.txt for more information.
-            
-            Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
-                java -jar ss.jar -d   # dump sql that creates in memory database
-                java -jar ss.jar -d mysql   # dump sql to create mysql database
-                java -cp jdbc_driver:ss.jar dev.visdb.seesaw.demo.MainClass \\
-                    -p db_props -s initializer.sql
-            
-            """;
+        Run the SwingSet demo. With no options/args use the self contained
+        in memory database.
+        
+        CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
+        
+            -h             help
+            -v             verbose; output initialization sql as executed
+            -d             dump/create sql scripts in local directory, exit
+            -n             do NOT initialize database, just run demo
+            -i             do NOT load images
+            -p fname       properties file for jdbc database connection
+                           'DB_URL', 'DB_DRIVER_CLASS' keys required
+            -s sqlScript   sql file to initialize database, multiple OK
+        
+        If specified, dbms-server in {mysql}
+        Internal mysql properties use database swingset_demo_suppliers_and_parts.
+        After the sql files are run, the images are loaded, unless '-i'.
+        Use '-n -p props' to run demo with a previously initialized database.
+        Use '-d' or '-d mysql' to create local files with sql initialization.
+        See swingset-demo/README.txt for more information.
+        
+        Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
+            java -jar ss.jar -d   # dump sql that creates in memory database
+            java -jar ss.jar -d mysql   # dump sql to create mysql database
+            java -cp jdbc_driver:ss.jar dev.visdb.seesaw.demo.MainClass \\
+                -p db_props -s initializer.sql
+        
+        """;
     usage = usage.replace("CMD_NAME", cmdName);
     System.err.println(usage);
     System.exit(1);
@@ -863,24 +861,26 @@ public class MainClass extends JFrame {
     configureJavaUtilLogger();
     Screens.setPrefGraphicsDev("SWINGSET_PREFERRED_SCREEN");
 
-    CentralLookup lkup = CentralLookup.getDefault();
-    lkup.add(new LoadDemoImages());
-    lkup.add(new H2Trace());
+    Globals.setOption(LoadDemoImages.class, new LoadDemoImages(){});
+    Globals.setOption(H2Trace.class, new H2Trace());
 
-    if(Boolean.FALSE) lkup.add(new SsTextField.DebugBaseComponentValidate() {});
+    // To allow force baseValidate() and componentValidate() erros.
+    if(Boolean.FALSE) Globals.setOption(SsTextField.DebugBaseComponentValidate.class,
+                                        new SsTextField.DebugBaseComponentValidate() {});
 
-    if(Boolean.TRUE) lkup.replace(Decorator.DecoratorStyle.class,
-                                   SVUtils.SV_DECORATOR_STYLE);
-    if(Boolean.FALSE) lkup.replace(Decorator.DecoratorStyle.class,
-                                   Decorator.DecoratorStyle.BACKGROUND);
+    if(Boolean.TRUE) Globals.setOption(Decorator.DecoratorStyle.class,
+                                        SVUtils.SV_DECORATOR_STYLE);
+    if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
+                                        Decorator.DecoratorStyle.BACKGROUND);
 
-    //lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+    //Globals.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
     //SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
-    //lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
-    //lkup.add(new SsUtils.DebugRowSetListenerFlag());
+    // fixed in H2 Version 2.3.230 (2024-07-15
+    //Globals.setOption(H2Workaround.class, new H2Workaround());
+    //Globals.setOption(new SsUtils.DebugRowSetListenerFlag());
 
-    // Enable this to force CachedRowSet conflict
-    //lkup.add(new ForceConflict(1));
+    // For debug, enable this to force CachedRowSet conflict
+    //Globals.setOption(new ForceConflict(1));
 
     LookupDefaults.init();
 

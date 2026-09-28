@@ -12,7 +12,7 @@ package dev.visdb.seesaw.mock;
 
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 
 /**
  * x
@@ -22,8 +22,7 @@ public class Util {
    * x
    */
   public static void initLookup() {
-    CentralLookup lkup = CentralLookup.getDefault();
-    lkup.replace(DbSupport.class, new DbSupportBase(null));
+    Globals.setOption(DbSupport.class, new DbSupportBase(null));
   }
 
   private Util() {}

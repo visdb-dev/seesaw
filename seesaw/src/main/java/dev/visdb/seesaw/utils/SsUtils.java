@@ -110,7 +110,7 @@ public class SsUtils {
    * @return
    */
   public static JPanel createDecoratorPanel(Component uiPanel) {
-    DecoratorStyle style = CentralLookup.getDefault().lookup(Decorator.DecoratorStyle.class);
+    DecoratorStyle style = Globals.getOption(Decorator.DecoratorStyle.class);
     var decos = Lookups.forPath(DecoratorSupplier.DECORATOR_PATH)
         .lookupAll(DecoratorSupplier.class);
     DecoratorSupplier decoratorSupplier = null;
@@ -127,7 +127,9 @@ public class SsUtils {
 
   /**
    * This HACK is used to adjust the decorator label to avoid layout wiggles
-   * for some {@literal Look&Feel}. Put one of these in Central lookup as needed.
+   * for some {@literal Look&Feel}. Put one of these in {@link Globals} as needed.
+   * If the chosen decorator infrastructure does not need wiggle room, then
+   * this has no effect.
    */
   public static class DecoratorPanelAdjustSOUTH {
     /** The adjustment */
@@ -156,7 +158,7 @@ public class SsUtils {
   /**
    * Convenience method for searching above {@code comp} in the
    * component hierarchy and returns the first JComponent, must be a JPanel,
-   * that has * ClientProperty {@code Decorator.SEE_SAW_PANEL_KEY}.
+   * that has ClientProperty {@code Decorator.SEE_SAW_PANEL_KEY}.
    * Returns {@code null} if not found.
    *
    * @param comp the component
@@ -282,11 +284,14 @@ public class SsUtils {
    */
   public static DbSupport dbSupport() {
     if (dbSupport == null) {
-      dbSupportResult = CentralLookup.getDefault().lookupResult(DbSupport.class);
+      dbSupportResult = Globals.lookupResult(DbSupport.class);
       dbSupportResult.addLookupListener((LookupEvent le) -> {
-        dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
+        // NOTE: there are two events, one for remove, one for add.
+        var option = Globals.getOption(dbSupportResult);
+        if( option != null)
+          dbSupport = option;
       });
-      dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
+      dbSupport = Globals.getOption(DbSupport.class);
       if (dbSupport == null)
         throw new IllegalStateException("SsDBSupport not found");
     }

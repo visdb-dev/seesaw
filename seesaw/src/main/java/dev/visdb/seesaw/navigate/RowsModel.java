@@ -46,7 +46,7 @@ import dev.visdb.seesaw.navigate.RowsEvent.OperatorKind;
 import dev.visdb.seesaw.navigate.RowsEvent.RowSetEventType;
 import dev.visdb.seesaw.navigate.RowsModelEventHandling.RowsEventSource;
 import dev.visdb.seesaw.navigate.RowsModelEventHandling.SimpleEvents;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.LookupDefaults;
 import dev.visdb.seesaw.utils.SsComponent;
@@ -145,7 +145,7 @@ public final class RowsModel {
   public static DbOps findDbOps(RowSet rs, RowsModel rowsModel) {
     DbOps dbOps = null;
     // creator may check by DB/TBL/whatever
-    DbOpsCreator creator = CentralLookup.defLookup(DbOpsCreator.class);
+    DbOpsCreator creator = Globals.getOption(DbOpsCreator.class);
     if (creator != null)
       dbOps = creator.create(rs, rowsModel);
 
@@ -186,6 +186,7 @@ public final class RowsModel {
    * @param rs
    */
   // TODO: handle null RowSet; important, consider empty DataNavigator, build UI first.
+  @SuppressWarnings("LeakingThisInConstructor")
   private RowsModel(RowSet rs, DbOps dbOps) {
     Objects.requireNonNull(dbOps);
     // TODO: get rid of junit test after tests are fully RowsModel ported.

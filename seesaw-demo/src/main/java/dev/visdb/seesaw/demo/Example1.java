@@ -52,7 +52,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.function.Function;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
@@ -65,7 +64,7 @@ import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
@@ -117,7 +116,7 @@ public class Example1 extends JFrame {
     // After the first time, change modified color to BLUE
     switch (newBorderSet) {
       case 0 -> {
-        CentralLookup.getDefault().replace(BorderDecorator.BorderDecoratorPaint.class,
+        Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
           new BorderDecorator.BorderDecoratorPaint() {
             @Override
             public Color getBorderColor(ComponentState state) {
@@ -131,13 +130,11 @@ public class Example1 extends JFrame {
           });
       }
       case 1 -> {
-        // Should keep the previous
-        CentralLookup def = CentralLookup.getDefault();
-        def.lookupAll(BorderDecorator.BorderDecoratorPaint.class).forEach(p -> def.remove(p));
+        // Used to set to null: "Should keep the previous"
       }
       case 2 -> {
-        CentralLookup.getDefault().replace(BorderDecorator.BorderDecoratorPaint.class,
-                                           new BorderDecorator.BorderDecoratorPaint());
+        Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
+                          new BorderDecorator.BorderDecoratorPaint());
       }
     }
     newBorderSet++;

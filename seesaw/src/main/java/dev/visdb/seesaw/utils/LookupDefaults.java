@@ -74,15 +74,14 @@ public class LookupDefaults {
 
     initStyles();
 
-    CentralLookup lkup = CentralLookup.getDefault();
-
     // Make sure there's a default DecoratorStyle.
-    if (lkup.lookup(Decorator.DecoratorStyle.class) == null)
-      lkup.add(Decorator.DecoratorStyle.BORDER);
+    if (Globals.getOption(Decorator.DecoratorStyle.class) == null)
+      Globals.setOption(Decorator.DecoratorStyle.class, Decorator.DecoratorStyle.BORDER);
 
     // There should be a BorderDecoratorPaint.
-    if (lkup.lookup(BorderDecorator.BorderDecoratorPaint.class) == null)
-      lkup.add(new BorderDecorator.BorderDecoratorPaint());
+    if (Globals.getOption(BorderDecorator.BorderDecoratorPaint.class) == null)
+      Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
+                     new BorderDecorator.BorderDecoratorPaint());
 
     // BORDER and BACKGROUND decorators are available by path.
 
@@ -97,10 +96,10 @@ public class LookupDefaults {
     // TODO: could include style, allow multiple, then spin through
     //       looking for an adjustment that matches our style.
     //       But, for now, there's only SV that cares about this.
-    if (lkup.lookup(DecoratorPanelAdjustSOUTH.class) == null) {
-      lkup.add(new DecoratorPanelAdjustSOUTH(new Dimension(0, 1)));
+    if (Globals.getOption(DecoratorPanelAdjustSOUTH.class) == null) {
+      Globals.setOption(DecoratorPanelAdjustSOUTH.class,
+                        new DecoratorPanelAdjustSOUTH(new Dimension(0, 1)));
     }
-
 
     initialized = true;
   }

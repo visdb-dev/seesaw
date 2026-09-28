@@ -10,13 +10,11 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
- * Historical. This doesn't do anything.
- * should be called at the end of subclass' decorate().
+ * Base class for a {@link Decorator}.
  */
 public abstract class BaseDecorator extends BaseAnyDecorator implements Decorator {
 

@@ -57,7 +57,7 @@ public class RowsModelTest {
   public static void setUpClass() throws ClassNotFoundException, SQLException {
     isJunit(); // Make sure it's set; when using invokeLater, can be missed.
     TestLogging.load();
-    DbSupportFactory.addDbSupportToLookup(H2.getCon());
+    DbSupportFactory.setDbSupportGlobalOption(H2.getCon());
   }
 
   /** x */
