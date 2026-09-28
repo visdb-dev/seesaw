@@ -19,7 +19,7 @@ import java.util.Collection;
 import org.openide.util.lookup.Lookups;
 
 import dev.visdb.seesaw.datasources.DbSupport;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsUtils;
 
@@ -47,10 +47,10 @@ public class DbSupportFactory {
    * @param sharedConnection
    * @return an DbSupport instance that is put into CentralLookup or null.
    */
-  public static DbSupport addDbSupportToLookup(Connection sharedConnection) {
+  public static DbSupport setDbSupportGlobalOption(Connection sharedConnection) {
     DbSupport dbSupport = createDbSupport(sharedConnection);
     if (dbSupport != null)
-      CentralLookup.getDefault().replace(DbSupport.class, dbSupport);
+      Globals.setOption(DbSupport.class, dbSupport);
     return dbSupport;
   }
 

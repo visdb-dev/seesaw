@@ -416,7 +416,8 @@ final class SsCommon {
     // From RowSetOps.updateColumn*
     @WeakSubscribe
     public void handleColumnChangeDone(ColumnChangeDoneEvent ev) {
-      // Looking for same RowSet, same Column, different component
+      // Looking for same RowSet, same Column, different component.
+      // Mirror the SsComponent that the user changed.
       if (ev.matches(getRowSet()) && ev.getColumnIndex() == getColumnIndex()
           && ev.getSource() != getSsComponent()) {
         try {
@@ -1360,8 +1361,7 @@ final class SsCommon {
 
   /** Use lookup to find the default decorator */
   static Decorator createDefaultDecorator() {
-    CentralLookup lkup = CentralLookup.getDefault();
-    Decorator.DecoratorStyle decoratorStyle = lkup.lookup(Decorator.DecoratorStyle.class);
+    Decorator.DecoratorStyle decoratorStyle = Globals.getOption(Decorator.DecoratorStyle.class);
     if (decoratorStyle == null) {
       logger.log(Level.ERROR, "Lookup of default DecoratorStyle returns null");
       decoratorStyle = Decorator.DecoratorStyle.BORDER;

@@ -73,7 +73,8 @@ public abstract class DecoratorSupplierBase implements DecoratorSupplier {
     return style;
   }
 
-  /** style */
+  /**
+   * @return style */
   @Override
   public String toString() {
     return getDecoratorStyle().toString();

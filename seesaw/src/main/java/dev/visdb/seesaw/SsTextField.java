@@ -50,7 +50,7 @@ import java.util.EventListener;
 import javax.swing.JTextField;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsTextSupport;
@@ -103,7 +103,7 @@ public class SsTextField extends JTextField implements SsComponent {
     finishSsCommon();
     if (rowsModel != null)
       rowsModel.bind(this, columnName);
-    debug = CentralLookup.defLookup(DebugBaseComponentValidate.class) != null;
+    debug = Globals.getOption(DebugBaseComponentValidate.class) != null;
   }
 
   // For DEBUG only.

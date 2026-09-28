@@ -34,11 +34,14 @@ import static java.sql.JDBCType.DATE;
  * Date picker that gets it's value from a database column and sends
  * date changes back to the database. Undo/redo and more is supported,
  * see {@link SsComponent}.
- * The datapicker is based on
+ * The datepicker is based on
  * <a href="https://github.com/LGoodDatePicker/LGoodDatePicker">LGoodDatePicker</a>.
  * <p>
- * It is an example of building a component that inter-operates with SS but is not
- * part of the SS library.
+ * This class is an example of building a component from a 3rd party library that
+ * inter-operates with SeeSaw but is not part of the SeeSaw library.
+ * <p>
+ * <img src="doc-files/datepicker.png" alt="Date Picker image"
+ * style="display: inline-block; margin-left: 40px;">
  */
 @SuppressWarnings("serial")
 public class SsLGoodDatePicker extends DatePicker implements SsComponent {
