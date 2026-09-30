@@ -44,6 +44,7 @@ package dev.visdb.seesaw.contrib.simplevalidation;
 
 
 import org.netbeans.validation.api.Problem;
+import org.netbeans.validation.api.ui.ValidationListener;
 
 import dev.visdb.seesaw.decorators.BaseDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
@@ -53,16 +54,16 @@ import dev.visdb.seesaw.decorators.Decorator;
  * <a href="https://github.com/timboudreau/simplevalidation">Simple Validation</a>
  * framework.
  */
-public class SimpleValidationDecorator extends BaseDecorator {
+public class SVDecorator extends BaseDecorator {
 
-  private final JTextComponentValidationOnDemand valItem;
+  private final ValidationListener<?> valItem;
 
   /**
-   * Create SimpleValidationDecorator which uses JTextComponentValidationOnDemand
+   * Create SimpleValidationDecorator which uses any ValidationListener
    * for decoration/validation.
    * @param valItem
    */
-  public SimpleValidationDecorator(JTextComponentValidationOnDemand valItem) {
+  public SVDecorator(TextValidationOnDemand valItem) {
     this.valItem = valItem;
   }
 
@@ -72,7 +73,6 @@ public class SimpleValidationDecorator extends BaseDecorator {
    */
   @Override
   public boolean decorate() {
-    valItem.verifyComponent(getSsComponent());
     Problem problem = valItem.performValidation();
     return problem == null || !problem.isFatal();
   }

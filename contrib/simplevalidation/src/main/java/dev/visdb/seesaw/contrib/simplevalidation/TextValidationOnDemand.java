@@ -35,7 +35,7 @@ import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 //      validation/api/ui/JTextComponentValidationListenerImpl.java
 // TODO: Make this independent of Document, just use a string?
 //		 Set the string on every change to text, after change needs validation?
-public class JTextComponentValidationOnDemand extends ValidationListener<JTextComponent> {
+public class TextValidationOnDemand extends ValidationListener<JTextComponent> {
   private final Validator<Document> validator;
 
   /**
@@ -44,7 +44,7 @@ public class JTextComponentValidationOnDemand extends ValidationListener<JTextCo
    * @param validationUI
    * @param validator 
    */
-  public JTextComponentValidationOnDemand(JTextComponent component, ValidationUI validationUI,
+  public TextValidationOnDemand(JTextComponent component, ValidationUI validationUI,
                                      Validator<Document> validator) {
     super(JTextComponent.class, validationUI, component);
     this.validator = validator;

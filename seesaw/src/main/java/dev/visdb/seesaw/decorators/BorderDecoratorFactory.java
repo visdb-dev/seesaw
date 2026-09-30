@@ -16,12 +16,13 @@ import org.openide.util.lookup.ServiceProvider;
 import dev.visdb.seesaw.decorators.Decorator.DecoratorStyle;
 
 /**
- *
+ * Create BorderDecorator related objects.
  */
-@ServiceProvider(path = DecoratorSupplier.DECORATOR_PATH, service = DecoratorSupplier.class)
-public class BackgroundDecoratorSupplier extends DecoratorSupplierBase {
-    public BackgroundDecoratorSupplier() {
-        super(() -> new BackgroundDecorator(), DecoratorStyle.BACKGROUND);
+@ServiceProvider(path = DecoratorFactory.DECORATOR_PATH,
+    service = DecoratorFactory.class)
+public class BorderDecoratorFactory extends DecoratorFactoryBase {
+    /** Create the factory. */
+    public BorderDecoratorFactory() {
+        super(() -> new BorderDecorator(), DecoratorStyle.BORDER);
     }
 }
-// vi: sw=2 ts=8

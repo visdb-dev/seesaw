@@ -74,14 +74,12 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
 import org.openide.util.lookup.Lookups;
 
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.Decorator.DecoratorStyle;
-import dev.visdb.seesaw.decorators.DecoratorSupplier;
+import dev.visdb.seesaw.decorators.DecoratorFactory;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -91,6 +89,7 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
  */
 public class SsUtils {
   private SsUtils() {}
+  private static final Logger logger = JStuff.getLogger();
 
   /**
    * Temporary for hiding SsCommon; used from SsDBComboBox.
@@ -110,19 +109,34 @@ public class SsUtils {
    * @return
    */
   public static JPanel createDecoratorPanel(Component uiPanel) {
+    return findDecoratorFactory().createDecoratorPanel(uiPanel);
+  }
+
+  /**
+   * Find the decorator factory for the current decorator style.
+   * @return current decorator factory
+   */
+  public static DecoratorFactory findDecoratorFactory() {
+    DecoratorFactory decoratorFactory = null;
     DecoratorStyle style = Globals.getOption(Decorator.DecoratorStyle.class);
-    var decos = Lookups.forPath(DecoratorSupplier.DECORATOR_PATH)
-        .lookupAll(DecoratorSupplier.class);
-    DecoratorSupplier decoratorSupplier = null;
+    if (style == null) {
+      logger.log(Level.ERROR, "No current style option specified ");
+      throw new IllegalStateException("No current style option specified ");
+    }
+    var decos = Lookups.forPath(DecoratorFactory.DECORATOR_PATH)
+        .lookupAll(DecoratorFactory.class);
     for (var deco : decos) {
       if (deco.getDecoratorStyle() == style) {
-        decoratorSupplier = deco;
+        decoratorFactory = deco;
         break;
       }
     }
-    if (decoratorSupplier == null)
-      throw new IllegalStateException(sf("Decorator supplier not found for '%s'", style));
-    return decoratorSupplier.createDecoratorPanel(uiPanel);
+    if (decoratorFactory == null) {
+      String msg = sf("Decorator supplier not found for '%s'", style);
+      logger.log(Level.ERROR, msg);
+      throw new IllegalStateException(msg);
+    }
+    return decoratorFactory;
   }
 
   /**
@@ -284,21 +298,16 @@ public class SsUtils {
    */
   public static DbSupport dbSupport() {
     if (dbSupport == null) {
-      dbSupportResult = Globals.lookupResult(DbSupport.class);
-      dbSupportResult.addLookupListener((LookupEvent le) -> {
-        // NOTE: there are two events, one for remove, one for add.
-        var option = Globals.getOption(dbSupportResult);
-        if( option != null)
-          dbSupport = option;
-      });
-      dbSupport = Globals.getOption(DbSupport.class);
+      Globals.notifyOptionChange(DbSupport.class, (optionValue -> {
+        if (optionValue != null) // typically two events, one for remove, one for add.
+          dbSupport = optionValue;
+      }));
       if (dbSupport == null)
         throw new IllegalStateException("SsDBSupport not found");
     }
     return dbSupport;
   }
   private static DbSupport dbSupport;
-  private static Lookup.Result<DbSupport> dbSupportResult;
 
   /**
    * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's

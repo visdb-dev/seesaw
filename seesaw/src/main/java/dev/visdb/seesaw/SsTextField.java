@@ -62,6 +62,10 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * SsTextField extends the JTextField.
+ * Add application validity checks with
+ * {@link SsComponent#setTextValidationCondition(java.util.function.Function,
+ * java.util.function.Supplier)
+ * SsComponent.setTextValidationCondition(Function, Supplier)}.
  */
 @SuppressWarnings("serial")
 public class SsTextField extends JTextField implements SsComponent {
@@ -129,8 +133,8 @@ public class SsTextField extends JTextField implements SsComponent {
   public boolean componentValidate() {
     if (debug) {
       if (validationMsg(Validation.COMPONENT).equals(Validation.COMPONENT.toString()+" failed"))
-        setValidationMsg(Validation.COMPONENT,
-                       () -> sf("Component validation of '%s' failed", getColumnName()));
+        setValidationMsg(Validation.COMPONENT, (ssComp) -> sf(
+            "Component validation of '%s' failed", ssComp.getColumnName()));
       String text = getText();
       return text == null || !text.endsWith("ZZ");
     }

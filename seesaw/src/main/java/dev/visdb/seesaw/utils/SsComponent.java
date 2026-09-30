@@ -49,6 +49,7 @@ import java.sql.SQLException;
 import java.util.EventListener;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.sql.RowSet;
@@ -64,7 +65,6 @@ import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.TextDecorator;
-import dev.visdb.seesaw.decorators.Validator;
 import dev.visdb.seesaw.formatting.SsFormat;
 import dev.visdb.seesaw.formatting.SsFormattedTextField;
 import dev.visdb.seesaw.navigate.ColumnChangeStartEvent;
@@ -118,24 +118,25 @@ import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
  * {@link #getColumnJDBCType() }.
  * <p>
  * There are multiple levels of validation.
- * The validators are executed in the
+ * Validation is executed in the
  * following order, see {@link allValidate};
  * if there's an error, validation stops, and see {@link ValidationResult}.
  * <ol>
- * <li>{@code baseValidate()} - method, defaults true<br>
+ * <li>{@code baseValidate()} - SsComponent method, defaults true<br>
  * This checks that the SsComponent's value is more or less correct.
  * For example a mask formatter's valid indicator,
  * {@link javax.swing.JFormattedTextField#isEditValid};
- * or a {@link dev.visdb.seesaw.SsTextField} subclass could check that there's only characters.
- * <li>{@code componentValidate()} - method default true<br>
- * A subclass of something that does baseValidate, can use this for more
+ * or a {@link dev.visdb.seesaw.SsTextField} subclass could check that there's
+ * only alpha characters.
+ * <li>{@code componentValidate()} - SsComponent method default true<br>
+ * Typically a subclass of something that does baseValidate, can use this for more
  * specific validation.
- * <li>optionally check rowsModel.hasError(SsComponent)
- * <li>{@code pluginValidate} - Application specific validation, per component instance.
+ * <li>check rowsModel.hasError(SsComponent)
+ * <li>instance validation - Application specific validation, per component instance,
+ * specified by {@link #setValidationCondition} or {@link #setTextValidationCondition}.
  * <br>
- * Set at run time with {@link #setPluginValidator(Validator)}.
  * For example check for specific values; or other columns or ...
- * Can apply constraints while editing and avoid errors at commit.
+ * Can check constraints while editing and avoid errors at commit.
  * </ol>
  * <p>
  * There are {@link Decorator}s that visually indicate the components state.
@@ -875,7 +876,7 @@ in the SsComponent's constructor, but before bind.
   /**
    * There are levels of validation; they execute in order.
    * BASE and COMPONENT are specified through overriding.
-   * COLUMN database related error. PLUGIN may be set per
+   * COLUMN database related error. INSTANCE may be set per
    * instantiated component.
    */
   public enum Validation {
@@ -886,7 +887,7 @@ in the SsComponent's constructor, but before bind.
     /** */
     COLUMN("ColumnValidate"),
     /** */
-    PLUGIN("PluginValidate");
+    INSTANCE("InstanceValidate");
 
     final String toString;
 
@@ -905,26 +906,50 @@ in the SsComponent's constructor, but before bind.
    * @return
    */
   default String validationMsg(Validation validation) {
-    Supplier<String> msg = getSsCommon().validationErrorMsg.get(validation);
-    return msg != null ? msg.get() : (validation.toString() + " failed");
+    Function<SsComponent, String> msg = getSsCommon().validationErrorMsg.get(validation);
+    return msg != null ? msg.apply(this) : (validation.toString() + " failed");
   }
 
   /** set an error message for the specified validation.
    * @param validation
    * @param msg
    */
-  default void setValidationMsg(Validation validation, Supplier<String> msg) {
+  default void setValidationMsg(Validation validation, Function<SsComponent, String> msg) {
     getSsCommon().validationErrorMsg.put(validation, msg);
   }
 
   /**
-   * Install the specified pluginValidator into this component.
-   * Each instance can have a unique validator.
-   * This is run after all the other validations succeed.
-   * @param pluginValidator validator to install
+   * Convenience method that first wraps
+   * {@code Function<String, Boolean> validCondition} in a
+   * {@code Function<SsComponent, Boolean>} and then calls
+   * {@link #setValidationCondition(Function, Supplier) }.
+   * @param validCondition
+   * @param validationMsg
    */
-  default void setPluginValidator(Validator pluginValidator) {
-    getSsCommon().setPluginValidator(pluginValidator);
+  default void setTextValidationCondition(Function<String, Boolean> validCondition,
+                                          Function<SsComponent, String> validationMsg) {
+    getSsCommon().setValidationCondition(
+        ssComp -> validCondition.apply(((JTextComponent)ssComp).getText()),
+        validationMsg);
+  }
+
+  /**
+   * Use {@code validCondition} to validate the instance after the other
+   * validation steps.
+   * @param validCondition
+   * @param validationMsg
+   */
+  default void setValidationCondition(Function<SsComponent, Boolean> validCondition,
+                                      Function<SsComponent, String> validationMsg) {
+    getSsCommon().setValidationCondition(validCondition, validationMsg);
+  }
+
+  /**
+   * The final validation, aka instanceValidation.
+   * @return 
+   */
+  default Function<SsComponent, Boolean> getValidationCondition() {
+    return getSsCommon().getValidationCondition();
   }
 
   /**
@@ -933,8 +958,7 @@ in the SsComponent's constructor, but before bind.
    * For example, a mask formatter indicates valid; generally simple
    * constraints that are context independent; e.g. {@literal month <= 12}.
    * There may be additional checks defined by {@link #componentValidate() }
-   * and/or a {@link Validator}, see
-   * {@link #setPluginValidator(Validator) }; those are checked after baseValidate.
+   * and/or a {@link #setValidationCondition(java.util.function.Function, java.util.function.Supplier) }.
    * The default implementation returns true.
    *
    * @return false for error in data, otherwise true
@@ -959,9 +983,9 @@ in the SsComponent's constructor, but before bind.
    * @param comp result of base and componentValidate()
    * @param other false if this component is the target of an error event,
    * see {@link RowsModel#hasError(SsComponent) }
-   * @param plugin result of pluginValidate
+   * @param instance result of instanceValidate
    */
-  record ValidationResult(boolean base, boolean comp, boolean other, boolean plugin) {
+  record ValidationResult(boolean base, boolean comp, boolean other, boolean instance) {
     /**
      * The first validation that failed.
      */
@@ -970,7 +994,7 @@ in the SsComponent's constructor, but before bind.
       if (!base) fail = Validation.BASE;
       else if (!comp) fail = Validation.COMPONENT;
       else if (!other) fail = Validation.COLUMN;
-      else if (!plugin) fail = Validation.PLUGIN;
+      else if (!instance) fail = Validation.INSTANCE;
       return Optional.ofNullable(fail);
     }
     public boolean result(Validation which) {
@@ -978,19 +1002,18 @@ in the SsComponent's constructor, but before bind.
         case BASE -> base;
         case COMPONENT -> comp;
         case COLUMN -> other;
-        case PLUGIN -> plugin;
+        case INSTANCE -> instance;
       };
     }
     /** @return true if everything validated */
     public boolean all() {
-      return plugin;
+      return instance;
     }
   }
 
   /**
    * Run the validators: baseValidate, componentValidate,
-   * possibly check RowsModel.hasError(),
-   * pluginValidate.
+   * check RowsModel.hasError(), instanceValidate.
    * The checks are done in order, they stop with any failure.
    * @return result
    */
@@ -1003,9 +1026,9 @@ in the SsComponent's constructor, but before bind.
       if (rowsModel != null && rowsModel.getRowSet() != null)
         otherValid = !rowsModel.hasError(this);
     }
-    boolean pluginValid = otherValid && getSsCommon().pluginValidate();
+    boolean instanceValid = otherValid && getValidationCondition().apply(this);
 
-    return new ValidationResult(baseValid, compValid, otherValid, pluginValid);
+    return new ValidationResult(baseValid, compValid, otherValid, instanceValid);
   }
 
   /**

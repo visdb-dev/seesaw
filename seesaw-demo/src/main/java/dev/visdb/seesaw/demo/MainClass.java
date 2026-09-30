@@ -868,7 +868,7 @@ public class MainClass extends JFrame {
     if(Boolean.FALSE) Globals.setOption(SsTextField.DebugBaseComponentValidate.class,
                                         new SsTextField.DebugBaseComponentValidate() {});
 
-    if(Boolean.TRUE) Globals.setOption(Decorator.DecoratorStyle.class,
+    if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
                                         SVUtils.SV_DECORATOR_STYLE);
     if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
                                         Decorator.DecoratorStyle.BACKGROUND);

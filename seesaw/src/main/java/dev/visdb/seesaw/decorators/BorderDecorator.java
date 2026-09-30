@@ -49,9 +49,6 @@ import javax.swing.JComponent;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
-import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
@@ -79,8 +76,6 @@ public class BorderDecorator extends FocusDecorator {
 
   // ???: allow each border instance to have it's own painter
   private static BorderDecoratorPaint bdp;
-  // Keep Lookup.Result to allow dynamic changes.
-  private static Lookup.Result<BorderDecoratorPaint> bdpResult;
 
   /**
    * Listens to lookup for the value.
@@ -88,14 +83,10 @@ public class BorderDecorator extends FocusDecorator {
    */
   protected static BorderDecoratorPaint getBorderDecoratorPaint() {
     if (bdp == null) {
-      bdpResult = Globals.lookupResult(BorderDecoratorPaint.class);
-      bdpResult.addLookupListener((LookupEvent le) -> {
-        // NOTE: there are two events, one for remove, one for add.
-        var option = Globals.getOption(bdpResult);
-        if(option != null)
-          bdp = option;
-      });
-      bdp = Globals.getOption(BorderDecoratorPaint.class);
+      Globals.notifyOptionChange(BorderDecoratorPaint.class, (optionValue -> {
+        if (optionValue != null) // typically two events, one for remove, one for add.
+          bdp = optionValue;
+      }));
       if (bdp == null)
         throw new IllegalStateException("BorderDecoratorPaint not found");
     }

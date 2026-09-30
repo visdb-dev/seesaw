@@ -17,9 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 // @start region=validation_example_import
-
-import org.netbeans.validation.api.ui.ValidationItem;
-
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 // @end region=validation_example_import
 import dev.visdb.seesaw.SsTextField;
@@ -31,24 +28,24 @@ public class SimpleValidation {
     SsTextField txtSupplierName = new SsTextField();
     SsTextField txtSupplierCity = new SsTextField();
 
-    ValidationItem decoSupplierName = SVUtils.setDecoratorValidator(
-        txtSupplierName, "Supplier Name",
+    // Set some validation criteria; note it's independent of validation style.
+    txtSupplierName.setTextValidationCondition(
         (str) -> str == null || !str.matches("(?i).*oops.{0,2}$"),
-        () -> "Supplier name can not end with 'oops..'");
-
-    ValidationItem decoSupplierCity = SVUtils.setDecoratorValidator(
-        txtSupplierCity, "Supplier City",
+        (ssComp) -> "Supplier name can not end with 'oops..'");
+    txtSupplierCity.setTextValidationCondition(
         (str) -> str == null || !str.matches(".*X"),
-        () -> "City can not end in 'X'");
+        (ssComp) -> "City can not end in 'X'");
 
-    // Put our components in a JPanel as usual
+    // Put our components in a JPanel and build the UI as usual.
     final Container uiPanel = new JPanel();
     uiPanel.add(txtSupplierName);
     uiPanel.add(txtSupplierCity);
     
-    // Wrap the uiPanel in a ValidationPanel.
-    JPanel validationPanel = SVUtils.createDecoratorPanel(
-        uiPanel, decoSupplierName, decoSupplierCity);
+    // Wrap the uiPanel in a ValidationPanel,
+    // and add ValidationItems to the ValidationPanel's ValidationGroup.
+    JPanel validationPanel = SVUtils.createDecoratorPanel(uiPanel,
+        SVUtils.setTextDecorator(txtSupplierName, "Supplier Name"),
+        SVUtils.setTextDecorator(txtSupplierCity, "Supplier City"));
     
     // Put the ValidiationPanel in the frame's contentPane.
     frame.setContentPane(validationPanel);

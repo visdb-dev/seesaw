@@ -18,18 +18,18 @@ import java.awt.Container;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 import org.openide.util.lookup.ServiceProvider;
 
-import dev.visdb.seesaw.decorators.DecoratorSupplier;
-import dev.visdb.seesaw.decorators.DecoratorSupplierBase;
+import dev.visdb.seesaw.decorators.DecoratorFactory;
+import dev.visdb.seesaw.decorators.DecoratorFactoryBase;
 
 /**
  * Handles SimpleValidation.
  */
-@ServiceProvider(path = DecoratorSupplier.DECORATOR_PATH, service = DecoratorSupplier.class)
-public class SimpleValidationDecoratorSupplier extends DecoratorSupplierBase {
+@ServiceProvider(path = DecoratorFactory.DECORATOR_PATH, service = DecoratorFactory.class)
+public class SVDecoratorFactory extends DecoratorFactoryBase {
   
-  /** Create SV DecoratorSupplierBase */
-  public SimpleValidationDecoratorSupplier() {
-    super(() -> new DefaultValidationDecorator(), SVUtils.SV_DECORATOR_STYLE);
+  /** Create SV DecoratorFactoryBase */
+  public SVDecoratorFactory() {
+    super(() -> new DefaultSVDecorator(), SVUtils.SV_DECORATOR_STYLE);
   }
   
   /**

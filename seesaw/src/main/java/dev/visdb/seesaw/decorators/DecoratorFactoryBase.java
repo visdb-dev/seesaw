@@ -17,10 +17,10 @@ import java.util.function.Supplier;
 import javax.swing.JPanel;
 
 /**
- * Make a DecoratorSupplier out of this.
+ * Make a DecoratorFactory out of this.
  * 
  */
-public abstract class DecoratorSupplierBase implements DecoratorSupplier {
+public abstract class DecoratorFactoryBase implements DecoratorFactory {
   private final Supplier<Decorator> supplier;
   private final Decorator.DecoratorStyle style;
 
@@ -29,7 +29,7 @@ public abstract class DecoratorSupplierBase implements DecoratorSupplier {
    * @param supplier
    * @param style
    */
-  public DecoratorSupplierBase(Supplier<Decorator> supplier, Decorator.DecoratorStyle style) {
+  public DecoratorFactoryBase(Supplier<Decorator> supplier, Decorator.DecoratorStyle style) {
     this.supplier = supplier;
     this.style = style;
   }

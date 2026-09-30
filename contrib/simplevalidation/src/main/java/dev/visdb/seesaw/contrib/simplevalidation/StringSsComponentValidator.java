@@ -44,8 +44,6 @@ package dev.visdb.seesaw.contrib.simplevalidation;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problems;
@@ -57,35 +55,23 @@ import dev.visdb.seesaw.utils.SsComponent.Validation;
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 /**
- * A validator specialized for an SsComponent.
+ * A validator specialized for an SsComponent; uses allValidate().
+ * Deprecated use:
  * It has a validationCondition, like a pluginValidator,
  * and description, that handles a string.
  * It sets the SsComponent's pluginValidator to nullValidator.
  * It does SsComponent.allValidate().
  */
-// TODO: handle condition taken from pluginValidate.
-// TODO: Turn this into an SsComponentValidator.
-//       Should this be Validator<SsComponent>?
-//       Needs converter SsComponent to text or to Document.
 public class StringSsComponentValidator extends AbstractValidator<String> {
-  private final Function<String, Boolean> validationCondition;
-  private final Supplier<String> problemDescription;
   private final SsComponent ssComp;
 
   /**
    * Create a validator that handles a string.
-   * @param validationCondition returns true if string is valid.
-   * @param problemDescription produces error message if validationCondition is false.
    * @param ssComp how weird is it to have this here?
    */
-  public StringSsComponentValidator(Function<String, Boolean> validationCondition,
-				    Supplier<String> problemDescription,
-				    SsComponent ssComp) {
+  public StringSsComponentValidator(SsComponent ssComp) {
     super(String.class);
-    this.validationCondition = Objects.requireNonNull(validationCondition);
-    this.problemDescription = Objects.requireNonNull(problemDescription);
     this.ssComp = Objects.requireNonNull(ssComp);
-    ssComp.setPluginValidator(dev.visdb.seesaw.decorators.Validator.nullValidator);
   }
   
   /**
@@ -105,17 +91,8 @@ public class StringSsComponentValidator extends AbstractValidator<String> {
       problems.append("modified", Severity.INFO);
     
     Optional<Validation> fail = vr.firstFail();
-    if (fail.isPresent()) {
+    if (fail.isPresent())
       problems.append(ssComp.validationMsg(fail.get()));
-    } else {
-      // pluginValidate can't fail since it has a nullValidator.
-      // Check validateCondition here.
-      if (!validationCondition.apply(model)) {
-        problems.append(problemDescription.get());
-        // Need to recreate the ValidationResult marking plugin validate failed.
-        vr = new ValidationResult(true, true, true, false);
-      }
-    }
 
     // This is normally at the end of the SeeSaw decorator.
     ssComp.handleTextDecorator(vr);

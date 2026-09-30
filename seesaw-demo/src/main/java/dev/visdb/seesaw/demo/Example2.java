@@ -47,21 +47,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.netbeans.validation.api.ui.ValidationItem;
-
 import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsDataNavigator;
@@ -128,26 +124,13 @@ public class Example2 extends JFrame {
     // Set screen position
     setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
-    // Set a validator.
-    final boolean USE_SIMPLE_VALIDATION = true;
-    Function<String, Boolean> validateSupplierName = (str) -> {
-      return str == null || !str.matches("(?i).*oops.{0,2}$");
-    };
-    Function<String, Boolean> validateSupplierCity = (str) -> {
-      return str == null || !str.matches(".*X");
-    };
-    ValidationItem decoSupplierName = null;
-    ValidationItem decoSupplierCity = null;
-    if (USE_SIMPLE_VALIDATION) {
-      decoSupplierName = SVUtils.setDecoratorValidator(txtSupplierName, "Supplier Name",
-          validateSupplierName, () -> "Supplier name can not end with 'oops..'");
-      decoSupplierCity = SVUtils.setDecoratorValidator(txtSupplierCity, "Supplier City",
-          validateSupplierCity, () -> "City can not end in 'X'");
-    } else {
-      txtSupplierName.setPluginValidator(TextComponentValidator.create(validateSupplierName));
-      txtSupplierCity.setPluginValidator(
-          TextComponentValidator.create(validateSupplierCity));
-    }
+    // Set some validation criteria.
+    txtSupplierName.setTextValidationCondition(
+        (str) -> str == null || !str.matches("(?i).*oops.{0,2}$"),
+        (ssComp) -> "Supplier name can not end with 'oops..'");
+    txtSupplierCity.setTextValidationCondition(
+        (str) -> str == null || !str.matches(".*X"),
+        null);
 
     // Initialize database connection and components
     try {
@@ -225,8 +208,10 @@ public class Example2 extends JFrame {
 
     // Set up the simple validation panel.
     JPanel decoratorPanel;
-    if (USE_SIMPLE_VALIDATION) {
-      decoratorPanel = SVUtils.createDecoratorPanel(uiPanel, decoSupplierName, decoSupplierCity);
+    if (Boolean.TRUE) { // SIMPLE_VALIDATION
+      decoratorPanel = SVUtils.createDecoratorPanel(uiPanel,
+          SVUtils.setTextDecorator(txtSupplierName, "Supplier Name"),
+          SVUtils.setTextDecorator(txtSupplierCity, "Supplier City"));
     } else {
       decoratorPanel = SsUtils.createDecoratorPanel(uiPanel);
     }

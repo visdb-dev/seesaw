@@ -22,12 +22,12 @@ import dev.visdb.seesaw.utils.SsComponent;
 
 /**
  * This decorator can be attached to any component.
- * The actual validator is created during install
- * and added to the validation group during decorate.
+ * The actual validator is created and added to the
+ * validation group during decorate().
  */
-public class DefaultValidationDecorator extends BaseDecorator {
+public class DefaultSVDecorator extends BaseDecorator {
   /** create Decorator */
-  public DefaultValidationDecorator() {
+  public DefaultSVDecorator() {
   }
   
   private ValidationListener<SsComponent> valItem;
@@ -58,10 +58,14 @@ public class DefaultValidationDecorator extends BaseDecorator {
     return problem == null || !problem.isFatal();
   }
 
+  /**
+   * Create the ValidationItem if needed.
+   * decoratorTarget may be set an anytime;
+   * check if it has changed and recreate if needed.
+   */
   // TODO: Might want DecorationFactory that takes a Supplier<JComponent>
   //       then can avoid this mess.
   private boolean isValItemOK() {
-    // decoratorTarget may be set an anytime; check if it has changed
     JComponent currentDecoratorTarget = getSsComponent().getDecorateTarget();
     boolean newTarget = currentDecoratorTarget != decoratorTarget;
     if (foundValidationPanel && !newTarget)

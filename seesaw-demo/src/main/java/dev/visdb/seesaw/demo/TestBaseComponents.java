@@ -85,7 +85,6 @@ import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
-import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.models.DbCollection;
@@ -467,21 +466,25 @@ public class TestBaseComponents extends JFrame {
     replaceComponent(NAV, cmbSSDBComboNav);
     replaceComponent(DB_COMBO, cmbSSDBComboBox);
 
+    // This is used by a text field for the ComponentStateTextDecorator
+    try {
+      setupOurTextStyles();
+    } catch (IOException ex) {
+      logger.log(Level.ERROR, (String) null, ex);
+    }
     // validators for the text fields
-    Function<String, Boolean> validator = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
+    Function<String, Boolean> validationCondition
+        = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
     if (activeComps.contains(TEXT_FIELD)) {
-      txtSSTextField.setPluginValidator(TextComponentValidator.create(validator));
+      txtSSTextField.setTextValidationCondition(
+          validationCondition, (ssComp) -> "Supplier name can not end with 'oops..'");
     }
     if (activeComps.contains(TEXT_FIELD_B)) {
-      txtSSTextFieldB.setPluginValidator(TextComponentValidator.create(validator));
-      try {
-        setupOurTextStyles();
-      } catch (IOException ex) {
-        logger.log(Level.ERROR, (String) null, ex);
-      }
+      txtSSTextFieldB.setTextValidationCondition(
+          validationCondition, (ssComp) -> "Supplier name can not end with 'oops..'");
       txtSSTextFieldB.setTextDecorator(new ComponentStateTextDecorator(
-          Map.of(ComponentState.ERROR, "testComponents_componentStateError",
-                 ComponentState.MODIFIED, "testComponents_componentStateModified")));
+          Map.of(ComponentState.ERROR, "testComponents_ErrorStyle",
+                 ComponentState.MODIFIED, "testComponents_ModifiedStyle")));
     }
 
     // Bind the components to their database columns.
@@ -574,16 +577,16 @@ public class TestBaseComponents extends JFrame {
    */
   @SuppressWarnings("CallToPrintStackTrace")
   private void setupOurTextStyles() throws IOException {
-    if (TextStyles.getStyle("testComponents_componentStateError") != null)
+    if (TextStyles.getStyle("testComponents_ErrorStyle") != null)
       return;
     StringReader reader = new StringReader("""
         {
-          "testComponents_componentStateError": {
+          "testComponents_ErrorStyle": {
             "fontSize": 14,
             "italic": false,
             "strikethrough": true
           },
-          "testComponents_componentStateModified": {
+          "testComponents_ModifiedStyle": {
             "fontSize": "default",
             "italic": true,
             "strikethrough": false

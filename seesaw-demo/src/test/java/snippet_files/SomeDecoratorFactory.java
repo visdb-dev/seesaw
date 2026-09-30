@@ -13,19 +13,19 @@ package snippet_files;
 
 import org.openide.util.lookup.ServiceProvider;
 
-import dev.visdb.seesaw.decorators.DecoratorSupplier;
-import dev.visdb.seesaw.decorators.DecoratorSupplierBase;
+import dev.visdb.seesaw.decorators.DecoratorFactory;
+import dev.visdb.seesaw.decorators.DecoratorFactoryBase;
 
 /**
  *
  */
 // @start region=decorator_supplier_1
-@ServiceProvider(path = DecoratorSupplier.DECORATOR_PATH,
-    service = DecoratorSupplier.class)
-public class SomeDecoratorSupplier extends DecoratorSupplierBase {
+@ServiceProvider(path = DecoratorFactory.DECORATOR_PATH,
+    service = DecoratorFactory.class)
+public class SomeDecoratorFactory extends DecoratorFactoryBase {
   // ...
   // @end region=decorator_supplier_1
-  public SomeDecoratorSupplier() {
+  public SomeDecoratorFactory() {
     super(null, null);
   }
 }
