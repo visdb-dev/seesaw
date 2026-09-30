@@ -56,7 +56,7 @@ public interface Decorator extends AnyDecorator {
   };
 
   /**
-   * Decorator style primarily used with {@link DecoratorSupplier}.
+   * Decorator style. See {@link DecoratorFactory}.
    */
   public record DecoratorStyle(String style) {
     /** BorderDecorator */

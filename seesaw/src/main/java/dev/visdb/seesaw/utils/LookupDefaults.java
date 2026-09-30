@@ -23,7 +23,7 @@ import org.openide.util.lookup.Lookups;
 
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
-import dev.visdb.seesaw.decorators.DecoratorSupplier;
+import dev.visdb.seesaw.decorators.DecoratorFactory;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
@@ -86,10 +86,10 @@ public class LookupDefaults {
     // BORDER and BACKGROUND decorators are available by path.
 
     // For debug.
-    var decos = Lookups.forPath(DecoratorSupplier.DECORATOR_PATH)
-        .lookupAll(DecoratorSupplier.class);
-    for(DecoratorSupplier deco : decos) {
-      logger.log(Level.INFO, sf("Available DecoratorSupplier: '%s'", deco));
+    var decos = Lookups.forPath(DecoratorFactory.DECORATOR_PATH)
+        .lookupAll(DecoratorFactory.class);
+    for(DecoratorFactory deco : decos) {
+      logger.log(Level.INFO, sf("Available DecoratorFactory: '%s'", deco));
     }
 
     // HACK for SimpleValidation, seems to be an off by one issue

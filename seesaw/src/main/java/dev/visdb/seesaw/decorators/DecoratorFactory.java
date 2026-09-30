@@ -16,14 +16,14 @@ import java.awt.Component;
 import javax.swing.JPanel;
 
 /**
- * Typically extend {@link DecoratorSupplierBase}.
- * {@snippet lang="java" class=SomeDecoratorSupplier region=decorator_supplier_1}
+ * Typically extend {@link DecoratorFactoryBase}.
+ * {@snippet lang="java" class=SomeDecoratorFactory region=decorator_factory_1}
  * <p>
- * If you want to provide your own DecoratorSupplier for a given style
- * then add a position param, less than max int, to the ServerProvider
- * declaration.
+If you want to provide your own DecoratorFactory for a given style
+then add a position param, less than max int, to the ServerProvider
+declaration.
  */
-public interface DecoratorSupplier {
+public interface DecoratorFactory {
   /** these named services go here */
   public static String DECORATOR_PATH = "SS/Decorator";
   /**

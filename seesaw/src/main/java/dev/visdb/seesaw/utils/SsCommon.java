@@ -59,6 +59,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.sql.RowSet;
@@ -70,8 +71,6 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-
-import org.openide.util.lookup.Lookups;
 
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
@@ -89,12 +88,9 @@ import dev.visdb.seesaw.datasources.SqlConversionException;
 import dev.visdb.seesaw.datasources.SqlInternalException;
 import dev.visdb.seesaw.datasources.SqlNullException;
 import dev.visdb.seesaw.datasources.SqlRuntimeException;
-import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
-import dev.visdb.seesaw.decorators.DecoratorSupplier;
 import dev.visdb.seesaw.decorators.TextDecorator;
-import dev.visdb.seesaw.decorators.Validator;
 import dev.visdb.seesaw.formatting.SsFormat;
 import dev.visdb.seesaw.navigate.ColumnChangeDoneEvent;
 import dev.visdb.seesaw.navigate.ColumnChangeStartEvent;
@@ -116,6 +112,7 @@ import static dev.visdb.seesaw.utils.SsUtils.JDBCTypeMismatch;
 import static dev.visdb.seesaw.utils.SsUtils.NullabilityMismatch;
 import static dev.visdb.seesaw.utils.SsUtils.objectID;
 import static java.lang.System.Logger.Level.*;
+
 
 /**
  * Datasource binding data members and methods common to all SwingSet
@@ -157,7 +154,7 @@ final class SsCommon {
     this.ssComponent = ssComponent;
     decorator = Decorator.nullDecorator;
     textDecorator = TextDecorator.nullTextDecorator;
-    pluginValidator = Validator.nullValidator;
+    validCondition = (ssComp) -> true;
     busReceiver = new BusReceiver();
     if (finishInit)
       finishInit();
@@ -279,7 +276,6 @@ final class SsCommon {
   private DbUpdater<RowSet, Integer, SsComponent, Object> columnUpdater;
 
   private Decorator decorator;
-  private Validator pluginValidator;
 
   // For error handling.
   // TODO: handle initialization through a plugin. When retrieving
@@ -1326,28 +1322,20 @@ final class SsCommon {
     this.decorateTarget = decorateTarget;
   }
 
-  /**
-   * Install the given pluginValidator into the component
-   * @param pluginValidator pluginValidator to install
-   */
-  void setPluginValidator(Validator pluginValidator) {
-    this.pluginValidator.uninstall();
-    pluginValidator.install(ssComponent);
-    this.pluginValidator = pluginValidator;
+  private Function<SsComponent, Boolean> validCondition;
+  void setValidationCondition(Function<SsComponent, Boolean> validCondition,
+                              Function<SsComponent, String> validationMsg) {
+    this.validCondition = validCondition;
+    validationErrorMsg.put(Validation.INSTANCE, validationMsg);
   }
 
-  /**
-   * Run the SsComponent's plugin validator, return the result.
-   * First check component specific validator, then plugin validator.
-   *
-   * @return true if successful validation
-   */
-  boolean pluginValidate() {
-    // Invoke the per instance pluginValidator.
-    return pluginValidator.validate();
+  Function<SsComponent, Boolean> getValidationCondition() {
+    return validCondition;
   }
 
-  EnumMap<Validation, Supplier<String>> validationErrorMsg = new EnumMap<>(Validation.class);
+  /** Message for each validation step. */
+  EnumMap<Validation, Function<SsComponent, String>> validationErrorMsg
+      = new EnumMap<>(Validation.class);
 
 
   ///////////////////////////////////////////////////////////////////////////
@@ -1361,20 +1349,7 @@ final class SsCommon {
 
   /** Use lookup to find the default decorator */
   static Decorator createDefaultDecorator() {
-    Decorator.DecoratorStyle decoratorStyle = Globals.getOption(Decorator.DecoratorStyle.class);
-    if (decoratorStyle == null) {
-      logger.log(Level.ERROR, "Lookup of default DecoratorStyle returns null");
-      decoratorStyle = Decorator.DecoratorStyle.BORDER;
-    }
-
-    var decos = Lookups.forPath(DecoratorSupplier.DECORATOR_PATH)
-        .lookupAll(DecoratorSupplier.class);
-    for (var deco : decos) {
-      if (deco.getDecoratorStyle() == decoratorStyle)
-        return deco.get();
-    }
-    logger.log(Level.ERROR, sf("Style '%s' not found in lookup", decoratorStyle));
-    return new BorderDecorator();
+    return SsUtils.findDecoratorFactory().get();
   }
 
   /**

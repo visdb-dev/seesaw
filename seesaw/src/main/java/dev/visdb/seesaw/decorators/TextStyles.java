@@ -870,9 +870,10 @@ public class TextStyles {
 
   /**
    * Load styles in json format.
-   * Performance note: use a buffered reader.
    * If an exception occurs while processing, any changes
    * made up to the exception are backed out.
+   * <p>
+   * <em>Performance note</em>: use a buffered reader.
    *
    * @param reader
    * @param fName for messages, typically a file name

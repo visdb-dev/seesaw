@@ -62,7 +62,6 @@ import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
-import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
@@ -167,11 +166,13 @@ public class Example1 extends JFrame {
     // Set screen position.
     setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
-    // Set some validators.
-    txtSupplierName.setPluginValidator(
-        TextComponentValidator.create((str) -> str == null || !str.matches("(?i).*oops.{0,2}$")));
-    txtSupplierCity.setPluginValidator(
-        TextComponentValidator.create((str) -> str == null || !str.matches(".*X")));
+    // Set some validation criteria.
+    txtSupplierName.setTextValidationCondition(
+        (str) -> str == null || !str.matches("(?i).*oops.{0,2}$"),
+        (ssComp) -> "Supplier name can not end with 'oops..'");
+    txtSupplierCity.setTextValidationCondition(
+        (str) -> str == null || !str.matches(".*X"),
+        (ssComp) -> "City can not end in 'X'");
 
     RowSetButtons rsButtons = new RowSetButtons() {
       @Override
