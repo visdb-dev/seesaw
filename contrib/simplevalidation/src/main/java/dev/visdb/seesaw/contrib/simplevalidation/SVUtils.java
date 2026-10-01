@@ -99,9 +99,9 @@ public class SVUtils {
   }
 
   /**
-   * Create a ValidationItem from the merged {@code validators} that uses the SsComponent's
-   * validationCondition and validaitonMsg;
-   * create a {@link Decorator} using the new ValidationItem; and set the decorator on the SsComponent.
+   * Create a ValidationItem from the merged {@code validators} that uses
+   * {@link SsComponent#allValidate()}; create a {@link Decorator} using
+   * the new ValidationItem; and set the decorator on the SsComponent.
    * The ssComponent must be a {@code JTextComponent}.
    * For more information see
    * {@link #createTextValidationOnDemand(SsComponent, Validator...) },
@@ -110,11 +110,10 @@ public class SVUtils {
    * Note that JTextComponent.getName() is used, dynamically, if {@code name} is null
    * or not otherwise set.
    * <p>
-   * The returned ValidationItem is typically added to a {@link ValidationGroup}.
-   * This can be done manually,
+   * The caller typically adds the returned ValidationItem to a
+   * {@link ValidationGroup}. This can be done manually,
    * but {@link #createDecoratorPanel(Container, ValidationItem...) 
-   * createDecorationPanel(uiPanel, ValidationItem...)}
-   * is convenient.
+   * createDecorationPanel(uiPanel, ValidationItem...)} is convenient.
    * <p>
    * <b> If {@link SsComponent#isComposite() ssComp.isComposite()}
    * is true</b>, then
@@ -133,19 +132,40 @@ public class SVUtils {
                                                 Validator<String>... validators) {
     SwingValidationGroup.setComponentName((JTextComponent)ssComp, name); // type check
     Validator<String>[] newValidatorArray = Arrays.copyOf(validators, validators.length + 1);
-    newValidatorArray[newValidatorArray.length - 1] = new StringSsComponentValidator(ssComp);
-    return setTextDecorator(ssComp, newValidatorArray);
-  }
+    // put the new validator at the end of the array
+    newValidatorArray[newValidatorArray.length - 1] = new SsCompStringValidator(ssComp);
 
-  @SafeVarargs
-  private static ValidationItem setTextDecorator(SsComponent ssComp,
-                                                 Validator<String>... validators) {
-    TextValidationOnDemand textVali = createTextValidationOnDemand(ssComp, validators);
-    SVDecorator deco = new SVDecorator(textVali);
+    TextValidationOnDemand textVali = createTextValidationOnDemand(ssComp, newValidatorArray);
+    // handleTextDecorator() is done in SsCompStringValidator, so false param.
+    SVDecorator deco = new SVDecorator(textVali, false);
     ssComp.setDecorator(deco);
     return textVali;
   }
 
+  /**
+   * This method is simpler but see
+   * {@link #setTextDecorator(SsComponent, String, Validator...) }.
+   * <p>
+   * This method creates a default {@link SVDecorator} (it does not do
+   * handleTextDecorator). It assumes that the param validator
+   * does at least {@snippet lang="java":
+   *   ValidationResult result = getSsComponent().allValidate();
+   *   getSsComponent().handleTextDecorator(result);
+   * }
+   * @param <T> subclass of SsComponent
+   * @param ssComp
+   * @param name
+   * @param validator
+   * @return
+   */
+  public static <T extends SsComponent> ValidationItem setDecorator(T ssComp, String name,
+                                                                    Validator<T> validator) {
+    SwingValidationGroup.setComponentName((JComponent)ssComp, name);
+    var valItem = new SsCompValidationOnDemand<T>(ssComp, decorationFor(ssComp), validator);
+    ssComp.setDecorator(new SVDecorator(valItem));
+    return valItem;
+  }
+  
   /**
    * Find the validation panel containing the component.
    * @param ssComp find an ancestor of this component
@@ -204,6 +224,8 @@ public class SVUtils {
 
   /**
    * Get a SimpleValidation UI for {@link SsComponent#getDecorateTarget() }.
+   * {@link SsComponent#setDecorateTarget(JComponent) }, if used, should
+   * be invoked before {@code decorationFor} is called.
    * @param ssComp
    * @return 
    */

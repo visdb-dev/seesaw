@@ -39,7 +39,7 @@ public class TextValidationOnDemand extends ValidationListener<JTextComponent> {
   private final Validator<Document> validator;
 
   /**
-   * Create ValidationItem for on demand only for the specified component.
+   * Create ValidationItem, used only on demand, for the specified component.
    * @param component
    * @param validationUI
    * @param validator 
@@ -48,21 +48,6 @@ public class TextValidationOnDemand extends ValidationListener<JTextComponent> {
                                      Validator<Document> validator) {
     super(JTextComponent.class, validationUI, component);
     this.validator = validator;
-  }
-
-  /**
-   * Throw an IllegalStateException if component does not match the target.
-   * @param component
-   */
-  public void verifyComponent(Object component) {
-    if (component != getTarget())
-      throw new IllegalStateException("decorating the wrong component");
-  }
-  /**
-   * @return The JTextComponent that this ValidationItem is hooked to.
-   */
-  public JTextComponent getComponent() {
-    return getTarget();
   }
 
   /**

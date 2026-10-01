@@ -70,6 +70,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.netbeans.validation.api.Problems;
+import org.netbeans.validation.api.Validator;
+
 import dev.visdb.seesaw.SsCheckBox;
 import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.SsDbComboBox2;
@@ -80,6 +83,7 @@ import dev.visdb.seesaw.SsSlider;
 import dev.visdb.seesaw.SsTextArea;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker;
+import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
@@ -92,6 +96,7 @@ import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 import dev.visdb.seesaw.utils.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
@@ -354,6 +359,9 @@ public class TestBaseComponents extends JFrame {
     //		// LIST, SLIDER, TEXT_AREA, TEXT_FIELD
     //));
 
+    // activeComps.clear();
+    // activeComps.addAll(EnumSet.of(CHECK, COMBO, DB_COMBO));
+
     activeComps.remove(LIST2);
     //activeComps.remove(TEXT_FIELD_B);
 
@@ -466,6 +474,23 @@ public class TestBaseComponents extends JFrame {
     replaceComponent(NAV, cmbSSDBComboNav);
     replaceComponent(DB_COMBO, cmbSSDBComboBox);
 
+    if (Boolean.TRUE)
+      SVUtils.setDecorator(imgImage, "test_images", new Validator<SsImage>() {
+        @Override
+        public void validate(Problems problems, String compName, SsImage model) {
+          // Should do at least this when using SVUtils.setDecorator(...),
+          // because it creates a default SVDecorator.
+          ValidationResult result = imgImage.allValidate();
+          imgImage.handleTextDecorator(result);
+        }
+        
+        @Override
+        public Class<SsImage> modelType() {
+          return SsImage.class;
+        }
+        
+      });
+    
     // This is used by a text field for the ComponentStateTextDecorator
     try {
       setupOurTextStyles();
@@ -536,7 +561,10 @@ public class TestBaseComponents extends JFrame {
     borderPanel.add(navigator, BorderLayout.SOUTH);
 
     // Put a decorator panel in the frame.
-    setContentPane(SsUtils.createDecoratorPanel(borderPanel));
+    if (Boolean.FALSE)
+      setContentPane(SsUtils.createDecoratorPanel(borderPanel));
+    else
+      setContentPane(SVUtils.createDecoratorPanel(borderPanel));
 
     pack();
 

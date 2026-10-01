@@ -155,9 +155,9 @@ public class BorderDecorator extends FocusDecorator {
     Border b;
     ComponentState borderState = ComponentState.getComponentState(getSsComponent(), valid);
     //debugCheck(borderState);
-    b = getBorder(borderState);
+    b = getBorder(borderState, decoComp());
 
-    decoComp().setBorder(b);
+    decoComp().setBorder(b != null ? b : defaultBorder);
 
     getSsComponent().handleTextDecorator(valid);
 
@@ -168,7 +168,7 @@ public class BorderDecorator extends FocusDecorator {
   @Override
   public void install(SsComponent component) {
     super.install(component);
-    setupDefaultBorder();
+    defaultBorder = setupDefaultBorder(decoComp(), defaultBorder);
   }
 
   /** {@inheritDoc } */
@@ -179,21 +179,22 @@ public class BorderDecorator extends FocusDecorator {
   }
 
   /**
-   * Create a compound border the size of defaultBorder.
+   * Create a compound border the size of target's regular border.
    * Outside is empty, inside is 1 line.
    * @param state
-   * @return
+   * @param decorateTarget
+   * @return border for the state, null if state == CLEAN
    */
-  protected Border getBorder(ComponentState state) {
+  public static Border getBorder(ComponentState state, JComponent decorateTarget) {
     if (state == ComponentState.CLEAN)
-      return defaultBorder;
-    logger.log(DEBUG, () -> String.format("%s %s", state, asString(decoComp().getInsets())));
+      return null;
+    logger.log(DEBUG, () -> String.format("%s %s", state, asString(decorateTarget.getInsets())));
     Border b;
-    if (decoComp().getBorder() instanceof CompoundBorder cb) {
-      b = emptyLine_empty(cb.getOutsideBorder().getBorderInsets(decoComp()),
-                          cb.getInsideBorder().getBorderInsets(decoComp()), state);
+    if (decorateTarget.getBorder() instanceof CompoundBorder cb) {
+      b = emptyLine_empty(cb.getOutsideBorder().getBorderInsets(decorateTarget),
+                          cb.getInsideBorder().getBorderInsets(decorateTarget), state);
     } else {
-      b = empty_line(decoComp().getInsets(), state);
+      b = empty_line(decorateTarget.getInsets(), state);
     }
     return b;
   }
@@ -203,35 +204,30 @@ public class BorderDecorator extends FocusDecorator {
    * components original border.
    * If the component has no border, give it a default border
    * the size of it's insets, but with at least thickness 1.
+   * If the defaultBorder is not null, then return it.
+   * @param target
+   * @param defaultBorder 
+   * @return 
    */
-  protected void setupDefaultBorder() {
-    if (defaultBorder == null) {
-      logger.log(DEBUG, () -> {
-        Border b = decoComp().getBorder();
-        String bi = asString(decoComp().getInsets());
-        String bc = b != null ? b.getClass().getSimpleName() : null;
-        String bs = asString(b, decoComp());
-        return String.format("%s-%s %s %s", decoComp().getClass().getSimpleName(), bc, bi, bs);
-      });
-      Border b = decoComp().getBorder();
-      if (b == null) {
-        b = createDefaultBorder();
-        decoComp().setBorder(b);
-      }
-      defaultBorder = b;
+  public static Border setupDefaultBorder(JComponent target, Border defaultBorder) {
+    if (defaultBorder != null)
+      return defaultBorder;
+    logger.log(DEBUG, () -> {
+      Border b = target.getBorder();
+      String bi = asString(target.getInsets());
+      String bc = b != null ? b.getClass().getSimpleName() : null;
+      String bs = asString(b, target);
+      return String.format("%s-%s %s %s", target.getClass().getSimpleName(), bc, bi, bs);
+    });
+    Border b = target.getBorder();
+    if (b == null) {
+      //b = createDefaultBorder();
+      Insets i = target.getInsets();
+      b = BorderFactory.createEmptyBorder(Math.max(1, i.top), Math.max(1, i.left),
+                                                                Math.max(1, i.bottom), Math.max(1, i.right));
+      target.setBorder(b);
     }
-  }
-
-  /**
-   * This is used to create a border in situations where the component
-   * does not have a border. It returns an empty border
-   * the size of it's insets, but with at least thickness 1.
-   * @return an empty border
-   */
-  protected Border createDefaultBorder() {
-    Insets i = decoComp().getInsets();
-    return BorderFactory.createEmptyBorder(Math.max(1, i.top), Math.max(1, i.left),
-                                           Math.max(1, i.bottom), Math.max(1, i.right));
+    return b;
   }
 
   /**

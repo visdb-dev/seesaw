@@ -68,12 +68,14 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator,
   /** Apply decoration */
   @Override
   public void focusGained(FocusEvent e) {
+    // System.err.printf("*** FocusDecorator focusGained: %s\n", objectID(e.getSource()));
     decorate();
   }
 
   /** Remove decoration */
   @Override
   public void focusLost(FocusEvent e) {
+    // System.err.printf("*** FocusDecorator focusLost: %s\n", objectID(e.getSource()));
     decorate();
   }
 

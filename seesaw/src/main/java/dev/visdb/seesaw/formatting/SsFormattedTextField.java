@@ -99,8 +99,8 @@ import static java.lang.System.Logger.Level.*;
  * Formatter/FormatterFactory (which generally only handles display of values
  * and/or character masks). Add application validity checks with
  * {@link SsComponent#setTextValidationCondition(java.util.function.Function,
- * java.util.function.Supplier)
- * SsComponent.setTextValidationCondition(Function, Supplier)}.
+ * java.util.function.Function)
+ * SsComponent.setTextValidationCondition(Function, Function)}.
  * <br>see {@link FormattedTextFieldVerifier} which locks focus while data is invalid.
  * <br>see {@link SSFormattedTextFieldListener} which may update the database.
  *

@@ -19,12 +19,12 @@ import dev.visdb.seesaw.decorators.DecoratorFactoryBase;
 /**
  *
  */
-// @start region=decorator_supplier_1
+// @start region=decorator_factory_1
 @ServiceProvider(path = DecoratorFactory.DECORATOR_PATH,
     service = DecoratorFactory.class)
 public class SomeDecoratorFactory extends DecoratorFactoryBase {
   // ...
-  // @end region=decorator_supplier_1
+  // @end region=decorator_factory_1
   public SomeDecoratorFactory() {
     super(null, null);
   }

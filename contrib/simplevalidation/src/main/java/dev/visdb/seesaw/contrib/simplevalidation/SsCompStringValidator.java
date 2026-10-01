@@ -62,14 +62,14 @@ import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
  * It sets the SsComponent's pluginValidator to nullValidator.
  * It does SsComponent.allValidate().
  */
-public class StringSsComponentValidator extends AbstractValidator<String> {
+public class SsCompStringValidator extends AbstractValidator<String> {
   private final SsComponent ssComp;
 
   /**
    * Create a validator that handles a string.
    * @param ssComp how weird is it to have this here?
    */
-  public StringSsComponentValidator(SsComponent ssComp) {
+  public SsCompStringValidator(SsComponent ssComp) {
     super(String.class);
     this.ssComp = Objects.requireNonNull(ssComp);
   }

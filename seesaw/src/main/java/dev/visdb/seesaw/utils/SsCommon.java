@@ -66,7 +66,6 @@ import javax.sql.RowSet;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -1304,10 +1303,7 @@ final class SsCommon {
   private JComponent decorateTarget;
 
   Component getFocusTarget() {
-    if (focusTarget != null)
-      return focusTarget;
-    return getSsComponent() instanceof JComboBox<?> jcb ? jcb.getEditor().getEditorComponent()
-                                                        : (Component) getSsComponent();
+    return focusTarget != null ? focusTarget : (Component) getSsComponent();
   }
 
   void setFocusTarget(Component focusTarget) {
@@ -1428,9 +1424,10 @@ final class SsCommon {
   void handleTextDecorator(ValidationResult valid) {
     if (!isTextDecoratorEnabled())
       return;
+    logger.log(DEBUG, () -> sf("column '%s', valid '%s'", getColumnForLog(), valid));
     TextDecorator td = getTextDecorator();
     assert td != null;
-    if (td instanceof ComponentStateTextDecorator std)
+    if (td instanceof ComponentStateTextDecorator std && valid != null)
       std.decorateText(valid);
     else
       td.decorateText();

@@ -29,10 +29,11 @@ import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 /**
  * This class provides an on demand validation item for an SsComponent
- * to satisfy global SV_DECORATOR_STYLE when there is no explicit ValidationItem.
+ * to satisfy global SV_DECORATOR_STYLE when there is no explicit ValidationItem;
+ * validate() is built in.
  */
-class ValidationItemFactory {
-  private ValidationItemFactory() { }
+class NOT_USED_ValidationItemFactory {
+  private NOT_USED_ValidationItemFactory() { }
   
   /**
    * Not really a listener, more like a ValidationItem,
@@ -94,6 +95,7 @@ class ValidationItemFactory {
       ssComp.handleTextDecorator(vr);
     }
   }
+}
 
     // TODO: use try catch IllegalArgumentException "No registered..."
     // and try the "Validating custom components" in original docs.
@@ -141,5 +143,5 @@ class ValidationItemFactory {
   //   }
   //   // TODO: consider model of button[], changelistener, itemlistener
   // }
-}
+
 // vi: sw=2 ts=8
