@@ -98,7 +98,7 @@
     <version.google-guava>33.7.1-jre</version.google-guava>
     <version.util-lookup>1.0.0</version.util-lookup>
     <version.weak-event-bus-receiver>1.0.0</version.weak-event-bus-receiver>
-    <version.jackson>3.2.2</version.jackson>
+    <version.jackson>3.2.3</version.jackson>
     <!--        Demo -->
     <version.log4j>2.26.1</version.log4j>
     <version.h2>2.5.250</version.h2>
@@ -111,7 +111,7 @@
     <version.mockito>5.23.0</version.mockito>
 
     <!-- Plugins -->
-    <version.versions-maven-plugin>2.21.0</version.versions-maven-plugin>
+    <version.versions-maven-plugin>2.22.0</version.versions-maven-plugin>
     <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
     <version.extra-enforcer-rules>1.12.1</version.extra-enforcer-rules>
     <version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
@@ -120,12 +120,12 @@
     <version.maven-surefire-plugin>3.6.0</version.maven-surefire-plugin>
     <version.maven-failsafe-plugin>3.6.0</version.maven-failsafe-plugin>
     <version.maven-jar-plugin>3.5.1</version.maven-jar-plugin>
-    <version.maven-install-plugin>3.1.4</version.maven-install-plugin>
+    <version.maven-install-plugin>3.2.0</version.maven-install-plugin>
     <version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
     <version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
 
     <!-- Publish Plugins -->
-    <version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
+    <version.maven-deploy-plugin>3.2.0</version.maven-deploy-plugin>
     <version.njord>0.9.10</version.njord>
     <njord.publisher>sonatype-central-portal</njord.publisher>
     <njord.releaseUrl>njord:template:release-sca</njord.releaseUrl>

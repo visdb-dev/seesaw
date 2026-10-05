@@ -82,6 +82,7 @@ public class Globals {
   /**
    * Monitor for a change in {@code optionClass}, invoke reportChange when it changes.
    * {@code notifyChange} is invoked during this call reporting the current value.
+   * An exception is thrown if the option is already monitored.
    * @param <T>
    * @param optionClass
    * @param notifyChange

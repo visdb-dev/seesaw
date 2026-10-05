@@ -42,7 +42,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
-import java.awt.Component;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
@@ -54,6 +53,7 @@ import java.util.function.Supplier;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
@@ -298,17 +298,19 @@ public interface SsComponent extends RSC {
   default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException {}
 
   /**
-   * This is overriden to return true by components that are made up of
+   * Override this to return true by components that are made up of
    * other components; and some of those contained components might get
    * the focus. Examples are
    * {@link dev.visdb.seesaw.SsImage} and
    * {@link dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker}.
+   * <p>
+   * This is most meaningful when it comes to determining
+   * if an SsComponent is focused.
    * @return
    */
-  // isComposite component usually has
-  // comp != comp.getFocusTarget() || comp != comp.getDecorateTarget()
   default boolean isComposite() {
-    return false;
+    // textField inside comboBox may get focus.
+    return this instanceof JComboBox;
   }
 
   /**
@@ -834,29 +836,7 @@ in the SsComponent's constructor, but before bind.
    * for use with decorators.
    * But an SsComponent may be grouped with other components, and some
    * other component may be the the focused component.
-   * @return the component that gets focus when this component is active
-   */
-  default Component getFocusTarget() {
-    return getSsCommon().getFocusTarget();
-  }
-
-  /**
-   * Typically an SsComponent is both the decorate component and focus component
-   * for use with decorators.
-   * But an SsComponent may be grouped with other components, and some
-   * other component may be the the focused component.
-   * @param focusTarget
-   */
-  default void setFocusTarget(Component focusTarget) {
-    getSsCommon().setFocusTarget(focusTarget);
-  }
-
-  /**
-   * Typically an SsComponent is both the decorate component and focus component
-   * for use with decorators.
-   * But an SsComponent may be grouped with other components, and some
-   * other component may be the the focused component.
-   * @return the component that is decorate decorated
+   * @return the component to decorate
    */
   default JComponent getDecorateTarget() {
     return getSsCommon().getDecorateTarget();
@@ -922,7 +902,7 @@ in the SsComponent's constructor, but before bind.
    * Convenience method that first wraps
    * {@code Function<String, Boolean> validCondition} in a
    * {@code Function<SsComponent, Boolean>} and then calls
-   * {@link #setValidationCondition(Function, Supplier) }.
+   * {@link #setValidationCondition(Function, Function) }.
    * @param validCondition
    * @param validationMsg
    */
@@ -958,7 +938,8 @@ in the SsComponent's constructor, but before bind.
    * For example, a mask formatter indicates valid; generally simple
    * constraints that are context independent; e.g. {@literal month <= 12}.
    * There may be additional checks defined by {@link #componentValidate() }
-   * and/or a {@link #setValidationCondition(java.util.function.Function, java.util.function.Supplier) }.
+   * and/or a {@link #setValidationCondition(java.util.function.Function,
+   * java.util.function.Function) setValidationCondition(Function, Function) }.
    * The default implementation returns true.
    *
    * @return false for error in data, otherwise true
@@ -1116,11 +1097,14 @@ in the SsComponent's constructor, but before bind.
   }
 
   /**
-   * Run the textDecorator as possible.
-   * @param valid 
+   * Run the textDecorator or ComponentStateTextDecorator as possible.
+   * By default this is is a no-op.
+   * This usually, but not exclusively, does something if SsComponent
+   * is a subclass of JTextComponent.
+   * @param valid may be null
    */
-  default void handleTextDecorator(ValidationResult valid) {
-    getSsCommon().handleTextDecorator(valid);
+  default void decorateText(ValidationResult valid) {
+    getSsCommon().decorateText(valid);
   }
 }
 // vi: sw=2 ts=8

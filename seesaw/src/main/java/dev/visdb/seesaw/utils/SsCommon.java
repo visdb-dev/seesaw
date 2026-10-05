@@ -43,7 +43,6 @@
 package dev.visdb.seesaw.utils;
 
 import java.awt.AWTKeyStroke;
-import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -66,7 +65,6 @@ import javax.sql.RowSet;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -1300,19 +1298,7 @@ final class SsCommon {
   // TODO:	May need a plugin for whether or not to allow decorate().
   //			Incorporate check into Validator? Decorator? ChangeHandler?
 
-  private Component focusTarget;
   private JComponent decorateTarget;
-
-  Component getFocusTarget() {
-    if (focusTarget != null)
-      return focusTarget;
-    return getSsComponent() instanceof JComboBox<?> jcb ? jcb.getEditor().getEditorComponent()
-                                                        : (Component) getSsComponent();
-  }
-
-  void setFocusTarget(Component focusTarget) {
-    this.focusTarget = focusTarget;
-  }
 
   JComponent getDecorateTarget() {
     return decorateTarget != null ? decorateTarget : (JComponent) getSsComponent();
@@ -1425,12 +1411,13 @@ final class SsCommon {
    * Deal with a TextDecorator for this component.
    * @param valid
    */
-  void handleTextDecorator(ValidationResult valid) {
+  void decorateText(ValidationResult valid) {
     if (!isTextDecoratorEnabled())
       return;
+    logger.log(DEBUG, () -> sf("column '%s', valid '%s'", getColumnForLog(), valid));
     TextDecorator td = getTextDecorator();
     assert td != null;
-    if (td instanceof ComponentStateTextDecorator std)
+    if (td instanceof ComponentStateTextDecorator std && valid != null)
       std.decorateText(valid);
     else
       td.decorateText();

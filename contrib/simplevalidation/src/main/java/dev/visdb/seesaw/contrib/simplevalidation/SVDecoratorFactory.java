@@ -26,10 +26,9 @@ import dev.visdb.seesaw.decorators.DecoratorFactoryBase;
  */
 @ServiceProvider(path = DecoratorFactory.DECORATOR_PATH, service = DecoratorFactory.class)
 public class SVDecoratorFactory extends DecoratorFactoryBase {
-  
-  /** Create SV DecoratorFactoryBase */
+  /** Create a DefaultSVDecorator */
   public SVDecoratorFactory() {
-    super(() -> new DefaultSVDecorator(), SVUtils.SV_DECORATOR_STYLE);
+    super(() -> new DefaultSVDecorator(), SVUtils.SIMPLE_VALIDATION);
   }
   
   /**

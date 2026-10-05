@@ -74,7 +74,7 @@ public class BackgroundDecorator extends FocusDecorator {
     logger.log(TRACE,
                () -> String.format("%s focus: %s, compValid %s, allValid: %s",
                                    decoComp().getClass().getSimpleName(),
-                                   focusComp().isFocusOwner(), valid.comp(), valid.all()));
+                                   hasFocus(), valid.comp(), valid.all()));
     if (SsUtils.findDecoratorPanel((Component)getSsComponent()) == null)
       return valid.all();
 
@@ -85,7 +85,7 @@ public class BackgroundDecorator extends FocusDecorator {
                                        : standardBackgroundColor;
     decoComp().setBackground(color);
 
-    getSsComponent().handleTextDecorator(valid);
+    getSsComponent().decorateText(valid);
 
     return valid.all();
   }

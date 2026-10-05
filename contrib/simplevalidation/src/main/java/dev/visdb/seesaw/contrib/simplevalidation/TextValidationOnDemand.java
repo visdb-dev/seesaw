@@ -21,16 +21,23 @@ import javax.swing.text.JTextComponent;
 
 import org.netbeans.validation.api.Problems;
 import org.netbeans.validation.api.Validator;
+import org.netbeans.validation.api.ValidatorUtils;
+import org.netbeans.validation.api.conversion.Converter;
 import org.netbeans.validation.api.ui.*;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 
+import dev.visdb.seesaw.utils.SsComponent;
+
+import static dev.visdb.seesaw.contrib.simplevalidation.SVUtils.decorationFor;
+
 /**
- * Hook into SimpleValidation framework; validate on demand, not as a listener.
- * That is the key difference from a typical validation listener,
- * this does not add itself as a listener.
+ * Hook into SimpleValidation framework; validate on demand, not a listener,
+ * see {@link SVUtils#setTextDecorator(dev.visdb.seesaw.utils.SsComponent,
+ * java.lang.String, org.netbeans.validation.api.Validator...)
+ * SVUtils.setTextDecorator(ssComp, name, validator...)}
  * SeeSaw decorator invokes this as needed.
- * Derived from validation.api.ui.JTextComponentValidationListenerImpl 
  */
+// Derived from validation.api.ui.JTextComponentValidationListenerImpl 
 // Copied from:
 //      validation/api/ui/JTextComponentValidationListenerImpl.java
 // TODO: Make this independent of Document, just use a string?
@@ -39,7 +46,23 @@ public class TextValidationOnDemand extends ValidationListener<JTextComponent> {
   private final Validator<Document> validator;
 
   /**
-   * Create ValidationItem for on demand only for the specified component.
+   * Create an on demand {@link ValidationListener} for an {@link SsComponent},
+   * exception if not a {@code JTextComponent}.
+   * On demand, does no listening, invocation is handled by a SeeSaw decorator.
+   * @param ssComp
+   * @param validators
+   * @return
+   */
+  @SafeVarargs
+  public static TextValidationOnDemand create(
+      SsComponent ssComp, Validator<String>... validators) {
+    Validator<String> merged = ValidatorUtils.merge(validators);
+    Validator<Document> validator = Converter.find(String.class, Document.class).convert(merged);
+    return new TextValidationOnDemand((JTextComponent)ssComp, decorationFor(ssComp), validator);
+  }
+
+  /**
+   * Create ValidationItem, used only on demand, for the specified component.
    * @param component
    * @param validationUI
    * @param validator 
@@ -48,21 +71,6 @@ public class TextValidationOnDemand extends ValidationListener<JTextComponent> {
                                      Validator<Document> validator) {
     super(JTextComponent.class, validationUI, component);
     this.validator = validator;
-  }
-
-  /**
-   * Throw an IllegalStateException if component does not match the target.
-   * @param component
-   */
-  public void verifyComponent(Object component) {
-    if (component != getTarget())
-      throw new IllegalStateException("decorating the wrong component");
-  }
-  /**
-   * @return The JTextComponent that this ValidationItem is hooked to.
-   */
-  public JTextComponent getComponent() {
-    return getTarget();
   }
 
   /**

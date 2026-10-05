@@ -13,6 +13,7 @@ package dev.visdb.seesaw.decorators;
 import java.lang.System.Logger;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.text.AttributeSet;
 
@@ -46,6 +47,7 @@ public class ComponentStateTextDecorator extends BaseTextDecorator {
    * @param valid
    */
   public void decorateText(SsComponent.ValidationResult valid) {
+    Objects.requireNonNull(valid);
     ComponentState state = ComponentState.getComponentState(getSsComponent(), valid);
     AttributeSet style = TextStyles.getStyle(styleNames.get(state));
     TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
