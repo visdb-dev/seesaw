@@ -44,27 +44,78 @@ package dev.visdb.seesaw.contrib.simplevalidation;
 
 
 import org.netbeans.validation.api.Problem;
+import org.netbeans.validation.api.Validator;
 import org.netbeans.validation.api.ui.ValidationListener;
 
 import dev.visdb.seesaw.decorators.BaseDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
+import dev.visdb.seesaw.decorators.SsCompFocusListener;
+import dev.visdb.seesaw.utils.SsComponent;
 
 /**
- * A combined decorator/validator using the 
+ * A SeeSaw decorator using the 
  * <a href="https://github.com/timboudreau/simplevalidation">Simple Validation</a>
- * framework.
+ * framework to perform swing component decoration and problem reporting.
+ * The decorate() method optionally invokes
+ * {@link SsComponent#decorateText(dev.visdb.seesaw.utils.SsComponent.ValidationResult)
+ * ssComp.decorateText(result)}, see {@link #setDoDecorateText(boolean) }.
  */
 public class SVDecorator extends BaseDecorator {
 
   private final ValidationListener<?> valItem;
+  private boolean doDecorateText;
 
   /**
-   * Create SimpleValidationDecorator which uses any ValidationListener
-   * for decoration/validation.
+   * Create SeeSaw decorator which uses a ValidationItem
+   * for decoration/validation. {@code doDecorateText} is false.
+   * decorateText() is typically invoked in a custom {@link Validator}
+   * invoked via valItem.performValidation().
    * @param valItem
    */
-  public SVDecorator(TextValidationOnDemand valItem) {
+  public SVDecorator(ValidationListener<?> valItem) {
+    this(valItem, false);
+  }
+
+  /**
+   * Create an SVDecorator which uses any ValidationListener
+   * for decoration/validation. The {@code doDeorateText}
+   * may be set.
+   * @param valItem
+   * @param doDecorateText if true, do it during the decorate() method
+   */
+  SVDecorator(ValidationListener<?> valItem, boolean doDecorateText) {
     this.valItem = valItem;
+    this.doDecorateText = doDecorateText;
+  }
+
+  private SVBorder border;
+  private SsCompFocusListener focusListener;
+
+  /**
+   * {@inheritDoc }
+   */
+  @Override
+  public void install(SsComponent ssComp) {
+    super.install(ssComp);
+    border = SVBorder.get(getSsComponent());
+    focusListener = new SsCompFocusListener(ssComp, (c) -> {
+      // System.err.printf("*** DefaultSVDecorator (%s) - notifyFocusChange: %s, focused: %s\n",
+      //                     objectID(component), objectID(c), c.isFocusOwner());
+      if (c.isFocusOwner())
+        border.draw();
+      else
+        border.clear();
+    });
+    focusListener.addFocusListener();
+  }
+
+  /**
+   * Remove focus listening.
+   */
+  @Override
+  public void uninstall() {
+    focusListener.removeFocusListener();
+    super.uninstall();
   }
 
   /**
@@ -74,7 +125,25 @@ public class SVDecorator extends BaseDecorator {
   @Override
   public boolean decorate() {
     Problem problem = valItem.performValidation();
+    if (doDecorateText)
+      getSsComponent().decorateText(null);
     return problem == null || !problem.isFatal();
+  }
+
+  /**
+   * @return if this decorator invokes decorateText().
+   */
+  public boolean isDoDecorateText() {
+    return doDecorateText;
+  }
+
+  /**
+   * Set whether or not this decorator invokes decorateText().
+   *
+   * @param doDecorateText flag
+   */
+  public void setDoDecorateText(boolean doDecorateText) {
+    this.doDecorateText = doDecorateText;
   }
 
   /**
@@ -83,7 +152,7 @@ public class SVDecorator extends BaseDecorator {
    */
   @Override
   public Decorator.DecoratorStyle getDecoratorStyle() {
-    return SVUtils.SV_DECORATOR_STYLE;
+    return SVUtils.SIMPLE_VALIDATION;
   }
 }
 // vi: sw=2 ts=8

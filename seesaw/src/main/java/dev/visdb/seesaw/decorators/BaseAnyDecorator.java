@@ -23,7 +23,7 @@ public abstract class BaseAnyDecorator implements AnyDecorator {
   private SsComponent ssComponent;
 
   /**
-   * Install this decorator into the component. Installs listeners
+   * Install this decorator into the component. Installs listeners.
    * @param component the component
    */
   @Override

@@ -805,7 +805,7 @@ public class TextStyles {
    *        static class DotSplitter extends JPropPathSplitter.CharPathOnlySplitter {}
    * but no clean way to provide a splitter at this point.
    */
-  @SuppressWarnings("serial")
+  @SuppressWarnings({"serial", "CloneableImplementsClone"})
   private static class PrelimCheckProperties extends Properties {
     @Override
     public synchronized Object put(Object _key, Object _value) {

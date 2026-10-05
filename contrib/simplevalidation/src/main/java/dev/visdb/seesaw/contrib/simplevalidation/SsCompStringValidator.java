@@ -48,6 +48,8 @@ import java.util.Optional;
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problems;
 import org.netbeans.validation.api.Severity;
+import org.netbeans.validation.api.Validator;
+import org.netbeans.validation.api.builtin.stringvalidation.StringValidators;
 
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.utils.SsComponent;
@@ -55,21 +57,30 @@ import dev.visdb.seesaw.utils.SsComponent.Validation;
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
 
 /**
- * A validator specialized for an SsComponent; uses allValidate().
- * Deprecated use:
- * It has a validationCondition, like a pluginValidator,
- * and description, that handles a string.
- * It sets the SsComponent's pluginValidator to nullValidator.
- * It does SsComponent.allValidate().
+ * A validator specialized for an SsComponent that's a subclass of
+ * JTextComponent. It is used by
+ * {@link SVUtils#setTextDecorator(SsComponent, String, Validator...) }
+ * It does {@link SsComponent#allValidate()} and, if there's a failure,
+ * it uses {@link SsComponent#validationMsg(Validation)} for the problem
+ * description. Finally it invokes
+ * {@link SsComponent#decorateText(ValidationResult)}.
+ * <p>
+ * The SsComponent is used in {@link #validate(Problems, String, String) validate(...)};
+ * this is unusual.
+ * It is a {@code Validator<String>} so it is easy to chain together with other
+ * {@code Validator<String>}, see {@link StringValidators} and
+ * {@link SVUtils#setTextDecorator(SsComponent, String, Validator...) }.
+ * 
  */
-public class StringSsComponentValidator extends AbstractValidator<String> {
+// TODO: Should this be FIRST and not LAST?
+public class SsCompStringValidator extends AbstractValidator<String> {
   private final SsComponent ssComp;
 
   /**
    * Create a validator that handles a string.
    * @param ssComp how weird is it to have this here?
    */
-  public StringSsComponentValidator(SsComponent ssComp) {
+  public SsCompStringValidator(SsComponent ssComp) {
     super(String.class);
     this.ssComp = Objects.requireNonNull(ssComp);
   }
@@ -95,7 +106,7 @@ public class StringSsComponentValidator extends AbstractValidator<String> {
       problems.append(ssComp.validationMsg(fail.get()));
 
     // This is normally at the end of the SeeSaw decorator.
-    ssComp.handleTextDecorator(vr);
+    ssComp.decorateText(vr);
   }
 }
 // vi: sw=2 ts=8

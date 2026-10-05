@@ -192,6 +192,7 @@ public class Utils {
 
     // broadcast focus changes
     listenerFocusOwner = pce -> {
+      logger.log(TRACE, sf("FocusChange: %s", pce));
       globalEventBus.post(new FocusChangeEvent(pce));
     };
     // detect change in focus manager,

@@ -9,7 +9,7 @@ BUG: In testBaseComponents, edit TextField "oops",
     IT SHOULD BE COLUMN)
     Validate should only be done once for the column.
 
-    The following looks interesting for handling this
+    The following looks interesting for investigating handling this
         SsCommon.setColumn does postColumnChangeStart
             NaviagateState handleColumnChangeStart
                 adjustErrorComponentState(ev.getRSC(), ev.isError());
@@ -18,6 +18,13 @@ BUG: In testBaseComponents, edit TextField "oops",
         Then
             SsCommon.handleColumnChangeDone
                 // Looking for same RowSet, same Column, different component.
+
+    An SsComponent validation could include: condition, msgSupplier, result,
+        Maybe have a forward iterator to go through them.
+        See StringValidator().
+
+    Have a method to set a validatorFunction for columnname in RowsModel.
+      setStringValidator() and setUntypedValidator()
 
 ================================================================================
 

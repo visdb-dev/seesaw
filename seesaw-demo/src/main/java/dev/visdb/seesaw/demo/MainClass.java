@@ -864,12 +864,16 @@ public class MainClass extends JFrame {
     Globals.setOption(LoadDemoImages.class, new LoadDemoImages(){});
     Globals.setOption(H2Trace.class, new H2Trace());
 
-    // To allow force baseValidate() and componentValidate() erros.
+    // To allow forcing baseValidate() and componentValidate() errors.
     if(Boolean.FALSE) Globals.setOption(SsTextField.DebugBaseComponentValidate.class,
                                         new SsTextField.DebugBaseComponentValidate() {});
-
+    // disable simplevalidation border
+    if(Boolean.FALSE) Globals.setOption(SVUtils.SimpleValidationBorderEnable.class,
+                                        new SVUtils.SimpleValidationBorderEnable(false));
+    // use simple validation decorators
     if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
-                                        SVUtils.SV_DECORATOR_STYLE);
+                                        SVUtils.SIMPLE_VALIDATION);
+    // use background decorators
     if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
                                         Decorator.DecoratorStyle.BACKGROUND);
 
@@ -888,7 +892,7 @@ public class MainClass extends JFrame {
     System.err.printf("java:%s vm:%s date:%s os:%s\n", System.getProperty("java.version"),
                       System.getProperty("java.vm.version"),
                       System.getProperty("java.version.date"), System.getProperty("os.name"));
-    System.err.printf("SwingSet: %s\n", Version.get().toString());
+    System.err.printf("SeeSaw: %s\n", Version.get().toString());
 
     try {
       for (SyncProvider sp : Collections.list(SyncFactory.getRegisteredProviders())) {

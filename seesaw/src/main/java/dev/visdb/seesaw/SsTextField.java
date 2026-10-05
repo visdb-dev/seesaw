@@ -64,8 +64,8 @@ import static java.lang.System.Logger.Level.*;
  * SsTextField extends the JTextField.
  * Add application validity checks with
  * {@link SsComponent#setTextValidationCondition(java.util.function.Function,
- * java.util.function.Supplier)
- * SsComponent.setTextValidationCondition(Function, Supplier)}.
+ * java.util.function.Function)
+ * SsComponent.setTextValidationCondition(Function, Function)}.
  */
 @SuppressWarnings("serial")
 public class SsTextField extends JTextField implements SsComponent {

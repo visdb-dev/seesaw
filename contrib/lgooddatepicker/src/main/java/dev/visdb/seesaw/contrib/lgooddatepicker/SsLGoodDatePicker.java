@@ -97,7 +97,6 @@ public class SsLGoodDatePicker extends DatePicker implements SsComponent {
 
     // Highlight the date text field when this component gets focus.
     setDecorateTarget(getComponentDateTextField());
-    setFocusTarget(getComponentDateTextField());
   }
 
   /** {@inheritDoc } */
