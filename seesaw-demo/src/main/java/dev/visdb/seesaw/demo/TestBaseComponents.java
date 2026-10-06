@@ -104,7 +104,7 @@ import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsComponent.Validation;
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 

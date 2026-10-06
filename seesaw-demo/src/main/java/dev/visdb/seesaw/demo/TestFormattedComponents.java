@@ -67,7 +67,7 @@ import dev.visdb.seesaw.formatting.SsTimeField;
 import dev.visdb.seesaw.formatting.SsTimestampField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 

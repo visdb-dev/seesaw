@@ -65,7 +65,7 @@ import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 
 /**
