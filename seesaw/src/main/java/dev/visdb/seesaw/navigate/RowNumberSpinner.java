@@ -82,7 +82,7 @@ import static javax.swing.KeyStroke.getKeyStroke;
  * <li>{@link #setWindowUpDownKeysEnable(boolean) }
  * <li>{@link #setUpDownKeysEnable(boolean) }
  * </ul>
- * These methods are accessible through {@link dev.visdb.seesaw.utils.SsDataNavigator} methods.
+ * These methods are accessible through {@link dev.visdb.seesaw.SsDataNavigator} methods.
  * <p>
  * There's a Spinner API tweak such that {@code setModel()}
  * sends a {@code ChangeEvent}. This is convenient when considering the spinner

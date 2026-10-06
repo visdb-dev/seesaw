@@ -59,7 +59,7 @@ import dev.visdb.seesaw.formatting.SsDateField;
 import dev.visdb.seesaw.formatting.SsIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.formatting.SsFormat.DATE_MMDDYYYY_SLASH;

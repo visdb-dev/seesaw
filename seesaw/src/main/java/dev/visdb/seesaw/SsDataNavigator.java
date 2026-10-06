@@ -40,7 +40,7 @@
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package dev.visdb.seesaw.utils;
+package dev.visdb.seesaw;
 
 import java.awt.Dimension;
 import java.util.List;
