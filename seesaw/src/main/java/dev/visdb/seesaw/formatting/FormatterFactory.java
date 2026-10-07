@@ -138,7 +138,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory {
   }
 
   /** use setEditValid method to check that formatter should flip */
-  @SuppressWarnings("serial")
+  @SuppressWarnings({"serial", "CloneableImplementsClone"})
   protected static class NullFormatter extends DefaultFormatter {
     /**
      * The null formatter.
