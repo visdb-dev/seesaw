@@ -1,1 +1,1 @@
-See https://sourceforge.net/p/swingset/code/ci/master/tree/swingset-demo/README.txt
+See https://github.com/visdb-dev/seesaw/tree/main/seesaw-demo
