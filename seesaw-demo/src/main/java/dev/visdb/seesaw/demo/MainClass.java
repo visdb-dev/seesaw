@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package dev.visdb.seesaw.demo;
 
 import java.awt.Dimension;
@@ -101,13 +106,14 @@ import dev.visdb.seesaw.utils.LookupDefaults;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.Version;
 import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
 
 import static dev.visdb.seesaw.demo.DemoUtil.configureJavaUtilLogger;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * A JFrame with buttons to launch each of the SwingSet example/demo screens.
+ * A JFrame with buttons to launch each of the SeeSaw example/demo screens.
  */
 @SuppressWarnings("serial")
 public class MainClass extends JFrame {
@@ -120,9 +126,9 @@ public class MainClass extends JFrame {
   private static final boolean USE_IN_MEMORY_DATABASE = true;
 
   private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
-  private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
-  private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
-  private static final String DATABASE_SCRIPT_DEBUG = "swingset_debug.sql";
+  private static final String DATABASE_SCRIPT_TEST = "tests.sql";
+  private static final String DATABASE_SCRIPT_TEST_IMAGES = "tests_load_blobs.sql";
+  private static final String DATABASE_SCRIPT_DEBUG = "debug.sql";
 
   private static final boolean RUN_DEMO_SQL_SCRIPTS = true;
   private static final boolean RUN_TEST_SQL_SCRIPTS = true;
@@ -538,7 +544,7 @@ public class MainClass extends JFrame {
       } else {
         // ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
         // sa AND BLANK PASSWORD
-        // USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
+        // USEFUL FOR WORKING WITH DATASET FOR SEESAW TESTS
         result
             = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
         logger.log(INFO, "Established connection to database server.");
@@ -557,9 +563,9 @@ public class MainClass extends JFrame {
         inStreamTest.close();
 
         if (!no_load_images) {
-          String sql = "UPDATE swingset_base_test_data"
-                       + " SET ss_image = ? WHERE swingset_base_test_pk = ?";
-          DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
+          String sql = "UPDATE base_test_data"
+                       + " SET ss_image = ? WHERE base_test_pk = ?";
+          DemoUtil.loadBinaries(result, "/demo-images.txt", sql, verbose);
         }
       }
 
@@ -654,9 +660,9 @@ public class MainClass extends JFrame {
 
       if (ok && !no_load_images) {
         // Load up the images
-        String sql = "UPDATE swingset_base_test_data"
-                     + " SET ss_image = ? WHERE swingset_base_test_pk = ?";
-        ok = DemoUtil.loadBinaries(conn, "/swingset-demo-images.txt", sql, verbose);
+        String sql = "UPDATE base_test_data"
+                     + " SET ss_image = ? WHERE base_test_pk = ?";
+        ok = DemoUtil.loadBinaries(conn, "/demo-images.txt", sql, verbose);
       }
 
       if (!ok) {
@@ -776,9 +782,9 @@ public class MainClass extends JFrame {
       } else {
         info = new Properties();
         info.put("DB_DRIVER_CLASS", "com.mysql.cj.jdbc.Driver");
-        info.put("DB_URL", "jdbc:mysql://localhost/swingset_demo_suppliers_and_parts");
+        info.put("DB_URL", "jdbc:mysql://localhost/demo_suppliers_and_parts");
         // DB_NAME NOT USED
-        info.put("DB_NAME", "swingset_demo_suppliers_and_parts");
+        info.put("DB_NAME", "demo_suppliers_and_parts");
         info.put("user", "root");
         info.put("serverTimezone", "UTC");
       }
@@ -788,7 +794,10 @@ public class MainClass extends JFrame {
     @Override
     List<String> getScripts() {
       return Arrays.asList(
-          new String[] {"/mysql.swingset-demo-app.sql", "/mysql.swingset-demo-components.sql"});
+          new String[] {
+            "/mysql.demo-app.sql",
+            "/mysql.demo-components.sql"
+          });
     }
   }
 
@@ -809,19 +818,23 @@ public class MainClass extends JFrame {
   private static List<String> userSqlFiles = new ArrayList<>();
   private static DatabaseSetup databaseSetup = null;
 
-  private static String cmdName = "SwingSetDemo";
+  private static String cmdName = "SeeSawDemo";
 
   @SuppressWarnings({"ResultOfMethodCallIgnored", "UseOfSystemOutOrSystemErr"})
   private static void usage() {
     // TODO: specify don't load images
     String usage = """
 
-        Run the SwingSet demo. With no options/args use the self contained
+        Run the SeeSaw demo. With no options/args use the self contained
         in memory database.
         
         CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
         
             -h             help
+            --style=[SV|BG|BORDER]         BORDER is the default
+                           SeeSaw gives visual indication of input field state;
+                           there are three decorator styles currently supported.
+                           SV is the SimpleValidation framework.
             -v             verbose; output initialization sql as executed
             -d             dump/create sql scripts in local directory, exit
             -n             do NOT initialize database, just run demo
@@ -831,17 +844,16 @@ public class MainClass extends JFrame {
             -s sqlScript   sql file to initialize database, multiple OK
         
         If specified, dbms-server in {mysql}
-        Internal mysql properties use database swingset_demo_suppliers_and_parts.
+        Internal mysql properties use database demo_suppliers_and_parts.
         After the sql files are run, the images are loaded, unless '-i'.
         Use '-n -p props' to run demo with a previously initialized database.
         Use '-d' or '-d mysql' to create local files with sql initialization.
-        See swingset-demo/README.txt for more information.
+        See seesaw-demo/README.txt for more information.
         
-        Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
-            java -jar ss.jar -d   # dump sql that creates in memory database
-            java -jar ss.jar -d mysql   # dump sql to create mysql database
-            java -cp jdbc_driver:ss.jar dev.visdb.seesaw.demo.MainClass \\
-                -p db_props -s initializer.sql
+        Examples: SeeSawDemo is typically run with a maven command
+            mvn exec:exec -Dargs="-d"   # dump sql that creates in memory database
+            mvn exec:exec -Dargs="-d mysql"   # dump sql to create mysql database
+            mvn exec:exec -Dxcp=":jdbc_driver" -Dargs="-p db_props -s initializer.sql"
         
         """;
     usage = usage.replace("CMD_NAME", cmdName);
@@ -849,8 +861,12 @@ public class MainClass extends JFrame {
     System.exit(1);
   }
 
+  private static void setDecoratorStyle(Decorator.DecoratorStyle style) {
+    Globals.setOption(Decorator.DecoratorStyle.class, style);
+  }
+
   /**
-   * Main method for SwingSet samples/demo
+   * Main method for SeeSaw samples/demo
    * <p>
    *
    * @param _args - optional command line arguments, which are ignored by this
@@ -859,7 +875,7 @@ public class MainClass extends JFrame {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void main(String[] _args) {
     configureJavaUtilLogger();
-    Screens.setPrefGraphicsDev("SWINGSET_PREFERRED_SCREEN");
+    Screens.setPrefGraphicsDev("SEESAW_PREFERRED_SCREEN");
 
     Globals.setOption(LoadDemoImages.class, new LoadDemoImages(){});
     Globals.setOption(H2Trace.class, new H2Trace());
@@ -870,18 +886,20 @@ public class MainClass extends JFrame {
     // disable simplevalidation border
     if(Boolean.FALSE) Globals.setOption(SVUtils.SimpleValidationBorderEnable.class,
                                         new SVUtils.SimpleValidationBorderEnable(false));
-    // use simple validation decorators
-    if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
-                                        SVUtils.SIMPLE_VALIDATION);
-    // use background decorators
-    if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
-                                        Decorator.DecoratorStyle.BACKGROUND);
 
-    //Globals.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
-    //SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
+    //
+    // Pick decorator style, BORDER is default
+    // May be overriden by command line option: --style=[SV|BG|BORDER]
+    //
+    // setDecoratorStyle(SVUtils.SIMPLE_VALIDATION);
+    // setDecoratorStyle(Decorator.DecoratorStyle.BACKGROUND);
+
+    // Globals.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+    // Globals.setOption(new SsUtils.DebugRowSetListenerFlag());
+    //
+    // SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
     // fixed in H2 Version 2.3.230 (2024-07-15
-    //Globals.setOption(H2Workaround.class, new H2Workaround());
-    //Globals.setOption(new SsUtils.DebugRowSetListenerFlag());
+    // Globals.setOption(H2Workaround.class, new H2Workaround());
 
     // For debug, enable this to force CachedRowSet conflict
     //Globals.setOption(new ForceConflict(1));
@@ -906,11 +924,21 @@ public class MainClass extends JFrame {
       logger.log(DEBUG, "SyncFactory.getRegisteredProviders()", ex);
     }
 
-    Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
 
+    // longopts.add(new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'));
+    // longopts.add(new LongOpt("outputdir", LongOpt.REQUIRED_ARGUMENT, sb, 'o'));
+    // longopts.add(new LongOpt("maximum", LongOpt.OPTIONAL_ARGUMENT, null, 2));
+
+    ArrayList<LongOpt> longopts = new ArrayList<>();
+    longopts.add(new LongOpt("style", LongOpt.REQUIRED_ARGUMENT, null, 0));
+    Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:", longopts.toArray(LongOpt[]::new));
+
+    String decoStyleString = null;
+    Decorator.DecoratorStyle decoStyle = null;
     int c;
     while ((c = g.getopt()) != -1) {
       switch (c) {
+        case   0: decoStyleString = g.getOptarg(); break;
         case 'v': verbose = true; break;
         case 'd': dump = true; break;
         case 'n': no_initialize_db = true; break;
@@ -925,10 +953,27 @@ public class MainClass extends JFrame {
           some_error = true;
           break; // getopt() already printed an error
       }
+      if (decoStyleString != null) {
+        decoStyle = switch(decoStyleString) {
+          case "BORDER" -> Decorator.DecoratorStyle.BORDER;
+          case "BG" -> Decorator.DecoratorStyle.BACKGROUND;
+          case "SV" -> SVUtils.SIMPLE_VALIDATION;
+          default -> {
+            System.err.printf("Unknown style option value '%s'\n", decoStyleString);
+            yield null;
+          }
+        };
+      }
     }
+    // if (longo != null)
+    //   System.err.printf("*** longopt: '%s'\n", longo);
+
+    if (decoStyle != null)
+      setDecoratorStyle(decoStyle);
 
     if (verbose) {
       StringBuilder sb = new StringBuilder();
+      sb.setLength(0);
       sb.append('\n').append(cmdName);
       for (String arg : _args) {
         sb.append(' ').append(arg);

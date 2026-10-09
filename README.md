@@ -3,6 +3,93 @@
 
 [javadoc](https://visdb-dev.github.io/seesaw/).
 
+## Running the Demo (Standalone)
+
+You can run the full interactive demo without cloning this repository. 
+
+1. Create a new, empty directory on your machine and navigate into it:
+   ```bash
+   mkdir demo-runner && cd demo-runner
+   ```
+
+2. Create a file named `pom.xml` and paste the following content into it:
+   <details>
+       <summary>Click to expand to show pom.xml content</summary>
+
+   ```xml
+   <project xmlns="http://apache.org" 
+            xmlns:xsi="http://w3.org"
+            xsi:schemaLocation="http://apache.org http://apache.org">
+       <modelVersion>4.0.0</modelVersion>
+   
+       <groupId>dev.visdb.seesaw</groupId>
+       <artifactId>seesaw-demo-runner</artifactId>
+       <version>1.0.0</version>
+       <packaging>pom</packaging>
+   
+       <properties>
+           <args></args>
+           <demo.args>${args}</demo.args>
+           <xcp></xcp>
+           <seesaw.version>0.5.1</seesaw.version> 
+           <exec-maven-plugin.version>3.6.4</exec-maven-plugin.version>
+           <log4j.version>2.26.1</log4j.version>
+       </properties>
+   
+       <dependencies>
+           <dependency>
+               <groupId>dev.visdb.seesaw</groupId>
+               <artifactId>seesaw-demo</artifactId>
+               <version>${seesaw.version}</version>
+           </dependency>
+       </dependencies>
+   
+       <build>
+           <plugins>
+               <plugin>
+                   <groupId>org.codehaus.mojo</groupId>
+                   <artifactId>exec-maven-plugin</artifactId>
+                   <version>${exec-maven-plugin.version}</version>
+                   <configuration>
+                       <executable>java</executable>
+                       <commandlineArgs>
+                           -classpath %classpath${xcp}
+                           dev.visdb.seesaw.demo.MainClass ${demo.args}
+                       </commandlineArgs>
+                       <classpathScope>test</classpathScope> 
+                       <successCodes>
+                           <successCode>0</successCode>
+                           <successCode>1</successCode>
+                       </successCodes>
+                   </configuration>
+               </plugin>
+           </plugins>
+       </build>
+   
+       <profiles>
+           <profile>
+               <id>log4j</id>
+               <dependencies>
+                   <!-- inject the log4j System.Logger bridge -->
+                   <dependency>
+                       <groupId>org.apache.logging.log4j</groupId>
+                       <artifactId>log4j-jpl</artifactId>
+                       <version>${log4j.version}</version>
+                   </dependency>
+               </dependencies>
+           </profile>
+       </profiles>
+   </project>
+   ```
+
+   </details>
+
+3. Run the demo using standard Maven commands:
+   * **Default Mode:** `mvn exec:exec`
+   * **Show Help:** `mvn exec:exec -Dargs=-h`
+   * **Custom Arguments:** `mvn exec:exec -Dargs="--flag1 --flag2"`
+   * **log4j instead of JUL:** `mvn exec:exec -Plog4j -Dargs=-h`
+
 ## DESCRIPTION
 
 

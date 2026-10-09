@@ -29,6 +29,8 @@ import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.simplevalidation.SVDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
+import dev.visdb.seesaw.decorators.Decorator;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsComponent.Validation;
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
@@ -89,6 +91,19 @@ public class SimpleValidation {
           // @end region=setDoDecorateText
         }
       });
+  }
+
+  void bar() {
+    // @start region=sv_border_enable
+    Globals.setOption(SVUtils.SimpleValidationBorderEnable.class,
+                      new SVUtils.SimpleValidationBorderEnable(false));
+    // @end region=sv_border_enable
+
+    // @start region=sv_global
+    Globals.setOption(Decorator.DecoratorStyle.class,
+                      SVUtils.SIMPLE_VALIDATION);
+    // @end region=sv_global
+
   }
 }
 // vi: sw=2 ts=8

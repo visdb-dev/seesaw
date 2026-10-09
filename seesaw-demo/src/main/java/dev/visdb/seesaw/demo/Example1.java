@@ -58,6 +58,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.BorderDecorator;
@@ -65,7 +66,6 @@ import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 
 /**
