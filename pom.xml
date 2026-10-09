@@ -95,7 +95,7 @@
     <!-- Dependencies -->
     <version.glazedlists>1.11.1203</version.glazedlists>
     <version.table-sort-header>1.0.1</version.table-sort-header>
-    <version.google-guava>33.7.1-jre</version.google-guava>
+    <version.google-guava>33.7.2-jre</version.google-guava>
     <version.util-lookup>1.0.0</version.util-lookup>
     <version.weak-event-bus-receiver>1.0.0</version.weak-event-bus-receiver>
     <version.jackson>3.2.3</version.jackson>
@@ -108,7 +108,7 @@
     <!--        Test -->
     <version.junit-jupiter>6.1.3</version.junit-jupiter>
     <version.assertj>3.27.7</version.assertj>
-    <version.mockito>5.23.0</version.mockito>
+    <version.mockito>5.24.0</version.mockito>
 
     <!-- Plugins -->
     <version.versions-maven-plugin>2.22.0</version.versions-maven-plugin>
