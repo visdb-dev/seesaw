@@ -80,6 +80,7 @@ import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import dev.visdb.seesaw.SsCheckBox;
 import dev.visdb.seesaw.SsComboBox1;
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.SsImage;
 import dev.visdb.seesaw.SsLabel;
@@ -104,7 +105,6 @@ import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsComponent.Validation;
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
-import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
@@ -114,11 +114,11 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * This example demonstrates all of the Base SwingSet Components
+ * This example demonstrates all of the Base SeeSaw Components
  * except for the SSDataGrid.
  * <p>
  * There is a separate example screen to demonstrate the
- * Formatted SwingSet Components.
+ * Formatted SeeSaw Components.
  * <p>
 IMPORTANT: The relationship of the SsDbComboBox2 and RowSet queries can have a
 large negative impact on performance. See {@link SyncManager} for an
@@ -176,7 +176,7 @@ public class TestBaseComponents extends JFrame {
     // This MUST be in the same order as the CompID enum.
     Object tComps[] = {
       null,                      cmbSSDBComboNav,     lblSSDBComboNav,     H1,
-      "swingset_base_test_pk",   txtTestPK,           lblTestPK,           H1,
+      "base_test_pk",            txtTestPK,           lblTestPK,           H1,
       "ss_check_box",            chkSSCheckBox,       lblSSCheckBox,       H1,
       "ss_combo_box",            cmbSSComboBox,       lblSSComboBox,       H1,
       "ss_combo_box",            cmbEnumSSComboBox,   lblEnumSSComboBox,   H1,
@@ -424,7 +424,7 @@ public class TestBaseComponents extends JFrame {
     // initialize database connection and components
     try {
       RowSet rowset = DemoUtil.getNewRowSet(connection);
-      String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
+      String sql = sf("SELECT %s FROM base_test_data", getColumnsSQL());
       logger.log(INFO, sql);
       rowset.setCommand(sql);
       rowset.execute();
@@ -447,13 +447,13 @@ public class TestBaseComponents extends JFrame {
       syncManager = null;
     } else {
       // setup navigator query
-      final String query = "SELECT * FROM swingset_base_test_data;";
-      //= (connection, query, "swingset_base_test_pk", "swingset_base_test_pk");
+      final String query = "SELECT * FROM base_test_data;";
+      //= (connection, query, "base_test_pk", "base_test_pk");
       cmbSSDBComboNav = new SsDbComboBox2.Builder<Long, Object, Object>() {}
                             .connection(connection)
                             .query(query)
-                            .primaryKeyColumnName("swingset_base_test_pk")
-                            .displayColumnName("swingset_base_test_pk")
+                            .primaryKeyColumnName("base_test_pk")
+                            .displayColumnName("base_test_pk")
                             .build();
 
       try {
@@ -472,7 +472,7 @@ public class TestBaseComponents extends JFrame {
       //
       // After calling .execute() on the combo navigator, call the .SYNC() method.
       syncManager = new SyncManager<>(cmbSSDBComboNav, rowsModel);
-      syncManager.setSyncColumnName("swingset_base_test_pk");
+      syncManager.setSyncColumnName("base_test_pk");
       syncManager.sync();
     }
 
@@ -885,7 +885,7 @@ public class TestBaseComponents extends JFrame {
     // Get the new record id.
     try (ResultSet rs
          = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-               .executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;")) {
+               .executeQuery("SELECT nextval('base_test_seq') as nextVal;")) {
       rs.next();
       final int recordPK = rs.getInt("nextVal");
       txtTestPK.setText(String.valueOf(recordPK));

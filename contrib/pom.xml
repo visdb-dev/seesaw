@@ -27,7 +27,7 @@
   <properties>
     <group_abbrev>visdb.contrib</group_abbrev>
 
-    <version.ldatepicker>11.2.1</version.ldatepicker>
+    <ldatepicker.version>11.2.1</ldatepicker.version>
     <!-- simplevalidation in seesaw-parent -->
   </properties>
 
@@ -44,7 +44,7 @@
       <dependency>
         <groupId>com.github.lgooddatepicker</groupId>
         <artifactId>LGoodDatePicker</artifactId>
-        <version>${version.ldatepicker}</version>
+        <version>${ldatepicker.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

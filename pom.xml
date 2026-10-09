@@ -83,60 +83,60 @@
       ${maven.multiModuleProjectDirectory}/seesaw-demo/src/test/java/snippet_files
     </snippet_path>
 
-    <version.maven-checkstyle-plugin>3.6.0</version.maven-checkstyle-plugin>
+    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <!-- Toolchain -->
-    <version.maven>3.9.6</version.maven>
+    <maven.version>3.9.6</maven.version>
     <java-release>25</java-release>
     <!-- source/target for using frgaal -->
-    <version.frgaal>25.0.0</version.frgaal>
+    <frgaal.version>25.0.0</frgaal.version>
     <java-source>24</java-source>
     <java-target>17</java-target>
 
     <!-- Dependencies -->
-    <version.glazedlists>1.11.1203</version.glazedlists>
-    <version.table-sort-header>1.0.1</version.table-sort-header>
-    <version.google-guava>33.7.1-jre</version.google-guava>
-    <version.util-lookup>1.0.0</version.util-lookup>
-    <version.weak-event-bus-receiver>1.0.0</version.weak-event-bus-receiver>
-    <version.jackson>3.2.3</version.jackson>
+    <glazedlists.version>1.11.1203</glazedlists.version>
+    <table-sort-header.version>1.0.1</table-sort-header.version>
+    <google-guava.version>33.7.1-jre</google-guava.version>
+    <util-lookup.version>1.0.0</util-lookup.version>
+    <weak-event-bus-receiver.version>1.0.0</weak-event-bus-receiver.version>
+    <jackson.version>3.2.3</jackson.version>
     <!--        Demo -->
-    <version.log4j>2.26.1</version.log4j>
-    <version.h2>2.5.250</version.h2>
-    <version.java-getopt>1.0.13</version.java-getopt>
-    <version.raelity-lib>1.2.0</version.raelity-lib>
-    <version.simplevalidation>1.14.1</version.simplevalidation>
+    <log4j.version>2.26.1</log4j.version>
+    <h2.version>2.5.250</h2.version>
+    <java-getopt.version>1.0.13</java-getopt.version>
+    <raelity-lib.version>1.2.0</raelity-lib.version>
+    <simplevalidation.version>1.14.1</simplevalidation.version>
     <!--        Test -->
-    <version.junit-jupiter>6.1.3</version.junit-jupiter>
-    <version.assertj>3.27.7</version.assertj>
-    <version.mockito>5.23.0</version.mockito>
+    <junit-jupiter.version>6.1.3</junit-jupiter.version>
+    <assertj.version>3.27.7</assertj.version>
+    <mockito.version>5.23.0</mockito.version>
 
     <!-- Plugins -->
-    <version.versions-maven-plugin>2.22.0</version.versions-maven-plugin>
-    <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
-    <version.extra-enforcer-rules>1.12.1</version.extra-enforcer-rules>
-    <version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
-    <version.maven-resources-plugin>3.5.0</version.maven-resources-plugin>
-    <version.maven-compiler-plugin>3.16.0</version.maven-compiler-plugin>
-    <version.maven-surefire-plugin>3.6.0</version.maven-surefire-plugin>
-    <version.maven-failsafe-plugin>3.6.0</version.maven-failsafe-plugin>
-    <version.maven-jar-plugin>3.5.1</version.maven-jar-plugin>
-    <version.maven-install-plugin>3.2.0</version.maven-install-plugin>
-    <version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
-    <version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
+    <versions-maven-plugin.version>2.22.0</versions-maven-plugin.version>
+    <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
+    <extra-enforcer-rules.version>1.12.1</extra-enforcer-rules.version>
+    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+    <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
+    <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+    <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
+    <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
+    <maven-install-plugin.version>3.2.0</maven-install-plugin.version>
+    <maven-site-plugin.version>4.0.0-M16</maven-site-plugin.version>
+    <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
 
     <!-- Publish Plugins -->
-    <version.maven-deploy-plugin>3.2.0</version.maven-deploy-plugin>
-    <version.njord>0.9.10</version.njord>
+    <maven-deploy-plugin.version>3.2.0</maven-deploy-plugin.version>
+    <njord.version>0.9.10</njord.version>
     <njord.publisher>sonatype-central-portal</njord.publisher>
     <njord.releaseUrl>njord:template:release-sca</njord.releaseUrl>
 
-    <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
-    <version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
-    <version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
-    <version.flatten-maven-plugin>1.8.0</version.flatten-maven-plugin>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+    <flatten-maven-plugin.version>1.8.0</flatten-maven-plugin.version>
 
     <!-- Security -->
-    <version.dependency-check-maven>13.0.0</version.dependency-check-maven>
+    <dependency-check-maven.version>13.0.0</dependency-check-maven.version>
   </properties>
 
   <dependencyManagement>
@@ -152,53 +152,53 @@
       <dependency>
         <groupId>com.raelity.3rdparty.com.glazedlists</groupId>
         <artifactId>glazedlists</artifactId>
-        <version>${version.glazedlists}</version>
+        <version>${glazedlists.version}</version>
       </dependency>
       <dependency>
         <groupId>com.raelity.3rdparty.org.netbeans</groupId>
         <artifactId>util-lookup</artifactId>
-        <version>${version.util-lookup}</version>
+        <version>${util-lookup.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>${version.google-guava}</version>
+        <version>${google-guava.version}</version>
       </dependency>
       <dependency>
         <groupId>com.raelity.jdk</groupId>
         <artifactId>table-sort-header-renderer</artifactId>
-        <version>${version.table-sort-header}</version>
+        <version>${table-sort-header.version}</version>
       </dependency>
       <dependency>
         <groupId>com.raelity.lib</groupId>
         <artifactId>weak-event-bus-receiver</artifactId>
-        <version>${version.weak-event-bus-receiver}</version>
+        <version>${weak-event-bus-receiver.version}</version>
       </dependency>
       <dependency>
         <groupId>tools.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>${version.jackson}</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>tools.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${version.jackson}</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>tools.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-properties</artifactId>
-        <version>${version.jackson}</version>
+        <version>${jackson.version}</version>
       </dependency>
       <!-- used by contrib's simplevalidation and seesaw-demo's logman -->
       <dependency>
         <groupId>com.mastfrog</groupId>
         <artifactId>simplevalidation</artifactId>
-        <version>${version.simplevalidation}</version>
+        <version>${simplevalidation.version}</version>
       </dependency>
       <dependency>
         <groupId>com.mastfrog</groupId>
         <artifactId>simplevalidation-swing</artifactId>
-        <version>${version.simplevalidation}</version>
+        <version>${simplevalidation.version}</version>
         <exclusions>
           <exclusion>
             <groupId>com.mastfrog</groupId>
@@ -211,52 +211,52 @@
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>${version.h2}</version>
+        <version>${h2.version}</version>
       </dependency>
       <dependency>
         <groupId>gnu.getopt</groupId>
         <artifactId>java-getopt</artifactId>
-        <version>${version.java-getopt}</version>
+        <version>${java-getopt.version}</version>
       </dependency>
       <dependency>
         <groupId>com.raelity</groupId>
         <artifactId>raelity-lib</artifactId>
-        <version>${version.raelity-lib}</version>
+        <version>${raelity-lib.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-jpl</artifactId>
-        <version>${version.log4j}</version>
+        <version>${log4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-core</artifactId>
-        <version>${version.log4j}</version>
+        <version>${log4j.version}</version>
       </dependency>
 
       <!-- Tests -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>${version.junit-jupiter}</version>
+        <version>${junit-jupiter.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>${version.assertj}</version>
+        <version>${assertj.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>${version.mockito}</version>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-junit-jupiter</artifactId>
-        <version>${version.mockito}</version>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -285,7 +285,7 @@
       <extension>
         <groupId>eu.maveniverse.maven.njord</groupId>
         <artifactId>extension3</artifactId>
-        <version>${version.njord}</version>
+        <version>${njord.version}</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -293,27 +293,27 @@
         <plugin>
           <groupId>eu.maveniverse.maven.plugins</groupId>
           <artifactId>njord</artifactId>
-          <version>${version.njord}</version>
+          <version>${njord.version}</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
-          <version>${version.versions-maven-plugin}</version>
+          <version>${versions-maven-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>${version.maven-clean-plugin}</version>
+          <version>${maven-clean-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>${version.maven-resources-plugin}</version>
+          <version>${maven-resources-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>${version.maven-checkstyle-plugin}</version>
+          <version>${maven-checkstyle-plugin.version}</version>
           <configuration>
             <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
             <consoleOutput>true</consoleOutput>
@@ -338,12 +338,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${version.maven-compiler-plugin}</version>
+          <version>${maven-compiler-plugin.version}</version>
           <dependencies>
             <dependency>                                    <!-- frgaal -->
               <groupId>org.frgaal</groupId>
               <artifactId>compiler-maven-plugin</artifactId>
-              <version>${version.frgaal}</version>
+              <version>${frgaal.version}</version>
             </dependency>
           </dependencies>
           <configuration>
@@ -362,7 +362,7 @@
                 <path>
                     <groupId>com.raelity.lib</groupId>
                     <artifactId>weak-event-bus-receiver</artifactId>
-                    <version>${version.weak-event-bus-receiver}</version>
+                    <version>${weak-event-bus-receiver.version}</version>
                 </path>
                 <path>
                     <groupId>com.raelity.3rdparty.org.netbeans</groupId>
@@ -378,7 +378,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>${version.maven-jar-plugin}</version>
+          <version>${maven-jar-plugin.version}</version>
           <configuration>
             <archive>
               <manifestEntries>
@@ -391,38 +391,38 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${version.maven-surefire-plugin}</version>
+          <version>${maven-surefire-plugin.version}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${version.maven-failsafe-plugin}</version>
+          <version>${maven-failsafe-plugin.version}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>${version.maven-install-plugin}</version>
+          <version>${maven-install-plugin.version}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>${version.maven-site-plugin}</version>
+          <version>${maven-site-plugin.version}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>${version.maven-assembly-plugin}</version>
+          <version>${maven-assembly-plugin.version}</version>
         </plugin>
 
         <!-- OWASP (managed; executed only in -Psecurity-scan) -->
         <plugin>
           <groupId>org.owasp</groupId>
           <artifactId>dependency-check-maven</artifactId>
-          <version>${version.dependency-check-maven}</version>
+          <version>${dependency-check-maven.version}</version>
           <configuration>
             <nvdApiServerId>nvd</nvdApiServerId>
             <ossIndexServerId>ossindex</ossIndexServerId>
@@ -458,14 +458,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>${version.maven-deploy-plugin}</version>
+          <version>${maven-deploy-plugin.version}</version>
         </plugin>
 
         <!-- Required by Central: Source JAR generation -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>${version.maven-source-plugin}</version>
+          <version>${maven-source-plugin.version}</version>
           <executions>
             <execution>
               <id>attach-sources</id>
@@ -480,7 +480,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${version.maven-javadoc-plugin}</version>
+          <version>${maven-javadoc-plugin.version}</version>
           <configuration> <!-- EXTRA -->
             <release>${version.java}</release>
             <failOnError>false</failOnError>
@@ -494,7 +494,7 @@
             <!-- TODO: don't supress "html" -->
             <doclint>all,-missing,-html</doclint>
             <links>
-              <link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
+              <link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${glazedlists.version}</link>
               <link>https://errael.github.io/simplevalidation</link>
             </links>
           </configuration>
@@ -513,7 +513,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
-          <version>${version.maven-gpg-plugin}</version>
+          <version>${maven-gpg-plugin.version}</version>
           <executions>
             <execution>
               <id>sign-artifacts</id>
@@ -529,7 +529,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>flatten-maven-plugin</artifactId>
-          <version>${version.flatten-maven-plugin}</version>
+          <version>${flatten-maven-plugin.version}</version>
           <configuration>
             <flattenMode>oss</flattenMode>
             <updatePomFile>true</updatePomFile> <!-- for local install -->
@@ -575,7 +575,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${version.maven-enforcer-plugin}</version>
+        <version>${maven-enforcer-plugin.version}</version>
         <executions>
           <execution>
             <id>enforce-versions</id>
@@ -585,7 +585,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>[${version.maven},)</version>
+                  <version>[${maven.version},)</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>[17,)</version>
@@ -621,7 +621,7 @@
           <dependency>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>extra-enforcer-rules</artifactId>
-            <version>${version.extra-enforcer-rules}</version>
+            <version>${extra-enforcer-rules.version}</version>
           </dependency>
         </dependencies>
       </plugin>

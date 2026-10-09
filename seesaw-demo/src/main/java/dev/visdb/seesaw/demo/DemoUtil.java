@@ -1,3 +1,13 @@
+/* *****************************************************************************
+ * Portions created by Ernie Rael are
+ * Copyright (C) 2026 Ernie Rael.  All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org.
+ *
+ * Contributor(s): Ernie Rael <errael@raelity.com>
+ * ****************************************************************************/
 /**
  * This class can be used to read sql files into an array of Strings, each
  * representing a single query terminated by ";"
@@ -12,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -301,7 +312,7 @@ public class DemoUtil {
     return isUtilLogging;
   }
   /** This does nothing if java.util.logging is not used */
-  private static final java.util.logging.Logger swingsetLogger
+  private static final java.util.logging.Logger seesawLogger
       = java.util.logging.Logger.getLogger("dev.visdb.seesaw");
   /** This does nothing if java.util.logging is not used */
   @SuppressWarnings({"UseOfSystemOutOrSystemErr", "UseSpecificCatch", "CallToPrintStackTrace",
@@ -313,13 +324,24 @@ public class DemoUtil {
       jpl = Class.forName("org.apache.logging.log4j.jpl.Log4jSystemLogger");
     } catch (ClassNotFoundException ex) {
     }
-    if (jpl != null)
+    if (jpl != null) {
+      System.err.println("*** Apache logging found");
       return;
+    }
+
+    ByteArrayInputStream bais = null;
+    try (InputStream is = MainClass.class.getResourceAsStream("/util.logging.properties");) {
+      bais = new ByteArrayInputStream(is.readAllBytes());
+    } catch(IOException ex) {
+      logger.log(Logger.Level.ERROR, (String)null, ex);
+    }
 
     // TODO: take the following values from a config file
-    try (InputStream is = MainClass.class.getResourceAsStream("/util.logging.properties");) {
-      if (is == null)
+    try (InputStream is = bais;) {
+      if (is == null) {
+        System.err.println("*** 'util.loggin.properties' not found");
         return;
+      }
       is.mark(0x20000); // 2*64K
       Properties props = new Properties();
       try {
@@ -330,20 +352,21 @@ public class DemoUtil {
       }
 
       // FINE is System.logger's DEBUG
-      Level level = Level.parse(props.getProperty("swingset_logger_level", "INFO"));
+      Level level = Level.parse(props.getProperty("seesaw_logger_level", "INFO"));
 
       try {
-        swingsetLogger.setLevel(level);
+        seesawLogger.setLevel(level);
       } catch (Exception ex) {
         System.err.println(ex.getMessage());
         ex.printStackTrace();
       }
       is.reset();
       // merge in stuff from the config file
-      java.util.logging.LogManager.getLogManager().updateConfiguration(is, (k) -> ((o, n) -> {
-                                                                         //System.err.printf("LOGGING: key %s, old %s, new %s\n", k, o, n);
-                                                                         return n == null ? o : n;
-                                                                       }));
+      java.util.logging.LogManager.getLogManager().updateConfiguration(is,
+          (k) -> ((o, n) -> {
+            //System.err.printf("LOGGING: key %s, old %s, new %s\n", k, o, n);
+            return n == null ? o : n;
+          }));
 
       Preferences prefs = Preferences.userRoot().node("com/raelity/logman/demo");
       // Set up the logging manager
@@ -680,8 +703,8 @@ public class DemoUtil {
       String[] splitQueries = sBuffer.toString().split(";");
 
       // filter out empty statements
-      for (String query : splitQueries) {
-        query = query.trim();
+      for (String _query : splitQueries) {
+        String query = _query.trim();
         if (!query.isEmpty() && !query.equals("\t"))
           listOfQueries.add(query);
       }

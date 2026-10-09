@@ -51,6 +51,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.DbOps;
@@ -67,7 +68,6 @@ import dev.visdb.seesaw.formatting.SsTimeField;
 import dev.visdb.seesaw.formatting.SsTimestampField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
@@ -83,9 +83,7 @@ large negative impact on performance. See {@link SyncManager} for an
  */
 @SuppressWarnings("serial")
 public class TestFormattedComponents extends JFrame {
-  /**
-   * Log4j2 Logger
-   */
+  /** Logger */
   private static final Logger logger = JStuff.getLogger();
 
   /**
@@ -163,7 +161,7 @@ public class TestFormattedComponents extends JFrame {
     // INITIALIZE DATABASE CONNECTION AND COMPONENTS
     try {
       RowSet rowset = DemoUtil.getNewRowSet(connection);
-      rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
+      rowset.setCommand("SELECT * FROM formatted_test_data;");
       rowset.execute();
       rowsModel = RowsModel.create(rowset, createDbNav());
       navigator = new SsDataNavigator(rowsModel);
@@ -172,13 +170,13 @@ public class TestFormattedComponents extends JFrame {
     }
 
     // SETUP NAVIGATOR QUERY
-    final String query = "SELECT * FROM swingset_formatted_test_data;";
-    // (connection, query, "swingset_formatted_test_pk", "swingset_formatted_test_pk");
+    final String query = "SELECT * FROM formatted_test_data;";
+    // (connection, query, "formatted_test_pk", "formatted_test_pk");
     cmbSSDBComboNav = new SsDbComboBox2.Builder<Long, Object, Object>() {}
                           .connection(connection)
                           .query(query)
-                          .primaryKeyColumnName("swingset_formatted_test_pk")
-                          .displayColumnName("swingset_formatted_test_pk")
+                          .primaryKeyColumnName("formatted_test_pk")
+                          .displayColumnName("formatted_test_pk")
                           .build();
 
     try {
@@ -197,11 +195,11 @@ public class TestFormattedComponents extends JFrame {
     //
     // AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
     syncManager = new SyncManager<>(cmbSSDBComboNav, rowsModel);
-    syncManager.setSyncColumnName("swingset_formatted_test_pk");
+    syncManager.setSyncColumnName("formatted_test_pk");
     syncManager.sync();
 
     // SETUP BOUND COMPONENTS
-    rowsModel.bind(txtSwingSetFormattedTestPK, "swingset_formatted_test_pk");
+    rowsModel.bind(txtSwingSetFormattedTestPK, "formatted_test_pk");
 
     rowsModel.bind(fmtSSCurrencyField, "ss_currency_field");
     rowsModel.bind(fmtSSCurrencyFieldNull, "ss_currency_field_null");
@@ -426,7 +424,7 @@ public class TestFormattedComponents extends JFrame {
    */
   public void setDefaultValues() {
     try (ResultSet rs = connection.createStatement().executeQuery(
-             "SELECT nextval('swingset_formatted_test_seq') as nextVal;")) {
+             "SELECT nextval('formatted_test_seq') as nextVal;")) {
       // GET THE NEW RECORD ID.
       rs.next();
       final int recordPK = rs.getInt("nextVal");
