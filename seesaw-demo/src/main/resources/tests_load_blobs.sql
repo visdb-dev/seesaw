@@ -35,16 +35,19 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
-#
-# list of images and the primary key, swingset_base_test_pk that are put
-# into swingset_base_test_data field ss_image
-#
 
-/sample_image_1.png 1;
-/sample_image_2.png 3;
-/sample_image_3.png 4;
-/sample_image_4.png 5;
-/sample_image_5.png 6;
-/sample_image_6.png 7;
+/* This SQL script is used to load the images/blobs for the seesaw testing tables. */
 
+/* base_test_data images/blobs */
+UPDATE base_test_data SET ss_image = FILE_READ('classpath:/sample_image_1.png') WHERE base_test_pk = '1';
+UPDATE base_test_data SET ss_image = FILE_READ('classpath:/sample_image_2.png') WHERE base_test_pk = '3';
+UPDATE base_test_data SET ss_image = FILE_READ('classpath:/sample_image_3.png') WHERE base_test_pk = '4';
+UPDATE base_test_data SET ss_image = FILE_READ('classpath:/sample_image_4.png') WHERE base_test_pk = '5';
+UPDATE base_test_data SET ss_image = FILE_READ('classpath:/sample_image_5.png') WHERE base_test_pk = '6';
+UPDATE base_test_data SET ss_image = FILE_READ('classpath:/sample_image_6.png') WHERE base_test_pk = '7';

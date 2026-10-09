@@ -20,7 +20,6 @@
 
   <properties>
     <maven.javadoc.skip>true</maven.javadoc.skip>
-    <maven.deploy.skip>true</maven.deploy.skip>
     <version.logman>2.3.1</version.logman>
     <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
   </properties>
@@ -48,11 +47,14 @@
 
             This single dependency can be removed to take
             log4j out of the picture; or can comment out all log4j-*.
-    -->
+
+            The demo-runner allows log4j.
+
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-jpl</artifactId>
     </dependency>
+    -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
@@ -85,37 +87,9 @@
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <archive>
-                <manifest>
-                  <mainClass>
-                    dev.visdb.seesaw.demo.MainClass</mainClass>
-                </manifest>
-                <manifestEntries>
-                  <Multi-Release>true</Multi-Release>
-                </manifestEntries>
-              </archive>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -63,6 +63,7 @@ import org.netbeans.validation.api.ui.swing.SwingComponentDecorationFactory;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
+import dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.SsComponent;
@@ -74,14 +75,17 @@ import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
 public class SVUtils {
   private SVUtils() {}
 
-  /** SimpleValidation decorator style name. Find in Globals. */
+  /** 
+   * To make SimpleValidation the default, during startup style do
+   * {@snippet lang="java" class=SimpleValidation region=sv_global}
+   */
   public static final Decorator.DecoratorStyle SIMPLE_VALIDATION
       = new Decorator.DecoratorStyle("SV_DECORATOR_STYLE");
   /**
-   * To disable SimpleValidation borders do {@snippet lang="java":
-   *   Globals.setOption(SVUtils.SimpleValidationBorderEnable.class,
-   *                     new SVUtils.SimpleValidationBorder(false));
-   * }
+   * The SimpleValidation focus border can be disabled.
+   * {@snippet lang="java" class=SimpleValidation region=sv_border_enable}
+   * The color of the border is taken from {@code Globals}'
+   * {@link BorderDecoratorPaint}'s {@code FOCUSED_CLEAN} color.
    */
   public record SimpleValidationBorderEnable(boolean flag){}
   

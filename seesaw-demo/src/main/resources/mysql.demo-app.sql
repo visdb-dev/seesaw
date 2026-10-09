@@ -34,12 +34,17 @@
  *   Diego Gil
  *   Man "Bee" Vo
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
--- drop database if exists swingset_demo_suppliers_and_parts;
--- CREATE DATABASE IF NOT EXISTS swingset_demo_suppliers_and_parts;
--- USE swingset_demo_suppliers_and_parts;
+-- drop database if exists suppliers_and_parts;
+-- CREATE DATABASE IF NOT EXISTS suppliers_and_parts;
+-- USE suppliers_and_parts;
 
-/* This SQL script is used to generate the sample swingset_demo_suppliers_and_parts
+/* This SQL script is used to generate the sample suppliers_and_parts
    database for the SwingSet sample programs */
 
 DROP TABLE IF EXISTS supplier_part_data, part_data, supplier_data;

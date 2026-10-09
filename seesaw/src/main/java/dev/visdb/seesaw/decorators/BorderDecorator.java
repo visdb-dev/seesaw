@@ -94,8 +94,8 @@ public class BorderDecorator extends FocusDecorator {
   }
 
   /**
-   * Creates a Border that provides the visual state information; used by
-   * BorderDecorator. Typically one line wide, colored and possibly dashed.
+   * Creates a Colored Border that provides the visual state information;
+   * used by BorderDecorator.
    */
   public static class BorderDecoratorPaint {
     /**
