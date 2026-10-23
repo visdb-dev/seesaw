@@ -47,11 +47,11 @@ public class ComboBoxSnippets extends JFrame {
     }
   }
 
-  MyDbComboBox dbCombo = new MyDbComboBox
-                             .Builder() // NOTE: "{ }" not needed
-                             .primaryKeyColumnName("keyCol")
-                             .displayColumnName("dispCol")
-                             .build();
+  MyDbComboBox dbCombo
+      = new MyDbComboBox.Builder() // NOTE: "{ }" not needed
+          .primaryKeyColumnName("keyCol")
+          .displayColumnName("dispCol")
+          .build();
   // System.out.println(""+dbCombo.getD2Type()); // output: class java.lang.Byte
   // @end region=MyDbComboBox
 
@@ -107,13 +107,12 @@ public class ComboBoxSnippets extends JFrame {
   // @end region=ExtendableDbComboBox
   void useExCombo() {
     // @start region=ExtendableDbComboBoxExample
-    DbComboBox2Extra<Double, List<Double>> cbExtra = new DbComboBox2Extra
-                                                         .Builder<Double, List<Double>>() {}
-                                                         // <- "{ }" NEEDED
-                                                         .primaryKeyColumnName("aaa")
-                                                         .displayColumnName("bbb")
-                                                         .d3Data(new ArrayList<>())
-                                                         .build();
+    DbComboBox2Extra<Double, List<Double>> cbExtra
+        = new DbComboBox2Extra.Builder<Double, List<Double>>() {} // <- "{ }" NEEDED
+            .primaryKeyColumnName("aaa")
+            .displayColumnName("bbb")
+            .d3Data(new ArrayList<>())
+            .build();
     cbExtra.getD3().addAll(List.of(7D, 6D, 5D));
     System.out.println("" + cbExtra.getKeyType());
     System.out.println("" + cbExtra.getDisplayValueType());
@@ -121,10 +120,20 @@ public class ComboBoxSnippets extends JFrame {
     System.out.println("" + cbExtra.getD3TypeToken());
     System.out.println("" + cbExtra.getD3());
     // @end region=ExtendableDbComboBoxExample
+    
+    /*
+    // @start region=ExtendableDbComboBoxExampleOutput
+    class java.lang.Integer
+    class java.lang.String
+    class java.lang.Double
+    java.util.List<java.lang.Double>
+    [7.0, 6.0, 5.0]
+    // @end region=ExtendableDbComboBoxExampleOutput
+    */
   }
 
   RowsModel rowsModel;
-  SsDbComboBox2<Long, String, Long> combo;
+  // SsDbComboBox2<Long, String, Long> combo;
 
   // @start region=init
   /**
@@ -148,13 +157,13 @@ public class ComboBoxSnippets extends JFrame {
 
       // Create an instance of the SsDbComboBox2 with the connection object,
       // query, and column names.
-      combo = new SsDbComboBox2
-                  .Builder<Long, String, Long>() {} // <- "{ }" NEEDED
-                  .connection(connection)
-                  .query(query)
-                  .primaryKeyColumnName("part_id")
-                  .displayColumnName("part_name")
-                  .build();
+      SsDbComboBox2<Long, String, Long> combo
+          = new SsDbComboBox2.Builder<Long, String, Long>() {} // <- "{ }" NEEDED
+              .connection(connection)
+              .query(query)
+              .primaryKeyColumnName("part_id")
+              .displayColumnName("part_name")
+              .build();
 
       // Execute the query.
       combo.execute();
@@ -162,12 +171,12 @@ public class ComboBoxSnippets extends JFrame {
       // Specifies the column bound to the combo.
       rowsModel.bind(combo, "part_id");
 
-    } catch (Exception ex) {
-      // Exception handler here...
-    }
+      // Add the ssdbcombobox to the JFrame.
+      getContentPane().add(combo);
 
-    // Add the ssdbcombobox to the JFrame.
-    getContentPane().add(combo);
+    } catch (Exception ex) {
+      // Exception handling here ...
+    }
   }
   // @end region=init
 
@@ -180,7 +189,7 @@ public class ComboBoxSnippets extends JFrame {
     // @end region=auto_gen
   }
 
-  RowSet rowSet;
+  // RowSet rowSet;
 
   @SuppressWarnings("unused")
   void customKey() {
