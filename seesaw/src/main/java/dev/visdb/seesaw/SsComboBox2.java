@@ -118,8 +118,8 @@ import static java.lang.System.Logger.Level.*;
  * Builder.modelType(modelType)}
  * to select the model type.
  * <p>
- * See <a href="DBComboBox2.html#builders-and-generics">
- * DBComboBox2 examples of working with {@code Builder}s.</a>
+ * See <a href="SsDbComboBox2.html#builders-and-generics">
+ * SsDbComboBox2 examples of working with {@code Builder}s.</a>
  * <p>
  * <b>Warning:
  * This combo box automatically inserts an item when {@link #getAllowNull()} is true.
@@ -380,7 +380,7 @@ public class SsComboBox2<K, D, D2> extends JComboBox<ListItem> implements SsComp
   /**
    * A list item formatter that displays the key if the displayValue is null.
    */
-  @SuppressWarnings("serial")
+  @SuppressWarnings({"serial", "CloneableImplementsClone"})
   class ShowKeyIfNullDisplayValue extends ListItemFormat {
     /**
      * If null displayValue, then show the key; otherwise do the default

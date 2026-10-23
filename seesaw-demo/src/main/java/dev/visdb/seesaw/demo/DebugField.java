@@ -46,7 +46,7 @@ public class DebugField extends Field {
     super(factory);
   }
 
-  /** {@inheritDoc */
+  /** {@inheritDoc} */
   @Override
   public void cleanField() {
     setValue(getAllowNull() ? null : 777);

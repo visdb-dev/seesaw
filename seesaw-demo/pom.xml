@@ -19,7 +19,6 @@
   <name>${group_abbrev}:${project.artifactId}</name>
 
   <properties>
-    <maven.javadoc.skip>true</maven.javadoc.skip>
     <logman.version>2.3.1</logman.version>
     <exec.mainClass>dev.visdb.seesaw.demo.MainClass</exec.mainClass>
   </properties>

@@ -105,13 +105,8 @@ import static java.lang.System.Logger.Level.*;
  * {@snippet class=ComboBoxSnippets region=ExtendableDbComboBox}
  * And a usage example
  * {@snippet class=ComboBoxSnippets region=ExtendableDbComboBoxExample}
- * With output {@snippet :
- *     class java.lang.Integer
- *     class java.lang.String
- *     class java.lang.Double
- *     java.util.List<java.lang.Double>
- *     [7.0, 6.0, 5.0]
- * }
+ * With output 
+ * {@snippet class=ComboBoxSnippets region=ExtendableDbComboBoxExampleOutput}
  * <p>
  * <h2>Example with two tables</h2>
  * <ol>
