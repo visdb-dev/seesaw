@@ -24,35 +24,35 @@ import dev.visdb.seesaw.navigate.RowsModel;
  */
 @SuppressWarnings("serial")
 public class DataGridSnippets extends JFrame {
-  SsTable dataGrid;
-  RowSet rowSet;
+  // SsTable dataGrid;
+  // RowSet rowSet;
   RowsModel rowsModel;
 
   // @start region=init1
   /**
-   * Set up a data grid with customizations for some known table.
-   * @param dataGrid initialize this data grid
+   * Set up a data table with customizations.
+   * @param table initialize this table
    * @throws SQLException
    */
-  void init(SsTable dataGrid) throws SQLException {
+  void init(SsTable table) throws SQLException {
     // Set the header before setting the RowsModel.
-    dataGrid.setHeaders(new String[] {"Part Name", "Color Code", " Weight", "City"});
-    dataGrid.setRowsModel(rowsModel);
+    table.setHeaders(new String[] {"Part Name", "Color Code", " Weight", "City"});
+    table.setRowsModel(rowsModel);
 
     // HIDE THE PART ID COLUMN
-    dataGrid.setHiddenColumnsByName(List.of("part_id"));
+    table.setHiddenColumnsByName(List.of("part_id"));
 
-    dataGrid.setMessageWindow(this);
-    dataGrid.setUneditableColumns(new String[] {"part_id"});
+    table.setDialogParent(this); // Defaults to the SsTable
+    table.setUneditableColumns(new String[] {"part_id"});
 
-    dataGrid.setComboRenderer("color_code", new String[] {"Red", "Green", "Blue"},
-                              new Integer[] {0, 1, 2});
-    dataGrid.setDefaultValues(new int[] {1, 2, 3}, new Object[] {0, 20, "New Orleans"});
+    table.setComboRenderer("color_code", new String[] {"Red", "Green", "Blue"},
+                           new Integer[] {0, 1, 2});
+    table.setDefaultValues(new int[] {1, 2, 3}, new Object[] {0, 20, "New Orleans"});
 
-    dataGrid.setPrimaryColumn("part_id");
+    table.setPrimaryColumn("part_id");
 
     // Setup the primary key generation as needed.
-    dataGrid.setSSDataValue(() -> {
+    table.setSsDataValue(() -> {
       Integer key = null;
 
       // your primary key value generation goes here.

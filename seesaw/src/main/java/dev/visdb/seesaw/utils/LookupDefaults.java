@@ -12,6 +12,7 @@ package dev.visdb.seesaw.utils;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.beans.Beans;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -122,9 +123,11 @@ public class LookupDefaults {
       return;
 
     if (EventQueue.isDispatchThread()) {
-      String msg = "LookupDefaults.initStyles() invoked from EDT.";
-      Exception ex = new Exception(msg);
-      logger.log(Level.ERROR, msg, ex);
+      if (!Beans.isDesignTime()) {
+        String msg = "LookupDefaults.initStyles() invoked from EDT.";
+        Throwable stack = new Throwable(msg);
+        logger.log(Level.ERROR, msg, stack);
+      }
 
       // Problem if EDT tries to access TextStyles before loading complete.
       new SwingWorker<Object, Object>() {

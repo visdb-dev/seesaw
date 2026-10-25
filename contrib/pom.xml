@@ -7,7 +7,7 @@
 
   <parent>
     <groupId>dev.visdb.seesaw</groupId>
-    <artifactId>seesaw-parent</artifactId>
+    <artifactId>visdb-seesaw</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -17,7 +17,7 @@
   <artifactId>seesaw-contrib</artifactId>
   <packaging>pom</packaging>
 
-  <name>${group_abbrev}</name>
+  <name>${project.artifactId}</name>
   <modules>
     <module>lgooddatepicker</module>
     <module>simplevalidation</module>
@@ -25,7 +25,8 @@
   </modules>
 
   <properties>
-    <group_abbrev>visdb.contrib</group_abbrev>
+    <!-- <group_abbrev>seesaw.contrib:</group_abbrev> -->
+    <group_abbrev></group_abbrev>
 
     <ldatepicker.version>11.2.1</ldatepicker.version>
     <!-- simplevalidation in seesaw-parent -->
@@ -35,7 +36,7 @@
     <dependencies>
       <dependency>
         <groupId>dev.visdb.seesaw</groupId>
-        <artifactId>seesaw-parent</artifactId>
+        <artifactId>visdb-seesaw</artifactId>
         <version>${revision}</version>
         <type>pom</type>
         <scope>import</scope>
