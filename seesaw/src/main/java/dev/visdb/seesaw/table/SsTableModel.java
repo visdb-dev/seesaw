@@ -77,7 +77,7 @@ import static java.lang.System.Logger.Level.*;
  * JTable), but the cell renderers and hidden columns features of the SsDataGrid
  * will not be available.
  * <p>
-SsTableModel can be used with a JTable to get a Grid view of the data.
+ * SsTableModel can be used with a JTable to get a Grid view of the data.
  */
 @SuppressWarnings("serial")
 public class SsTableModel extends AbstractTableModel {
@@ -93,7 +93,7 @@ public class SsTableModel extends AbstractTableModel {
 
   /**
    * Implementation of SsCellEditing interface used to determine dynamically if a
-given cell can be edited and to determine if a given value is valid.
+   * given cell can be edited and to determine if a given value is valid.
    */
   private SsCellEditing cellEditing = null;
 
@@ -105,9 +105,9 @@ given cell can be edited and to determine if a given value is valid.
   private transient List<Class<?>> columnClasses = Collections.emptyList();
 
   /**
-   * Window where messages should be displayed.
+   * Window to parent dialogs.
    */
-  private transient Component component = null;
+  private transient Component dialogParent = null;
 
   /**
    * Implementation of DataGridHandler interface used to determine dynamically if
@@ -178,6 +178,13 @@ rows.
     init(true);
   }
 
+  private void messageDialog(String msg, Throwable ex) {
+    Component parent = getDialogParent();
+    if (parent == null)
+      return;
+    JOptionPane.showMessageDialog(parent, ex == null ? msg : msg + ex.getMessage());
+  }
+
   /**
    * Deletes the specified JTable row from the database.
    * The rows are numbered as: 0, 1, * ..., n-1
@@ -205,9 +212,7 @@ rows.
         return true;
       } catch (final SQLException se) {
         logger.log(ERROR, "SQL Exception while deleting row.", se);
-        if (component != null) {
-          JOptionPane.showMessageDialog(component, "Error while deleting row.\n" + se.getMessage());
-        }
+        messageDialog("Error while deleting row.\n", se);
       }
     }
 
@@ -328,10 +333,7 @@ rows.
       value = RowSetOps.getColumnObjectDirect(RSC.get(rowsModel, column + 1));
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while retrieving value.", se);
-      if (component != null) {
-        JOptionPane.showMessageDialog(component,
-                                      "Error while retrieving value.\n" + se.getMessage());
-      }
+      messageDialog("Error while retrieving value.\n", se);
     }
 
     return value;
@@ -451,9 +453,7 @@ rows.
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while inserting row.", se);
       inInsertRow = false;
-      if (component != null) {
-        JOptionPane.showMessageDialog(component, "Error while inserting row.\n" + se.getMessage());
-      }
+      messageDialog("Error while inserting row.\n", se);
     }
 
     logger.log(DEBUG, "Successfully added row.");
@@ -509,10 +509,7 @@ rows.
 
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while setting defaults for row.", se);
-      if (component != null) {
-        JOptionPane.showMessageDialog(component,
-                                      "Error while setting defaults for row.\n" + se.getMessage());
-      }
+      messageDialog("Error while setting defaults for row.\n", se);
     }
   } // end protected void setDefaults() {
 
@@ -572,13 +569,33 @@ rows.
   }
 
   /**
+   * A dialog, like when there's an error, uses this component as its parent.
+   *
+   * @param component component to parent dialogs.
+   */
+  public void setDialogParent(Component component) {
+    this.dialogParent = component;
+  }
+
+  /**
+   * Get the component to use as the parent for any dialogs,
+   * typically error, generated from this SsTableModel.
+   * @return parent for my dialogs.
+   */
+  protected Component getDialogParent() {
+    return this.dialogParent;
+  }
+
+  /**
    * Sets the message window. This is used as parent component for pop up message
    * dialogs.
    *
    * @param component the component that should be used for message dialogs.
+   * @deprecated use setDialogParent()
    */
+  @Deprecated
   public void setMessageWindow(Component component) {
-    this.component = component;
+    setDialogParent(component);
   }
 
   /**
@@ -591,10 +608,7 @@ specified for the SsTableModel and the underlying SQL data type.
       updateColumnObjectDirect(rowset, primaryColumn + 1, dataValue.getPrimaryColumnValue());
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while insering Primary Key value.", se);
-      if (component != null) {
-        JOptionPane.showMessageDialog(
-            component, "Error while inserting Primary Key value.\n" + se.getMessage());
-      }
+      messageDialog("Error while inserting Primary Key value.\n", se);
     }
   }
 
@@ -685,9 +699,7 @@ be done after row insertion, and deletion.
       type = RowSetOps.getJDBCColumnType(rowset, column + 1);
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while updating value.", se);
-      if (component != null) {
-        JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
-      }
+      messageDialog("Error while updating value.\n", se);
       return;
     }
 
@@ -747,9 +759,7 @@ be done after row insertion, and deletion.
       logger.log(DEBUG, () -> sf("Updated value: %s.", getValueAt(row, column)));
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while updating value.", se);
-      if (component != null) {
-        JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
-      }
+      messageDialog("Error while updating value.\n", se);
     }
   }
 }

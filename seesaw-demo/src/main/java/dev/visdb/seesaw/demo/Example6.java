@@ -138,7 +138,7 @@ public class Example6 extends JFrame {
                                 new Object[] {"", 1, 20, "Default City"});
 
       dataGrid.setPrimaryColumn("part_id");
-      dataGrid.setSSDataValue(() -> {
+      dataGrid.setSsDataValue(() -> {
         int partID = 0;
 
         try {

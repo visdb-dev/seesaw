@@ -45,6 +45,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.beans.Beans;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.lang.reflect.Constructor;
@@ -109,8 +110,8 @@ import static java.lang.System.Logger.Level.*;
  * RowSet as a source of data. It also provides different cell renderers
  * including a comboboxes renderer and a date renderer.
  * <p>
- * SsTable internally uses the SsTableModel to display the information in a
- * table format. SsTable also provides an easy means for displaying headers.
+ * SsTable displays the information from its SsTableModel.
+ * SsTable also provides an easy means for displaying headers.
  * Columns can be hidden or made uneditable. In addition, it provides much finer
  * control over which cells can be edited and which cells can't be edited. It
  * uses the SsCellEditing interface for achieving this. The implementation of
@@ -139,18 +140,18 @@ import static java.lang.System.Logger.Level.*;
  * function you have to call them only after setting the RowSet. Because
  * SsTable uses the RowSet to convert the column names to column numbers.
  * If you specify the column numbers you can do before or after setting the
- * RowSet, it does not matter.
+ * RowsModel, it does not matter.
  * <p>
  * You can simply remember this order
  * <ol>
  * <li>Set the headers
- * <li>Set the RowSet
- * <li>Any other function calls.
+ * <li>Set the RowsModel
+ * <li>Other configuration.
  * </ol>
  * <b>Simple Example</b>:
  * {@snippet class=DataGridSnippets region=init1}
  *
- * Also See Examples 5, 6, 7 in the samples.
+ * Also See Examples 5, 6, 7 in the demo.
  */
 @SuppressWarnings("serial")
 public class SsTable extends JTable {
@@ -799,7 +800,7 @@ public class SsTable extends JTable {
   /**
    * Component where messages should be popped up.
    */
-  private Component messageWindow = null;
+  private Component dialogParent = null;
 
   /**
    * Scrollpane used to scroll datagrid.
@@ -816,7 +817,7 @@ public class SsTable extends JTable {
    * Constructs an empty data grid.
    */
   public SsTable() {
-    messageWindow = this;
+    dialogParent = this;
     init();
   }
 
@@ -873,18 +874,24 @@ public class SsTable extends JTable {
    */
   @Override
   public void setModel(TableModel dataModel) {
-    if (!(dataModel instanceof SsTableModel)) {
-      throw new IllegalArgumentException("Must be an SSTableModel");
+    if (Beans.isDesignTime()) {
+      // if (getModel() == null)
+      super.setModel(dataModel instanceof SsTableModel ssTableModel
+                     ? ssTableModel : new SsTableModel());
+      return;
     }
+
+    if (!(dataModel instanceof SsTableModel))
+      throw new IllegalArgumentException("Must be an SsTableModel");
 
     if (getModel() == null) {
       super.setModel(dataModel);
     } else {
-      throw new IllegalStateException("Can not change SSTableModel");
+      throw new IllegalStateException("Can not change SsTableModel");
     }
 
     // Alternate implementation (untested) that allows changing
-    // an existing SSTable model.
+    // an existing SsTable model.
     // must also propogate messageWindow
     // super.setModel(dataModel);
   }
@@ -1085,16 +1092,6 @@ public class SsTable extends JTable {
   }
 
   /**
-   * Returns the component on which error messages will be popped up. The error
-   * dialog will use this component as its parent component.
-   *
-   * @return the component that should be used when displaying error messages
-   */
-  public Component getMessageWindow() {
-    return messageWindow;
-  }
-
-  /**
    * Returns number of selected columns.
    * <p>
    * Currently not a bean property since there is no associated variable.
@@ -1216,9 +1213,9 @@ public class SsTable extends JTable {
         }
         final int[] rows = getSelectedRows();
         // CONFIRM THE DELETION
-        final int returnValue = JOptionPane.showConfirmDialog(
-            messageWindow, "You are about to delete " + rows.length + " rows. "
-                               + "\nAre you sure you want to delete the rows?");
+        final int returnValue = JOptionPane.showConfirmDialog(getDialogParent(), sf(
+            "You are about to delete %d rows.\nAre you sure you want to delete the rows?",
+            rows.length));
         if (returnValue != JOptionPane.YES_OPTION) {
           return;
         }
@@ -1241,7 +1238,7 @@ public class SsTable extends JTable {
 
     // SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
     // ERROR MESSAGES.
-    getModel().setMessageWindow(messageWindow);
+    getModel().setDialogParent(dialogParent);
 
     // THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
     // CODE IN HIDECOLUMNS FUNCTION DEPENDS ON THIS VARIABLE.
@@ -1251,7 +1248,7 @@ public class SsTable extends JTable {
     scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                                  ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-  } // end protected void init() {
+  } // end protected void init()
 
   /**
    * @return the allowDeletion flag
@@ -1566,17 +1563,43 @@ public class SsTable extends JTable {
   }
 
   /**
-   * Sets the component on which error messages will be popped up. The error
-   * dialog will use this component as its parent component.
+   * A dialog, like when there's an error, uses this component as its parent.
    *
-   * @param messageWindow the component that should be used when displaying error
-   *                       messages
+   * @return component component to parent dialogs.
    */
+  public Component getDialogParent() {
+    return dialogParent;
+  }
+
+  /**
+   * A dialog, e.g. error, uses this component as its parent.
+   * The dialogParent is forwarded to the current SsTableModel.
+   *
+   * @param component component to parent dialogs, if null use this SsTable.
+   */
+  public void setDialogParent(Component component) {
+    final Component oldValue = this.dialogParent;
+    this.dialogParent = component != null ? component : this;
+    firePropertyChange("messageWindow", oldValue, this.dialogParent);
+    getModel().setDialogParent(this.dialogParent);
+  }
+
+  /**
+   * @return the component that should be used when displaying error messages
+   * @deprecated use getDialogParent
+   */
+  @Deprecated
+  public Component getMessageWindow() {
+    return getDialogParent();
+  }
+  
+  /**
+   * @param messageWindow
+   * @deprecated use setDialogParent
+   */
+  @Deprecated
   public void setMessageWindow(Component messageWindow) {
-    final Component oldValue = this.messageWindow;
-    this.messageWindow = messageWindow != null ? messageWindow : this;
-    firePropertyChange("messageWindow", oldValue, this.messageWindow);
-    getModel().setMessageWindow(this.messageWindow);
+    setDialogParent(messageWindow);
   }
 
   /**
@@ -1657,33 +1680,33 @@ public class SsTable extends JTable {
 
   /**
    * If the user has to decide on which cell has to be editable and which is not
-   * then SSCellEditable interface has to be implemented and set it for the
-   * SSTableModel.
+   * then SsCellEditing interface has to be implemented and set it for the
+   * SsTableModel.
    * <p>
    * Currently not a bean property since there is no associated variable.
    *
-   * @param cellEditing implementation of SSCellEditable interface.
+   * @param cellEditing implementation of SsCellEditable interface.
    */
-  public void setSSCellEditing(SsCellEditing cellEditing) {
+  public void setSsCellEditing(SsCellEditing cellEditing) {
     getModel().setSsCellEditing(cellEditing);
   }
 
   /**
-   * Sets the SSDataValue interface implemention. This interface specifies
+   * Sets the SsDataValue interface implemention. This interface specifies
    * function to retrieve primary column values for a new row to be added.
    * <p>
    * Currently not a bean property since there is no associated variable.
    *
    * @param dataValue implementation of SsDataValue
    */
-  public void setSSDataValue(SsDataValue dataValue) {
+  public void setSsDataValue(SsDataValue dataValue) {
     getModel().setSsDataValue(dataValue);
   }
 
   /**
    * Sets the uneditable columns. The columns specified as uneditable will not be
    * available for user to edit. This overrides the isCellEditable function in
-   * SSCellEditing.
+   * SsCellEditing.
    * <p>
    * Currently not a bean property since there is no associated variable.
    *
@@ -1698,7 +1721,7 @@ public class SsTable extends JTable {
   /**
    * Sets the uneditable columns. The columns specified as uneditable will not be
    * available for user to edit. This overrides the isCellEditable function in
-   * SSCellEditing.
+   * SsCellEditing.
    * <p>
    * Currently not a bean property since there is no associated variable.
    *

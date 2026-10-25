@@ -46,6 +46,7 @@ import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.Beans;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.Array;
@@ -86,6 +87,8 @@ import dev.visdb.seesaw.datasources.SqlConversionException;
 import dev.visdb.seesaw.datasources.SqlInternalException;
 import dev.visdb.seesaw.datasources.SqlNullException;
 import dev.visdb.seesaw.datasources.SqlRuntimeException;
+import dev.visdb.seesaw.decorators.BorderDecorator;
+import dev.visdb.seesaw.decorators.BorderDecoratorFactory;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.TextDecorator;
@@ -1335,6 +1338,8 @@ final class SsCommon {
 
   /** Use lookup to find the default decorator */
   static Decorator createDefaultDecorator() {
+    if (Beans.isDesignTime())
+      return new BorderDecorator();
     return SsUtils.findDecoratorFactory().get();
   }
 

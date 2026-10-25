@@ -38,9 +38,9 @@
 package dev.visdb.seesaw.table;
 
 /**
- * The SsCellEditing interface specifies the methods the SSTableModel will use
-to determine whether or not a given cell can be edited or if a user-specified
-value for a cell is valid or invalid.
+ * The SsCellEditing interface specifies the methods the SsTableModel will use
+ * to determine whether or not a given cell can be edited or if a user-specified
+ * value for a cell is valid or invalid.
  */
 public interface SsCellEditing {
   /**
@@ -64,9 +64,9 @@ public interface SsCellEditing {
    * Returns true if the cell at row _row and at column _column is editable else
    * false.
    * <p>
-SSTableModel first looks in to uneditable columns, if the column is not in
-the uneditable columns list then this function is called (If SsCellEditing is
-implemented).
+   * SsTableModel first looks in to uneditable columns, if the column is not in
+   * the uneditable columns list then this function is called (If SsCellEditing is
+   * implemented).
    *
    * @param row    the row to which the cell belongs.
    * @param column the column to which the cell belongs.

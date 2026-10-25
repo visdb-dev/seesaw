@@ -12,9 +12,10 @@
   <artifactId>contrib-docs</artifactId>
   <packaging>jar</packaging>
 
-  <name>${group_abbrev}:${project.artifactId}</name>
+  <name>${group_abbrev}${project.artifactId}</name>
 
   <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 </project>
 <!-- vi: set sw=2 ts=8: -->

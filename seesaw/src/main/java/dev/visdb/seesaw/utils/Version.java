@@ -43,7 +43,9 @@
 package dev.visdb.seesaw.utils;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.System.Logger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -228,7 +230,11 @@ public class Version implements Comparable<Version> {
     String ver = null;
     Properties props = new Properties();
     try {
-      props.load(Version.class.getClassLoader().getResourceAsStream(SS_VERSION_FILENAME));
+      // NOTE: top level pom.xml specifies resources as UTF-8
+      props.load(new InputStreamReader(
+          Version.class.getClassLoader().getResourceAsStream(SS_VERSION_FILENAME),
+          StandardCharsets.UTF_8));
+      // props.load(Version.class.getClassLoader().getResourceAsStream(SS_VERSION_FILENAME));
       ver = props.getProperty(VERSION_KEY);
     } catch (IOException | NullPointerException ex) {
       logger.log(ERROR, "Unable to load SeeSaw version properties file.", ex);
