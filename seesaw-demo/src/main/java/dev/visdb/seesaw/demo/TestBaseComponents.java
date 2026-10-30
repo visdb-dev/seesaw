@@ -586,10 +586,11 @@ public class TestBaseComponents extends JFrame {
                 problems.append(ssComp.validationMsg(fail.get()));
               
               int test = testValidationFail();
+              String clazz = model.getClass().getSimpleName();
               if (test == 2)
-                problems.append(sf("testImageValidationFail '%d'", testValidationCount));
+                problems.append(sf("%s Validation Fail '%d'", clazz, testValidationCount));
               else if (test == 1)
-                problems.append(sf("testImageValidationWarn '%d'", testValidationCount),
+                problems.append(sf("%s Validation Warn '%d'", clazz, testValidationCount),
                                 Severity.WARNING);
             }
           }

@@ -8,16 +8,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>dev.visdb.seesaw</groupId>
-  <artifactId>seesaw-parent</artifactId>
+  <artifactId>visdb-seesaw</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
 
-  <name>${group_abbrev}:${project.artifactId}</name>
+  <name>${project.artifactId}</name>
 
   <description>
     Seesaw library:
     Java swing database aware components.
-    Supports multiple databases through plugins.
+    Supports multiple databases through simple plugins.
   </description>
 
   <url>
@@ -77,8 +77,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <revision>0.5.1</revision>
-    <group_abbrev>visdb</group_abbrev>
+    <revision>0.5.2</revision>
+    <group_abbrev></group_abbrev>
 
     <snippet_path>
       ${maven.multiModuleProjectDirectory}/seesaw-demo/src/test/java/snippet_files
@@ -310,6 +310,10 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${maven-resources-plugin.version}</version>
+          <configuration>
+            <!-- NOTE: seesaw's Version.java props.load is sensitive to the encoding. -->
+            <propertiesEncoding>UTF-8</propertiesEncoding>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -589,7 +593,7 @@
                   <version>[${maven.version},)</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>[17,)</version>
+                  <version>[${java-source},)</version>
                 </requireJavaVersion>
                 <dependencyConvergence/>
                 <banDuplicateClasses>

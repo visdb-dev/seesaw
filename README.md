@@ -150,3 +150,7 @@ For questions regarding Seesaw, contact info at
 
 ### Seesaw Demo - Example 5
 ![Seesaw Demo - Example 5](docs/ss4/img/example5.png)
+
+-------
+Releases are signed with GPG key:
+22F7 6E71 B251 AA2C 6AFD  8F9B D6A9 8F71 FF9B C213

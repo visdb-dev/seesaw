@@ -106,7 +106,7 @@ class DataGridExampleSupport {
     // stuff needed if there's going to be an insertion
     dataGrid.getModel().setSsDataGridHandler(new DataGridHandler());
     dataGrid.setPrimaryColumn(primaryColumn);
-    dataGrid.setSSDataValue(dataValue);
+    dataGrid.setSsDataValue(dataValue);
     dataGrid.setDefaultValues(columnNames, defaultValues);
 
     TableColumnModel cm = dataGrid.getColumnModel();
