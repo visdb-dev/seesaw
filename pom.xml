@@ -95,10 +95,10 @@
     <!-- Dependencies -->
     <glazedlists.version>1.11.1203</glazedlists.version>
     <table-sort-header.version>1.0.1</table-sort-header.version>
-    <google-guava.version>33.7.1-jre</google-guava.version>
+    <google-guava.version>33.7.2-jre</google-guava.version>
     <util-lookup.version>1.0.0</util-lookup.version>
     <weak-event-bus-receiver.version>1.0.0</weak-event-bus-receiver.version>
-    <jackson.version>3.2.3</jackson.version>
+    <jackson.version>3.2.4</jackson.version>
     <!--        Demo -->
     <log4j.version>2.26.1</log4j.version>
     <h2.version>2.5.250</h2.version>
@@ -108,7 +108,7 @@
     <!--        Test -->
     <junit-jupiter.version>6.1.3</junit-jupiter.version>
     <assertj.version>3.27.7</assertj.version>
-    <mockito.version>5.23.0</mockito.version>
+    <mockito.version>5.24.0</mockito.version>
 
     <!-- Plugins -->
     <versions-maven-plugin.version>2.22.0</versions-maven-plugin.version>
@@ -117,7 +117,7 @@
     <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
-    <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+    <maven-surefire-plugin.version>3.6.1</maven-surefire-plugin.version>
     <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
     <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
     <maven-install-plugin.version>3.2.0</maven-install-plugin.version>
