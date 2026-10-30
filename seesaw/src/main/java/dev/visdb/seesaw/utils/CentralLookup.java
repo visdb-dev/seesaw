@@ -1,6 +1,7 @@
 
 package dev.visdb.seesaw.utils;
 
+
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -54,16 +55,17 @@ to use
     content.remove(instance);
   }
 
-  /**
-   * Remove all instances of {@code clazz}, then add {@code instance}.
-   * @param <T> type of interface remove/replace
-   * @param clazz class to remove
-   * @param instance add this
-   */
-  public <T> void replace(Class<T> clazz, T instance) {
-    lookupAll(clazz).forEach(o -> remove(o));
-    add(instance);
-  }
+  // /**
+  //  * Remove all instances of {@code clazz}, then add {@code instance}.
+  //  * @param <T> type of interface remove/replace
+  //  * @param clazz class to remove
+  //  * @param instance add this
+  //  */
+  // public <T> void replace(Class<T> clazz, T instance) {
+  //   lookupAll(clazz).forEach(o -> remove(o));
+  //   add(instance);
+  // }
+
   /**
    * Returns the default CentralLookup. This can be used as an application context for
    * the entire application. If needed CentralLookup may be used directly through the

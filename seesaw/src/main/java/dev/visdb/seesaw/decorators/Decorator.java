@@ -50,38 +50,27 @@ import dev.visdb.seesaw.utils.SsComponent;
  * Typically both component and its validator are checked.
  */
 public interface Decorator extends AnyDecorator {
+  /** JComponent ClientProperty key */
+  public static final Object SEE_SAW_PANEL_KEY = new Object() {
+    @Override public String toString() { return "SEE_SAW_PANEL"; }
+  };
+
   /**
-   * Decorator style primarily used with {@link DecoratorSupplier}.
+   * Decorator style. See {@link DecoratorFactory}.
    */
-  public static class DecoratorStyle {
-    private final String style;
-    // Well known border styles
+  public record DecoratorStyle(String style) {
     /** BorderDecorator */
-    public static DecoratorStyle BORDER = new DecoratorStyle("BORDER");
+    public static final DecoratorStyle BORDER = new DecoratorStyle("BORDER");
     /** BackgroundDecorator */
-    public static DecoratorStyle BACKGROUND = new DecoratorStyle("BACKGROUND");
+    public static final DecoratorStyle BACKGROUND = new DecoratorStyle("BACKGROUND");
     /** no decoration */
-    public static DecoratorStyle NONE = new DecoratorStyle("NONE");
-
-    /**
-     * create named decorator style
-     * @param style arbitrary string
-     */
-    public DecoratorStyle(String style) {
-      this.style = style;
-    }
-
-    /** {@inheritDoc } */
-    @Override
-    public String toString() {
-      return "DecoratorStyle{"
-          + "style=" + style + '}';
-    }
+    public static final DecoratorStyle NONE = new DecoratorStyle("NONE");
   }
 
   /**
    * Decorate the component using current state.
-   * The current state is typically obtained by getComponent().isDataValid()
+   * The current state is typically obtained by invoking
+   * {@link SsComponent#allValidate() }.
    * @return true if the data is valid
    */
   boolean decorate();
@@ -99,17 +88,6 @@ public interface Decorator extends AnyDecorator {
    * @return  decorator style
    */
   DecoratorStyle getDecoratorStyle();
-
-  /**
-   * Decorators typically invoke a component's TextDecorator as as well;
-   * use this method to control that behavior.
-   * <p>
-   * A Decorator should default to true.
-   * A decorator may choose to never decorate text; should document this.
-   *
-   * @param flag
-   */
-  void setDecorateTextEnabled(boolean flag);
 
   /**
    * A decorator that does nothing.
@@ -139,9 +117,6 @@ public interface Decorator extends AnyDecorator {
     public SsComponent getSsComponent() {
       return null;
     }
-
-    @Override
-    public void setDecorateTextEnabled(boolean flag) {}
   };
 }
 // vi: sw=2 ts=8

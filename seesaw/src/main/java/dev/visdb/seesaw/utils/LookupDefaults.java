@@ -1,34 +1,16 @@
 /* *****************************************************************************
- * Copyright (C) 2026, Ernie R Rael. All rights reserved.
+ * Portions created by Ernie Rael are
+ * Copyright (C) 2026 Ernie Rael.  All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org.
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Contributor(s): Ernie Rael <errael@raelity.com>
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.Reader;
@@ -37,12 +19,16 @@ import java.lang.System.Logger.Level;
 
 import javax.swing.SwingWorker;
 
-import dev.visdb.seesaw.decorators.BackgroundDecorator;
+import org.openide.util.lookup.Lookups;
+
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
-import dev.visdb.seesaw.decorators.DecoratorSupplier;
+import dev.visdb.seesaw.decorators.DecoratorFactory;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.navigate.Utils;
+import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
+
+import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
  * This class is used internally to initialize CentralLookup defaults
@@ -88,38 +74,32 @@ public class LookupDefaults {
 
     initStyles();
 
-    CentralLookup lkup = CentralLookup.getDefault();
+    // Make sure there's a default DecoratorStyle.
+    if (Globals.getOption(Decorator.DecoratorStyle.class) == null)
+      Globals.setOption(Decorator.DecoratorStyle.class, Decorator.DecoratorStyle.BORDER);
 
-    //
-    // There should be a DecoratorStyle.
-    //
-    Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
-    if (style == null)
-      lkup.add(Decorator.DecoratorStyle.BORDER);
-
-    //
-    // There should be BORDER and BACKGROUND decorators.
-    //
-    var decos = lkup.lookupAll(DecoratorSupplier.class);
-
-    boolean hasBorder = false;
-    boolean hasBackground = false;
-    for (var deco : decos) {
-      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BORDER))
-        hasBorder = true;
-      if (deco.getDecoratorStyle().equals(Decorator.DecoratorStyle.BACKGROUND))
-        hasBackground = true;
-    }
-    if (!hasBorder)
-      lkup.add(new DecoratorSupplier(() -> { return new BorderDecorator(); }));
-    if (!hasBackground)
-      lkup.add(new DecoratorSupplier(() -> { return new BackgroundDecorator(); }));
-
-    //
     // There should be a BorderDecoratorPaint.
-    //
-    if (lkup.lookup(BorderDecorator.BorderDecoratorPaint.class) == null)
-      lkup.add(new BorderDecorator.BorderDecoratorPaint());
+    if (Globals.getOption(BorderDecorator.BorderDecoratorPaint.class) == null)
+      Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
+                     new BorderDecorator.BorderDecoratorPaint());
+
+    // BORDER and BACKGROUND decorators are available by path.
+
+    // For debug.
+    var decos = Lookups.forPath(DecoratorFactory.DECORATOR_PATH)
+        .lookupAll(DecoratorFactory.class);
+    for(DecoratorFactory deco : decos) {
+      logger.log(Level.INFO, sf("Available DecoratorFactory: '%s'", deco));
+    }
+
+    // HACK for SimpleValidation, seems to be an off by one issue
+    // TODO: could include style, allow multiple, then spin through
+    //       looking for an adjustment that matches our style.
+    //       But, for now, there's only SV that cares about this.
+    if (Globals.getOption(DecoratorPanelAdjustSOUTH.class) == null) {
+      Globals.setOption(DecoratorPanelAdjustSOUTH.class,
+                        new DecoratorPanelAdjustSOUTH(new Dimension(0, 1)));
+    }
 
     initialized = true;
   }

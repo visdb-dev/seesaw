@@ -19,6 +19,7 @@
   <name>${group_abbrev}:${project.artifactId}</name>
 
   <properties>
+    <property-file.seesawVersion>seesawVersion.properties</property-file.seesawVersion>
   </properties>
 
   <dependencies>
@@ -102,6 +103,27 @@
   </dependencies>
 
   <build>
+    <resources>
+        <!-- 1. Only filter specific files -->
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+                <include>${property-file.seesawVersion}</include>
+                <!-- You can also use wildcards, like **/*.properties -->
+            </includes>
+        </resource>
+        
+        <!-- 2. Copy everything else WITHOUT filtering -->
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>false</filtering>
+            <excludes>
+                <exclude>${property-file.seesawVersion}</exclude>
+            </excludes>
+        </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

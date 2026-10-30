@@ -15,7 +15,7 @@
                 <jpda.listen>true</jpda.listen>
                 <exec.appArgs></exec.appArgs>
                 <exec.mainClass>${packageClassName}</exec.mainClass>
-                <exec.vmArgs>--enable-preview -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.vmArgs>-ea --enable-preview -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
             </properties>
         </action>
         <action>
@@ -32,7 +32,7 @@
                 <exec.executable>java</exec.executable>
                 <exec.appArgs></exec.appArgs>
                 <exec.mainClass>${packageClassName}</exec.mainClass>
-                <exec.vmArgs>--enable-preview</exec.vmArgs>
+                <exec.vmArgs>-ea --enable-preview</exec.vmArgs>
             </properties>
         </action>
         <action>

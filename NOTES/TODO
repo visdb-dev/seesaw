@@ -1,6 +1,35 @@
+BUG: In testBaseComponents, edit TextField "oops",
 
-Contrib artifact(s), like DataPicker, Simple validation decorators.
+    TextField has "plugin" error, TextFieldB has "other" error.
+    Looks like B is picking state up from A.
+    Maybe this error state should be associate with the column, not component.
+    Hmm, maybe validators should be with column, not component, as well.
+    (would this prevent specialized validations (what's that even mean)?
+    IT SHOULD BE COLUMN)
+    Validate should only be done once for the column.
 
+    The following looks interesting for investigating handling this
+        SsCommon.setColumn does postColumnChangeStart
+            NaviagateState handleColumnChangeStart
+                adjustErrorComponentState(ev.getRSC(), ev.isError());
+                Utils.postColumnChangeDone(ev);
+
+        Then
+            SsCommon.handleColumnChangeDone
+                // Looking for same RowSet, same Column, different component.
+
+    An SsComponent validation could include: condition, msgSupplier, result,
+        Maybe have a forward iterator to go through them.
+        See StringValidator().
+
+    Have a method to set a validatorFunction for columnname in RowsModel.
+      setStringValidator() and setUntypedValidator()
+
+================================================================================
+Move raelity-lib to github. Use maven instead of gradle.
+Clean up com.raelity:raelity-lib vs com.raelity.lib?
+================================================================================
+Use BOM dependency in poms.
 ================================================================================
 
 JavaFx components.
@@ -142,6 +171,10 @@ Could
 ================================================================================
 
 SsTable (DataGrid)
+
+- SsTableModel.setMessageWindow sets dialog parent.
+- See LibDBMS "For error dialog, getting JTable from TableModel in Java"
+- ? Optionally throw an exception
 
 - In DataGrid.bind(), callExecute. Is callExecute needed?
 - date/time popup for editing

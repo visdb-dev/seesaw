@@ -1,115 +1,60 @@
-# ReadMe file for the SwingSet DEMO
-
-## LICENSE
-
-Copyright (C) 2003-2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
-
-Contributors:
-  Prasanth R. Pasala
-  Brian E. Pangburn
-  Diego Gil
-  Man "Bee" Vo
-  Ernie R. Rael
-
-## 3rd PARTY LICENSES
-
-This software contains unmodified binary redistributions for
-H2 database engine (http://www.h2database.com/),
-which is dual licensed and available under the MPL 2.0
-(Mozilla Public License) or under the EPL 1.0 (Eclipse Public License).
-An original copy of the license agreement can be found at:
-http://www.h2database.com/html/license.html
-
-This software contains unmodified binary redistributions for
-Glazed Lists List Transformation toolkit (http://glazedlists.com)
-which is dual licensed and available under the MPL 2.0
-(Mozilla Public License)
-or under the LGPL 2.1 (GNU Lesser General Public License).
+# ReadMe file for the SeeSaw DEMO
 
 ## DESCRIPTION
 
-SwingSet is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
+SeeSaw is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components. The seesaw-demo project contains sample/demo source code that uses the SeeSaw library.
 
-This file contains sample/demo SwingSet source code and Java class files.
+By default, the sample/demo programs provided with SeeSaw utilize the h2 database, which is run in memory. The sample database is based on the suppliers-and-parts database referenced in the classic database textbook, "An Introduction to Database Systems," by C. J. Date.
 
-The sample/demo programs provided with SwingSet utilize the h2 database, which is run in memory.
+You can view the [aggregated SeeSaw javadoc](https://github.com/visdb-dev/seesaw).
 
-The sample database is based on the suppliers-and-parts database referenced in the classic database textbook, "An Introduction to Database Systems," by C. J. Date.
-
-For questions regarding SwingSet, send an email to:
-swingset#NO-SPAM#@pangburngroup.com
+For questions regarding SeeSaw, send an email to: visdb@visdb.dev
 
 ## EXECUTION
 
-The SwingSet samples/demo requires Java 1.8 or later.
+The SeeSaw samples/demo requires Java 17 or later. The simplest way to run the demo is described on
+the [main project's page](https://github.com/visdb-dev/seesaw) README. Essentially you download a
+pom.xml into an empty directory and run some maven commands that execute the demo from artifacts
+in the local maven repository. The repository does not need to be cloned.
 
-  1. Beginning with SwingSet 3.0.0. we're providing an executable jar with all dependencies.
-  2. Download/save swingset-demo-x.y.z-jar-with-dependencies.jar to a local folder
-  3. Type: `java -jar swingset-demo-x.y.z-jar-with-dependencies.jar`
-  		
-The swingset-demo uses an in-memory H2 database by default, but can be run using other databases with some effort.
+The seesaw-demo uses an in-memory H2 database by default, but can be run using other databases with some effort. See [USING ALTERNATE DATABASE SERVERS](#using-alternate-database-servers) at the end of this document for more information.
 
-See "USING ALTERNATE DATABASE SERVERS" at the end of this document for more information.
-
-Note that the default screen for placement of the demo can be specified using the environment variable: `JAVA_PREFERRED_SCREEN`.
-For example, in a dual monitor Linux environment, you can type `export JAVA_PREFERRED_SCREEN=1` prior to running the demo, and the SwingSet demo will appear on the right screen (presuming the left monitor is the default). 
-If the environment variable is not present or out of bound, the default is used.
+Note that the default screen for placement of the demo can be specified using the environment variable: `SEESAW_PREFERRED_SCREEN`. For example, in a dual monitor Linux environment, you can type `export SEESAW_PREFERRED_SCREEN=1` prior to running the demo, and the SeeSaw demo will appear on the right screen (presuming the left monitor is the default). If `SEESAW_PREFERRED_SCREEN` is not found, `JAVA_PREFERRED_SCREEN` is used. If neither environment variable is present, the java/jvm default is used. Screen feature provided by `com.raelity:raelity-lib`.
 
 ## COMPILATION
 
-The SwingSet samples/demo requires Java 1.8 or later.
+Although you can run the demo without cloning the repository, you can build it yourself.
+
+The SeeSaw samples/demo requires Java 17 or later.
 
 Git/Maven:
-  `git clone https://github.com/bpangburn/swingset.git`
+  `git clone https://github.com/visdb-dev/seesaw.git`
 
   After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
   Or you can use mvn directly and then run as shown here. Note that compiled
   jar files will be in the ./target subdirectory. The library must be installed
   into the maven repository; the demo build looks there.
   
-  SwingSet Library:
-    `cd ./swingset/swingset/`
-    `mvn clean install
-    
-  SwingSet Demo:
-    `cd ./swingset/swingset-demo/`
-    `### mvn clean package -Prelease`
-    `mvn clean package`
-    `cd target`
-    `java -jar swingset-demo-X.Y.Z-jar-with-dependencies.jar`
+  To build the SeeSaw Library, contributed modules, the seesaw-demo and install their artifacts in the local maven repository:
+
+    cd ./seesaw
+    mvn clean install
+
+  Now you can `cd seesaw-demo-runner` which has a single pom.xml that supports running the demo from the maven artifacts:
+
+    cd seesaw-demo-runner
+    mvn exec:exec
 
 ## CLASS DESCRIPTIONS
 
+### (updating documentation in progress)
+
 ### MainClass
 
-A JFrame with buttons to launch each of the SwingSet example/demo screens.
+Brings up a window to select specific demos and options.
+- Buttons to launch each of the SeeSaw example/demo screens.
+- Combo for type/method for JdbcRowSet creation.
+- If `java.util.logging` (`JUL`) is used, there is a button to bring up a dialog to examine and/or set logging levels.
 
 ### Example1
 
@@ -170,21 +115,21 @@ Same as Example7, but built by extending the SSDataGridScreenHelper helper class
 
 ### Test Base Components
 
-This example demonstrates all of the Base SwingSet Components except for the SSDataGrid.
+This example demonstrates all of the Base SeeSaw Components except for the SSDataGrid.
 
-There is a separate example screen to demonstrate the Formatted SwingSet Components.
+There is a separate example screen to demonstrate the Formatted SeeSaw Components.
 
 ### Test Formatted Components
 
-This example demonstrates all of the Formatted SwingSet Components.
+This example demonstrates all of the Formatted SeeSaw Components.
 
-There is a separate example screen to demonstrate the Base SwingSet Components.
+There is a separate example screen to demonstrate the Base SeeSaw Components.
 
 ## USING ALTERNATE DATABASE SERVERS
 
-swingset-demo can work with user supplied connection properties and sql scripts to initialize a database that is then used for the demo. Look at the help with
+seesaw-demo can work with user supplied connection properties and sql scripts to initialize a database that is then used for the demo. You should be in the directory `seesaw-demo-runner` or in the directory you created to run the demo without cloning the repository. Look at the help with
 
-    java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -h
+    mvn exec:exec -Dargs=-h
 
 The connection properties is standard java format for a properties file.
 Here is an example of a database connection property file used with mysql
@@ -192,7 +137,7 @@ Here is an example of a database connection property file used with mysql
     # This is a standard java properties file
 
     DB_DRIVER_CLASS = com.mysql.cj.jdbc.Driver
-    DB_URL = jdbc:mysql://localhost/swingset_demo_suppliers_and_parts
+    DB_URL = jdbc:mysql://localhost/seesaw_demo_suppliers_and_parts
     user = some_user
     password = some_password
     serverTimezone = UTC
@@ -201,33 +146,29 @@ The properties "DB_DRIVER_CLASS" and "DB_URL" are used internally with
     Class.forName(driver_class)
     DriverManager.getConnection(url, props)
 
-You can run the demo, without re-compiling, if you provide java the dbms server class jar on the command line. Before running the demo, create the database swingset_demo_suppliers_and_parts.  The sql scripts to initialize the MySQL database tables are included in swingset-demo
+You can run the demo, without re-compiling, if you provide java the dbms server jar. Before running the demo, create the database seesaw_demo_suppliers_and_parts.  The sql scripts to initialize the MySQL database tables are included in seesaw-demo
 
-    java -cp mysql-connector-java-8.0.21.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
-        com.nqadmin.swingset.demo.MainClass -v -p property_file mysql
-
-Note that if you use the '-cp' option, you can not use the '-jar' option and so you tell java the main class to run.
+    mvn exec:exec -Dxcp=:mysql-connector-java-8.0.21.jar \
+        -Dargs="-v -p property_file mysql"
 
 You can extract the MySQL script. The following command:
 
-    java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -d mysql
+    mvn exec:exec -Dargs="-d mysql"
 
 puts the following files into the current directory.
 
-    dump.mysql.swingset-demo-app.sql
-    dump.mysql.swingset-demo-components.sql
+    dump.mysql.demo-app.sql
+    dump.mysql.demo-components.sql
 
 These files can be edited as needed for a different database. If the files are edited and saved under the names
 
-    swingset-demo-app.sql
-    swingset-demo-components.sql
+    xdb.demo-app.sql
+    xdb.demo-components.sql
 
 You can use them as in this example
 
-    java -cp some_db_driver.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
-        com.nqadmin.swingset.demo.MainClass -v \
-        -p property_file \
-        -s swingset-demo-app.sql -s swingset-demo-components.sql
+    mvn exec:exec -Dxcp=:some_db_driver.jar \
+        -Dargs="-v -p property_file -s xdb.demo-app.sql -s xdb.demo-components.sql"
 
 The user supplied connection properties and sql scripts initialize the database and then the demo is started.
 

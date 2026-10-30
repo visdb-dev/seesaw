@@ -34,19 +34,24 @@
  *   Diego Gil
  *   Man "Bee" Vo
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 
-/* This SQL script is used to add to the swingset_demo_suppliers_and_parts
+/* This SQL script is used to add to the suppliers_and_parts
    database with some tables for testing individual SwingSet components.
  */
 
 /* housekeeping */
-DROP TABLE IF EXISTS swingset_base_test_data, swingset_formatted_test_data;
+DROP TABLE IF EXISTS base_test_data, formatted_test_data;
 
-/* swingset_base_test_data */
-CREATE TABLE IF NOT EXISTS swingset_base_test_data 
+/* base_test_data */
+CREATE TABLE IF NOT EXISTS base_test_data 
 ( 
-    swingset_base_test_pk INTEGER NOT NULL PRIMARY KEY,
+    base_test_pk INTEGER NOT NULL PRIMARY KEY,
 	ss_check_box INTEGER,
 	ss_combo_box INTEGER, /* arbitrary values 0-3 */
 	ss_db_combo_box INTEGER, /* mapping to part_data, which has valid PK values of 1-6 by default */
@@ -58,7 +63,7 @@ CREATE TABLE IF NOT EXISTS swingset_base_test_data
 	ss_text_field VARCHAR(100)
 );
 
-INSERT INTO swingset_base_test_data VALUES
+INSERT INTO base_test_data VALUES
     (1,0,2,3,NULL,'This is Label 1','1,2,3',12,'This is Text Area 1','This is TextField 1'),
     (2,1,1,2,NULL,'This is Label 2','3,4,5',3,'This is Text Area 2. Image is NULL by default for this record.','This is TextField 2'),
     (3,1,0,1,NULL,'This is Label 3','4,5,1',8,'This is Text Area 3','This is TextField 3'),
@@ -76,10 +81,10 @@ INSERT INTO swingset_base_test_data VALUES
 --    (6,0,1,6,NULL,'This is Label 6','134',1,'This is Text Area 6.','This is TextField 6'),
 --    (7,1,0,3,NULL,'This is Label 7','523',17,'This is Text Area 7','This is TextField 7');
 
-/* swingset_formatted_test_data */
-CREATE TABLE IF NOT EXISTS swingset_formatted_test_data 
+/* formatted_test_data */
+CREATE TABLE IF NOT EXISTS formatted_test_data 
 ( 
-    swingset_formatted_test_pk INTEGER NOT NULL PRIMARY KEY,
+    formatted_test_pk INTEGER NOT NULL PRIMARY KEY,
     ss_cuit_field VARCHAR(13), /* Tax ID for the country of Argentina. See https://meta.cdq.ch/CUIT_number_(Argentina) */
     ss_currency_field DECIMAL(20,2),
     ss_date_field DATE NOT NULL,
@@ -94,7 +99,7 @@ CREATE TABLE IF NOT EXISTS swingset_formatted_test_data
 );
 
 
-INSERT INTO swingset_formatted_test_data VALUES
+INSERT INTO formatted_test_data VALUES
     (1,'20-10563145-8',1234567.89,  '2020-01-01','2010-01-01','This is some random text 1.',2384709,4534.4321,0.99375,'111-22-3333','12:34:56',NULL),
     (2,'23-10563146-8',7222567.11,  '2021-02-03','2011-02-03','This is some random text 2.',435634,1237643.1111,0.78345,'221-22-3333','12:00:00',NULL),
     (3,'24-10563147-8',52347.23,    '2020-02-29','2010-02-29','This is some random text 3.',345237745,435652.2222,0.23456,'331-22-3333','01:22:33',NULL),

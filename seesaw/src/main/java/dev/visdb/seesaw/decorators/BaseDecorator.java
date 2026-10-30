@@ -1,66 +1,29 @@
 /* *****************************************************************************
- * Copyright (C) 2026, Ernie R Rael. All rights reserved.
+ * Portions created by Ernie Rael are
+ * Copyright (C) 2026 Ernie Rael.  All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org.
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Contributor(s): Ernie Rael <errael@raelity.com>
  * ****************************************************************************/
 package dev.visdb.seesaw.decorators;
 
-import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
+
+import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
- * Some handling for the TextDecorator; {@link #handleTextDecorator(ValidationResult)}
- * should be called at the end of subclass' decorate().
+ * Base class for a {@link Decorator}.
  */
 public abstract class BaseDecorator extends BaseAnyDecorator implements Decorator {
-  private boolean decorateTextEnabled = true;
 
   /**
-   * Focus decorators typically decorate text as well;
-   * this can be used to control that behavior.
-   * @param flag
+   * {@inheritDoc }
    */
   @Override
-  public void setDecorateTextEnabled(boolean flag) {
-    decorateTextEnabled = flag;
-  }
-
-  /**
-   * Deal with a TextDecorator for this component.
-   * @param valid
-   */
-  protected void handleTextDecorator(ValidationResult valid) {
-    if (!decorateTextEnabled)
-      return;
-    TextDecorator td = getSsComponent().getTextDecorator();
-    assert td != null;
-    if (td instanceof ComponentStateTextDecorator std)
-      std.decorateText(valid);
-    else
-      td.decorateText();
+  public String toString() {
+    return sf("Decorator{%s}", getDecoratorStyle());
   }
 }
 // vi: sw=2 ts=8

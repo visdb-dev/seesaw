@@ -42,8 +42,10 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
 import java.lang.System.Logger;
@@ -72,10 +74,12 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
+import org.openide.util.lookup.Lookups;
 
 import dev.visdb.seesaw.datasources.DbSupport;
+import dev.visdb.seesaw.decorators.Decorator;
+import dev.visdb.seesaw.decorators.Decorator.DecoratorStyle;
+import dev.visdb.seesaw.decorators.DecoratorFactory;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -85,6 +89,7 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
  */
 public class SsUtils {
   private SsUtils() {}
+  private static final Logger logger = JStuff.getLogger();
 
   /**
    * Temporary for hiding SsCommon; used from SsDBComboBox.
@@ -92,6 +97,99 @@ public class SsUtils {
    */
   public static void updateSsComponent_HACK(SsComponent comp) {
     comp.getSsCommon().updateSsComponent();
+  }
+
+  /**
+   * Register the given panel for use with SeeSaw decorators that is
+   * compatible with the current DecoratorStyle. The uiPanel
+   * is used to create the gui. The returned parentPanel wraps the uiPanel
+   * and is typically added to a frame. For example
+   * {@snippet lang="java" class=Decorators region=decorator_panel_1}
+   * @param uiPanel
+   * @return
+   */
+  public static JPanel createDecoratorPanel(Component uiPanel) {
+    return findDecoratorFactory().createDecoratorPanel(uiPanel);
+  }
+
+  /**
+   * Find the decorator factory for the current decorator style.
+   * @return current decorator factory
+   */
+  public static DecoratorFactory findDecoratorFactory() {
+    DecoratorFactory decoratorFactory = null;
+    DecoratorStyle style = Globals.getOption(Decorator.DecoratorStyle.class);
+    if (style == null) {
+      logger.log(Level.ERROR, "No current style option specified ");
+      throw new IllegalStateException("No current style option specified ");
+    }
+    var decos = Lookups.forPath(DecoratorFactory.DECORATOR_PATH)
+        .lookupAll(DecoratorFactory.class);
+    for (var deco : decos) {
+      if (deco.getDecoratorStyle() == style) {
+        decoratorFactory = deco;
+        break;
+      }
+    }
+    if (decoratorFactory == null) {
+      String msg = sf("Decorator supplier not found for '%s'", style);
+      logger.log(Level.ERROR, msg);
+      throw new IllegalStateException(msg);
+    }
+    return decoratorFactory;
+  }
+
+  /**
+   * This HACK is used to adjust the decorator label to avoid layout wiggles
+   * for some {@literal Look&Feel}. Put one of these in {@link Globals} as needed.
+   * If the chosen decorator infrastructure does not need wiggle room, then
+   * this has no effect.
+   */
+  public static class DecoratorPanelAdjustSOUTH {
+    /** The adjustment */
+    public final Dimension d;
+
+    /** Create an adjustment.
+     * @param d the adjustment
+     */
+    public DecoratorPanelAdjustSOUTH(Dimension d) {
+      this.d = d;
+    }
+  }
+
+  /** Return the component wrapped by the decorator panel.
+   * @param decoratorPanel
+   * @return the inner/ui panel
+   */
+  public static JPanel getInnerComponent(Component decoratorPanel) {
+    if (decoratorPanel instanceof JPanel jp
+        && jp.getClientProperty(Decorator.SEE_SAW_PANEL_KEY) != null
+        && jp.getLayout() instanceof BorderLayout b)
+      return (JPanel)b.getLayoutComponent(jp, BorderLayout.CENTER);
+    return null;
+  }
+  
+  /**
+   * Convenience method for searching above {@code comp} in the
+   * component hierarchy and returns the first JComponent, must be a JPanel,
+   * that has ClientProperty {@code Decorator.SEE_SAW_PANEL_KEY}.
+   * Returns {@code null} if not found.
+   *
+   * @param comp the component
+   *
+   * @return the ancestor of the {@code comp}, or {@code null} if not found.
+   */
+  public static JPanel findDecoratorPanel(Component comp) {
+    if (comp == null)
+      return null;
+    
+    Container parent = comp.getParent();
+    while(parent != null
+        && !(parent instanceof JPanel jp
+             && jp.getClientProperty(Decorator.SEE_SAW_PANEL_KEY) != null)) {
+      parent = parent.getParent();
+    }
+    return (JPanel)parent;
   }
 
   /**
@@ -125,6 +223,7 @@ public class SsUtils {
   }
 
   /** Put this in the global lookup to create debug row set listeners */
+  @SuppressWarnings("ClassMayBeInterface")
   public static class DebugRowSetListenerFlag {}
 
   /**
@@ -199,18 +298,16 @@ public class SsUtils {
    */
   public static DbSupport dbSupport() {
     if (dbSupport == null) {
-      dbSupportResult = CentralLookup.getDefault().lookupResult(DbSupport.class);
-      dbSupportResult.addLookupListener((LookupEvent le) -> {
-        dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
-      });
-      dbSupportResult.allInstances().stream().findFirst().ifPresent(item -> dbSupport = item);
+      Globals.notifyOptionChange(DbSupport.class, (optionValue -> {
+        if (optionValue != null) // typically two events, one for remove, one for add.
+          dbSupport = optionValue;
+      }));
       if (dbSupport == null)
         throw new IllegalStateException("SsDBSupport not found");
     }
     return dbSupport;
   }
   private static DbSupport dbSupport;
-  private static Lookup.Result<DbSupport> dbSupportResult;
 
   /**
    * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's

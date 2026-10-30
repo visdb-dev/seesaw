@@ -461,7 +461,6 @@ public class SsImage extends JPanel implements SsComponent, ScrollPaneConstants 
   public void customInit() {
     // Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
     //setDecorateTarget(btnUpdateImage);
-    setFocusTarget(btnUpdateImage);
   }
 
   /** {@inheritDoc } */

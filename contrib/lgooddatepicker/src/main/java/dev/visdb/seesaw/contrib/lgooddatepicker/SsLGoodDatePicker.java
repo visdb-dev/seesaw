@@ -2,15 +2,9 @@
  * Portions created by Ernie Rael are
  * Copyright (C) 2026 Ernie Rael.  All Rights Reserved.
  *
- * The contents of this file are subject to the Mozilla Public
- * License Version 1.1 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of
- * the License at http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org.
  *
  * Contributor(s): Ernie Rael <errael@raelity.com>
  */
@@ -40,11 +34,14 @@ import static java.sql.JDBCType.DATE;
  * Date picker that gets it's value from a database column and sends
  * date changes back to the database. Undo/redo and more is supported,
  * see {@link SsComponent}.
- * The datapicker is based on
+ * The datepicker is based on
  * <a href="https://github.com/LGoodDatePicker/LGoodDatePicker">LGoodDatePicker</a>.
  * <p>
- * It is an example of building a component that inter-operates with SS but is not
- * part of the SS library.
+ * This class is an example of building a component from a 3rd party library that
+ * inter-operates with SeeSaw but is not part of the SeeSaw library.
+ * <p>
+ * <img src="doc-files/datepicker.png" alt="Date Picker image"
+ * style="display: inline-block; margin-left: 40px;">
  */
 @SuppressWarnings("serial")
 public class SsLGoodDatePicker extends DatePicker implements SsComponent {
@@ -100,7 +97,6 @@ public class SsLGoodDatePicker extends DatePicker implements SsComponent {
 
     // Highlight the date text field when this component gets focus.
     setDecorateTarget(getComponentDateTextField());
-    setFocusTarget(getComponentDateTextField());
   }
 
   /** {@inheritDoc } */

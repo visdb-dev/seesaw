@@ -64,6 +64,7 @@ import javax.sql.rowset.spi.SyncResolver;
 import dev.visdb.seesaw.datasources.Utils.ConflictRow;
 import dev.visdb.seesaw.navigate.RowSetState;
 import dev.visdb.seesaw.navigate.UndoRedo;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsUtils;
@@ -74,7 +75,6 @@ import static dev.visdb.seesaw.datasources.ConvertType.findJavaTypeClass;
 import static dev.visdb.seesaw.datasources.ConvertType.getJDBCType;
 import static dev.visdb.seesaw.datasources.DateTime.getSQLDateTimeObject;
 import static dev.visdb.seesaw.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass;
-import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
@@ -708,7 +708,7 @@ public class RowSetOps {
     if (jdbcTypeToClass(comp.getColumnJDBCType()) != String.class)
       return;
 
-    ForceConflict fc = defLookup(ForceConflict.class);
+    ForceConflict fc = Globals.getOption(ForceConflict.class);
     if (fc == null || !fc.doForce())
       return;
 

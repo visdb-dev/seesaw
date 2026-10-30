@@ -49,6 +49,7 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.SsTextField;
@@ -58,7 +59,8 @@ import dev.visdb.seesaw.formatting.SsDateField;
 import dev.visdb.seesaw.formatting.SsIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.SsDataNavigator;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.formatting.SsFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
@@ -194,38 +196,43 @@ public class Example3 extends JFrame {
     txtShipDate.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
-    contentPane.setLayout(new GridBagLayout());
-    final GridBagConstraints constraints = new GridBagConstraints();
+    final Container uiPanel = new JPanel(new GridBagLayout());
+    setContentPane(SsUtils.createDecoratorPanel(uiPanel));
 
+    final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
-    contentPane.add(lblSupplierPartID, constraints);
+    // constraints.weightx = .40;
+    // constraints.anchor = GridBagConstraints.WEST;
+    uiPanel.add(lblSupplierPartID, constraints);
     constraints.gridy = 1;
-    contentPane.add(lblSupplierName, constraints);
+    uiPanel.add(lblSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(lblPartName, constraints);
+    uiPanel.add(lblPartName, constraints);
     constraints.gridy = 3;
-    contentPane.add(lblQuantity, constraints);
+    uiPanel.add(lblQuantity, constraints);
     constraints.gridy = 4;
-    contentPane.add(lblShipDate, constraints);
+    uiPanel.add(lblShipDate, constraints);
 
     constraints.gridx = 1;
     constraints.gridy = 0;
-    contentPane.add(txtSupplierPartID, constraints);
+    // constraints.weightx = .60;
+    // constraints.anchor = GridBagConstraints.CENTER;
+    // constraints.fill = GridBagConstraints.HORIZONTAL;
+    uiPanel.add(txtSupplierPartID, constraints);
     constraints.gridy = 1;
-    contentPane.add(cmbSupplierName, constraints);
+    uiPanel.add(cmbSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(cmbPartName, constraints);
+    uiPanel.add(cmbPartName, constraints);
     constraints.gridy = 3;
-    contentPane.add(txtQuantity, constraints);
+    uiPanel.add(txtQuantity, constraints);
     constraints.gridy = 4;
-    contentPane.add(txtShipDate, constraints);
+    uiPanel.add(txtShipDate, constraints);
 
     constraints.gridx = 0;
     constraints.gridy = 5;
     constraints.gridwidth = 2;
-    contentPane.add(navigator, constraints);
+    uiPanel.add(navigator, constraints);
 
     // DISABLE THE PRIMARY KEY
     txtSupplierPartID.setEnabled(false);

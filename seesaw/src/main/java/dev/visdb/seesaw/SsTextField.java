@@ -50,6 +50,7 @@ import java.util.EventListener;
 import javax.swing.JTextField;
 
 import dev.visdb.seesaw.navigate.RowsModel;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsTextSupport;
@@ -61,6 +62,10 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * SsTextField extends the JTextField.
+ * Add application validity checks with
+ * {@link SsComponent#setTextValidationCondition(java.util.function.Function,
+ * java.util.function.Function)
+ * SsComponent.setTextValidationCondition(Function, Function)}.
  */
 @SuppressWarnings("serial")
 public class SsTextField extends JTextField implements SsComponent {
@@ -102,6 +107,38 @@ public class SsTextField extends JTextField implements SsComponent {
     finishSsCommon();
     if (rowsModel != null)
       rowsModel.bind(this, columnName);
+    debug = Globals.getOption(DebugBaseComponentValidate.class) != null;
+  }
+
+  // For DEBUG only.
+  private final boolean debug;
+  /** Put one of these into CentralLookup to enable the debugging */
+  public interface DebugBaseComponentValidate {}
+
+  /**
+   * @return 
+   */
+  @Override
+  public boolean baseValidate() {
+    if (debug) {
+      String text = getText();
+      return text == null || !text.endsWith("YY");
+    }
+    return true;
+  }
+  /**
+   * @return 
+   */
+  @Override
+  public boolean componentValidate() {
+    if (debug) {
+      if (validationMsg(Validation.COMPONENT).equals(Validation.COMPONENT.toString()+" failed"))
+        setValidationMsg(Validation.COMPONENT, (ssComp) -> sf(
+            "Component validation of '%s' failed", ssComp.getColumnName()));
+      String text = getText();
+      return text == null || !text.endsWith("ZZ");
+    }
+    return true;
   }
 
   // /**

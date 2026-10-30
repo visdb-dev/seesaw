@@ -44,12 +44,14 @@
 package dev.visdb.seesaw.decorators;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.lang.System.Logger;
 
 import javax.swing.UIManager;
 
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -72,7 +74,9 @@ public class BackgroundDecorator extends FocusDecorator {
     logger.log(TRACE,
                () -> String.format("%s focus: %s, compValid %s, allValid: %s",
                                    decoComp().getClass().getSimpleName(),
-                                   focusComp().isFocusOwner(), valid.comp(), valid.all()));
+                                   hasFocus(), valid.comp(), valid.all()));
+    if (SsUtils.findDecoratorPanel((Component)getSsComponent()) == null)
+      return valid.all();
 
     ComponentState state = ComponentState.getComponentState(getSsComponent(), valid);
     Color color = state.isError()      ? errorBackgroundColor
@@ -81,7 +85,7 @@ public class BackgroundDecorator extends FocusDecorator {
                                        : standardBackgroundColor;
     decoComp().setBackground(color);
 
-    handleTextDecorator(valid);
+    getSsComponent().decorateText(valid);
 
     return valid.all();
   }

@@ -37,7 +37,6 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.demo;
 
-import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.beans.PropertyChangeEvent;
@@ -48,6 +47,7 @@ import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -60,6 +60,7 @@ import javax.swing.text.DocumentFilter;
 import dev.visdb.seesaw.SsComboBox2.MissingDisplayValueControl;
 import dev.visdb.seesaw.models.ListItem;
 import dev.visdb.seesaw.models.ListItemFormat;
+import dev.visdb.seesaw.utils.SsUtils;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -170,7 +171,7 @@ public class Example4Advanced extends Example4 {
     navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
         .put(KeyStroke.getKeyStroke("F11"), ACT_DELETE);
 
-    final Container contentPane = getContentPane();
+    final JPanel contentPane = SsUtils.getInnerComponent(getContentPane());
     final GridBagConstraints constraints = new GridBagConstraints();
 
     // Do something with the "Extra" buttons

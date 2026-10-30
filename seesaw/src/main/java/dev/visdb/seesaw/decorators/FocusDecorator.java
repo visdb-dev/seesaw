@@ -43,73 +43,44 @@
 
 package dev.visdb.seesaw.decorators;
 
-import java.awt.Component;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 
-import com.raelity.lib.eventbus.WeakEventBus;
-import com.raelity.lib.eventbus.WeakSubscribe;
-
-import dev.visdb.seesaw.navigate.FocusChangeEvent;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
-
-import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
-import static dev.visdb.seesaw.utils.JStuff.sf;
-import static dev.visdb.seesaw.utils.SsUtils.objectID;
-import static javax.swing.SwingUtilities.isDescendingFrom;
 
 /**
  * Base class for decorators that use Focus.
  */
-public abstract class FocusDecorator extends BaseDecorator implements Decorator, FocusListener {
-  /** Apply decoration */
-  @Override
-  public void focusGained(FocusEvent e) {
-    decorate();
-  }
-
-  /** Remove decoration */
-  @Override
-  public void focusLost(FocusEvent e) {
-    decorate();
-  }
+public abstract class FocusDecorator extends BaseDecorator implements Decorator {
+  private SsCompFocusListener focusListener;
 
   /** {@inheritDoc} */
   @Override
   public void install(SsComponent comp) {
     super.install(comp);
-    if (!comp.isComposite())
-      focusComp().addFocusListener(this);
-    else {
-      logger().log(Level.DEBUG, sf("Composite component %s", objectID(comp)));
-      busReceiver = new BusReceiver();
-      WeakEventBus.register(busReceiver, getGlobalEventBus());
-    }
+    focusListener = new SsCompFocusListener(comp, (c) -> {
+      decorate();
+    }, () -> logger());
+    focusListener.addFocusListener();
   }
 
   /** {@inheritDoc} */
   @Override
   public void uninstall() {
-    focusComp().removeFocusListener(this);
-    if (busReceiver != null) {
-      WeakEventBus.unregister(busReceiver, getGlobalEventBus());
-      busReceiver = null;
-    }
+    focusListener.removeFocusListener();
     super.uninstall();
   }
 
   /**
-   * Return the Component that gets focus when the associated SsComponent
-is focused.
-   *
-   * @return focus target
+   * For debug use.
+   * @return true if the SsComponent is focused
    */
-  protected Component focusComp() {
-    return getSsComponent().getFocusTarget();
+  public Boolean hasFocus() {
+    if (getSsComponent() == null)
+      return null;
+    return SsCompFocusListener.hasFocus(getSsComponent());
   }
+
 
   @SuppressWarnings("NonConstantLogger")
   private static Logger lazyLogger;
@@ -117,50 +88,6 @@ is focused.
     if (lazyLogger == null)
       lazyLogger = JStuff.getLogger(getClass().getName());
     return lazyLogger;
-  }
-
-  private BusReceiver busReceiver; // Must have a strong reference.
-
-  class BusReceiver {
-    /**
-     * via KeyboardFocusManager.
-     * @param ev
-     */
-    @WeakSubscribe
-    public void handleFocusChangeEvent(FocusChangeEvent ev) {
-      checkFocusChange((Component) ev.getPce().getOldValue());
-      checkFocusChange((Component) ev.getPce().getNewValue());
-    }
-  }
-
-  /**
-   * If the component is of the SsComponent, then decorate().
-   * @param c
-   */
-  protected void checkFocusChange(Component c) {
-    if (c instanceof SsComponent && c != getSsComponent()) {
-      logger().log(Level.TRACE, sf("Quick exit: focused '%s', ssComp '%s'", objectID(c),
-                                   objectID(getSsComponent())));
-      return;
-    }
-    if (logger().isLoggable(Level.DEBUG))
-      dumpCheckFocusInfo(c);
-
-    if (c != null && isDescendingFrom(c, (Component) getSsComponent())) {
-      decorate();
-    }
-  }
-
-  @SuppressWarnings({"UseOfSystemOutOrSystemErr", "unused"})
-  private void dumpCheckFocusInfo(Component c) {
-    String nam = "";
-    if (c != null) {
-      nam = c.getClass().getSimpleName();
-      if (nam.isBlank())
-        nam = c.getClass().getName();
-    }
-    logger().log(Level.TRACE, sf("focused %s, SSComp %s", c == null ? "null" : nam,
-                                 getSsComponent().getClass().getSimpleName()));
   }
 }
 // vi: sw=2 ts=8

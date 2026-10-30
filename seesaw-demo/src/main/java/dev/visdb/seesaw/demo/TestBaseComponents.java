@@ -59,6 +59,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -69,9 +70,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.text.AttributeSet;
+
+import org.netbeans.validation.api.AbstractValidator;
+import org.netbeans.validation.api.Problems;
+import org.netbeans.validation.api.Severity;
+import org.netbeans.validation.api.ui.ValidationItem;
+import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import dev.visdb.seesaw.SsCheckBox;
 import dev.visdb.seesaw.SsComboBox1;
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.SsDbComboBox2;
 import dev.visdb.seesaw.SsImage;
 import dev.visdb.seesaw.SsLabel;
@@ -80,20 +89,23 @@ import dev.visdb.seesaw.SsSlider;
 import dev.visdb.seesaw.SsTextArea;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker;
+import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
+import dev.visdb.seesaw.decorators.BaseTextDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
-import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.utils.SsComponent.Validation;
+import dev.visdb.seesaw.utils.SsComponent.ValidationResult;
+import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SyncManager;
 
 import static dev.visdb.seesaw.demo.TestBaseComponents.CompDim.*;
@@ -102,11 +114,11 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * This example demonstrates all of the Base SwingSet Components
+ * This example demonstrates all of the Base SeeSaw Components
  * except for the SSDataGrid.
  * <p>
  * There is a separate example screen to demonstrate the
- * Formatted SwingSet Components.
+ * Formatted SeeSaw Components.
  * <p>
 IMPORTANT: The relationship of the SsDbComboBox2 and RowSet queries can have a
 large negative impact on performance. See {@link SyncManager} for an
@@ -164,7 +176,7 @@ public class TestBaseComponents extends JFrame {
     // This MUST be in the same order as the CompID enum.
     Object tComps[] = {
       null,                      cmbSSDBComboNav,     lblSSDBComboNav,     H1,
-      "swingset_base_test_pk",   txtTestPK,           lblTestPK,           H1,
+      "base_test_pk",            txtTestPK,           lblTestPK,           H1,
       "ss_check_box",            chkSSCheckBox,       lblSSCheckBox,       H1,
       "ss_combo_box",            cmbSSComboBox,       lblSSComboBox,       H1,
       "ss_combo_box",            cmbEnumSSComboBox,   lblEnumSSComboBox,   H1,
@@ -242,7 +254,7 @@ public class TestBaseComponents extends JFrame {
       = {"Combo Item 0", "Combo Item 1", "Combo Item 2", "Combo Item 3"};
   //private static final int[] comboCodes = {0,1,2,3};
   private static final Integer[] comboCodesIntegers = new Integer[] {0, 1, 2, 3};
-  private static final Object[] listCodes = {1, 2, 3, 4, 5, 6, 7};
+  private static final Integer[] listCodes = {1, 2, 3, 4, 5, 6, 7};
   private static final String[] listItems
       = {"List Item 1", "List Item 2", "List Item 3", "List Item 4",
          "List Item 5", "List Item 6", "List Item 7"};
@@ -263,7 +275,7 @@ public class TestBaseComponents extends JFrame {
   JLabel lblSSSlider = new JLabel("Slider");
   JLabel lblSSTextArea = new JLabel("TextArea");
   JLabel lblSSTextField = new JLabel("TextField");
-  JLabel lblSSTextFieldB = new JLabel("SSTextFieldB");
+  JLabel lblSSTextFieldB = new JLabel("TextFieldB");
   JLabel lblDatePicker = new JLabel("DbDatePicker");
 
   //
@@ -279,6 +291,16 @@ public class TestBaseComponents extends JFrame {
     }
   }
 
+  static class MyList extends SsList1<Integer, String> {
+    public MyList(DbCollection dbCollection) {
+      super(dbCollection);
+    }
+
+    public MyList(JDBCType jdbcType) {
+      super(jdbcType);
+    }
+  }
+
   SsComboBox1<Integer, String> cmbSSComboBox = new SsComboBox1.Builder<Integer, String>() {}.build();
   MyComboBox cmbEnumSSComboBox = new MyComboBox();
   SsTextField txtTestPK = new SsTextField();
@@ -286,8 +308,8 @@ public class TestBaseComponents extends JFrame {
   SsDbComboBox2<Long, Object, Object> cmbSSDBComboBox;
   SsImage imgImage = new SsImage();
   SsLabel lblSSLabel2 = new SsLabel();
-  final SsList1<Object, String> lstSSList;
-  final SsList1<Object, String> lstSSList2;
+  final MyList lstSSList;
+  final MyList lstSSList2;
   SsSlider sliSSSlider = new SsSlider();
   SsTextArea txtSSTextArea = new SsTextArea();
   SsTextField txtSSTextField = new SsTextField();
@@ -318,8 +340,26 @@ public class TestBaseComponents extends JFrame {
     return supl == null ? new DbArray(JDBCType.INTEGER) : supl.get();
   }
 
+  private int testValidationCount;
+  int testValidationFail() {
+    final int span = 4;
+    testValidationCount++;
+    if (testValidationCount >= 3*span)
+      testValidationCount = 0;
+    return     span <= testValidationCount && testValidationCount < 2*span ? 2
+           : 2*span <= testValidationCount && testValidationCount < 3*span ? 1
+                                                                           : 0;
+  }
+
   /**
-   * Constructor for Base Component Test
+   * Constructor for Base Component Test.
+   * Some notable things
+   * <ul>
+   * <li> the enum combobox uses different styles for odd/even selected item
+   * <li> clicking on items in the list, cycles through ok/warning/error
+   * <li> Note the two text fields at the bottom are same column, and
+   *      the second has modified/error styles using ComponentStateTextDecorator.
+   * </ul>
    * <p>
    * @param _dbConn database connection
    * @param _hints dynamic information on collection model, other
@@ -330,17 +370,24 @@ public class TestBaseComponents extends JFrame {
     super("SeeSaw Base Component Test");
     DemoUtil.initExampleFrame(this, null);
 
+    // These styles are used for TextDecorator play.
+    try {
+      setupOurTextStyles();
+    } catch (IOException ex) {
+      logger.log(Level.ERROR, (String) null, ex);
+    }
+
     // imgImage.setResizeMode(ZoomCanvas.ResizeMode.CENTER_PANNING);
 
     // initialize some dynamic information
     hints = _hints;
 
-    lstSSList = new SsList1<>(getCollectionModel());
+    lstSSList = new MyList(getCollectionModel());
     //lstSSList = new SSList(JDBCType.INTEGER); // DbCollection.getSuitableDbCollection()
 
     // lstSSList2 = new SSList(new SSDbStringCollection(
     // 		JDBCType.INTEGER, SSDbStringCollection.COMMA_SEP));
-    lstSSList2 = new SsList1<>(JDBCType.INTEGER); // auto pick for String column
+    lstSSList2 = new MyList(JDBCType.INTEGER); // auto pick for String column
 
     populateCompInfo();
     //activeComps.remove(DATE_PICKER);
@@ -353,6 +400,9 @@ public class TestBaseComponents extends JFrame {
     //		// NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
     //		// LIST, SLIDER, TEXT_AREA, TEXT_FIELD
     //));
+
+    // activeComps.clear();
+    // activeComps.addAll(EnumSet.of(CHECK, COMBO, DB_COMBO));
 
     activeComps.remove(LIST2);
     //activeComps.remove(TEXT_FIELD_B);
@@ -368,14 +418,13 @@ public class TestBaseComponents extends JFrame {
 
     // TEST DbOpsCreator
     DbOpsCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
-    CentralLookup lkup = CentralLookup.getDefault();
-    DbOpsCreator prevCreator = lkup.lookup(DbOpsCreator.class);
-    lkup.replace(DbOpsCreator.class, creator);
+    DbOpsCreator prevCreator = Globals.getOption(DbOpsCreator.class);
+    Globals.setOption(DbOpsCreator.class, creator);
 
     // initialize database connection and components
     try {
       RowSet rowset = DemoUtil.getNewRowSet(connection);
-      String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
+      String sql = sf("SELECT %s FROM base_test_data", getColumnsSQL());
       logger.log(INFO, sql);
       rowset.setCommand(sql);
       rowset.execute();
@@ -389,23 +438,22 @@ public class TestBaseComponents extends JFrame {
     if (!name.equals("TestBaseComponentsDbOps")) {
       throw new IllegalStateException(sf("wrong customizer %s", name));
     }
-    lkup.remove(creator);
-    if (prevCreator != null) {
-      lkup.add(prevCreator);
-    }
+
+    if (prevCreator != null)
+      Globals.setOption(DbOpsCreator.class, prevCreator);
 
     if (!activeComps.contains(NAV)) {
       cmbSSDBComboNav = null;
       syncManager = null;
     } else {
       // setup navigator query
-      final String query = "SELECT * FROM swingset_base_test_data;";
-      //= (connection, query, "swingset_base_test_pk", "swingset_base_test_pk");
+      final String query = "SELECT * FROM base_test_data;";
+      //= (connection, query, "base_test_pk", "base_test_pk");
       cmbSSDBComboNav = new SsDbComboBox2.Builder<Long, Object, Object>() {}
                             .connection(connection)
                             .query(query)
-                            .primaryKeyColumnName("swingset_base_test_pk")
-                            .displayColumnName("swingset_base_test_pk")
+                            .primaryKeyColumnName("base_test_pk")
+                            .displayColumnName("base_test_pk")
                             .build();
 
       try {
@@ -424,7 +472,7 @@ public class TestBaseComponents extends JFrame {
       //
       // After calling .execute() on the combo navigator, call the .SYNC() method.
       syncManager = new SyncManager<>(cmbSSDBComboNav, rowsModel);
-      syncManager.setSyncColumnName("swingset_base_test_pk");
+      syncManager.setSyncColumnName("base_test_pk");
       syncManager.sync();
     }
 
@@ -437,6 +485,18 @@ public class TestBaseComponents extends JFrame {
     if (activeComps.contains(ENUM_COMBO)) {
       cmbEnumSSComboBox.setAllowNull(true);
       cmbEnumSSComboBox.setDisplayValues(ComboEnum.class);
+      cmbEnumSSComboBox.setTextDecorator(new BaseTextDecorator() {
+        @Override
+        public void decorateText() {
+          Integer key = cmbEnumSSComboBox.getChosenKey();
+          if (key != null) {
+            boolean even = (cmbEnumSSComboBox.getChosenKey() & 1) == 0;
+            AttributeSet style = TextStyles.getStyle("testComponents_" + even);
+            TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
+          }
+        }
+      });
+      cmbEnumSSComboBox.getTextDecorator().decorateText();
     }
 
     // NOTE following enum has [0,N) mapping, but DB is [1,N]
@@ -467,22 +527,20 @@ public class TestBaseComponents extends JFrame {
     // SSComponents are setup, save info that may have changed.
     replaceComponent(NAV, cmbSSDBComboNav);
     replaceComponent(DB_COMBO, cmbSSDBComboBox);
-
+    
     // validators for the text fields
-    Function<String, Boolean> validator = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
+    Function<String, Boolean> validationCondition
+        = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
     if (activeComps.contains(TEXT_FIELD)) {
-      txtSSTextField.setPluginValidator(TextComponentValidator.create(validator));
+      txtSSTextField.setTextValidationCondition(
+          validationCondition, (ssComp) -> "Supplier name can not end with 'oops..'");
     }
     if (activeComps.contains(TEXT_FIELD_B)) {
-      txtSSTextFieldB.setPluginValidator(TextComponentValidator.create(validator));
-      try {
-        setupOurTextStyles();
-      } catch (IOException ex) {
-        logger.log(Level.ERROR, (String) null, ex);
-      }
+      txtSSTextFieldB.setTextValidationCondition(
+          validationCondition, (ssComp) -> "Supplier name can not end with 'oops..'");
       txtSSTextFieldB.setTextDecorator(new ComponentStateTextDecorator(
-          Map.of(ComponentState.ERROR, "testComponents_componentStateError",
-                 ComponentState.MODIFIED, "testComponents_componentStateModified")));
+          Map.of(ComponentState.ERROR, "testComponents_ErrorStyle",
+                 ComponentState.MODIFIED, "testComponents_ModifiedStyle")));
     }
 
     // Bind the components to their database columns.
@@ -504,11 +562,38 @@ public class TestBaseComponents extends JFrame {
     buildGui_dim();
 
     JScrollPane lstScrollPane = null;
+    ValidationItem lstValidationItem = null;
     if (activeComps.contains(LIST)) {
       lstScrollPane = new JScrollPane(lstSSList);
       lstScrollPane.setPreferredSize(MainClass.ssDimTall);
       lstSSList.setDecorateTarget(lstScrollPane);
-      lstSSList.setFocusTarget(lstSSList);
+
+      // Now that decorator target is set, it's OK to do setDecorator
+      lstValidationItem = SVUtils.setDecorator(lstSSList, "test_list",
+          new AbstractValidator<MyList>(MyList.class) {
+            @Override
+            public void validate(Problems problems, String compName, MyList model) {
+              // Should do at least this when using SVUtils.setDecorator(...)
+              assert model == lstSSList;
+              SsComponent ssComp = lstSSList;
+              ValidationResult result = ssComp.allValidate();
+              ComponentState state = ComponentState.getComponentState(ssComp, result);
+              if (state.isModified())
+                problems.append("modified", Severity.INFO);
+              
+              Optional<Validation> fail = result.firstFail();
+              if (fail.isPresent())
+                problems.append(ssComp.validationMsg(fail.get()));
+              
+              int test = testValidationFail();
+              if (test == 2)
+                problems.append(sf("testImageValidationFail '%d'", testValidationCount));
+              else if (test == 1)
+                problems.append(sf("testImageValidationWarn '%d'", testValidationCount),
+                                Severity.WARNING);
+            }
+          }
+      );
     }
 
     JScrollPane lstScrollPane2 = null;
@@ -516,18 +601,30 @@ public class TestBaseComponents extends JFrame {
       lstScrollPane2 = new JScrollPane(lstSSList2);
       lstScrollPane2.setPreferredSize(MainClass.ssDimTall);
       lstSSList2.setDecorateTarget(lstScrollPane2);
-      lstSSList2.setFocusTarget(lstSSList2);
     }
     // Disable the primary key so the user can't change it.
     txtTestPK.setEnabled(false);
 
     // Setup the container and layout the components.
-    JPanel mainPane = new JPanel(new GridBagLayout());
+    JPanel uiPanel = new JPanel(new GridBagLayout());
 
     // Add the components, there's a special case with the list scroll panes.
-    buildGui_add(mainPane, lstScrollPane, lstScrollPane2);
-    add(mainPane);
-    add(navigator, BorderLayout.SOUTH);
+    buildGui_add(uiPanel, lstScrollPane, lstScrollPane2);
+
+    // In this class, instead of putting the navigator in the grid,
+    // put it in the SOUTH of a BorderLayout
+    JPanel borderPanel = new JPanel(new BorderLayout());
+    borderPanel.add(uiPanel, BorderLayout.CENTER);
+    borderPanel.add(navigator, BorderLayout.SOUTH);
+
+    // Put a decorator panel in the frame.
+    JPanel decoratorPanel = Boolean.TRUE
+                            ? SsUtils.createDecoratorPanel(borderPanel)
+                            : SVUtils.createDecoratorPanel(borderPanel);
+    setContentPane(decoratorPanel);
+
+    if (lstValidationItem != null && decoratorPanel instanceof ValidationPanel valiPanel)
+      valiPanel.getValidationGroup().addItem(lstValidationItem, false);
 
     pack();
 
@@ -538,6 +635,7 @@ public class TestBaseComponents extends JFrame {
     // is platform dependent. This listener caps the size.
     addComponentListener(new ComponentAdapter() {
       @Override
+      @SuppressWarnings("UseOfSystemOutOrSystemErr")
       public void componentResized(ComponentEvent e) {
         int w = getWidth();
         int h = getHeight();
@@ -547,7 +645,7 @@ public class TestBaseComponents extends JFrame {
           int maxW = Math.max(minWidth, w);
           int maxH = Math.max(minHeight, h);
           setSize(maxW, maxH);
-          System.err.printf("W %d, H %d, getW %d, getH %d\n", maxW, maxH, getWidth(), getHeight());
+          //System.err.printf("W %d, H %d, getW %d, getH %d\n", maxW, maxH, getWidth(), getHeight());
         }
       }
     });
@@ -567,19 +665,31 @@ public class TestBaseComponents extends JFrame {
    */
   @SuppressWarnings("CallToPrintStackTrace")
   private void setupOurTextStyles() throws IOException {
-    if (TextStyles.getStyle("testComponents_componentStateError") != null)
+    if (TextStyles.getStyle("testComponents_ErrorStyle") != null)
       return;
     StringReader reader = new StringReader("""
         {
-          "testComponents_componentStateError": {
+          "testComponents_ErrorStyle": {
             "fontSize": 14,
             "italic": false,
             "strikethrough": true
           },
-          "testComponents_componentStateModified": {
+          "testComponents_ModifiedStyle": {
             "fontSize": "default",
             "italic": true,
             "strikethrough": false
+          },
+          "testComponents_true": {
+            "fontSize": "default",
+            "italic": false,
+            "underline": true,
+            "bold": false
+          },
+          "testComponents_false": {
+            "fontSize": "default",
+            "italic": true,
+            "underline": false,
+            "bold": false
           }
         }
         """);
@@ -713,14 +823,14 @@ public class TestBaseComponents extends JFrame {
     }
   }
 
-  private void buildGui_add(JComponent mainPane, JScrollPane jspList, JScrollPane jspList2) {
+  private void buildGui_add(JComponent uiPanel, JScrollPane jspList, JScrollPane jspList2) {
     GridBagConstraints gridPos = new GridBagConstraints();
     gridPos.gridx = 0;
     gridPos.gridy = 0;
 
     for (CompInfo compInfo : getActiveCompInfo()) {
       gridPos.gridx = 0;
-      mainPane.add(compInfo.label, createConstraints(gridPos, null));
+      uiPanel.add(compInfo.label, createConstraints(gridPos, null));
 
       gridPos.gridx = 1;
       GridBagConstraints extra = null;
@@ -738,7 +848,7 @@ public class TestBaseComponents extends JFrame {
         }
         default -> jComp;
       };
-      mainPane.add(jComp, createConstraints(gridPos, extra));
+      uiPanel.add(jComp, createConstraints(gridPos, extra));
       gridPos.gridy++;
     }
   }
@@ -775,7 +885,7 @@ public class TestBaseComponents extends JFrame {
     // Get the new record id.
     try (ResultSet rs
          = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-               .executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;")) {
+               .executeQuery("SELECT nextval('base_test_seq') as nextVal;")) {
       rs.next();
       final int recordPK = rs.getInt("nextVal");
       txtTestPK.setText(String.valueOf(recordPK));

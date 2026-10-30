@@ -52,9 +52,13 @@ import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.EventListener;
 import java.util.Objects;
+import java.util.function.Function;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -65,6 +69,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
+import javax.swing.text.InternationalFormatter;
 import javax.swing.text.MaskFormatter;
 
 import dev.visdb.seesaw.datasources.RowSetOps;
@@ -98,7 +103,9 @@ import static java.lang.System.Logger.Level.*;
  * checks (like date validation) beyond what is provided by the
  * Formatter/FormatterFactory (which generally only handles display of values
  * and/or character masks). Add application validity checks with
- * {@link #setPluginValidator(dev.visdb.seesaw.decorators.Validator)}.
+ * {@link SsComponent#setTextValidationCondition(java.util.function.Function,
+ * java.util.function.Function)
+ * SsComponent.setTextValidationCondition(Function, Function)}.
  * <br>see {@link FormattedTextFieldVerifier} which locks focus while data is invalid.
  * <br>see {@link SSFormattedTextFieldListener} which may update the database.
  *
@@ -163,7 +170,7 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
           ftf.setValue(null); // Note: "verifyingText" skips pce.
         // Update text decoration, e.g. red for negative.
         if (ok)
-          decorateText();
+          forceTextDecoration();
       } catch (final Exception e) {
         // TODO: Not right. What runtime exceptions should be looked for?
         logger.log(Level.ERROR, () -> getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
@@ -296,8 +303,15 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
   @SuppressWarnings("OverridableMethodCallInConstructor")
   public SsFormattedTextField(AbstractFormatterFactory factory) {
     super(factory);
+    setValidationMsg(Validation.BASE, baseError);
     finishSsCommon();
   }
+  private static final Function<SsComponent, String> baseError = (ssComp) -> {
+    return sf("Invalid for %s (%s: %s)",
+              ssComp.getColumnName(),
+              ssComp.getClass().getSimpleName(),
+              ((SsFormattedTextField)ssComp).getFormatPattern());
+  };
 
   /**
    * Creates a new instance of SSFormattedTextField
@@ -307,8 +321,8 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
   public SsFormattedTextField(SsFormat format) {
     this(lookupAbstractFormatter(format));
   }
-  private static AbstractFormatter lookupAbstractFormatter(@SuppressWarnings("unused")
-                                                           SsFormat format) {
+  private static AbstractFormatter lookupAbstractFormatter(
+      @SuppressWarnings("unused") SsFormat format) {
     // For this to work need a way to register/lookup AbstractFormatter
     if (Boolean.TRUE)
       throw new IllegalCallerException("Not implemented");
@@ -320,6 +334,7 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
    * This is only so that the no arg constructor acts as expected.
    * Any custom formatter is expected to decorate as needed.
    */
+  @SuppressWarnings("CloneableImplementsClone")
   private static class DecoratingFormatter extends DefaultFormatter {
     private SsFormattedTextField ftf;
 
@@ -542,8 +557,12 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
       logger.log(Level.ERROR, sf("%s: Exception updating rowset.", getColumnForLog(), sqe));
       setValue(null);
     }
-    decorateText(); // For example: color red for negative number
+    forceTextDecoration();// For example: color red for negative number
     decorate();
+  }
+
+  private void forceTextDecoration() {
+    getTextDecorator().decorateText();
   }
 
   /**
@@ -587,7 +606,7 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
   @Override
   public TextDecorator createDefaultTextDecorator() {
     // SsFormattedTextField handles its own text decoration
-    getDecorator().setDecorateTextEnabled(false);
+    setTextDecoratorEnabled(false);
     return new NegativeNumberTextDecorator();
   }
 
@@ -595,6 +614,46 @@ public class SsFormattedTextField extends JFormattedTextField implements SsCompo
   @Override
   public boolean baseValidate() {
     return isEditValid();
+  }
+
+  /**
+   * Extracts the active format or mask pattern string from the formatter.
+   * Overridable by custom subclasses using exotic formatters.
+   *
+   * @return The pattern string, or null if no pattern is available.
+   */
+  // Thanks to Google search AI.
+  public String getFormatPattern() {
+    AbstractFormatter formatter = this.getFormatter();
+    if (formatter == null) {
+      return null;
+    }
+    
+    // 1. Handle character/input masks (e.g., "###-####")
+    if (formatter instanceof MaskFormatter maskFormatter) {
+      return maskFormatter.getMask();
+    }
+    
+    // 2. Handle International formatters (Dates, Numbers, Percentages)
+    if (formatter instanceof InternationalFormatter intFormatter) {
+      Format format = intFormatter.getFormat();
+      if (format == null) {
+        return null;
+      }
+      
+      // Extract from Date formatters
+      if (format instanceof SimpleDateFormat simpleDateFormat) {
+        return simpleDateFormat.toPattern();
+      }
+      
+      // Extract from Number formatters
+      if (format instanceof DecimalFormat decimalFormat) {
+        return decimalFormat.toPattern();
+      }
+    }
+    
+    // Fallback for unrecognized formatters (can be overridden by subclasses)
+    return null;
   }
 
   /**

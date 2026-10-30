@@ -47,27 +47,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.netbeans.validation.api.ui.ValidationGroup;
-import org.netbeans.validation.api.ui.ValidationItem;
-import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
-import org.netbeans.validation.api.ui.swing.ValidationPanel;
-
 import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.SsDataNavigator;
+import dev.visdb.seesaw.utils.SsUtils;
 
 /**
  * This example displays data from the supplier_data table.
@@ -130,30 +124,13 @@ public class Example2 extends JFrame {
     // Set screen position
     setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
-    // Set a validator.
-    final boolean USE_SIMPLE_VALIDATION = true;
-    Function<String, Boolean> validateSupplierName = (str) -> {
-      return str == null || !str.matches("(?i).*oops.{0,2}$");
-    };
-    Function<String, Boolean> validateSupplierCity = (str) -> {
-      return str == null || !str.matches(".*X");
-    };
-    ValidationItem decoSupplierName = null;
-    ValidationItem decoSupplierCity = null;
-    if (USE_SIMPLE_VALIDATION) {
-      SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
-      decoSupplierName = SVUtils.setDecoratorValidator(txtSupplierName,
-          SVUtils.getStringValidator(
-                  validateSupplierName, () -> "Supplier name can not end with 'oops..'"));
-      SwingValidationGroup.setComponentName(txtSupplierCity, "Supplier City");
-      decoSupplierCity = SVUtils.setDecoratorValidator(txtSupplierCity,
-          SVUtils.getStringValidator(
-                  validateSupplierCity, () -> "City can not end in 'X'"));
-    } else {
-      txtSupplierName.setPluginValidator(TextComponentValidator.create(validateSupplierName));
-      txtSupplierCity.setPluginValidator(
-          TextComponentValidator.create(validateSupplierCity));
-    }
+    // Set some validation criteria.
+    txtSupplierName.setTextValidationCondition(
+        (str) -> str == null || !str.matches("(?i).*oops.{0,2}$"),
+        (ssComp) -> "Supplier name can not end with 'oops..'");
+    txtSupplierCity.setTextValidationCondition(
+        (str) -> str == null || !str.matches(".*X"),
+        null);
 
     // Initialize database connection and components
     try {
@@ -193,61 +170,56 @@ public class Example2 extends JFrame {
     cmbSupplierStatus.setPreferredSize(MainClass.ssDim);
 
     // Setup the container and layout the components
-    //final Container contentPane = getContentPane();
-    final Container contentPane = new JPanel();
-    contentPane.setLayout(new GridBagLayout());
+    final Container uiPanel = new JPanel(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
 
     constraints.gridx = 0;
     constraints.gridy = 0;
     constraints.weightx = .40;
     constraints.anchor = GridBagConstraints.WEST;
-    contentPane.add(lblSupplierID, constraints);
+    uiPanel.add(lblSupplierID, constraints);
     constraints.gridy = 1;
-    contentPane.add(lblSupplierName, constraints);
+    uiPanel.add(lblSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(lblSupplierCity, constraints);
+    uiPanel.add(lblSupplierCity, constraints);
     constraints.gridy = 3;
-    contentPane.add(lblSupplierStatus, constraints);
+    uiPanel.add(lblSupplierStatus, constraints);
 
     constraints.gridx = 1;
     constraints.gridy = 0;
     constraints.weightx = .60;
     constraints.anchor = GridBagConstraints.CENTER;
     constraints.fill = GridBagConstraints.HORIZONTAL;
-    contentPane.add(txtSupplierID, constraints);
+    uiPanel.add(txtSupplierID, constraints);
     constraints.gridy = 1;
-    contentPane.add(txtSupplierName, constraints);
+    uiPanel.add(txtSupplierName, constraints);
     constraints.gridy = 2;
-    contentPane.add(txtSupplierCity, constraints);
+    uiPanel.add(txtSupplierCity, constraints);
     constraints.gridy = 3;
-    contentPane.add(cmbSupplierStatus, constraints);
+    uiPanel.add(cmbSupplierStatus, constraints);
 
     constraints.gridx = 0;
     constraints.gridy = 4;
     constraints.gridwidth = 2;
-    contentPane.add(navigator, constraints);
+    uiPanel.add(navigator, constraints);
 
     // DISABLE THE PRIMARY KEY
     txtSupplierID.setEnabled(false);
 
     // Set up the simple validation panel.
-    JPanel uiPanel;
-    if (USE_SIMPLE_VALIDATION) {
-      ValidationPanel valiPanel = new ValidationPanel();
-      valiPanel.setInnerComponent(contentPane);
-      ValidationGroup group = valiPanel.getValidationGroup();
-      group.addItem(decoSupplierName, false);
-      group.addItem(decoSupplierCity, false);
-      uiPanel = valiPanel;
+    JPanel decoratorPanel;
+    if (Boolean.TRUE) { // SIMPLE_VALIDATION
+      decoratorPanel = SVUtils.createDecoratorPanel(uiPanel,
+          SVUtils.setTextDecorator(txtSupplierName, "Supplier Name"),
+          SVUtils.setTextDecorator(txtSupplierCity, "Supplier City"));
     } else {
-      uiPanel = (JPanel) contentPane;
+      decoratorPanel = SsUtils.createDecoratorPanel(uiPanel);
     }
+    frame.setContentPane(decoratorPanel);
 
-    // MAKE THE JFRAME VISIBLE
-    frame.add(uiPanel);
-    frame.setVisible(true);
+    // Make the jframe visible
     frame.pack();
+    frame.setVisible(true);
   }
 
   private DbOps createDbNav() {

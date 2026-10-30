@@ -42,16 +42,20 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.utils;
 
-import java.awt.Component;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.text.JTextComponent;
 
 import dev.visdb.seesaw.SsCheckBox;
 import dev.visdb.seesaw.datasources.DbSupport.DbReader;
@@ -61,7 +65,6 @@ import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.TextDecorator;
-import dev.visdb.seesaw.decorators.Validator;
 import dev.visdb.seesaw.formatting.SsFormat;
 import dev.visdb.seesaw.formatting.SsFormattedTextField;
 import dev.visdb.seesaw.navigate.ColumnChangeStartEvent;
@@ -84,7 +87,7 @@ import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
  * See {@link Hook} for a complete example.
  * <p>
  * The basic components for application use and/or subclassing are found in
- * <a href="../core/package-summary.html">core components</a>.
+ * <a href="../package-summary.html">core components</a>.
  * They are subclassed into a
  * <a href="../package-summary.html">compatibility layer</a>
  * as a replacement for the
@@ -115,24 +118,25 @@ import static dev.visdb.seesaw.utils.SsUtils.findRowsModel;
  * {@link #getColumnJDBCType() }.
  * <p>
  * There are multiple levels of validation.
- * The validators are executed in the
+ * Validation is executed in the
  * following order, see {@link allValidate};
  * if there's an error, validation stops, and see {@link ValidationResult}.
  * <ol>
- * <li>{@code baseValidate()} - method, defaults true<br>
+ * <li>{@code baseValidate()} - SsComponent method, defaults true<br>
  * This checks that the SsComponent's value is more or less correct.
  * For example a mask formatter's valid indicator,
  * {@link javax.swing.JFormattedTextField#isEditValid};
- * or a {@link dev.visdb.seesaw.SsTextField} subclass could check that there's only characters.
- * <li>{@code componentValidate()} - method default true<br>
- * A subclass of something that does baseValidate, can use this for more
+ * or a {@link dev.visdb.seesaw.SsTextField} subclass could check that there's
+ * only alpha characters.
+ * <li>{@code componentValidate()} - SsComponent method default true<br>
+ * Typically a subclass of something that does baseValidate, can use this for more
  * specific validation.
- * <li>optionally check rowsModel.hasError(SsComponent)
- * <li>{@code pluginValidate} - Application specific validation, per component instance.
+ * <li>check rowsModel.hasError(SsComponent)
+ * <li>instance validation - Application specific validation, per component instance,
+ * specified by {@link #setValidationCondition} or {@link #setTextValidationCondition}.
  * <br>
- * Set at run time with {@link #setPluginValidator(Validator)}.
  * For example check for specific values; or other columns or ...
- * Can apply constraints while editing and avoid errors at commit.
+ * Can check constraints while editing and avoid errors at commit.
  * </ol>
  * <p>
  * There are {@link Decorator}s that visually indicate the components state.
@@ -294,16 +298,19 @@ public interface SsComponent extends RSC {
   default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException {}
 
   /**
-   * This is overriden to return true by components that are made up of
+   * Override this to return true by components that are made up of
    * other components; and some of those contained components might get
    * the focus. Examples are
-   * {@link dev.visdb.seesaw.SsImage} and DbDatePicker.
+   * {@link dev.visdb.seesaw.SsImage} and
+   * {@link dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker}.
+   * <p>
+   * This is most meaningful when it comes to determining
+   * if an SsComponent is focused.
    * @return
    */
-  // isComposite component usually has
-  // comp != comp.getFocusTarget() || comp != comp.getDecorateTarget()
   default boolean isComposite() {
-    return false;
+    // textField inside comboBox may get focus.
+    return this instanceof JComboBox;
   }
 
   /**
@@ -829,29 +836,7 @@ in the SsComponent's constructor, but before bind.
    * for use with decorators.
    * But an SsComponent may be grouped with other components, and some
    * other component may be the the focused component.
-   * @return the component that gets focus when this component is active
-   */
-  default Component getFocusTarget() {
-    return getSsCommon().getFocusTarget();
-  }
-
-  /**
-   * Typically an SsComponent is both the decorate component and focus component
-   * for use with decorators.
-   * But an SsComponent may be grouped with other components, and some
-   * other component may be the the focused component.
-   * @param focusTarget
-   */
-  default void setFocusTarget(Component focusTarget) {
-    getSsCommon().setFocusTarget(focusTarget);
-  }
-
-  /**
-   * Typically an SsComponent is both the decorate component and focus component
-   * for use with decorators.
-   * But an SsComponent may be grouped with other components, and some
-   * other component may be the the focused component.
-   * @return the component that is decorate decorated
+   * @return the component to decorate
    */
   default JComponent getDecorateTarget() {
     return getSsCommon().getDecorateTarget();
@@ -869,13 +854,82 @@ in the SsComponent's constructor, but before bind.
   }
 
   /**
-   * Install the specified pluginValidator into this component.
-   * Each instance can have a unique validator.
-   * This is run after all the other validations succeed.
-   * @param pluginValidator validator to install
+   * There are levels of validation; they execute in order.
+   * BASE and COMPONENT are specified through overriding.
+   * COLUMN database related error. INSTANCE may be set per
+   * instantiated component.
    */
-  default void setPluginValidator(Validator pluginValidator) {
-    getSsCommon().setPluginValidator(pluginValidator);
+  public enum Validation {
+    /** */
+    BASE("BaseValidate"),
+    /** */
+    COMPONENT("ComponentValidate"),
+    /** */
+    COLUMN("ColumnValidate"),
+    /** */
+    INSTANCE("InstanceValidate");
+
+    final String toString;
+
+    private Validation(String toString) { this.toString = toString; }
+
+    /** {@inheritDoc } */
+    @Override
+    public String toString() {
+      return toString;
+    }
+  }
+
+  /**
+   * Retrieve the error msg. Should only be invoked if there was an error.
+   * @param validation
+   * @return
+   */
+  default String validationMsg(Validation validation) {
+    Function<SsComponent, String> msg = getSsCommon().validationErrorMsg.get(validation);
+    return msg != null ? msg.apply(this) : (validation.toString() + " failed");
+  }
+
+  /** set an error message for the specified validation.
+   * @param validation
+   * @param msg
+   */
+  default void setValidationMsg(Validation validation, Function<SsComponent, String> msg) {
+    getSsCommon().validationErrorMsg.put(validation, msg);
+  }
+
+  /**
+   * Convenience method that first wraps
+   * {@code Function<String, Boolean> validCondition} in a
+   * {@code Function<SsComponent, Boolean>} and then calls
+   * {@link #setValidationCondition(Function, Function) }.
+   * @param validCondition
+   * @param validationMsg
+   */
+  default void setTextValidationCondition(Function<String, Boolean> validCondition,
+                                          Function<SsComponent, String> validationMsg) {
+    getSsCommon().setValidationCondition(
+        ssComp -> validCondition.apply(((JTextComponent)ssComp).getText()),
+        validationMsg);
+  }
+
+  /**
+   * Use {@code validCondition} to validate the instance after the other
+   * validation steps.
+   * @param validCondition
+   * @param validationMsg
+   */
+  default void setValidationCondition(Function<SsComponent, Boolean> validCondition,
+                                      Function<SsComponent, String> validationMsg) {
+    getSsCommon().setValidationCondition(validCondition, validationMsg);
+  }
+
+  /**
+   * The final validation, aka instanceValidation.
+   * @return 
+   */
+  default Function<SsComponent, Boolean> getValidationCondition() {
+    return getSsCommon().getValidationCondition();
   }
 
   /**
@@ -884,8 +938,8 @@ in the SsComponent's constructor, but before bind.
    * For example, a mask formatter indicates valid; generally simple
    * constraints that are context independent; e.g. {@literal month <= 12}.
    * There may be additional checks defined by {@link #componentValidate() }
-   * and/or a {@link Validator}, see
-   * {@link #setPluginValidator(Validator) }; those are checked after baseValidate.
+   * and/or a {@link #setValidationCondition(java.util.function.Function,
+   * java.util.function.Function) setValidationCondition(Function, Function) }.
    * The default implementation returns true.
    *
    * @return false for error in data, otherwise true
@@ -908,17 +962,39 @@ in the SsComponent's constructor, but before bind.
    *
    * @param base result of baseValidate()
    * @param comp result of base and componentValidate()
-   * @param other this component is the target of an error event,
+   * @param other false if this component is the target of an error event,
    * see {@link RowsModel#hasError(SsComponent) }
-   * @param plugin result of pluginValidate
-   * @param all true if everything validated
+   * @param instance result of instanceValidate
    */
-  record ValidationResult(boolean base, boolean comp, boolean other, boolean plugin, boolean all) {}
+  record ValidationResult(boolean base, boolean comp, boolean other, boolean instance) {
+    /**
+     * The first validation that failed.
+     */
+    public Optional<Validation> firstFail() {
+      Validation fail = null;
+      if (!base) fail = Validation.BASE;
+      else if (!comp) fail = Validation.COMPONENT;
+      else if (!other) fail = Validation.COLUMN;
+      else if (!instance) fail = Validation.INSTANCE;
+      return Optional.ofNullable(fail);
+    }
+    public boolean result(Validation which) {
+      return switch (which) {
+        case BASE -> base;
+        case COMPONENT -> comp;
+        case COLUMN -> other;
+        case INSTANCE -> instance;
+      };
+    }
+    /** @return true if everything validated */
+    public boolean all() {
+      return instance;
+    }
+  }
 
   /**
    * Run the validators: baseValidate, componentValidate,
-   * possibly check RowsModel.hasError(),
-   * pluginValidate.
+   * check RowsModel.hasError(), instanceValidate.
    * The checks are done in order, they stop with any failure.
    * @return result
    */
@@ -931,9 +1007,9 @@ in the SsComponent's constructor, but before bind.
       if (rowsModel != null && rowsModel.getRowSet() != null)
         otherValid = !rowsModel.hasError(this);
     }
-    boolean pluginValid = otherValid && getSsCommon().pluginValidate();
+    boolean instanceValid = otherValid && getValidationCondition().apply(this);
 
-    return new ValidationResult(baseValid, compValid, otherValid, pluginValid, pluginValid);
+    return new ValidationResult(baseValid, compValid, otherValid, instanceValid);
   }
 
   /**
@@ -986,6 +1062,25 @@ in the SsComponent's constructor, but before bind.
   }
 
   /**
+   * Flag specifying if the Decorator should invoke the TextDecorator.
+   * @return flag
+   */
+  default boolean isTextDecoratorEnabled() {
+    return getSsCommon().isTextDecoratorEnabled();
+  }
+
+  /**
+   * Decorators typically invoke a component's TextDecorator as as well;
+   * use this method to control that behavior. Enabled defaults true.
+   * <p>
+   * A decorator may choose to never decorate text; should document this.
+   * @param flag
+   */
+  default void setTextDecoratorEnabled(boolean flag) {
+    getSsCommon().setTextDecoratorEnabled(flag);
+  }
+
+  /**
    * Return the text decorator used by this component.
    * @return the textDecorator
    */
@@ -1001,9 +1096,15 @@ in the SsComponent's constructor, but before bind.
     getSsCommon().setTextDecorator(textDeco);
   }
 
-  /** Run the decorator */
-  default void decorateText() {
-    getSsCommon().decorateText();
+  /**
+   * Run the textDecorator or ComponentStateTextDecorator as possible.
+   * By default this is is a no-op.
+   * This usually, but not exclusively, does something if SsComponent
+   * is a subclass of JTextComponent.
+   * @param valid may be null
+   */
+  default void decorateText(ValidationResult valid) {
+    getSsCommon().decorateText(valid);
   }
 }
 // vi: sw=2 ts=8

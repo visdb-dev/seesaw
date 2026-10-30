@@ -48,8 +48,7 @@ import dev.visdb.seesaw.utils.SsComponent;
  * A validator allows a specialized validation condition on a per component
  * basis. If {@linkplain validate()} is false there is no attempt to write
  * to the data base. This is typically checked by a {@link Decorator}.
- *
- * .
+ * 
  * <p>
  * TODO: eventually define a factory to create these, a base
  *		 class might contain methods like getText.

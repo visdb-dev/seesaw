@@ -72,7 +72,7 @@ import static java.lang.System.Logger.Level.*;
  * {@linkplain Version} is comparable, for example,
  * {@snippet :
  * if (Version.get().compareTo(Version.get("4.0.11")) >= 0) {
- *     // Do this for SwingSet version 4.0.11 and later
+ *     // Do this for SeeSaw version 4.0.11 and later
  * }
  * assert Version.get("4.0").compareTo(Version.get("4.0.0")) == 0;
  * assert Version.get("4.0.11-SNAPSHOT").compareTo(Version.get("4.0.11")) < 0;
@@ -82,8 +82,8 @@ public class Version implements Comparable<Version> {
   /** Log4j Logger for component */
   private static final Logger logger = JStuff.getLogger();
 
-  /** Name of SwingSet version resource file. */
-  private final static String SS_VERSION_FILENAME = "swingsetVersion.properties";
+  /** Name of SeeSaw version resource file. */
+  private final static String SS_VERSION_FILENAME = "seesawVersion.properties";
 
   /** Name of version key in resource file. */
   private final static String VERSION_KEY = "version";
@@ -97,7 +97,7 @@ public class Version implements Comparable<Version> {
   private static Version SINGLETON;
 
   /**
-   * Returns the singleton Version of the running SwingSet library.
+   * Returns the singleton Version of the running SeeSaw library.
    * If the version property is not found, or there is a parse error,
    * then 0.0.0-SNAPSHOT is used.
    * @return version
@@ -220,9 +220,9 @@ public class Version implements Comparable<Version> {
   }
 
   /**
-   * Return the SwingSet version number or null if there is an issue.
+   * Return the SeeSaw version number or null if there is an issue.
    *
-   * @return the SwingSet version number or null if there is an issue.
+   * @return the SeeSaw version number or null if there is an issue.
    */
   private static String getVersionProperty() {
     String ver = null;
@@ -231,7 +231,7 @@ public class Version implements Comparable<Version> {
       props.load(Version.class.getClassLoader().getResourceAsStream(SS_VERSION_FILENAME));
       ver = props.getProperty(VERSION_KEY);
     } catch (IOException | NullPointerException ex) {
-      logger.log(ERROR, "Unable to load SwingSet version properties file.", ex);
+      logger.log(ERROR, "Unable to load SeeSaw version properties file.", ex);
     }
 
     return ver;

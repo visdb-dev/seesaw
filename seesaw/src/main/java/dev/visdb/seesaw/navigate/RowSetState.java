@@ -61,11 +61,11 @@ import com.google.common.collect.MapMaker;
 
 import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.SqlException;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SsUtils.DebugRowSetListenerFlag;
 
 import static dev.visdb.seesaw.navigate.RowsEvent.RowSetEventType.*;
-import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static dev.visdb.seesaw.utils.SsUtils.objectID;
 
@@ -164,7 +164,7 @@ public class RowSetState {
   private final RowSetListener debugRowSetListener; // Strong reference needed.
   private static class DebugRowSetListener implements RowSetListener {
     static RowSetListener create(RowSet rs) {
-      if (defLookup(DebugRowSetListenerFlag.class) == null)
+      if (Globals.getOption(DebugRowSetListenerFlag.class) == null)
         return null;
       DebugRowSetListener l = new DebugRowSetListener();
       rs.addRowSetListener(WeakListeners.create(RowSetListener.class, l, rs));
