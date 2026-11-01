@@ -118,12 +118,6 @@ public class Example2 extends JFrame {
     // Set connection
     connection = _dbConn;
 
-    // Set screen dimensions
-    setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-
-    // Set screen position
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
     // Set some validation criteria.
     txtSupplierName.setTextValidationCondition(
         (str) -> str == null || !str.matches("(?i).*oops.{0,2}$"),
@@ -217,8 +211,9 @@ public class Example2 extends JFrame {
     }
     frame.setContentPane(decoratorPanel);
 
-    // Make the jframe visible
     frame.pack();
+    // Position the screen and make the jframe visible.
+    DemoUtil.setChildScreenLocation(this);
     frame.setVisible(true);
   }
 

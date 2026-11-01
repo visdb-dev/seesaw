@@ -139,9 +139,15 @@ public class SsUtils {
     return decoratorFactory;
   }
 
+  ////////////////////////////////////////////////////////////////////////////
+  //
+  // Decorator panel.
+  //
+
   /**
-   * This HACK is used to adjust the decorator label to avoid layout wiggles
-   * for some {@literal Look&Feel}. Put one of these in {@link Globals} as needed.
+   * This HACK is used to adjust the decorator panel label (where messages go)
+   * to avoid layout wiggles for some {@literal Look&Feel}.
+   * Put one of these in {@link Globals} as needed.
    * If the chosen decorator infrastructure does not need wiggle room, then
    * this has no effect.
    */
@@ -157,22 +163,39 @@ public class SsUtils {
     }
   }
 
+  // TODO: Make this public? And/or create stuct for value
+  //       then can easily have more than just style associated with the panel.
+  /** JPanel's ClientProperty key to tag a decorator panel. */
+  static final Object SEE_SAW_PANEL_KEY = new Object() {
+    @Override public String toString() { return "SEE_SAW_PANEL"; }
+  };
+
+  /**
+   * This method creates and puts a ClientProperty into the decorator panel; this ClientProperty
+   * allows the decorator panel to be easily found. The decorator panel contains the ui panel.
+   * @param parentPanel
+   * @param style
+   */
+  public static void createDecoratorPanelKey(JPanel parentPanel, DecoratorStyle style) {
+    parentPanel.putClientProperty(SEE_SAW_PANEL_KEY, style);
+  }
+
   /** Return the component wrapped by the decorator panel.
    * @param decoratorPanel
    * @return the inner/ui panel
    */
   public static JPanel getInnerComponent(Component decoratorPanel) {
     if (decoratorPanel instanceof JPanel jp
-        && jp.getClientProperty(Decorator.SEE_SAW_PANEL_KEY) != null
+        && jp.getClientProperty(SEE_SAW_PANEL_KEY) != null
         && jp.getLayout() instanceof BorderLayout b)
       return (JPanel)b.getLayoutComponent(jp, BorderLayout.CENTER);
     return null;
   }
   
   /**
-   * Convenience method for searching above {@code comp} in the
-   * component hierarchy and returns the first JComponent, must be a JPanel,
-   * that has ClientProperty {@code Decorator.SEE_SAW_PANEL_KEY}.
+   * Search above {@code comp} in the component hierarchy
+   * and returns the nearest JComponent, must be a JPanel,
+   * that has ClientProperty {@code SEE_SAW_PANEL_KEY}.
    * Returns {@code null} if not found.
    *
    * @param comp the component
@@ -186,11 +209,13 @@ public class SsUtils {
     Container parent = comp.getParent();
     while(parent != null
         && !(parent instanceof JPanel jp
-             && jp.getClientProperty(Decorator.SEE_SAW_PANEL_KEY) != null)) {
+             && jp.getClientProperty(SEE_SAW_PANEL_KEY) != null)) {
       parent = parent.getParent();
     }
     return (JPanel)parent;
   }
+
+  ////////////////////////////////////////////////////////////////////////////
 
   /**
    * Use this if you want a 1-1 correspondence between {@code RowSet} and {@code RowsModel};

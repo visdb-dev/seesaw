@@ -67,6 +67,7 @@ import dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
 
 /**
@@ -215,7 +216,7 @@ public class SVUtils {
   static ValidationPanel createDecoratorPanel(Container uiPanel) {
     ValidationPanel parentPanel = new ValidationPanel();
     parentPanel.setInnerComponent(uiPanel);
-    parentPanel.putClientProperty(Decorator.SEE_SAW_PANEL_KEY, SIMPLE_VALIDATION);
+    SsUtils.createDecoratorPanelKey(parentPanel, SIMPLE_VALIDATION);
     var adj = Globals.getOption(DecoratorPanelAdjustSOUTH.class);
     if (adj != null) {
       Component p = ((BorderLayout)parentPanel.getLayout()).getLayoutComponent(BorderLayout.SOUTH);

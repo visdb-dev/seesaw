@@ -88,7 +88,6 @@ import dev.visdb.seesaw.datasources.SqlInternalException;
 import dev.visdb.seesaw.datasources.SqlNullException;
 import dev.visdb.seesaw.datasources.SqlRuntimeException;
 import dev.visdb.seesaw.decorators.BorderDecorator;
-import dev.visdb.seesaw.decorators.BorderDecoratorFactory;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.TextDecorator;

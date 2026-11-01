@@ -125,12 +125,6 @@ public class Example3 extends JFrame {
     // SET CONNECTION
     connection = _dbConn;
 
-    // SET SCREEN DIMENSIONS
-    setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-
-    // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
     // INITIALIZE DATABASE CONNECTION AND COMPONENTS
     try {
       RowSet rowset = DemoUtil.getNewRowSet(connection);
@@ -240,9 +234,10 @@ public class Example3 extends JFrame {
     //			cmbSupplierName.addDisplayValue("Adams2", (long)5);
     //			cmbSupplierName.updateDisplayValue((long)55, "Hello");
 
-    // MAKE THE JFRAME VISIBLE
-    setVisible(true);
     pack();
+    // Position the screen and make the jframe visible.
+    DemoUtil.setChildScreenLocation(this);
+    setVisible(true);
   }
 
   /**

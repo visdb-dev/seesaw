@@ -94,7 +94,7 @@ public class Example7 extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
     // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+    DemoUtil.setChildScreenLocation(this);
 
     // INITIALIZE SCREEN & DATAGRID
     init();
@@ -118,7 +118,7 @@ public class Example7 extends JFrame {
       dataGrid.setHeaders(
           new String[] {"Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date"});
       dataGrid.setRowsModel(rowsModel);
-      dataGrid.setMessageWindow(this);
+      dataGrid.setDialogParent(this);
 
       // DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
       dataGrid.setInsertion(false);
@@ -178,7 +178,9 @@ public class Example7 extends JFrame {
     // SETUP THE CONTAINER AND ADD THE DATAGRID
     getContentPane().add(dataGrid.getComponent());
 
-    // MAKE THE JFRAME VISIBLE
+    // pack();
+    // Position the screen and make the jframe visible.
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 }

@@ -149,7 +149,7 @@ public class SsCompFocusListener {
                                objectID(ssComp)));
       return;
     }
-    dumpCheckFocusInfo(Level.INFO, c, ssComp, loggerSupplier);
+    dumpCheckFocusInfo(Level.TRACE, c, ssComp, loggerSupplier);
 
     if (isDescendingFrom(c, (Component) ssComp)) {
       log(Level.TRACE, () ->sf("%s, focused: %s\n", objectID(c), c.isFocusOwner()));

@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 
 import javax.swing.JPanel;
 
+import dev.visdb.seesaw.utils.SsUtils;
+
 /**
  * Make a DecoratorFactory out of this.
  * 
@@ -59,9 +61,8 @@ public abstract class DecoratorFactoryBase implements DecoratorFactory {
     // Could just do: uiPanel.putClientProperty return uiPanel;
     JPanel parentPanel = new JPanel(new BorderLayout());
     parentPanel.add(uiPanel, BorderLayout.CENTER);
-    parentPanel.putClientProperty(Decorator.SEE_SAW_PANEL_KEY, getDecoratorStyle());
+    SsUtils.createDecoratorPanelKey(parentPanel, getDecoratorStyle());
     return parentPanel;
-    //return uiPanel;
   }
 
   /**

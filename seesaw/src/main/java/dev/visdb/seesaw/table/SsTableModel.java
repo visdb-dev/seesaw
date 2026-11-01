@@ -683,19 +683,18 @@ be done after row insertion, and deletion.
   /**
    * Sets the value in the cell at row and column to value.
    *
-   * @param value  the new value
+   * @param _value  the new value
    * @param row    the row whose value is to be changed
    * @param column the column whose value is to be changed
    */
   @Override
-  public void setValueAt(Object value, int row, int column) {
-    // MAKE LOCAL COPY OF OBJECT FOR DATE MANIPULATIONS
-    Object valueCopy = value;
+  public void setValueAt(Object _value, int row, int column) {
+    // Make local copy of object for date manipulations
+    Object value = _value;
 
-    // GET THE TYPE OF THE COLUMN
+    // Get the type of the column
     JDBCType type;
     try {
-      //type = rowset.getColumnType(column + 1);
       type = RowSetOps.getJDBCColumnType(rowset, column + 1);
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while updating value.", se);
@@ -706,28 +705,23 @@ be done after row insertion, and deletion.
     // TODO Clean this up. Utilize java.util.Time.
 
     // If copying values the date will come as string so convert it to date object.
-    if (DateTime.isHandledDateTimeJDBCType(type) && valueCopy instanceof String string) {
-      valueCopy = getSQLDateTimeObject(string, RSC.get(rowsModel, column + 1));
+    if (DateTime.isHandledDateTimeJDBCType(type) && value instanceof String string) {
+      value = getSQLDateTimeObject(string, RSC.get(rowsModel, column + 1));
     }
 
-    // IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER
-    // THAT AN UPDATE FOR CELL HAS BEEN REQUESTED.
+    // If cell editing interface implementation is provided info the user
+    // that an update for cell has been requested.
     if (cellEditing != null) {
-      // THE ROW AND COLUMN NUMBERING STARTS FROM 0 FOR JTABLE BUT THE COLUMNS AND
-      // ROWS ARE NUMBERED FROM 1 FOR SSROWSET.
       boolean allowEdit;
 
-      // IF ITS NEW ROW SEND A NULL FOR THE OLD VALUE
-      if (row == rowCount) {
-        allowEdit = cellEditing.cellUpdateRequested(row, column, null, valueCopy);
-      } else {
-        allowEdit
-            = cellEditing.cellUpdateRequested(row, column, getValueAt(row, column), valueCopy);
-      }
+      // If its new row send a null for the old value
+      Object oldValue = row != rowCount ? getValueAt(row, column) : null;
+      allowEdit = cellEditing.cellUpdateRequested(row, column, oldValue, value);
 
-      // IF THE USER DOES NOT PERMIT THE UPDATE RETURN ELSE GO AHEAD AND UPDATE THE
-      // DATABASE.
+      // If the update is not permitted by SsCellEditing return; 
+      // else go ahead and update the database.
       if (!allowEdit) {
+        messageDialog("Value, or editing in general, not allowed for this cell.\n", null);
         return;
       }
     }
@@ -735,24 +729,27 @@ be done after row insertion, and deletion.
     // IF CHANGE IS MADE IN INSERT ROW ADD ROW TO THE DATABASE
     // INSERTROW FUNCTION ALSO INCREMENTS THE ROW COUNT
     if (row == rowCount) {
-      insertRow(valueCopy, column);
+      insertRow(value, column);
       return;
     }
 
-    var finalValueCopy = valueCopy;
-    logger.log(DEBUG, () -> "Set value at " + row + "  " + column + " with " + finalValueCopy);
+    var valueF = value;
+    logger.log(DEBUG, () -> sf("Set value at %d,%d with %s", row, column, valueF));
+
+    // The row and column numbering starts from 0 for jtable
+    // but the columns and rows are numbered from 1 for RowSet.
 
     try {
       // YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
       if (rowset.getRow() != (row + 1)) {
         rowset.absolute(row + 1);
       }
-      if (valueCopy == null) {
+      if (value == null) {
         rowset.updateNull(column + 1);
         return;
       }
 
-      updateColumnObjectDirect(rowset, column + 1, valueCopy);
+      updateColumnObjectDirect(rowset, column + 1, value);
 
       RowSetOps.updateRow(rowset);
 
