@@ -16,8 +16,10 @@
 package dev.visdb.seesaw.demo;
 
 import java.awt.EventQueue;
+import java.awt.GraphicsConfiguration;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -555,27 +557,56 @@ public class DemoUtil {
   }
 
   /**
-   * Provide a point with the child screen location based on the class name.
-   *
-   * @param _className name of screen to position
-   * @return top-left point to locate child screen in relation to parent screen
+   * Starting position of the staggered column.
+   * Adjusted to next column when a window goes off-screen.
    */
-  public static Point getChildScreenLocation(String _className) {
-    // TODO Consider cascading based on name.
+  // TODO: reset position, when there are no child screens.
+  private static final Point BaseChildPosition = new Point(
+      MainClass.buttonWidth, MainClass.buttonHeight * MainClass.childScreenCount);
+  private static final Point childPosition = new Point(BaseChildPosition);
+  /** Each child position xy offset from previous. */
+  private final static int cornerTranslate = MainClass.buttonHeight;
+  private static int childCount;
+  private static int openWindowCount;
 
-    Point result = new Point(MainClass.buttonWidth + 50,
-                             (MainClass.buttonHeight * MainClass.childScreenCount) + 50);
-    //		switch (_className) {
-    //		case "x":
-    //			result.setLocation(0,0);
-    //			break;
-    //		default:
-    //			result.setLocation(0,0);
-    //			break;
-    //		}
+  /**
+   * Provide a point with the child screen location based on the class name.
+   * This must only be called once per window.
+   *
+   * @param window name of Window to position
+   */
+  // TODO: detect if same window used again.
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public static void setChildScreenLocation(Window window) {
+    openWindowCount++;
+    window.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosed(WindowEvent e) {
+        openWindowCount--;
+      }
+    });
 
-    Screens.translateToPrefScreen(result);
-    return result;
+    if (openWindowCount == 0) {
+      childPosition.setLocation(BaseChildPosition);
+      childCount = 0;
+    }
+    GraphicsConfiguration gc = Screens.getPrefScreen();
+
+    // Allow one reposition.
+    for (int i = 0; i < 2; i++) {
+      // Could use translate on Point.
+      Point newPos = new Point(childPosition.x + childCount * cornerTranslate,
+          childPosition.y + childCount * cornerTranslate);
+      childCount++;
+      
+      window.setLocation(newPos);
+      Screens.translateToScreen(window, gc);
+      if (Screens.isWithinScreen(window, gc))
+        break;
+      childPosition.setLocation(childPosition.x + BaseChildPosition.x,
+                                childPosition.y);
+      childCount = 0;
+    }
   }
 
   /**

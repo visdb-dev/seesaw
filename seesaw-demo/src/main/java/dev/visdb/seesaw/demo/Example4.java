@@ -254,12 +254,6 @@ public class Example4 extends JFrame {
 
     comboPlay();
 
-    // SET SCREEN DIMENSIONS
-    setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-
-    // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
     // SET CONNECTION
     connection = _dbConn;
 
@@ -415,9 +409,10 @@ public class Example4 extends JFrame {
     // DISABLE THE PRIMARY KEY
     txtPartID.setEnabled(false);
 
-    // MAKE THE JFRAME VISIBLE
-    setVisible(true);
     pack();
+    // Position the screen and make the jframe visible.
+    DemoUtil.setChildScreenLocation(this);
+    setVisible(true);
   }
 
   private DbOps createDbNav() {

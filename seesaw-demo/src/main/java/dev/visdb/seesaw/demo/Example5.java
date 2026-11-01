@@ -90,9 +90,6 @@ public class Example5 extends JFrame {
     // SET SCREEN DIMENSIONS
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
-    // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
     // INITIALIZE SCREEN & DATAGRID
     init();
   }
@@ -128,7 +125,7 @@ public class Example5 extends JFrame {
       dataGrid = new SsTable();
       dataGrid.setHeaders(new String[] {"Part ID", "Part Name", "Color Code", "Weight", "City"});
       dataGrid.setRowsModel(rowsModel);
-      dataGrid.setMessageWindow(this);
+      dataGrid.setDialogParent(this);
 
       // DISABLES NEW INSERTIONS TO THE DATABASE.
       dataGrid.setInsertion(false);
@@ -149,7 +146,9 @@ public class Example5 extends JFrame {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }
 
-    // MAKE THE JFRAME VISIBLE
+    //pack();
+    // Position the screen and make the jframe visible.
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 }

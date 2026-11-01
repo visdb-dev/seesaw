@@ -413,9 +413,6 @@ public class TestBaseComponents extends JFrame {
     // set screen dimensions
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
 
-    // set screen position
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
     // TEST DbOpsCreator
     DbOpsCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
     DbOpsCreator prevCreator = Globals.getOption(DbOpsCreator.class);
@@ -627,8 +624,6 @@ public class TestBaseComponents extends JFrame {
     if (lstValidationItem != null && decoratorPanel instanceof ValidationPanel valiPanel)
       valiPanel.getValidationGroup().addItem(lstValidationItem, false);
 
-    pack();
-
     // Make sure the window is not resized smaller.
     // If that happened, info would be obscured.
 
@@ -651,11 +646,13 @@ public class TestBaseComponents extends JFrame {
       }
     });
 
+    pack();
     minWidth = getWidth();
     minHeight = getHeight();
     setMinimumSize(new Dimension(minWidth, minHeight));
 
-    // Make the JFrame visible.
+    // Position the screen and make the jframe visible.
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
   int minWidth;

@@ -37,7 +37,7 @@
       <artifactId>java-getopt</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.raelity</groupId>
+      <groupId>com.raelity.lib</groupId>
       <artifactId>raelity-lib</artifactId>
     </dependency>
     <!--

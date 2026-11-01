@@ -93,9 +93,6 @@ public class Example6 extends JFrame {
     // SET CONNECTION
     connection = _dbConn;
 
-    // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
     // SET SCREEN DIMENSIONS
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
@@ -120,7 +117,7 @@ public class Example6 extends JFrame {
       dataGrid = new SsTable();
       dataGrid.setHeaders(new String[] {"Part ID", "Part Name", "Color Code", "Weight", "City"});
       dataGrid.setRowsModel(rowsModel);
-      dataGrid.setMessageWindow(this);
+      dataGrid.setDialogParent(this);
 
       // DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
       dataGrid.setInsertion(false);
@@ -168,7 +165,9 @@ public class Example6 extends JFrame {
     // SETUP THE CONTAINER AND ADD THE DATAGRID
     getContentPane().add(dataGrid.getComponent());
 
-    // MAKE THE JFRAME VISIBLE
+    // pack();
+    // Position the screen and make the jframe visible.
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 }
