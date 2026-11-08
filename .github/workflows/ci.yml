@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # enable manual trigger
+
+permissions:
+  contents: read
+
+# Stops older runs if you push code changes back-to-back
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      # The build compiles with frgaal (source 24, target 17) and the
+      # enforcer requires JDK 24+, so build on 25.
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and run tests
+        run: mvn verify -B -ntp
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: surefire-reports
+          path: '**/target/surefire-reports/'
+          if-no-files-found: ignore
