@@ -13,6 +13,11 @@ name: Prune Old Workflow Runs
 on:
   schedule:
     - cron: '17 4 * * 0'   # weekly, Sunday 04:17 UTC
+  # Any PR that edits this file gets a dry run, so changes can be checked
+  # before they are merged. Pull request runs never delete anything.
+  pull_request:
+    paths:
+      - '.github/workflows/prune-workflow-runs.yml'
   workflow_dispatch:
     inputs:
       keep_days:
@@ -41,7 +46,7 @@ jobs:
       REPO: ${{ github.repository }}
       KEEP_DAYS: ${{ inputs.keep_days || '30' }}
       KEEP_MINIMUM: ${{ inputs.keep_minimum || '10' }}
-      DRY_RUN: ${{ inputs.dry_run || 'false' }}
+      DRY_RUN: ${{ (github.event_name == 'pull_request' || inputs.dry_run) && 'true' || 'false' }}
     steps:
       - name: Delete old runs
         run: |
