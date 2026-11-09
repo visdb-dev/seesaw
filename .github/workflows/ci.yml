@@ -17,29 +17,34 @@ concurrency:
 
 jobs:
   build:
-    name: Build and test
+    name: Build and test (JDK ${{ matrix.java }})
     runs-on: ubuntu-latest
+
+    # frgaal compiles source 24 to target 17 on any of these JDKs, and the
+    # tests then run on that same JDK. 17 is the minimum runtime.
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '17', '21', '25' ]
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
 
-      # The build compiles with frgaal (source 24, target 17) and the
-      # enforcer requires JDK 24+, so build on 25.
-      - name: Set up JDK
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v6
         with:
-          java-version: '25'
+          java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: 'maven'
 
       - name: Build and run tests
-        run: mvn verify -B -ntp
+        run: mvn verify -B -ntp -fae  # -fae: report failures in every module
 
       - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: surefire-reports
+          name: surefire-reports-jdk${{ matrix.java }}
           path: '**/target/surefire-reports/'
           if-no-files-found: ignore

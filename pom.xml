@@ -592,7 +592,7 @@
                   <version>[${maven.version},)</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>[${java-source},)</version>
+                  <version>[${java-target},)</version>
                 </requireJavaVersion>
                 <dependencyConvergence/>
                 <banDuplicateClasses>
