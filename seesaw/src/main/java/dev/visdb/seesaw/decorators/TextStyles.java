@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.System.Logger;
 import java.nio.charset.StandardCharsets;
@@ -800,42 +801,40 @@ public class TextStyles {
    * <li> Verify exactly one '.' in key.
    * <li> No blank keys or values
    * </ul>
-   *
-   * Tried using something like
-   *        static class DotSplitter extends JPropPathSplitter.CharPathOnlySplitter {}
-   * but no clean way to provide a splitter at this point.
    */
-  @SuppressWarnings({"serial", "CloneableImplementsClone"})
-  private static class PrelimCheckProperties extends Properties {
-    @Override
-    public synchronized Object put(Object _key, Object _value) {
-      String key = (String) _key;
-      String value = (String) _value;
+  private static void addEntry(Properties result,
+                               String text,
+                               @SuppressWarnings("unused") String fName,
+                               int line)
+      throws IOException {
+    Properties one = new Properties();
+    one.load(new StringReader(text));
+    for (String key : one.stringPropertyNames()) {   // exactly one entry
+      String value = one.getProperty(key);
+      
       if(key.isBlank() || value.isBlank())
-        throw new TextStylesException(sf("blank key or value '%s':'%s'", key, value));
-      if (containsKey(key)) {
-        throw new TextStylesException(sf("Duplicate key found: %s=%s", key, value));
-      }
+        throw new TextStylesException(sf("line %d: blank key or value '%s':'%s'",
+                                         line, key, value));
+      if (result.containsKey(key))
+        throw new TextStylesException(sf("line %d: Duplicate key found: %s=%s",
+                                         line, key, value));
       long count  = 0;
       for (int i = 0; i < key.length(); i++) {
         if (key.charAt(i) == '.')
           count++;
       }
-      if (count != 1) {
-        throw new TextStylesException(sf("Key must have exactly one '.' not %d: %s=%s",
-            count, key, value));
-      }
-      return super.put(key, value);
+      if (count != 1)
+        throw new TextStylesException(sf("line %d: Key must have exactly one '.' not %d: %s=%s",
+                                       line, count, key, value));
+      result.setProperty(key, value);
     }
   }
 
   // Parse the properties into a map.
-  private static Map<String, Map<String, String>> parseProperties(Reader reader,
-                                                                  @SuppressWarnings("unused")
-                                                                      String fName)
+  private static Map<String, Map<String, String>> parseProperties(
+      Reader reader, @SuppressWarnings("unused") String fName)
       throws IOException {
-    Properties props = new PrelimCheckProperties();
-    props.load(reader);
+    Properties props = loadStrict(reader, fName);
     JavaPropsMapper mapper = JavaPropsMapper.builder().build();
     JavaPropsSchema schemaWithDots = JavaPropsSchema.emptySchema();
     Map<String, Map<String, String>> styles
@@ -843,6 +842,57 @@ public class TextStyles {
     return styles;
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  //
+  // Claude assist.
+  // Following property stuff because can't override put() to do validation.
+  // See https://github.com/openjdk/jdk/pull/33638 which changes the spec.
+  //
+  
+  private static Properties loadStrict(Reader reader, String fName) throws IOException {
+    Properties result = new Properties();
+    BufferedReader br = new BufferedReader(reader);
+    StringBuilder logical = new StringBuilder();
+    int lineNo = 0, startLine = 0;
+    String line;
+    while ((line = br.readLine()) != null) {
+      lineNo++;
+      if (logical.isEmpty()) {
+        String s = stripLeadingPropsWhitespace(line);
+        if (s.isEmpty() || s.charAt(0) == '#' || s.charAt(0) == '!') {
+          continue;               // blank or comment (never continued)
+        }
+        startLine = lineNo;
+      }
+      logical.append(line).append('\n');
+      if (!endsWithContinuation(line)) {
+        addEntry(result, logical.toString(), fName, startLine);
+        logical.setLength(0);
+      }
+    }
+    if (!logical.isEmpty()) {     // file ended mid-continuation
+      addEntry(result, logical.toString(), fName, startLine);
+    }
+    return result;
+  }
+  
+  private static boolean endsWithContinuation(String line) {
+    int n = 0;
+    for (int i = line.length() - 1; i >= 0 && line.charAt(i) == '\\'; i--) n++;
+    return (n % 2) == 1;          // odd number of trailing backslashes
+  }
+  
+  private static String stripLeadingPropsWhitespace(String s) {
+    int i = 0;
+    while (i < s.length() && (s.charAt(i) == ' ' || s.charAt(i) == '\t' || s.charAt(i) == '\f')) i++;
+    return s.substring(i);
+  }
+
+  //
+  // End Claude assist.
+  //
+  //////////////////////////////////////////////////////////////////////////////
+  
   // @SuppressWarnings("unused")
   // static class DotSplitter extends JPropPathSplitter.CharPathOnlySplitter {
   //   public DotSplitter() {

@@ -411,7 +411,7 @@ public class TextStylesTest {
     System.err.println(configMap == null ? "null" : "not null");
   }
   
-  @SuppressWarnings("serial")
+  @SuppressWarnings({"serial", "CloneableImplementsClone"})
   static class MyMap<K,V> extends LinkedHashMap<K,V> {
     public MyMap() { }
     
@@ -518,7 +518,7 @@ public class TextStylesTest {
       TextStyles.loadStylesFromProperties(reader0, "StylesFromProperties0");
     });
     assertThat(ex.getMessage()).startsWith(
-        "File: StylesFromProperties0: Key must have exactly one '.' not 0:");
+        "File: StylesFromProperties0: line 2: Key must have exactly one '.' not 0:");
 
     props = """
         default.alignment=left
@@ -529,7 +529,7 @@ public class TextStylesTest {
       TextStyles.loadStylesFromProperties(reader2, "StylesFromProperties2");
     });
     assertThat(ex.getMessage()).startsWith(
-        "File: StylesFromProperties2: Key must have exactly one '.' not 2:");
+        "File: StylesFromProperties2: line 2: Key must have exactly one '.' not 2:");
 
     props = """
         default.alignment=left
@@ -541,7 +541,7 @@ public class TextStylesTest {
       TextStyles.loadStylesFromProperties(readera, "StylesFromProperties3");
     });
     assertThat(ex.getMessage()).isEqualTo(
-        "File: StylesFromProperties3: blank key or value '':'foo'");
+        "File: StylesFromProperties3: line 2: blank key or value '':'foo'");
 
     props = """
         default.alignment=left
@@ -553,7 +553,7 @@ public class TextStylesTest {
       TextStyles.loadStylesFromProperties(readerb, "StylesFromProperties3");
     });
     assertThat(ex.getMessage()).isEqualTo(
-        "File: StylesFromProperties3: blank key or value 'foo.bar':''");
+        "File: StylesFromProperties3: line 2: blank key or value 'foo.bar':''");
     System.err.println("");
   }
 

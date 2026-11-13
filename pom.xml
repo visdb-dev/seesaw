@@ -112,14 +112,14 @@
     <mockito.version>5.24.0</mockito.version>
 
     <!-- Plugins -->
-    <versions-maven-plugin.version>2.23.0</versions-maven-plugin.version>
-    <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
+    <versions-maven-plugin.version>2.25.1</versions-maven-plugin.version>
+    <maven-enforcer-plugin.version>3.7.0</maven-enforcer-plugin.version>
     <extra-enforcer-rules.version>1.12.1</extra-enforcer-rules.version>
     <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.6.1</maven-surefire-plugin.version>
-    <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
+    <maven-failsafe-plugin.version>3.6.1</maven-failsafe-plugin.version>
     <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
     <maven-install-plugin.version>3.2.0</maven-install-plugin.version>
     <maven-site-plugin.version>4.0.0-M16</maven-site-plugin.version>
@@ -127,14 +127,14 @@
 
     <!-- Publish Plugins -->
     <maven-deploy-plugin.version>3.2.0</maven-deploy-plugin.version>
-    <njord.version>0.9.10</njord.version>
+    <njord.version>0.10.0</njord.version>
     <njord.publisher>sonatype-central-portal</njord.publisher>
     <njord.releaseUrl>njord:template:release-sca</njord.releaseUrl>
 
     <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
     <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
     <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
-    <flatten-maven-plugin.version>1.8.0</flatten-maven-plugin.version>
+    <flatten-maven-plugin.version>1.9.0</flatten-maven-plugin.version>
 
     <!-- Security -->
     <dependency-check-maven.version>13.0.0</dependency-check-maven.version>

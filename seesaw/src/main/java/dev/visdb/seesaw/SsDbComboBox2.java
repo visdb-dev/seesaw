@@ -353,8 +353,8 @@ public class SsDbComboBox2<K, D, D2> extends SsComboBox2<K, D, D2> {
       logger.log(DEBUG, () -> sf("%s Nulls allowed? %s.", getColumnForLog(), getAllowNull()));
       adjustForNullItem();
 
-      Statement statement = getConnection().createStatement();
-      try (ResultSet rs = statement.executeQuery(getQuery());) {
+      try (Statement statement = getConnection().createStatement();
+           ResultSet rs = statement.executeQuery(getQuery());) {
         List<ListItem> newItems = new ArrayList<>();
         while (rs.next()) {
           // TODO: multikey
