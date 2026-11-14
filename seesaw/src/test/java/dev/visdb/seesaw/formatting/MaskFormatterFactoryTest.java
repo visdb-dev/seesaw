@@ -55,6 +55,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.visdb.seesaw.formatting.FormatterAssist.LiteralsAndPositions;
 import dev.visdb.seesaw.formatting.MaskFormatterFactory.SSMaskFormatter;
+import dev.visdb.seesaw.mock.Util;
 
 import static dev.visdb.seesaw.formatting.FormatterAssist.getLiteralsAndPositions;
 import static dev.visdb.seesaw.formatting.FormatterAssist.userText;
@@ -75,7 +76,9 @@ public class MaskFormatterFactoryTest {
 
   /** x */
   @BeforeAll
-  public static void setUpClass() {}
+  public static void setUpClass() {
+    Util.seesawInit();
+  }
 
   /** x */
   @AfterAll

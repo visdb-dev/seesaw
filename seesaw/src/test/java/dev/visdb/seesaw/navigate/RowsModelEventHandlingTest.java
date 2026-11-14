@@ -25,6 +25,7 @@ import com.raelity.lib.eventbus.WeakEventBus;
 
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TinyRS;
+import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.navigate.EQ.BusReceiver;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
@@ -66,7 +67,9 @@ public class RowsModelEventHandlingTest {
 
   /** x */
   @BeforeAll
-  public static void setUpClass() {}
+  public static void setUpClass() {
+    Util.seesawInit();
+  }
 
   /** x */
   @AfterAll

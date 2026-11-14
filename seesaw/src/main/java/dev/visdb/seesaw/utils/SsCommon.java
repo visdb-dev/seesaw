@@ -138,9 +138,6 @@ and should implement SsComponentInterface
  * navigation.
  */
 final class SsCommon {
-  static {
-    LookupDefaults.init();
-  }
   /**
    * Constructor that has a flag to only "half" initialize; typically half
    * initialization is done iff SsCommon is needed before the constructor finishes.
@@ -1425,6 +1422,12 @@ final class SsCommon {
       std.decorateText(valid);
     else
       td.decorateText();
+  }
+
+  // This is after the static fields, so that they are initialized before
+  // anything that the library initialization does can refer to this class.
+  static {
+    LookupDefaults.checkInit();
   }
 }
 // vi: sw=2 ts=8

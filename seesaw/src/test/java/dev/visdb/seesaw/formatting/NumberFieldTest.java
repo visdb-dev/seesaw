@@ -32,6 +32,7 @@ public class NumberFieldTest {
   /** x */
   @BeforeAll
   public static void setUpClass() {
+    Util.seesawInit();
     Util.initLookup();
   }
 

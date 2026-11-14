@@ -33,6 +33,7 @@ import dev.visdb.seesaw.datasources.products.DbSupportFactory;
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
 import dev.visdb.seesaw.mock.TinyRS;
+import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.navigate.EQ.BusReceiver;
 
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
@@ -55,6 +56,7 @@ public class RowsModelTest {
    */
   @BeforeAll
   public static void setUpClass() throws ClassNotFoundException, SQLException {
+    Util.seesawInit();
     isJunit(); // Make sure it's set; when using invokeLater, can be missed.
     TestLogging.load();
     DbSupportFactory.setDbSupportGlobalOption(H2.getCon());

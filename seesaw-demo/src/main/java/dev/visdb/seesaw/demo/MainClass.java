@@ -90,6 +90,7 @@ import org.h2.tools.RunScript;
 
 import com.raelity.lib.ui.Screens;
 
+import dev.visdb.seesaw.SeeSaw;
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.datasources.DbSupport;
@@ -102,7 +103,6 @@ import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.LookupDefaults;
 import dev.visdb.seesaw.utils.SsUtils;
 import dev.visdb.seesaw.utils.Version;
 import gnu.getopt.Getopt;
@@ -904,7 +904,7 @@ public class MainClass extends JFrame {
     // For debug, enable this to force CachedRowSet conflict
     //Globals.setOption(new ForceConflict(1));
 
-    LookupDefaults.init();
+    SeeSaw.init();
 
     boolean some_error = false;
     System.err.printf("java:%s vm:%s date:%s os:%s\n", System.getProperty("java.version"),

@@ -26,11 +26,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Iterator;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -57,6 +59,8 @@ public class ZoomCanvas extends JPanel {
   private final JScrollPane scrollPane;
   private final DoubleSupplier zoomFactor;
   private BufferedImage image;
+  /** Shown when there is no image; null for the default text. */
+  private String noImageText;
   private final Supplier<RenderingQuality> quality;
   private ResizeMode resizeMode = ResizeMode.CROP_PAD; // true for "Other" style.
 
@@ -95,6 +99,19 @@ public class ZoomCanvas extends JPanel {
    */
   public void setImage(BufferedImage newImage) {
     this.image = newImage;
+    this.noImageText = null;
+    revalidate();
+    repaint();
+  }
+
+  /**
+   * Clear the image and show the text in its place; for example to say
+   * why an image can not be displayed.
+   * @param text shown instead of an image, null for the default "No Image"
+   */
+  public void setNoImage(String text) {
+    this.image = null;
+    this.noImageText = text;
     revalidate();
     repaint();
   }
@@ -159,7 +176,7 @@ public class ZoomCanvas extends JPanel {
       g2d.fillRect(0, 0, getWidth(), getHeight());
 
       //String text = "No Image Loaded. Please Select an Image.";
-      String text = "No Image";
+      String text = noImageText != null ? noImageText : "No Image";
       g2d.setFont(new Font("SansSerif", Font.BOLD, 16));
       g2d.setColor(Color.DARK_GRAY);
 
@@ -212,15 +229,49 @@ public class ZoomCanvas extends JPanel {
   /**
    * The returned image is a "compatible" image,
    * {@link GraphicsConfiguration#createCompatibleImage(int, int, int) }
+   * <p>
+   * The size of the bytes, the image format and the dimensions of the image
+   * are checked against {@link ImageLimits} before the image is decoded.
    *
-   * @param bytes
-   * @return image for the bytes
-   * @throws IOException
+   * @param bytes encoded image
+   * @return image for the bytes, never null
+   * @throws ImageLimits.ImageLimitException if the image exceeds a limit
+   * @throws IOException if the bytes are not a recognized image format,
+   *         or there is an error decoding the image
    */
   public static BufferedImage bytes2image(byte[] bytes) throws IOException {
-    try (InputStream is = new ByteArrayInputStream(bytes);) {
-      BufferedImage bimg = toCompatibleImage(ImageIO.read(is));
-      return bimg;
+    return toCompatibleImage(decode(bytes));
+  }
+
+  /**
+   * Decode after checking against ImageLimits. Any failure in the decoder
+   * is an IOException; the readers throw assorted runtime exceptions for
+   * corrupt data.
+   */
+  static BufferedImage decode(byte[] bytes) throws IOException {
+    ImageLimits.checkBytes(bytes.length);
+    try (ImageInputStream iis
+         = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
+      Iterator<ImageReader> readers = iis == null ? null : ImageIO.getImageReaders(iis);
+      if (readers == null || !readers.hasNext())
+        throw new IOException("Unknown image format");
+      ImageReader reader = readers.next();
+      try {
+        ImageLimits.checkFormat(reader.getFormatName());
+        reader.setInput(iis, true, true);
+        // Header only; check the size before allocating pixels.
+        ImageLimits.checkDimensions(reader.getWidth(0), reader.getHeight(0));
+        BufferedImage bimg = reader.read(0);
+        if (bimg == null)
+          throw new IOException("Image could not be decoded");
+        return bimg;
+      } finally {
+        reader.dispose();
+      }
+    } catch (RuntimeException ex) {
+      throw new IOException("Image could not be decoded: " + ex, ex);
+    } catch (OutOfMemoryError ex) {
+      throw new ImageLimits.ImageLimitException("Not enough memory to decode the image");
     }
   }
 

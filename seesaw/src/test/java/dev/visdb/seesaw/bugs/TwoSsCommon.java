@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import dev.visdb.seesaw.SsImage;
+import dev.visdb.seesaw.mock.Util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,7 +32,9 @@ public class TwoSsCommon {
 
   /** x */
   @BeforeAll
-  public static void setUpClass() {}
+  public static void setUpClass() {
+    Util.seesawInit();
+  }
 
   /** x */
   @AfterAll

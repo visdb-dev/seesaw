@@ -34,6 +34,7 @@ import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
+import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.navigate.RowsAction;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.SsComponent;
@@ -61,6 +62,7 @@ public class RowSetOpsTest {
    */
   @BeforeAll
   public static void setUpClass() throws ClassNotFoundException, SQLException {
+    Util.seesawInit();
     isJunit(); // Make sure it's set; when using invokeLater, can be missed.
     TestLogging.load();
     DbSupportFactory.setDbSupportGlobalOption(H2.getCon());

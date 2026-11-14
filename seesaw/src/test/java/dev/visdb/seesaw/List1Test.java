@@ -36,6 +36,7 @@ public class List1Test {
   /** x */
   @BeforeAll
   public static void setUpClass() {
+    Util.seesawInit();
     // TestLogging.load(Level.FINE);
     Util.initLookup();
   }

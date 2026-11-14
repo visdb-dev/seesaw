@@ -84,9 +84,6 @@ import static java.lang.System.Logger.Level.*;
 //       Is there a way to tell if current command has been executed?
 //
 public final class RowsModel {
-  static {
-    LookupDefaults.init();
-  }
   /** Logger for component */
   private static final Logger logger = JStuff.getLogger();
 
@@ -1055,6 +1052,12 @@ public final class RowsModel {
   @Deprecated
   public SsDbComboBox2<?, ?, ?> getNavCombo() {
     return navState.getNavCombo();
+  }
+
+  // This is after the static fields, so that they are initialized before
+  // anything that the library initialization does can refer to this class.
+  static {
+    LookupDefaults.checkInit();
   }
 }
 // vi: sw=2 ts=8

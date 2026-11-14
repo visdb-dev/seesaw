@@ -26,6 +26,7 @@ import com.raelity.lib.eventbus.WeakEventBus;
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
 import dev.visdb.seesaw.mock.TinyRS;
+import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.navigate.EQ.BusReceiver;
 
 import static dev.visdb.seesaw.navigate.Utils.getGlobalEventBus;
@@ -47,6 +48,7 @@ public class RowNumberSpinnerTest {
   /** x */
   @BeforeAll
   public static void setUpClass() {
+    Util.seesawInit();
     isJunit(); // Make sure it's set; when using invokeLater, can be missed.
     TestLogging.load();
   }

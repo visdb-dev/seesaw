@@ -29,6 +29,7 @@ import dev.visdb.seesaw.SsTable;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
+import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +43,7 @@ public class SsTableKeyAdapterTest {
 
   @BeforeAll
   public static void setUpClass() throws ClassNotFoundException, SQLException {
+    Util.seesawInit();
     TestLogging.load();
     DbSupportFactory.setDbSupportGlobalOption(H2.getCon());
   }

@@ -95,6 +95,7 @@ import javax.swing.SwingUtilities;
 
 import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.navigate.RowsModel;
+import dev.visdb.seesaw.utils.ImageLimits;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 import dev.visdb.seesaw.utils.SsUtils;
@@ -168,7 +169,10 @@ public class SsImage extends JPanel implements SsComponent, ScrollPaneConstants 
       // Read the image into a byte array
       ByteBuffer bb;
       try (SeekableByteChannel rbc = Files.newByteChannel(tPath, EnumSet.of(READ))) {
-        int totalLength = (int) rbc.size();
+        long size = rbc.size();
+        // Check before allocating; also guards the int cast below.
+        ImageLimits.checkBytes(size);
+        int totalLength = (int) size;
         bb = ByteBuffer.allocate(totalLength);
         int bytesRead = rbc.read(bb);
         if (totalLength != bytesRead)
@@ -176,10 +180,9 @@ public class SsImage extends JPanel implements SsComponent, ScrollPaneConstants 
       }
       byte[] bytes = bb.array();
 
-      // Verify the bytes are a recognized image
+      // Verify the bytes are a recognized image within ImageLimits;
+      // bytes2image throws IOException if not.
       BufferedImage bimg = ZoomCanvas.bytes2image(bytes);
-      if (bimg == null)
-        throw new IOException("Unknown image format");
 
       // Stage the image to the database
       dbChange(() -> { setColumn(bytes); });
@@ -554,6 +557,7 @@ public class SsImage extends JPanel implements SsComponent, ScrollPaneConstants 
    */
   public void updateComponent() {
     java.awt.Image image;
+    boolean problem = false;
     try {
       byte[] imageData = (byte[]) getColumn();
 
@@ -567,9 +571,13 @@ public class SsImage extends JPanel implements SsComponent, ScrollPaneConstants 
     } catch (SQLException | IOException ex) {
       logger.log(Level.ERROR, getColumnForLog() + ": Exception.", ex);
       image = null;
+      problem = true;
     }
 
     setImage(image);
+    // Make it clear that the column is not null.
+    if (problem)
+      canvas.setNoImage("Can not display the image");
   }
 
   // only here for play at this time

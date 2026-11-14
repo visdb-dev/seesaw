@@ -10,6 +10,7 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.mock;
 
+import dev.visdb.seesaw.SeeSaw;
 import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
 import dev.visdb.seesaw.utils.Globals;
@@ -23,6 +24,14 @@ public class Util {
    */
   public static void initLookup() {
     Globals.setOption(DbSupport.class, new DbSupportBase(null));
+  }
+
+  /**
+   * The library initialization that an application must do.
+   * Use in setUpClass of tests that use RowsModel or the components.
+   */
+  public static void seesawInit() {
+    SeeSaw.init();
   }
 
   private Util() {}

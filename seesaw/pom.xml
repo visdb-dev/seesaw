@@ -133,6 +133,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <!-- A test that does not do SeeSaw.init() must not wait on a dialog. -->
+            <seesaw.init.noDialog>true</seesaw.init.noDialog>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
 
       <!-- include following for display-variable-value -->
