@@ -45,6 +45,7 @@ package dev.visdb.seesaw.table;
 import java.awt.Component;
 import java.lang.System.Logger;
 import java.sql.JDBCType;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -178,11 +179,22 @@ rows.
     init(true);
   }
 
+  /** When true, messageDialog records the message instead of showing it. */
+  private transient boolean quiet;
+  /** First message recorded while quiet. */
+  private transient String quietMessage;
+
   private void messageDialog(String msg, Throwable ex) {
+    String text = ex == null ? msg : msg + ex.getMessage();
+    if (quiet) {
+      if (quietMessage == null)
+        quietMessage = text.strip();
+      return;
+    }
     Component parent = getDialogParent();
     if (parent == null)
       return;
-    JOptionPane.showMessageDialog(parent, ex == null ? msg : msg + ex.getMessage());
+    JOptionPane.showMessageDialog(parent, text);
   }
 
   /**
@@ -461,7 +473,7 @@ rows.
 
   /**
    * Returns true if the cell at rowIndex and columnIndex is editable. Otherwise,
-   * a call to setValueAt() on the cell will not change the value of that cell.
+   * a call to setValueAt() on the cell throws IllegalStateException.
    *
    * @param row    the row whose value to be queried
    * @param column the column whose value to be queried
@@ -470,19 +482,60 @@ rows.
    */
   @Override
   public boolean isCellEditable(int row, int column) {
-    if (uneditableColumns != null) {
-      for (int i = 0; i < uneditableColumns.length; i++) {
-        if (column == uneditableColumns[i]) {
-          return false;
-        }
-      }
-    }
+    if (!isColumnEditable(column))
+      return false;
 
     if (cellEditing != null) {
       return cellEditing.isCellEditable(row, column);
     }
 
     return true;
+  }
+
+  /**
+   * Returns true if the column is not one of the uneditable columns,
+   * see {@link #setUneditableColumns(int[]) }. Unlike
+   * {@link #isCellEditable(int, int) } this does not consult SsCellEditing,
+   * so it can be used for a row that does not exist yet.
+   *
+   * @param column the column to be queried
+   * @return false if the column is in the uneditable columns list
+   */
+  public boolean isColumnEditable(int column) {
+    if (uneditableColumns != null) {
+      for (int uneditableColumn : uneditableColumns) {
+        if (column == uneditableColumn)
+          return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Returns true if the column may be set to null.
+   *
+   * @param column the column to be queried
+   * @return false if the database reports that the column does not allow
+   *         nulls; true otherwise, including when it is not known
+   */
+  public boolean isColumnNullable(int column) {
+    try {
+      return rowset.getMetaData().isNullable(column + 1) != ResultSetMetaData.columnNoNulls;
+    } catch (final SQLException se) {
+      logger.log(DEBUG, "SQL Exception.", se);
+      return true;
+    }
+  }
+
+  /**
+   * Returns true if the row is the row used for inserting a new row,
+   * which is the row after the last database row.
+   *
+   * @param row the row to be queried
+   * @return true if a value set in this row inserts a new row
+   */
+  public boolean isInsertRow(int row) {
+    return row == rowCount;
   }
 
   /**
@@ -681,14 +734,45 @@ be done after row insertion, and deletion.
   }
 
   /**
+   * Like {@link #setValueAt(Object, int, int) } but does not show a dialog
+   * and does not throw if the value is not written. This is for setting
+   * many cells, for example paste, where the caller reports the cells
+   * that were not written.
+   *
+   * @param value  the new value
+   * @param row    the row whose value is to be changed
+   * @param column the column whose value is to be changed
+   * @return null if there was no problem, otherwise a description of
+   *         why the value was not written
+   */
+  public String trySetValueAt(Object value, int row, int column) {
+    if (!isCellEditable(row, column))
+      return "Not editable.";
+    quiet = true;
+    quietMessage = null;
+    try {
+      setValueAt(value, row, column);
+      return quietMessage;
+    } finally {
+      quiet = false;
+      quietMessage = null;
+    }
+  }
+
+  /**
    * Sets the value in the cell at row and column to value.
    *
    * @param _value  the new value
    * @param row    the row whose value is to be changed
    * @param column the column whose value is to be changed
+   * @throws IllegalStateException if the cell is not editable,
+   *         see {@link #isCellEditable(int, int) }
    */
   @Override
   public void setValueAt(Object _value, int row, int column) {
+    if (!isCellEditable(row, column))
+      throw new IllegalStateException(sf("Cell %d,%d is not editable", row, column));
+
     // Make local copy of object for date manipulations
     Object value = _value;
 
@@ -744,12 +828,10 @@ be done after row insertion, and deletion.
       if (rowset.getRow() != (row + 1)) {
         rowset.absolute(row + 1);
       }
-      if (value == null) {
+      if (value == null)
         rowset.updateNull(column + 1);
-        return;
-      }
-
-      updateColumnObjectDirect(rowset, column + 1, value);
+      else
+        updateColumnObjectDirect(rowset, column + 1, value);
 
       RowSetOps.updateRow(rowset);
 

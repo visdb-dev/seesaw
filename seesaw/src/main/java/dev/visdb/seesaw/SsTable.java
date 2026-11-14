@@ -1126,7 +1126,7 @@ public class SsTable extends JTable {
     }
 
     return IntStream.of(super.getSelectedColumns())
-        .filter((selCol) -> !hiddenColumnsList.contains(selCol))
+        .filter((selCol) -> !hiddenColumnsList.contains(convertColumnIndexToModel(selCol)))
         .toArray();
   }
 
