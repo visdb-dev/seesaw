@@ -160,9 +160,13 @@ public class EQ {
     public void accept(T t) throws Exception;
   }
 
+  /**
+   * Create the latch for RowsModelEventHandling. It is armed, in the EDT,
+   * by invokeLatchWait; until then no latch is in use.
+   */
   private static CountDownLatch initLatch() {
     CountDownLatch latch = new CountDownLatch(1);
-    RowsModelEventHandling.latch = latch;
+    RowsModelEventHandling.latch = null;
     return latch;
   }
 
@@ -238,6 +242,10 @@ public class EQ {
     outMsg(msg, tag + "Enter");
     EventQueue.invokeLater(() -> { // typically right away since probably not in EDT
       try {
+        // Arm the latch here, in the EDT, so that a dispatchLoop which was
+        // queued before this runnable has already run and can not release it.
+        if (_latch != null)
+          RowsModelEventHandling.latch = _latch;
         r.run();
         if (_latch == null) // internal countdown?
           latch.countDown();

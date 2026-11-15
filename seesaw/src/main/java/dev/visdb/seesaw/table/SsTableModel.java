@@ -45,14 +45,15 @@ package dev.visdb.seesaw.table;
 import java.awt.Component;
 import java.lang.System.Logger;
 import java.sql.JDBCType;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -416,6 +417,29 @@ rows.
     if (value == null) {
       return;
     }
+    insertRow(Map.of(column, value));
+  }
+
+  /**
+   * Inserts a new row into the database with the values for several
+   * columns, using a single insert. The defaults and the primary column
+   * are set as for {@link #insertRow(Object, int) }; a column that has
+   * no value in the map gets its default value, if it has one.
+   *
+   * <p>
+   * An {@link SsDataGridHandler} is required, see
+   * {@link #setSsDataGridHandler }; without one this is an internal
+   * error, which is reported, and no row is inserted.
+   *
+   * @param values the value for each column, by column number;
+   *               there are no null values
+   */
+  protected void insertRow(Map<Integer, Object> values) {
+    if (dataGridHandler == null) {
+      logger.log(ERROR, "Internal error: can not insert a row, there is no SsDataGridHandler.");
+      messageDialog("Internal error: can not insert a row;\nthere is no SsDataGridHandler.", null);
+      return;
+    }
     if (dataGridHandler != null) {
       dataGridHandler.performPreInsertOps(rowCount);
     }
@@ -433,7 +457,9 @@ rows.
         }
       }
 
-      updateColumnObjectDirect(rowset, column + 1, value);
+      for (Map.Entry<Integer, Object> entry : values.entrySet()) {
+        updateColumnObjectDirect(rowset, entry.getKey() + 1, entry.getValue());
+      }
 
       RowSetOps.insertRow(rowset);
       if (rowCount != 0) {
@@ -441,7 +467,10 @@ rows.
       } else {
         rowset.first();
       }
-      rowset.refreshRow();
+      // There may be no current row, for example after the query is
+      // executed again; the row has been inserted in any case.
+      if (rowset.getRow() != 0)
+        rowset.refreshRow();
 
       Supplier<String> text = () -> {
         try {
@@ -458,6 +487,14 @@ rows.
       if (dataGridHandler != null) {
         dataGridHandler.performPostInsertOps(rowCount - 1);
       }
+      // With some databases a RowSet does not see its own inserts;
+      // the handler is expected to take care of that.
+      if (!rowset.absolute(rowCount)) {
+        final int rowCountF = rowCount;
+        logger.log(ERROR, () -> sf("After inserting a row, the RowSet has no row %d."
+                                   + " One possible cause: SsDataGridHandler.performPostInsertOps"
+                                   + " does not execute the query again.", rowCountF));
+      }
       // If allowInsertion then add another empty insert row.
       int newRow = allowInsertion ? rowCount : rowCount - 1;
       fireTableRowsInserted(newRow, newRow);
@@ -466,9 +503,72 @@ rows.
       logger.log(ERROR, "SQL Exception while inserting row.", se);
       inInsertRow = false;
       messageDialog("Error while inserting row.\n", se);
+      return;
     }
 
     logger.log(DEBUG, "Successfully added row.");
+  }
+
+  /** Returns the column's name, or its number if the name is not available. */
+  private String columnLabel(int column) {
+    try {
+      return RowSetOps.getColumnName(rowset, column + 1);
+    } catch (final SQLException se) {
+      return String.valueOf(column + 1);
+    }
+  }
+
+  /**
+   * Inserts a new row with the values for several columns, using a
+   * single insert; so the row is inserted with all the values or it is
+   * not inserted. Like {@link #trySetValueAt(Object, int, int) } this
+   * does not show a dialog and does not throw. A column that is not in
+   * the map, or whose value is null, gets its default value if it has one,
+   * see {@link #getDefaultValue(int) }. If there are no values, other
+   * than null, then no row is inserted; that is not a problem.
+   * <p>
+   * If any of the values is not allowed, either the cell is not editable
+   * or SsCellEditing does not permit the value, then the row is not inserted.
+   *
+   * @param values the value for each column, by column number
+   * @return null if there was no problem, otherwise a description of
+   *         why the row was not inserted
+   */
+  public String tryInsertRow(Map<Integer, Object> values) {
+    final Map<Integer, Object> rowValues = new LinkedHashMap<>();
+    quiet = true;
+    quietMessage = null;
+    try {
+      for (Map.Entry<Integer, Object> entry : values.entrySet()) {
+        final int column = entry.getKey();
+        Object value = entry.getValue();
+        if (value == null)
+          continue;
+        if (!isCellEditable(rowCount, column))
+          return sf("Column '%s' is not editable in this row (SsCellEditing).",
+                    columnLabel(column));
+
+        // A date may come as a string, see setValueAt.
+        final JDBCType type = RowSetOps.getJDBCColumnType(rowset, column + 1);
+        if (DateTime.isHandledDateTimeJDBCType(type) && value instanceof String string) {
+          value = getSQLDateTimeObject(string, RSC.get(rowsModel, column + 1));
+        }
+        if (cellEditing != null
+            && !cellEditing.cellUpdateRequested(rowCount, column, null, value))
+          return sf("Value not allowed for column '%s' (SsCellEditing).",
+                    columnLabel(column));
+        rowValues.put(column, value);
+      }
+      if (!rowValues.isEmpty())
+        insertRow(rowValues);
+      return quietMessage;
+    } catch (final SQLException se) {
+      logger.log(ERROR, "SQL Exception while inserting row.", se);
+      return "Error while inserting row.\n" + se.getMessage();
+    } finally {
+      quiet = false;
+      quietMessage = null;
+    }
   }
 
   /**
@@ -509,22 +609,6 @@ rows.
       }
     }
     return true;
-  }
-
-  /**
-   * Returns true if the column may be set to null.
-   *
-   * @param column the column to be queried
-   * @return false if the database reports that the column does not allow
-   *         nulls; true otherwise, including when it is not known
-   */
-  public boolean isColumnNullable(int column) {
-    try {
-      return rowset.getMetaData().isNullable(column + 1) != ResultSetMetaData.columnNoNulls;
-    } catch (final SQLException se) {
-      logger.log(DEBUG, "SQL Exception.", se);
-      return true;
-    }
   }
 
   /**
@@ -705,6 +789,9 @@ given value is valid.
    * Used to set an implementation of SsDataGridHandler interface which can be
 used to determine dynamically if a given row can be deleted, and what should
 be done after row insertion, and deletion.
+   * <p>
+   * An SsDataGridHandler is required for inserting rows; inserting a row
+   * without one is reported as an internal error and the row is not inserted.
    *
    * @param dataGridHandler implementation of SsDataGridHandler interface.
    */
@@ -838,6 +925,13 @@ be done after row insertion, and deletion.
       logger.log(DEBUG, () -> sf("Updated value: %s.", getValueAt(row, column)));
     } catch (final SQLException se) {
       logger.log(ERROR, "SQL Exception while updating value.", se);
+      // Discard the value that failed; otherwise it stays pending for the
+      // row and is sent again with the next update of the row.
+      try {
+        rowset.cancelRowUpdates();
+      } catch (final SQLException se2) {
+        logger.log(DEBUG, "SQL Exception while cancelling update.", se2);
+      }
       messageDialog("Error while updating value.\n", se);
     }
   }

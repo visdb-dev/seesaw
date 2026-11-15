@@ -613,7 +613,7 @@ public class SsUtils {
   public static boolean isJunitPrint() {
     if (!isJunit())
       return false;
-    return !System.getProperty(JUNIT_TEST_LOGGING).equals("true");
+    return !"true".equals(System.getProperty(JUNIT_TEST_LOGGING));
   }
 }
 // vi: sw=2 ts=8

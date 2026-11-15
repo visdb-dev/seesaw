@@ -69,6 +69,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -856,6 +857,50 @@ public class SsTable extends JTable {
     this.rowsModel = rowsModel;
     this.rowSet = rowsModel.getRowSet();
     bind();
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * A cell may stop being editable while it is being edited, for example
+   * {@link SsCellEditing#isCellEditable(int, int) } gives a different answer
+   * than when the edit started. In that case the edit is discarded, the
+   * editor is removed, and {@link #cellNoLongerEditable(int, int) } tells
+   * the user.
+   * <p>
+   * If setting the value throws an exception, the editor is removed before
+   * the exception continues; the editor is not left open on a value that can
+   * not be set.
+   */
+  @Override
+  public void editingStopped(ChangeEvent e) {
+    if (getCellEditor() != null && !isCellEditable(editingRow, editingColumn)) {
+      final int row = editingRow;
+      final int column = editingColumn;
+      removeEditor();
+      cellNoLongerEditable(row, column);
+      return;
+    }
+    try {
+      super.editingStopped(e);
+    } catch (RuntimeException ex) {
+      removeEditor();
+      throw ex;
+    }
+  }
+
+  /**
+   * Invoked when an edit is discarded because the cell stopped being
+   * editable while it was being edited. This logs it and shows a message.
+   *
+   * @param row the row, in the view, of the cell
+   * @param column the column, in the view, of the cell
+   */
+  protected void cellNoLongerEditable(int row, int column) {
+    logger.log(Level.WARNING, () -> sf("Cell %d,%d is no longer editable; edit discarded.",
+                                       row, column));
+    JOptionPane.showMessageDialog(dialogParent,
+                                  "The cell is no longer editable.\nThe change was discarded.");
   }
 
   /**

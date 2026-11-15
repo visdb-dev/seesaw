@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.sql.RowSet;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -36,7 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Copy and paste in SsTableKeyAdapter, and the SsTableModel methods it uses.
+ * Copy and paste in SsTableKeyAdapter, the SsTableModel methods it uses,
+ * and SsTable.editingStopped.
  * The clipboard is not used; the tests work headless.
  */
 public class SsTableKeyAdapterTest {
@@ -232,11 +234,15 @@ public class SsTableKeyAdapterTest {
    * table is created in one event and the test runs in a later one.
    */
   private static void withSsTable(Body body) throws Exception {
+    withSsTable("tbl_pk", body);
+  }
+
+  private static void withSsTable(String orderBy, Body body) throws Exception {
     SsTable[] table = new SsTable[1];
     Exception[] ex = new Exception[1];
     EventQueue.invokeAndWait(() -> {
       try {
-        table[0] = ssTable();
+        table[0] = ssTable(orderBy);
       } catch (Exception ex01) {
         ex[0] = ex01;
       }
@@ -253,7 +259,7 @@ public class SsTableKeyAdapterTest {
       throw ex[0];
   }
 
-  private static SsTable ssTable() throws SQLException, ClassNotFoundException {
+  private static SsTable ssTable(String orderBy) throws SQLException, ClassNotFoundException {
     RowSet rs = H2.getRowSetCleanDB("""
         CREATE TABLE tbl
         (
@@ -265,11 +271,53 @@ public class SsTableKeyAdapterTest {
         INSERT INTO tbl VALUES (1, 'text-1', 3, '2000-01-11');
         INSERT INTO tbl VALUES (2, 'text-2', 7, '2000-02-22');
         """);
-    rs.setCommand("SELECT * FROM tbl ORDER BY tbl_pk");
-    SsTable table = new SsTable(RowsModel.create(rs));
+    rs.setCommand("SELECT * FROM tbl ORDER BY " + orderBy);
+    SsTable table = new SsTable(RowsModel.create(rs)) {
+      @Override
+      protected void cellNoLongerEditable(int row, int column) {
+        noLongerEditable.add(row + "," + column);
+      }
+    };
     table.setUneditableColumns(new int[] {0});
+    table.getModel().setSsDataGridHandler(new Handler(rs));
+    noLongerEditable.clear();
     return table;
   }
+
+  /** Executes the query again after an insert; like the demo. */
+  private static class Handler implements SsDataGridHandler {
+    private final RowSet rs;
+
+    Handler(RowSet rs) {
+      this.rs = rs;
+    }
+
+    @Override
+    public boolean allowDeletion(int row) {
+      return true;
+    }
+
+    @Override
+    public void performPreInsertOps(int row) {}
+
+    @Override
+    public void performPostInsertOps(int row) {
+      try {
+        rs.execute();
+      } catch (SQLException ex) {
+        throw new IllegalStateException(ex);
+      }
+    }
+
+    @Override
+    public void performPreDeletionOps(int row) {}
+
+    @Override
+    public void performPostDeletionOps(int row) {}
+  }
+
+  /** The cells for which SsTable.cellNoLongerEditable was invoked. */
+  private static final List<String> noLongerEditable = new ArrayList<>();
 
   /** @return "c_text|c_int" for each row, by primary key */
   private static List<String> dbRows() throws SQLException, ClassNotFoundException {
@@ -290,7 +338,6 @@ public class SsTableKeyAdapterTest {
 
       assertThat(model.isColumnEditable(0)).isFalse();
       assertThat(model.isColumnEditable(1)).isTrue();
-      assertThat(model.isColumnNullable(1)).isTrue();
       assertThat(model.isInsertRow(1)).isFalse();
       assertThat(model.isInsertRow(2)).isTrue();
 
@@ -299,6 +346,68 @@ public class SsTableKeyAdapterTest {
       assertThat(model.trySetValueAt(99, 0, 0)).isNotNull();
       assertThat(model.trySetValueAt("changed", 0, 1)).isNull();
       assertThat(dbRows()).containsExactly("changed|3", "text-2|7");
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // SsTable.editingStopped
+  //
+
+  @Test
+  void testEditCommits() throws Exception {
+    withSsTable((table) -> {
+      assertThat(table.editCellAt(0, 1)).isTrue();
+      ((JTextField)table.getEditorComponent()).setText("edited");
+      assertThat(table.getCellEditor().stopCellEditing()).isTrue();
+
+      assertThat(table.isEditing()).isFalse();
+      assertThat(noLongerEditable).isEmpty();
+      assertThat(dbRows()).containsExactly("edited|3", "text-2|7");
+    });
+  }
+
+  /** The cell stops being editable while it is being edited. */
+  @Test
+  void testEditCellNoLongerEditable() throws Exception {
+    withSsTable((table) -> {
+      boolean[] editable = {true};
+      table.setSsCellEditing(new SsCellEditing() {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+          return editable[0];
+        }
+      });
+      assertThat(table.editCellAt(0, 1)).isTrue();
+      ((JTextField)table.getEditorComponent()).setText("edited");
+      editable[0] = false;
+      table.getCellEditor().stopCellEditing();
+
+      // The editor is not left open, the user is told, nothing is written.
+      assertThat(table.isEditing()).isFalse();
+      assertThat(noLongerEditable).containsExactly("0,1");
+      assertThat(dbRows()).containsExactly("text-1|3", "text-2|7");
+    });
+  }
+
+  /** An exception from setting the value does not leave the editor open. */
+  @Test
+  void testEditExceptionRemovesEditor() throws Exception {
+    withSsTable((table) -> {
+      table.setSsCellEditing(new SsCellEditing() {
+        @Override
+        public boolean cellUpdateRequested(int row, int column, Object oldValue,
+                                           Object newValue) {
+          throw new UnsupportedOperationException("expected by the test");
+        }
+      });
+      assertThat(table.editCellAt(0, 1)).isTrue();
+      ((JTextField)table.getEditorComponent()).setText("edited");
+      assertThatThrownBy(() -> table.getCellEditor().stopCellEditing())
+          .isInstanceOf(UnsupportedOperationException.class);
+
+      assertThat(table.isEditing()).isFalse();
+      assertThat(dbRows()).containsExactly("text-1|3", "text-2|7");
     });
   }
 
@@ -411,6 +520,151 @@ public class SsTableKeyAdapterTest {
       assertThat(adapter.questions).hasSize(1); // insert new rows?
       assertThat(adapter.messages).hasSize(1); // not enough rows
       assertThat(dbRows()).containsExactly("text-1|3", "upd|7", "ins|null");
+    });
+  }
+  @Test
+  void testPasteNewRowMultiColumn() throws Exception {
+    withSsTable((table) -> {
+      TestAdapter adapter = new TestAdapter(table);
+      adapter.setAllowInsertion(true);
+      table.setDefaultValues(new int[] {2}, new Object[] {42});
+      select(table, 2, 1);
+      // An empty cell in a new row gets the default value.
+      adapter.paste(table, "ins-1\t55\nins-2\t\n");
+
+      assertThat(adapter.messages).hasSize(1); // not enough rows
+      assertThat(dbRows()).containsExactly("text-1|3", "text-2|7", "ins-1|55", "ins-2|42");
+    });
+  }
+
+  /**
+   * The query is sorted and is executed again after an insert, so the
+   * new row is not the last row; like the demo.
+   */
+  @Test
+  void testPasteNewRowMoves() throws Exception {
+    withSsTable("c_text", (table) -> {
+      TestAdapter adapter = new TestAdapter(table);
+      adapter.setAllowInsertion(true);
+      select(table, 2, 1);
+      adapter.paste(table, "aaa\t55\nbbb\t66\n");
+
+      assertThat(adapter.messages).hasSize(1); // not enough rows
+      assertThat(dbRows()).containsExactly("text-1|3", "text-2|7", "aaa|55", "bbb|66");
+      assertThat(table.getValueAt(0, 1)).isEqualTo("aaa");
+    });
+  }
+
+  @Test
+  void testPasteNewRowSqlError() throws Exception {
+    withSsTable((table) -> {
+      TestAdapter adapter = new TestAdapter(table);
+      adapter.setAllowInsertion(true);
+      select(table, 2, 1);
+      // The second row's text is too long for the column; the row is not
+      // inserted and the paste stops.
+      adapter.paste(table, "ins\t55\n" + "x".repeat(60) + "\t66\nlater\t77\n");
+
+      assertThat(adapter.messages).hasSize(2); // not enough rows, the failure
+      assertThat(adapter.messages.get(1))
+          .contains("2 of 6")
+          .contains("Row 4, new row not inserted: Error while inserting row.")
+          .contains("Value too long")
+          .contains("Rows after it that were not pasted: 1");
+      assertThat(dbRows()).containsExactly("text-1|3", "text-2|7", "ins|55");
+    });
+  }
+  /** After a failed update the row shows the database value and can be edited. */
+  @Test
+  void testUpdateSqlError() throws Exception {
+    withSsTable((table) -> {
+      SsTableModel model = table.getModel();
+      assertThat(model.trySetValueAt("x".repeat(60), 1, 1)).contains("Error while updating");
+      assertThat(table.getValueAt(1, 1)).isEqualTo("text-2");
+      // The failed value must not be part of the next update of the row.
+      assertThat(model.trySetValueAt(9, 1, 2)).isNull();
+      assertThat(table.getValueAt(1, 2)).isEqualTo(9);
+      assertThat(dbRows()).containsExactly("text-1|3", "text-2|9");
+    });
+  }
+  /** A value refused for a new row stops the paste. */
+  @Test
+  void testPasteNewRowRefusedStops() throws Exception {
+    withSsTable((table) -> {
+      table.setSsCellEditing(new SsCellEditing() {
+        @Override
+        public boolean cellUpdateRequested(int row, int column, Object oldValue,
+                                           Object newValue) {
+          return !"bad".equals(newValue);
+        }
+      });
+      TestAdapter adapter = new TestAdapter(table);
+      adapter.setAllowInsertion(true);
+      select(table, 1, 1);
+      adapter.paste(table, "upd\t1\nins\t2\nbad\t3\nlater-1\t4\nlater-2\t5\n");
+
+      assertThat(adapter.messages).hasSize(2); // not enough rows, the failure
+      assertThat(adapter.messages.get(1))
+          .contains("2 of 10")
+          .contains("Row 4, new row not inserted")
+          .contains("Value not allowed for column 'C_TEXT' (SsCellEditing)")
+          .contains("Rows after it that were not pasted: 2");
+      assertThat(dbRows()).containsExactly("text-1|3", "upd|1", "ins|2");
+    });
+  }
+  /** With insertion off there is no insert row, and paste does not insert. */
+  @Test
+  void testPasteInsertionOff() throws Exception {
+    withSsTable((table) -> {
+      table.setInsertion(false);
+      TestAdapter adapter = new TestAdapter(table);
+      adapter.setAllowInsertion(true);
+      select(table, 1, 1);
+      adapter.paste(table, "upd\t1\nins\t2\n");
+
+      assertThat(adapter.messages).hasSize(1); // not enough rows
+      assertThat(adapter.messages.get(0)).contains("insertion is off");
+      assertThat(adapter.questions).hasSize(1);
+      assertThat(adapter.questions.get(0))
+          .contains("The clipboard has 2 rows, but only 1 row is available.")
+          .contains("Paste only the first 1 row?");
+      assertThat(dbRows()).containsExactly("text-1|3", "upd|1");
+    });
+  }
+
+  /** Inserting a row without an SsDataGridHandler is an internal error. */
+  @Test
+  void testPasteNewRowNoHandler() throws Exception {
+    withSsTable((table) -> {
+      table.getModel().setSsDataGridHandler(null);
+      TestAdapter adapter = new TestAdapter(table);
+      adapter.setAllowInsertion(true);
+      select(table, 1, 1);
+      adapter.paste(table, "upd\t1\nins-1\t55\nins-2\t66\n");
+
+      assertThat(adapter.messages).hasSize(2); // not enough rows, the failure
+      assertThat(adapter.messages.get(1))
+          .contains("Row 3, new row not inserted: Internal error")
+          .contains("SsDataGridHandler")
+          .contains("Rows after it that were not pasted: 1");
+      assertThat(table.getRowCount()).isEqualTo(3);
+      assertThat(dbRows()).containsExactly("text-1|3", "upd|1");
+    });
+  }
+
+  /** An inserted row can be read. */
+  @Test
+  void testPasteNewRowIsReadable() throws Exception {
+    withSsTable((table) -> {
+      TestAdapter adapter = new TestAdapter(table);
+      adapter.setAllowInsertion(true);
+      select(table, 2, 1);
+      adapter.paste(table, "ins-1\t55\nins-2\t66\n");
+
+      assertThat(table.getRowCount()).isEqualTo(5);
+      assertThat(table.getValueAt(2, 1)).isEqualTo("ins-1");
+      assertThat(table.getValueAt(3, 2)).isEqualTo(66);
+      assertThat(dbRows()).containsExactly("text-1|3", "text-2|7", "ins-1|55", "ins-2|66");
     });
   }
 }

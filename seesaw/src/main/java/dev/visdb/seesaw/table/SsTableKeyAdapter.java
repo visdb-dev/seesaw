@@ -57,13 +57,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 import dev.visdb.seesaw.SsTable;
+import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -227,6 +230,10 @@ public class SsTableKeyAdapter extends KeyAdapter {
     if (selectedColumns.length < 1)
       return null;
 
+    logger.log(DEBUG, () -> sf("Copy: start row %d, column %d; %d rows x %d columns.",
+                               selectedRows[0] + 1, selectedColumns[0] + 1,
+                               selectedRows.length, selectedColumns.length));
+
     final StringBuilder strBuf = new StringBuilder();
     for (int row : selectedRows) {
       for (int j = 0; j < selectedColumns.length; j++) {
@@ -276,6 +283,14 @@ public class SsTableKeyAdapter extends KeyAdapter {
    * <p>
    * An empty cell sets the target to null; except that a text column
    * which does not allow null is set to the empty string.
+   * <p>
+   * A clipboard row that goes into a new row of an SsTable is inserted
+   * with a single insert, see {@link SsTableModel#tryInsertRow }; so the
+   * row is inserted with all of its values or it is not inserted. In a new
+   * row, an empty cell leaves the column's default value, if it has one.
+   * If a new row can not be inserted, for example a value is refused by
+   * SsCellEditing or there is an SQL error, then the paste stops; the
+   * message after the paste has the reason and the number of rows not pasted.
    *
    * @param jTable table to paste into
    * @param strData clipboard text
@@ -319,32 +334,67 @@ public class SsTableKeyAdapter extends KeyAdapter {
     }
 
     // GET THE NUMBER OF ROWS IN THE JTABLE.
+    // An SsTable has a row for inserting new rows after the database rows,
+    // unless its insertion property is false; then rows can not be inserted.
+    final boolean hasInsertRow = jTable instanceof SsTable ssTable ? ssTable.getInsertion()
+                                                                   : forSsDataGrid;
+    final boolean canInsert = allowInsertion && (hasInsertRow || !(jTable instanceof SsTable));
     int rowCount = jTable.getRowCount();
-    if (forSsDataGrid || (jTable instanceof SsTable)) {
+    if (hasInsertRow) {
       rowCount--;
     }
 
     int numRowsToCopy = numRows;
+    {
+      final int numColumnsF = numColumns;
+      final int rowCountF = rowCount;
+      logger.log(DEBUG, () -> sf("Paste: clipboard %d rows x %d columns; start row %d, column %d;"
+                                 + " table has %d rows; can insert rows: %b.",
+                                 numRows, numColumnsF, selectedRows[0] + 1,
+                                 selectedColumns[0] + 1, rowCountF, canInsert));
+    }
 
     // SEE IF SUFFICENT ROWS ARE PRESENT.
     if (rowCount < (numRows + selectedRows[0])) {
-      showMessage(jTable, "There are not enough rows in the table to copy into.\n");
-      if (allowInsertion
+      final int available = rowCount - selectedRows[0];
+      String message = "There are not enough rows in the table to paste into.\n";
+      if (!canInsert) {
+        message += allowInsertion
+                   ? "New rows can not be inserted because the table's insertion is off.\n"
+                   : "New rows can not be inserted.\n";
+      }
+      showMessage(jTable, message);
+      if (canInsert
           && confirm(jTable, "Do you want to insert new rows?", "Add Rows")) {
         // SET THE NUMBER OF ROWS TO COPY EQUAL TO
         // NUMBER OF ROWS IN DATA.
         numRowsToCopy = numRows;
-      } else if (confirm(jTable, "Do you want to copy data into just the rows present?",
-                         "Limited Copy")) {
+        logger.log(DEBUG, "Paste: not enough rows; will insert new rows.");
+      } else if (available < 1) {
+        logger.log(DEBUG, "Paste: no rows to paste into.");
+        return;
+      } else if (confirm(jTable,
+                         sf("The clipboard has %s, but only %s available.\n"
+                            + "Paste only the first %s?\n"
+                            + "If you answer No, nothing is pasted.",
+                            rows(numRows), available == 1 ? "1 row is" : available + " rows are",
+                            rows(available)),
+                         "Paste into existing rows?")) {
         // GET THE NUMBER OF ROWS FROM SELECTED ROW TO LAST ROW
         // NO NEED TO ADD A ONE
         numRowsToCopy = rowCount - selectedRows[0];
+        final int numRowsToCopyF = numRowsToCopy;
+        logger.log(DEBUG, () -> sf("Paste: not enough rows; only the first %d clipboard rows.",
+                                   numRowsToCopyF));
       } else {
+        logger.log(DEBUG, "Paste: not enough rows; cancelled.");
         return;
       }
     }
-    if (numRowsToCopy < 1)
+    if (numRowsToCopy < 1) {
+      logger.log(DEBUG, "Paste: no rows to paste into.");
       return;
+    }
 
     // Find the target cells that are not editable. The answer is saved
     // so that each cell is asked about only once.
@@ -387,16 +437,39 @@ public class SsTableKeyAdapter extends KeyAdapter {
     final List<String> failures = new ArrayList<>();
     // The number of clipboard rows that were for a new row and did not insert one.
     int nNotInserted = 0;
+    int nRowsInserted = 0;
+    // Why the paste was stopped, null if it was not stopped.
+    String stopped = null;
+    // The number of cells in the new row that stopped the paste.
+    int nRowCellsNotWritten = 0;
+    // The number of clipboard rows left when the paste was stopped.
+    int nRowsNotPasted = 0;
     for (int i = 0; i < numRowsToCopy; i++) {
+      final int iF = i;
       final String[] cells = data.get(i);
       final int row = selectedRows[0] + i - nNotInserted;
       final boolean isInsertRow = ssModel != null && ssModel.isInsertRow(row);
+      // The values for a new row, by model column. They are inserted
+      // together, after the loop, because inserting the row can move it.
+      final Map<Integer, Object> newRowValues = new LinkedHashMap<>();
       for (int j = 0; j < cells.length; j++) {
         if (!editable[i][j])
           continue;
         final int column = targetColumns[j];
         String problem;
         try {
+          if (isInsertRow) {
+            final int modelColumn = jTable.convertColumnIndexToModel(column);
+            // An empty cell leaves the column's default value, if it has one.
+            if (!cells[j].isEmpty() || ssModel.getDefaultValue(modelColumn) == null) {
+              final Object newValue
+                  = cells[j].isEmpty() ? getEmptyCellValue(jTable, column)
+                                       : getObjectToSet(jTable, column, cells[j]);
+              if (newValue != null)
+                newRowValues.put(modelColumn, newValue);
+            }
+            continue;
+          }
           // GET THE VALUE FOR THIS CELL IN THE FORM OF THIS COLUMN CLASS OBJECT
           final Object newValue = cells[j].isEmpty() ? getEmptyCellValue(jTable, column)
                                                      : getObjectToSet(jTable, column, cells[j]);
@@ -412,6 +485,25 @@ public class SsTableKeyAdapter extends KeyAdapter {
         if (problem != null)
           failures.add(sf("Row %d, %s: %s", row + 1, getColumnLabel(jTable, column), problem));
       }
+      if (isInsertRow && !newRowValues.isEmpty()) {
+        final String problem = ssModel.tryInsertRow(newRowValues);
+        if (problem != null) {
+          // Do not go on to insert the rows that follow it.
+          stopped = sf("Row %d, new row not inserted: %s", row + 1, problem);
+          nRowCellsNotWritten += newRowValues.size();
+          nRowsNotPasted = numRowsToCopy - i - 1;
+          break;
+        }
+      }
+      if (isInsertRow) {
+        final boolean inserted = !ssModel.isInsertRow(row);
+        if (inserted)
+          nRowsInserted++;
+        logger.log(DEBUG, () -> sf("Paste: clipboard row %d, new row at row %d: %s.", iF + 1,
+                                   row + 1, inserted ? "inserted" : "nothing to insert"));
+      } else {
+        logger.log(DEBUG, () -> sf("Paste: clipboard row %d written to row %d.", iF + 1, row + 1));
+      }
       // If every cell for a new row was skipped or empty, then no row was
       // inserted; the next clipboard row is for the same new row.
       if (isInsertRow && ssModel.isInsertRow(row))
@@ -422,12 +514,29 @@ public class SsTableKeyAdapter extends KeyAdapter {
     // THIS HAS TO PROPOGATE TO THE SCREEN.
     jTable.updateUI();
 
-    if (!failures.isEmpty()) {
-      logger.log(WARNING, () -> sf("Paste: %d cells were not written:\n%s", failures.size(),
+    {
+      final int nRowsInsertedF = nRowsInserted;
+      final int nNotWritten = failures.size() + nRowCellsNotWritten;
+      final String stoppedF = stopped;
+      logger.log(DEBUG, () -> sf("Paste: done; %d rows inserted, %d cells not written%s.",
+                                 nRowsInsertedF, nNotWritten,
+                                 stoppedF == null ? "" : ", stopped early"));
+    }
+
+    if (!failures.isEmpty() || stopped != null) {
+      final String stoppedF = stopped;
+      final int nNotWritten = failures.size() + nRowCellsNotWritten;
+      logger.log(WARNING, () -> sf("Paste: %d cells were not written:\n%s%s", nNotWritten,
+                                   stoppedF == null ? "" : stoppedF + "\n",
                                    String.join("\n", failures)));
       final StringBuilder sb = new StringBuilder(
-          sf("Paste: %d of %d cells were not written.\n", failures.size(),
+          sf("Paste: %d of %d cells were not written.\n", nNotWritten,
              nCells - nNotEditable));
+      if (stopped != null) {
+        sb.append("\nThe paste was stopped.\n").append(stopped).append('\n');
+        if (nRowsNotPasted > 0)
+          sb.append(sf("Rows after it that were not pasted: %d\n", nRowsNotPasted));
+      }
       for (int i = 0; i < failures.size() && i < MAX_FAILURES_SHOWN; i++) {
         sb.append('\n').append(failures.get(i));
       }
@@ -435,6 +544,11 @@ public class SsTableKeyAdapter extends KeyAdapter {
         sb.append(sf("\n... and %d more; see the log.", failures.size() - MAX_FAILURES_SHOWN));
       showMessage(jTable, sb.toString());
     }
+  }
+
+  /** Returns "1 row" or "n rows". */
+  private static String rows(int n) {
+    return n == 1 ? "1 row" : n + " rows";
   }
 
   /** The maximum number of cells listed in the message after a paste. */
@@ -471,14 +585,17 @@ public class SsTableKeyAdapter extends KeyAdapter {
 
   /**
    * Returns the value to set for an empty clipboard cell: null, except
-   * the empty string for a text column that is not known to allow null.
+   * the empty string for a text column of an SsTable that does not allow
+   * null. A column whose nullability is not known is taken to allow null.
    */
   private Object getEmptyCellValue(JTable jTable, int column) {
     final Class<?> objectClass = jTable.getColumnClass(column);
     if (!objectClass.equals(String.class) && !objectClass.equals(Object.class))
       return null;
-    return jTable.getModel() instanceof SsTableModel ssModel
-               && ssModel.isColumnNullable(jTable.convertColumnIndexToModel(column))
+    return jTable instanceof SsTable ssTable
+               && RowSetOps.isNullable(ssTable.getRowSet(),
+                                       jTable.convertColumnIndexToModel(column) + 1)
+                      .orElse(true)
            ? null : "";
   }
 
