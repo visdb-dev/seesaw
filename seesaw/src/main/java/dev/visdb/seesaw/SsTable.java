@@ -56,7 +56,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
@@ -67,7 +69,6 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.JScrollPane;
@@ -93,6 +94,8 @@ import com.raelity.jdk.sun.swing.table.TableSortHeaderRenderer;
 import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.models.SimpleComboListSwingModel;
+import dev.visdb.seesaw.html.SsHtml;
+import dev.visdb.seesaw.html.SsHtmlPresenter;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.table.SsCellEditing;
 import dev.visdb.seesaw.table.SsDataValue;
@@ -384,9 +387,46 @@ public class SsTable extends JTable {
   }
 
   /**
+   * Renderer for cells that show text. The text may be HTML; how it is shown
+   * is decided by the table's {@link #getSsHtml() SsHtml}.
+   * This is the default renderer of an SsTable for text columns; the
+   * renderers that SsTable provides extend it.
+   * A subclass that sets the text itself should use {@link #setCellText(String)}.
+   */
+  protected class TextRenderer extends DefaultTableCellRenderer.UIResource {
+    /** The presenter for the column of the cell that is being set up. */
+    private SsHtmlPresenter presenter;
+
+    /** Create the renderer. */
+    public TextRenderer() {}
+
+    /** {@inheritDoc} */
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean selected,
+                                                   boolean hasFocus, int row, int column) {
+      presenter = getSsHtmlPresenter(table.convertColumnIndexToModel(column));
+      return super.getTableCellRendererComponent(table, value, selected, hasFocus, row, column);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void setValue(Object value) {
+      setCellText(value == null ? "" : value.toString());
+    }
+
+    /**
+     * Set the text of the cell; use this, not {@code setText}.
+     * @param text the text for the cell
+     */
+    protected final void setCellText(String text) {
+      setText(presenter != null ? presenter.prepare(this, text) : text);
+    }
+  }
+
+  /**
    * Renderer for combo box fields.
    */
-  protected class ComboRenderer extends DefaultTableCellRenderer.UIResource {
+  protected class ComboRenderer extends TextRenderer {
     Object[] displayValues = null;
     Object[] underlyingValues = null;
 
@@ -421,13 +461,13 @@ public class SsTable extends JTable {
       return 0;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Show the display value that goes with the underlying value.
+     * The underlying value itself is never put in the label.
+     * @param value the underlying value
+     */
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean selected,
-                                                   boolean hasFocus, int row, int column) {
-      final JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, selected,
-                                                                        hasFocus, row, column);
-
+    protected void setValue(Object value) {
       int index = -1;
       if (displayValues.length > 0) {
         index = getIndexOf(value);
@@ -436,11 +476,10 @@ public class SsTable extends JTable {
       }
 
       if (index == -1) {
-        label.setText("");
+        setCellText("");
       } else {
-        label.setText(displayValues[index].toString());
+        setCellText(displayValues[index].toString());
       }
-      return label;
     }
   }
 
@@ -587,7 +626,7 @@ public class SsTable extends JTable {
   /**
    * Renderer for date fields. Displays dates using mm/dd/yyyy format.
    */
-  protected class DateRenderer extends DefaultTableCellRenderer {
+  protected class DateRenderer extends TextRenderer {
     private final int cIdx;
 
     private DateRenderer(int cIdx) {
@@ -603,7 +642,7 @@ public class SsTable extends JTable {
       if (value instanceof java.sql.Date date) {
         String strDate = getDateTimeText(date, RSC.get(rowsModel, cIdx + 1));
         setHorizontalAlignment(SwingConstants.CENTER);
-        setText(strDate);
+        setCellText(strDate);
       } else {
         super.setValue(value);
       }
@@ -813,6 +852,60 @@ public class SsTable extends JTable {
    */
   private RowSet rowSet = null;
   private RowsModel rowsModel = null;
+
+  /** The table's SsHtml; null for the default. */
+  private SsHtml ssHtml;
+
+  /** A presenter for each column, by model index, so reports are by column. */
+  private final Map<Integer, SsHtmlPresenter> htmlPresenters = new HashMap<>();
+
+  /**
+   * Set how text from the database that may be HTML is shown in the cells
+   * of this table. This is used by the default renderer for text columns
+   * and by the combo and date renderers.
+   * {@link dev.visdb.seesaw.html.Rules#INLINE} is meant for table cells, for example
+   * {@snippet :
+   * table.setSsHtml(SsHtml.checker(Rules.INLINE));
+   * }
+   * @param ssHtml the {@code SsHtml} to use;
+   *        null to use {@link SsHtml#getDefault()}
+   */
+  public void setSsHtml(SsHtml ssHtml) {
+    this.ssHtml = ssHtml;
+    htmlPresenters.values().forEach(presenter -> presenter.setSsHtml(ssHtml));
+    repaint();
+  }
+
+  /**
+   * How text from the database that may be HTML is shown in the cells of
+   * this table.
+   * @return the {@code SsHtml} that was set, or else {@link SsHtml#getDefault()}
+   */
+  public SsHtml getSsHtml() {
+    return ssHtml != null ? ssHtml : SsHtml.getDefault();
+  }
+
+  /**
+   * The presenter that a renderer uses to show the text of a column;
+   * it applies {@link #getSsHtml()} and logs what is refused, by column.
+   * @param modelColumn index of the column in the model
+   * @return the presenter for the column, never null
+   */
+  protected SsHtmlPresenter getSsHtmlPresenter(int modelColumn) {
+    return htmlPresenters.computeIfAbsent(modelColumn, column -> {
+      SsHtmlPresenter presenter = new SsHtmlPresenter(() -> htmlSource(column));
+      presenter.setSsHtml(ssHtml);
+      return presenter;
+    });
+  }
+
+  /** Name a column for the log. */
+  private String htmlSource(int modelColumn) {
+    String name = "";
+    if (modelColumn >= 0 && modelColumn < getModel().getColumnCount())
+      name = getModel().getColumnName(modelColumn);
+    return sf("SsTable[%s:%d]", name, modelColumn);
+  }
 
   /**
    * Constructs an empty data grid.
@@ -1242,6 +1335,9 @@ public class SsTable extends JTable {
     setDefaultEditor(Number.class, new DefaultEditor());
     setDefaultEditor(String.class, new DefaultEditor());
     setDefaultEditor(Object.class, new DefaultEditor());
+    // Text cells go through SsHtml; JTable's own renderer would put
+    // database text that is HTML into a label as it is.
+    setDefaultRenderer(Object.class, new TextRenderer());
 
     // Handle Control-X for selected rows deletion
     KeyStroke ks = KeyStroke.getKeyStroke("control released X");

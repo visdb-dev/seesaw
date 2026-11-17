@@ -67,6 +67,7 @@ import java.util.function.Consumer;
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
+import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -536,6 +537,32 @@ public class SsUtils {
                     ex.getLocalizedMessage(), comp.getColumnForLog(), pathName,
                     ex.getClass().getSimpleName());
     JOptionPane.showMessageDialog((Component) comp, msg, title, JOptionPane.ERROR_MESSAGE);
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  //
+  // HTML
+  //
+
+  /**
+   * Allow the component to render text that starts with {@code <html>}
+   * as HTML, or make it show such text literally.
+   * See {@link dev.visdb.seesaw.html.SsHtml.Display#renderHtml()}.
+   * <p>
+   * This sets Swing's {@code "html.disable"} client property. It works for
+   * components whose look and feel honours that property: {@code JLabel}
+   * and its subclasses, which include the default table, list and combo
+   * renderers, {@code AbstractButton} and {@code JToolTip}.
+   * <p>
+   * Call this before {@code setText}; Swing reads the property only when
+   * the text changes. A renderer is used for many cells,
+   * so call this for every cell, not only to disable.
+   *
+   * @param comp the component
+   * @param enabled false to show HTML text literally
+   */
+  public static void setHtmlEnabled(JComponent comp, boolean enabled) {
+    comp.putClientProperty("html.disable", enabled ? null : Boolean.TRUE);
   }
 
   ////////////////////////////////////////////////////////////////////////////

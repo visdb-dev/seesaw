@@ -92,6 +92,7 @@ import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.TextDecorator;
 import dev.visdb.seesaw.formatting.SsFormat;
+import dev.visdb.seesaw.html.SsHtmlPresenter;
 import dev.visdb.seesaw.navigate.ColumnChangeDoneEvent;
 import dev.visdb.seesaw.navigate.ColumnChangeStartEvent;
 import dev.visdb.seesaw.navigate.RowSetState;
@@ -947,6 +948,17 @@ final class SsCommon {
   }
 
   private SsFormat ssFormat;
+  /** Shows this component's database text; holds its SsHtml. */
+  private final SsHtmlPresenter htmlPresenter = new SsHtmlPresenter(this::getColumnForLog);
+
+  /**
+   * @return
+   * @see SsComponent#getSsHtmlPresenter()
+   */
+  SsHtmlPresenter getSsHtmlPresenter() {
+    return htmlPresenter;
+  }
+
   /**
    * @param ssFormat
    * @see SsComponent#setFormat(dev.visdb.seesaw.formatting.SsFormat)

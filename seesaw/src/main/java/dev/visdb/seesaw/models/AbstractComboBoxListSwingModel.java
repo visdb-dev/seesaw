@@ -73,6 +73,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
+import dev.visdb.seesaw.html.SsHtml;
+import dev.visdb.seesaw.html.SsHtmlPresenter;
 import dev.visdb.seesaw.utils.JStuff;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -472,6 +474,32 @@ public abstract class AbstractComboBoxListSwingModel {
     return listItemFormatDelegate.listItemFormat;
   }
 
+  private SsHtmlPresenter htmlPresenter = new SsHtmlPresenter(() -> "list item");
+
+  /**
+   * Set the presenter that the cell renderers of this model use to show an
+   * item's text, which may be HTML. Without this the renderers use
+   * {@link SsHtml#getDefault()}.
+   * An {@code SsComponent} gives its own, see
+   * {@link dev.visdb.seesaw.utils.SsComponent#getSsHtmlPresenter()}.
+   * @param htmlPresenter the presenter to use
+   */
+  public void setSsHtmlPresenter(SsHtmlPresenter htmlPresenter) {
+    this.htmlPresenter = Objects.requireNonNull(htmlPresenter);
+  }
+
+  /**
+   * Create a cell renderer for a JComboBox that works with this model's
+   * ListItemFormat and presenter. This is for a combo box that gets its
+   * model in some other way than {@code install}.
+   * @return a new renderer
+   */
+  public ListCellRenderer<Object> createComboBoxCellRenderer() {
+    @SuppressWarnings("unchecked")
+    ListCellRenderer<Object> renderer = new LocalComboBoxCellRenderer();
+    return renderer;
+  }
+
   /**
    * Cell renderer that works with a ListItemFormat.
    */
@@ -482,7 +510,8 @@ public abstract class AbstractComboBoxListSwingModel {
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                   boolean isSelected, boolean cellHasFocus) {
-      String stringValue = getListItemFormat().format(value);
+      // The text may be HTML; see SsHtml.
+      String stringValue = htmlPresenter.prepare(this, getListItemFormat().format(value));
       return super.getListCellRendererComponent(list, stringValue, index, isSelected, cellHasFocus);
     }
   }
@@ -502,7 +531,8 @@ public abstract class AbstractComboBoxListSwingModel {
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index,
                                                   boolean isSelected, boolean cellHasFocus) {
-      String stringValue = getListItemFormat().format(value);
+      // The text may be HTML; see SsHtml.
+      String stringValue = htmlPresenter.prepare(this, getListItemFormat().format(value));
       return super.getListCellRendererComponent(list, stringValue, index, isSelected, cellHasFocus);
     }
   }

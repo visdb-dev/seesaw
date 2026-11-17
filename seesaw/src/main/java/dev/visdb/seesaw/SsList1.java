@@ -182,7 +182,9 @@ public class SsList1<K, D> extends JList<ListItem> implements SsComponent {
     finishSsCommon();
 
     // Last line of constructor, safe to access this.
-    Model.install(this);
+    Model<K, D> model = Model.install(this);
+    // The renderer shows database text according to this component's SsHtml.
+    model.setSsHtmlPresenter(getSsHtmlPresenter());
   }
 
   /**

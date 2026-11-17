@@ -61,6 +61,10 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
  * Used to display database values in a read-only JLabel.
+ * A {@code JLabel} renders text that starts with {@code <html>} as HTML;
+ * how such a database value is shown is decided by
+ * {@link SsComponent#getSsHtml()}. That does not apply to text the
+ * application sets with {@code setText}.
  * By default, programmatic changes to the label are not propagated,
  * except of course to set a label's value from a RowSet.
  */
@@ -159,7 +163,8 @@ public class SsLabel extends JLabel implements SsComponent {
         protected void updateSsComponent() {
           final String text = getColumnText();
           logger.log(Level.DEBUG, () -> sf("%s: Setting label to %s.", getColumnForLog(), text));
-          setText(text);
+          // The text may be HTML; see SsHtml.
+          setText(getSsHtmlPresenter().prepare(SsLabel.this, text));
         }
 
         /** {@inheritDoc } */

@@ -29,6 +29,7 @@ import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.DecoratorFactory;
 import dev.visdb.seesaw.decorators.TextStyles;
+import dev.visdb.seesaw.html.SsHtml;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
 
@@ -185,6 +186,17 @@ public class LookupDefaults {
     for(DecoratorFactory deco : decos) {
       logger.log(Level.INFO, sf("Available DecoratorFactory: '%s'", deco));
     }
+
+    // How text that may be HTML is displayed. The checker with the default
+    // rules, unless the app has chosen.
+    if (Globals.getOption(SsHtml.class) == null)
+      Globals.setOption(SsHtml.class, SsHtml.checker());
+
+    // For the record; these are the choices. An app may still set another.
+    for (SsHtml ssHtml : SsHtml.getAvailable()) {
+      logger.log(Level.INFO, sf("Available SsHtml: '%s'", ssHtml.getName()));
+    }
+    logger.log(Level.INFO, sf("SsHtml default: '%s'", SsHtml.getDefault().getName()));
 
     // HACK for SimpleValidation, seems to be an off by one issue
     // TODO: could include style, allow multiple, then spin through

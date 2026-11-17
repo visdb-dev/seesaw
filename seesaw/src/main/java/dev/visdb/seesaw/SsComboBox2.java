@@ -326,6 +326,10 @@ public class SsComboBox2<K, D, D2> extends JComboBox<ListItem> implements SsComp
       model.autoComplete.setStrict(true);
       model.autoComplete.setPositionCaretTowardZero(true);
 
+      // GlazedLists installed a renderer that puts an item's text in a label
+      // as it is. Use the model's renderer, which goes through SsHtml.
+      jc.setRenderer(model.createComboBoxCellRenderer());
+
       // RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
       jc.glazedListArrowHandler();
 
@@ -614,6 +618,8 @@ public class SsComboBox2<K, D, D2> extends JComboBox<ListItem> implements SsComp
       case SWING -> BaseModel.install(this);
     };
     keyVisual.setListItemFormat(new ShowKeyIfNullDisplayValue());
+    // The renderer shows database text according to this component's SsHtml.
+    keyVisual.setSsHtmlPresenter(getSsHtmlPresenter());
   }
 
   /**

@@ -1,3 +1,14 @@
 Notes for the next release.
 
 CachedRowSet is not supported.
+
+Text from the database that starts with "<html>" is checked before it is
+displayed in SsLabel, SsTable cells and the items of the combo boxes and
+lists; see SsHtml. The default, SsHtml.checker(), renders HTML that only
+formats text. If the text has anything else, such as an image, a link or
+a style, the text is displayed literally, markup and all, and a warning
+is logged that names what is not allowed. An application that needs more
+can allow it,
+    Globals.setOption(SsHtml.class, SsHtml.checker(Rules.DEFAULT.withElements("img").withAttributes("img@src")));
+or go back to the old behaviour with SsHtml.pass(); setSsHtml() does it
+for one component or one SsTable. See NOTES/SsHtml-design.md.

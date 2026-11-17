@@ -67,6 +67,8 @@ import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.TextDecorator;
 import dev.visdb.seesaw.formatting.SsFormat;
 import dev.visdb.seesaw.formatting.SsFormattedTextField;
+import dev.visdb.seesaw.html.SsHtml;
+import dev.visdb.seesaw.html.SsHtmlPresenter;
 import dev.visdb.seesaw.navigate.ColumnChangeStartEvent;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.navigate.UndoRedo;
@@ -655,6 +657,39 @@ in the SsComponent's constructor, but before bind.
   @Override
   default SsFormat getSsFormat() {
     return getSsCommon().getSsFormat();
+  }
+
+  /**
+   * Set how text from the database that may be HTML is shown by this
+   * component. This matters for components that show text in a label
+   * or with a renderer, for example {@code SsLabel} and the combo and list
+   * components; a text field never renders HTML.
+   * @param ssHtml the {@code SsHtml} to use;
+   *        null to use {@link SsHtml#getDefault()}
+   */
+  default void setSsHtml(SsHtml ssHtml) {
+    getSsHtmlPresenter().setSsHtml(ssHtml);
+  }
+
+  /**
+   * How text from the database that may be HTML is shown by this component.
+   * @return the {@code SsHtml} that was set, or else {@link SsHtml#getDefault()}
+   */
+  default SsHtml getSsHtml() {
+    return getSsHtmlPresenter().getSsHtml();
+  }
+
+  /**
+   * The presenter that this component uses to show database text;
+   * it applies {@link #getSsHtml()} and logs what is refused.
+   * A component, or its renderer, does
+   * {@snippet :
+   * setText(getSsHtmlPresenter().prepare(this, text));
+   * }
+   * @return the presenter, never null
+   */
+  default SsHtmlPresenter getSsHtmlPresenter() {
+    return getSsCommon().getSsHtmlPresenter();
   }
 
   /**
