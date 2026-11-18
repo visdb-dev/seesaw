@@ -52,8 +52,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.System.Logger;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.System.Logger.Level;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -474,7 +474,7 @@ public class MainClass extends JFrame {
   private static DemoDatabase.DatabaseSetup databaseSetup = null;
 
   /* long option ids, they are not characters */
-  private static final int OPT_STYLE = 0;
+  private static final int OPT_STYLE = 1000;
   private static final int OPT_DATASET = 1001;
   private static final int OPT_DATASET_LIST = 1002;
   private static final int OPT_DATASET_CHECK = 1003;
@@ -634,6 +634,15 @@ public class MainClass extends JFrame {
     // disable simplevalidation border
     if(Boolean.FALSE) Globals.setOption(SVUtils.SimpleValidationBorderEnable.class,
                                         new SVUtils.SimpleValidationBorderEnable(false));
+
+    // Specify the default rules for component handling of html.
+    // After options processed: Globals.setOption(SsHtml.class, DemoRules.get(rules)), 
+    // html hanlding for demo:  "PASS", "PLAIN", "INLINE", "DEFAULT",
+    //                          "BROAD", "IMG", "INLINE-TEXT"
+    if(Boolean.FALSE) rules = "DEFAULT";
+    // Specify which dataset to use for this run. Points to scripts to load database.
+    // html data: "", "html-inline", "html-default", "html-restricted"
+    if(Boolean.FALSE) dataset = "html-inline";
 
     //
     // Pick decorator style, BORDER is default
@@ -826,6 +835,8 @@ public class MainClass extends JFrame {
     if (some_error) {
       System.exit(1);
     }
+    assert ssHtml != null;
+    assert demoDataset != null;
 
     // The demo always sets how html is shown; it does not rely on the default.
     Globals.setOption(SsHtml.class, ssHtml);

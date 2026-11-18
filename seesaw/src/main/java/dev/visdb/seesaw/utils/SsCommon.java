@@ -948,16 +948,6 @@ final class SsCommon {
   }
 
   private SsFormat ssFormat;
-  /** Shows this component's database text; holds its SsHtml. */
-  private final SsHtmlPresenter htmlPresenter = new SsHtmlPresenter(this::getColumnForLog);
-
-  /**
-   * @return
-   * @see SsComponent#getSsHtmlPresenter()
-   */
-  SsHtmlPresenter getSsHtmlPresenter() {
-    return htmlPresenter;
-  }
 
   /**
    * @param ssFormat
@@ -973,6 +963,17 @@ final class SsCommon {
    */
   SsFormat getSsFormat() {
     return ssFormat;
+  }
+
+  /** Shows this component's database text; holds its SsHtml. */
+  private final SsHtmlPresenter htmlPresenter = new SsHtmlPresenter(this::getColumnForLog);
+
+  /**
+   * @return
+   * @see SsComponent#getSsHtmlPresenter()
+   */
+  SsHtmlPresenter getSsHtmlPresenter() {
+    return htmlPresenter;
   }
 
   /**

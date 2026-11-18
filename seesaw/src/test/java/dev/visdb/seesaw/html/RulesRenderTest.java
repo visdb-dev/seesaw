@@ -25,11 +25,11 @@ import java.util.concurrent.Executors;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import com.sun.net.httpserver.HttpServer;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import com.sun.net.httpserver.HttpServer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,6 +45,7 @@ public class RulesRenderTest {
   private static final List<String> fetched = new CopyOnWriteArrayList<>();
 
   @BeforeAll
+  @SuppressWarnings({"unused", "ConvertToTryWithResources"})
   static void startServer() throws IOException {
     server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
     server.createContext("/", exchange -> {
@@ -58,6 +59,7 @@ public class RulesRenderTest {
   }
 
   @AfterAll
+  @SuppressWarnings("unused")
   static void stopServer() {
     server.stop(0);
   }
@@ -83,6 +85,7 @@ public class RulesRenderTest {
     return result[0];
   }
 
+  @SuppressWarnings("SleepWhileInLoop")
   private static void awaitFetch() throws InterruptedException {
     for (int i = 0; i < 100 && fetched.isEmpty(); i++) {
       Thread.sleep(50);

@@ -26,11 +26,11 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.plaf.basic.BasicHTML;
 
-import com.sun.net.httpserver.HttpServer;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import com.sun.net.httpserver.HttpServer;
 
 import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.SsComboBox2;
@@ -65,6 +65,7 @@ public class SsHtmlComponentsTest {
   private static final List<String> fetched = new CopyOnWriteArrayList<>();
 
   @BeforeAll
+  @SuppressWarnings({"unused", "ConvertToTryWithResources"})
   static void setUpClass() throws Exception {
     Util.seesawInit();
     SsUtils.isJunit(); // Make sure it's set; it can not tell on the event thread.
@@ -82,6 +83,7 @@ public class SsHtmlComponentsTest {
   }
 
   @AfterAll
+  @SuppressWarnings("unused")
   static void tearDownClass() throws InterruptedException {
     // Anything that was fetched has arrived by now.
     Thread.sleep(500);
@@ -260,6 +262,7 @@ public class SsHtmlComponentsTest {
     return rs;
   }
 
+  @SuppressWarnings("deprecation")
   private static SsLabel ssLabel(int pk) throws Exception {
     SsLabel[] label = new SsLabel[1];
     onEdt(() -> label[0] = new SsLabel(RowsModel.create(rowSet(" WHERE tbl_pk = " + pk)),
@@ -288,6 +291,7 @@ public class SsHtmlComponentsTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   void testSsLabelOwnSsHtml() throws Exception {
     SsLabel[] label = new SsLabel[1];
     onEdt(() -> {
@@ -304,6 +308,7 @@ public class SsHtmlComponentsTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   void testSsTable() throws Exception {
     SsTable[] p_table = new SsTable[1];
     onEdt(() -> p_table[0] = new SsTable(RowsModel.create(rowSet(""))));
@@ -336,6 +341,7 @@ public class SsHtmlComponentsTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   void testSsTableComboAndDateRenderers() throws Exception {
     SsTable[] p_table = new SsTable[1];
     onEdt(() -> p_table[0] = new SsTable(RowsModel.create(rowSet(""))));

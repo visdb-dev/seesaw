@@ -88,6 +88,8 @@ public class Globals {
    * @param notifyChange
    */
   public static <T> void notifyOptionChange(Class<T> optionClass, Consumer<T> notifyChange) {
+    if (results.containsKey(optionClass))
+      throw new IllegalStateException(sf("'%s' already monitored", optionClass));
     Result<T> result = globals.lookupResult(optionClass);
     notifyChange.accept(Globals.getOption(result));
     result.addLookupListener((LookupEvent le) -> {
@@ -96,8 +98,6 @@ public class Globals {
       notifyChange.accept(Globals.getOption(lr));
     });
     // Keep a reference, use the map so can remove it if needed at some point.
-    if (results.containsKey(optionClass))
-      throw new IllegalStateException(sf("'%s' already monitored", optionClass));
     results.put(optionClass, result);
   }
 

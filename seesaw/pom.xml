@@ -136,6 +136,7 @@
         <configuration>
           <systemPropertyVariables>
             <!-- A test that does not do SeeSaw.init() must not wait on a dialog. -->
+            <seesaw.running.junit>true</seesaw.running.junit>
             <seesaw.init.noDialog>true</seesaw.init.noDialog>
           </systemPropertyVariables>
         </configuration>

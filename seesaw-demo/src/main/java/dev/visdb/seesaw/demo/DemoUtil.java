@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 import java.util.prefs.Preferences;
 
 import javax.naming.InitialContext;
@@ -316,6 +318,23 @@ public class DemoUtil {
   /** This does nothing if java.util.logging is not used */
   private static final java.util.logging.Logger seesawLogger
       = java.util.logging.Logger.getLogger("dev.visdb.seesaw");
+  
+  /** 
+   * This is expensive, walking the stack on each message, but for demo...
+   */
+  public static class LineFormatter extends SimpleFormatter {
+    /** x
+     * @param r*/
+    @Override
+    public String format(LogRecord r) {
+      String cls = r.getSourceClassName(), m = r.getSourceMethodName();
+      int line = StackWalker.getInstance().walk(s -> s
+          .filter(f -> f.getClassName().equals(cls) && f.getMethodName().equals(m))
+          .findFirst().map(StackWalker.StackFrame::getLineNumber).orElse(-1));
+      r.setSourceMethodName(m + ":" + line);   // shows up in %2$s
+      return super.format(r);
+    }
+  }
   /** This does nothing if java.util.logging is not used */
   @SuppressWarnings({"UseOfSystemOutOrSystemErr", "UseSpecificCatch", "CallToPrintStackTrace",
                      "BroadCatchBlock", "TooBroadCatch"})
@@ -341,7 +360,7 @@ public class DemoUtil {
     // TODO: take the following values from a config file
     try (InputStream is = bais;) {
       if (is == null) {
-        System.err.println("*** 'util.loggin.properties' not found");
+        System.err.println("*** 'util.logging.properties' not found");
         return;
       }
       is.mark(0x20000); // 2*64K
@@ -578,6 +597,11 @@ public class DemoUtil {
   // TODO: detect if same window used again.
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void setChildScreenLocation(Window window) {
+    if (openWindowCount == 0) {
+      childPosition.setLocation(BaseChildPosition);
+      childCount = 0;
+    }
+    
     openWindowCount++;
     window.addWindowListener(new WindowAdapter() {
       @Override
@@ -585,11 +609,7 @@ public class DemoUtil {
         openWindowCount--;
       }
     });
-
-    if (openWindowCount == 0) {
-      childPosition.setLocation(BaseChildPosition);
-      childCount = 0;
-    }
+    
     GraphicsConfiguration gc = Screens.getPrefScreen();
 
     // Allow one reposition.

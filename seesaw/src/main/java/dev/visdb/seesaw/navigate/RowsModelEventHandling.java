@@ -217,26 +217,29 @@ public class RowsModelEventHandling {
      * @param rs
      */
     @Override
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void addRowSetEvent(RowSetEventType rsEventType, RowSet rs) {
       verifyEDT();
       Objects.requireNonNull(rs);
       if (isAcceptingCachedRowSetChanges(rs))
         return;
-      logger.log(DEBUG, () -> sf("####### rs %s evType %s", objectID(rs), rsEventType));
+      logger.log(TRACE, () -> sf("####### rs %s evType %s", objectID(rs), rsEventType));
       RowsEventSource eventSource = getCurrentEventSource();
 
       if (eventSource == IDLE_EVENT) {
+        // SsTable doesn't use DbChange so ... use TRACE, not WARNING
         if (isJunitPrint())
           System.out.println("Anonymous RowSet");
         else
-          logger.log(WARNING, "Anonymous RowSet event"); //, new Throwable());
+          logger.log(TRACE, "Anonymous RowSet event"); //, new Throwable());
       }
 
       if (eventSource.rowSet != rs) { // IDLE_EVENT or OutOfTheBlue RowSet.
         if (eventSource.rowSet != null)
           logger.log(ERROR, "WRONG ROW SET");
+        // SsTable doesn't use DbChange so ... use TRACE, not WARNING
         if (!isJunitPrint())
-          logger.log(WARNING,
+          logger.log(TRACE,
                      () -> sf("Different RowSet: orig %s, new %s", eventSource.rowSet,
                               rs)); //, new Throwable());
 
@@ -275,6 +278,7 @@ public class RowsModelEventHandling {
     }
 
     @Override
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     protected void flushPendingEvent(RowsEventSource eventSource) {
       // TODO: add the RowSet, consider case where model == null ... UNKNOWN
       RowsEvent ev;

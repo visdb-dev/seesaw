@@ -619,12 +619,7 @@ public class SsUtils {
    */
   public static boolean isJunit() {
     if (!didJunitCheck) {
-      //.filter((f)->{System.err.println("    "+f.getClassName());return true; })
-      StackWalker walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
-      Optional<StackWalker.StackFrame> frame
-          = walker.walk(s -> s.filter((f) -> f.getClassName().startsWith("org.junit")).findFirst());
-      if (frame.isPresent())
-        isJunit = true;
+      isJunit = "true".equals(System.getProperty("seesaw.running.junit"));
       didJunitCheck = true;
     }
     return isJunit;

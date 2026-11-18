@@ -19,6 +19,13 @@
  * {@link dev.visdb.seesaw.html.Rules} says what is allowed, and
  * {@link dev.visdb.seesaw.html.SsHtmlChecker} checks text against rules
  * using the JDK's own HTML parser.
+ * <p>
+ * There is a {@link dev.visdb.seesaw.utils.Globals global} {@code SsHtml}
+ * that provides the default for any {@link dev.visdb.seesaw.utils.SsComponent}.
+ * A custom or specific {@link dev.visdb.seesaw.html.SsHtml}
+ * can be assigned to an {@code SsComponent},
+ * see {@link dev.visdb.seesaw.utils.SsComponent#setSsHtml(dev.visdb.seesaw.html.SsHtml)
+ * ssComp.setSsHtml(ssHtml)}.
  */
 package dev.visdb.seesaw.html;
 // vi: sw=2 ts=8

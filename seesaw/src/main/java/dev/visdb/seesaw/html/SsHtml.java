@@ -181,13 +181,15 @@ public interface SsHtml {
    *        {@code element@attribute}, or a reason in parentheses such as
    *        {@code (length)}; empty if nothing was refused
    */
-  record Display(String text, boolean renderHtml, Set<String> notAllowed) {
+  record Display(String text, boolean renderHtml,
+                 @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") Set<String> notAllowed) {
 
     /**
      * Create; a copy of {@code notAllowed} is kept.
      * @throws IllegalArgumentException if {@code renderHtml} is false
      *         and {@code notAllowed} is empty
      */
+    @SuppressWarnings("AssignmentToMethodParameter")
     public Display {
       notAllowed = notAllowed.isEmpty()
           ? Set.of() : Collections.unmodifiableSet(new TreeSet<>(notAllowed));

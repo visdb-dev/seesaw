@@ -19,10 +19,14 @@ import dev.visdb.seesaw.SeeSaw;
  * and do other initialization during startup. Any number of these may be
  * registered; they are all run. Register an implementation with
  * {@snippet lang="java":
- * @ServiceProvider(service = SeeSawInitialization.class, path = LookupDefaults.INIT_PATH)
- * public static class Init implements SeeSawInitialization {
- *   @Override
- *   public void init() { ... }
+ * public class SomeClass {
+ *   // Do some initialization for SomeClass during SeeSaw startup.
+ *   @ServiceProvider(service = SeeSawInitialization.class, path = LookupDefaults.INIT_PATH)
+ *   public static class Init implements SeeSawInitialization {
+ *     @Override
+ *     public void init() { ... }
+ *   }
+ *   // ...
  * }
  * }
  * The implementation must be public and have a public no argument constructor.

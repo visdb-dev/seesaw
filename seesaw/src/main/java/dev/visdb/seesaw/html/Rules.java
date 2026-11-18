@@ -137,6 +137,7 @@ public record Rules(Set<String> elements, Set<String> attributes, OnRefusal onRe
    * Create; the names are copied and converted to lower case.
    * @throws IllegalArgumentException if a limit is negative
    */
+  @SuppressWarnings("AssignmentToMethodParameter")
   public Rules {
     elements = normalize(elements);
     attributes = normalize(attributes);
