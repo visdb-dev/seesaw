@@ -1,1 +1,47 @@
-/target/
+# Maven output (including all modules in the reactor)
+target/
+.flattened-pom.xml
+flattened-pom.xml
+
+# Eclipse / m2e: regenerate by importing Maven projects
+.project
+.classpath
+.settings/
+.metadata/
+.factorypath
+.apt_generated/
+.apt_generated_tests/
+.recommenders/
+.m2e/
+
+# NetBeans: local Maven IDE metadata, not build definitions
+nbproject/
+nbactions.xml
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# VS Code
+.vscode/
+
+# Other local build outputs (if an IDE uses them)
+bin/
+build/
+dist/
+
+# Editors, OS files, and generated logs
+*.log
+*~
+*.swp
+*.swo
+*.orig
+*.orig.*
+*.rej
+tags
+TAGS
+.DS_Store
+Thumbs.db

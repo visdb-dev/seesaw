@@ -3,6 +3,8 @@
 
 [javadoc](https://visdb-dev.github.io/seesaw/).
 
+For developing in Eclipse, NetBeans, IntelliJ IDEA, or VS Code, see [IDE_SETUP.md](IDE_SETUP.md).
+
 ## Running the Demo (Standalone)
 
 You can run the full interactive demo without cloning this repository. 

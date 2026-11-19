@@ -1,2 +1,3 @@
+# Module-local Maven/demo output; shared IDE ignores live in ../.gitignore.
 /target/
 /log/
