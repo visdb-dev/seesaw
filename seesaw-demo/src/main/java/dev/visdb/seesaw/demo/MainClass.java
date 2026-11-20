@@ -43,6 +43,7 @@
 package dev.visdb.seesaw.demo;
 
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,6 +52,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.System.Logger;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -69,6 +71,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.SwingUtilities;
@@ -83,6 +86,7 @@ import dev.visdb.seesaw.datasources.RowSetOps.ForceConflict;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
 import dev.visdb.seesaw.decorators.Decorator;
+import dev.visdb.seesaw.html.SsHtml;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
@@ -345,7 +349,7 @@ public class MainClass extends JFrame {
   @SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor", "UseOfSystemOutOrSystemErr"})
   public MainClass() {
     // SETUP WINDOW
-    super("SeeSaw Demo");
+    super(frameTitle());
     setSize(300, 300);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
@@ -445,22 +449,37 @@ public class MainClass extends JFrame {
     Screens.translateToPrefScreen(this);
   }
 
-  private static final String DBMS_MYSQL = "mysql";
-  private static final String DBMS_H2 = "h2";
-  private static final String DBMS_EXTERNAL = "external";
-
   /*
    * defaults for optional command line arguments
    */
-  static boolean verbose = false;
+  private static boolean verbose = false;
   private static boolean dump = false;
-  static boolean no_load_images = false;
-  static boolean no_initialize_db = false;
+  private static boolean no_load_images = false;
+  private static boolean no_initialize_db = false;
   // private static boolean readme = false;
-  private static String dbname = DBMS_H2;
-  static String propertyFile = null;
+  private static String dbname = DbServer.H2.cmdName();
+  private static String propertyFile = null;
   private static List<String> userSqlFiles = new ArrayList<>();
+  /** The dataset to load; see DemoDataset. "" is the files at the top of the resources. */
+  private static String dataset = DemoDataset.UNNAMED;
+  private static boolean datasetList = false;
+  private static boolean datasetCheck = false;
+  /**
+   * How database text that may be HTML is shown; a name from DemoRules.
+   * The demo always sets the SsHtml; it does not use the library's default.
+   */
+  private static String rules = "DEFAULT";
+  private static boolean rulesList = false;
+
   private static DemoDatabase.DatabaseSetup databaseSetup = null;
+
+  /* long option ids, they are not characters */
+  private static final int OPT_STYLE = 0;
+  private static final int OPT_DATASET = 1001;
+  private static final int OPT_DATASET_LIST = 1002;
+  private static final int OPT_DATASET_CHECK = 1003;
+  private static final int OPT_RULES = 1004;
+  private static final int OPT_RULES_LIST = 1005;
 
   private static String cmdName = "SeeSawDemo";
 
@@ -479,6 +498,17 @@ public class MainClass extends JFrame {
                            SeeSaw gives visual indication of input field state;
                            there are three decorator styles currently supported.
                            SV is the SimpleValidation framework.
+            --dataset=name the dataset of sql scripts to load; the default is
+                           the unnamed dataset, the files at the top of the
+                           resources. Files a dataset lacks come from there.
+            --dataset-list list the datasets with their descriptions, exit
+            --dataset-check
+                           for each dataset, list the files it has and the
+                           files that come from the unnamed dataset, exit
+            --rules=name   how database text that may be html is shown;
+                           DEFAULT is the default. PASS shows all html as
+                           Swing does, which may fetch URLs. See DemoRules.
+            --rules-list   list the names for --rules, exit
             -v             verbose; output initialization sql as executed
             -d             dump/create sql scripts in local directory, exit
             -n             do NOT initialize database, just run demo
@@ -492,6 +522,7 @@ public class MainClass extends JFrame {
         After the sql files are run, the images are loaded, unless '-i'.
         Use '-n -p props' to run demo with a previously initialized database.
         Use '-d' or '-d mysql' to create local files with sql initialization.
+        '--dataset' can not be used with '-s'.
         See seesaw-demo/README.txt for more information.
         
         Examples: SeeSawDemo is typically run with a maven command
@@ -503,6 +534,79 @@ public class MainClass extends JFrame {
     usage = usage.replace("CMD_NAME", cmdName);
     System.err.println(usage);
     System.exit(1);
+  }
+
+  private static String frameTitle() {
+    DemoDataset ds = databaseSetup == null ? null : databaseSetup.options.dataset();
+    return ds == null || ds.isUnnamed() ? "SeeSaw Demo" : "SeeSaw Demo [" + ds.name() + "]";
+  }
+
+  /** For --dataset-list. */
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private static void printDatasets() {
+    for (DemoDataset ds : DemoDataset.available()) {
+      System.out.printf("%-20s %s\n", ds.isUnnamed() ? "\"\"" : ds.name(), ds.description());
+    }
+  }
+
+  /** For --dataset-check. */
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private static void checkDatasets() {
+    for (DemoDataset ds : DemoDataset.available()) {
+      if (ds.isUnnamed())
+        continue;
+      System.out.printf("%s: %s\n", ds.name(), ds.description());
+      for (DbServer server : DbServer.values()) {
+        List<String> own = new ArrayList<>();
+        List<String> fallback = new ArrayList<>();
+        for (DemoScript script : DemoScript.values()) {
+          String fileName = script.fileName(server);
+          if (fileName == null)
+            continue;
+          (ds.hasOwn(script, server) ? own : fallback).add(fileName);
+        }
+        System.out.printf("    %-6s own:      %s\n", server.cmdName(), String.join(" ", own));
+        System.out.printf("    %-6s fallback: %s\n", server.cmdName(), String.join(" ", fallback));
+      }
+    }
+  }
+
+  /**
+   * Report the files that a named dataset lacks, which come from the unnamed
+   * dataset. They are logged, and also shown in a dialog, since a log line
+   * is easy to miss; with -d, or without a display, they go to stderr.
+   * @return false if the user canceled
+   */
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private static boolean confirmFallbacks(DemoDataset ds, DbServer server,
+                                          List<String> fallbacks, boolean dump) {
+    if (ds.isUnnamed() || fallbacks.isEmpty())
+      return true;
+    for (String fileName : fallbacks) {
+      logger.log(WARNING, () -> sf("Dataset %s has no '%s' for %s; using the unnamed dataset's",
+                                   ds.name(), fileName, server.cmdName()));
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append(sf("Dataset '%s' does not have these %s files;\n", ds.name(), server.cmdName()))
+        .append("the files of the unnamed dataset are used instead:\n\n");
+    for (String fileName : fallbacks) {
+      sb.append("    ").append(fileName).append('\n');
+    }
+    if (dump || GraphicsEnvironment.isHeadless()) {
+      System.err.println(sb);
+      return true;
+    }
+    sb.append("\nOK to continue, Cancel to exit.");
+    int[] answer = new int[1];
+    try {
+      SwingUtilities.invokeAndWait(() -> answer[0] = JOptionPane.showConfirmDialog(
+          null, sb.toString(), "SeeSaw Demo: dataset " + ds.name(),
+          JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE));
+    } catch (InterruptedException | InvocationTargetException ex) {
+      logger.log(Level.ERROR, "Dataset fallback dialog", ex);
+      return true;
+    }
+    return answer[0] == JOptionPane.OK_OPTION;
   }
 
   private static void setDecoratorStyle(Decorator.DecoratorStyle style) {
@@ -574,15 +678,26 @@ public class MainClass extends JFrame {
     // longopts.add(new LongOpt("maximum", LongOpt.OPTIONAL_ARGUMENT, null, 2));
 
     ArrayList<LongOpt> longopts = new ArrayList<>();
-    longopts.add(new LongOpt("style", LongOpt.REQUIRED_ARGUMENT, null, 0));
+    longopts.add(new LongOpt("style", LongOpt.REQUIRED_ARGUMENT, null, OPT_STYLE));
+    longopts.add(new LongOpt("dataset", LongOpt.REQUIRED_ARGUMENT, null, OPT_DATASET));
+    longopts.add(new LongOpt("dataset-list", LongOpt.NO_ARGUMENT, null, OPT_DATASET_LIST));
+    longopts.add(new LongOpt("dataset-check", LongOpt.NO_ARGUMENT, null, OPT_DATASET_CHECK));
+    longopts.add(new LongOpt("rules", LongOpt.REQUIRED_ARGUMENT, null, OPT_RULES));
+    longopts.add(new LongOpt("rules-list", LongOpt.NO_ARGUMENT, null, OPT_RULES_LIST));
     Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:", longopts.toArray(LongOpt[]::new));
 
     String decoStyleString = null;
+    boolean datasetSpecified = false;
     Decorator.DecoratorStyle decoStyle = null;
     int c;
     while ((c = g.getopt()) != -1) {
       switch (c) {
-        case   0: decoStyleString = g.getOptarg(); break;
+        case OPT_STYLE: decoStyleString = g.getOptarg(); break;
+        case OPT_DATASET: dataset = g.getOptarg(); datasetSpecified = true; break;
+        case OPT_DATASET_LIST: datasetList = true; break;
+        case OPT_DATASET_CHECK: datasetCheck = true; break;
+        case OPT_RULES: rules = g.getOptarg(); break;
+        case OPT_RULES_LIST: rulesList = true; break;
         case 'v': verbose = true; break;
         case 'd': dump = true; break;
         case 'n': no_initialize_db = true; break;
@@ -629,6 +744,19 @@ public class MainClass extends JFrame {
       usage();
     }
 
+    if (datasetList) {
+      printDatasets();
+      System.exit(0);
+    }
+    if (datasetCheck) {
+      checkDatasets();
+      System.exit(0);
+    }
+    if (rulesList) {
+      System.out.println(String.join(" ", DemoRules.names()));
+      System.exit(0);
+    }
+
     // if (readme) {
     // return;
     // }
@@ -656,29 +784,73 @@ public class MainClass extends JFrame {
         if (databaseServerSpecified) {
           System.err.println("-s not allowed if database specified. Exiting.");
           some_error = true;
-        } else {
-          dbname = DBMS_EXTERNAL;
         }
       }
       if (dump) {
         System.err.println("-d not allowed when -s is used. Exiting.");
         some_error = true;
       }
+      if (datasetSpecified && !dataset.isEmpty()) {
+        System.err.println("--dataset not allowed when -s is used. Exiting.");
+        some_error = true;
+      }
     }
 
-    databaseSetup = switch (dbname) {
-      case DBMS_MYSQL -> new DemoDatabase.MysqlSetup();
-      case DBMS_EXTERNAL -> new DemoDatabase.ExternalSetup(userSqlFiles);
-      case DBMS_H2 -> new DemoDatabase.H2Setup();
-      default -> null;
-    };
-    if (databaseSetup == null) {
-      System.err.println("Unknown database server '" + dbname + "' . Exiting.");
+    DemoDataset demoDataset = null;
+    try {
+      demoDataset = DemoDataset.of(dataset);
+    } catch (IllegalArgumentException ex) {
+      System.err.printf("%s. Known datasets: %s. Exiting.\n", ex.getMessage(),
+                        DemoDataset.available().stream().filter(d -> !d.isUnnamed())
+                            .map(DemoDataset::name).toList());
       some_error = true;
+    }
+
+    SsHtml ssHtml = null;
+    try {
+      ssHtml = DemoRules.get(rules);
+    } catch (IllegalArgumentException ex) {
+      System.err.println(ex.getMessage() + ". Exiting.");
+      some_error = true;
+    }
+
+    DbServer server = null;
+    if (useInternalSql) {
+      server = DbServer.forName(dbname).orElse(null);
+      if (server == null) {
+        System.err.println("Unknown database server '" + dbname + "' . Exiting.");
+        some_error = true;
+      }
     }
 
     if (some_error) {
       System.exit(1);
+    }
+
+    // The demo always sets how html is shown; it does not rely on the default.
+    Globals.setOption(SsHtml.class, ssHtml);
+    System.err.printf("Rules: %s, SsHtml: %s\n", rules, ssHtml.getName());
+    if (ssHtml == SsHtml.pass()) {
+      System.err.println("""
+          WARNING: --rules=PASS shows database html as Swing does. Html from the
+          html-restricted dataset fetches URLs, and two of its records make
+          Swing throw or overflow the stack.""");
+    }
+
+    DemoOptions options = new DemoOptions(verbose, dump, no_load_images, no_initialize_db,
+                                          propertyFile, userSqlFiles, demoDataset);
+    databaseSetup = server == null ? new DemoDatabase.ExternalSetup(options)
+                    : switch (server) {
+                      case H2 -> new DemoDatabase.H2Setup(options);
+                      case MYSQL -> new DemoDatabase.MysqlSetup(options);
+                    };
+
+    if (server != null) {
+      List<String> fallbacks = demoDataset.fallbacks(databaseSetup.getDemoScripts(dump), server);
+      if (!confirmFallbacks(demoDataset, server, fallbacks, dump)) {
+        System.err.println("Canceled. Exiting.");
+        System.exit(0);
+      }
     }
 
     if (dump) {

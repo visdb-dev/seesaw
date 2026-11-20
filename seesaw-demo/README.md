@@ -125,6 +125,50 @@ This example demonstrates all of the Formatted SeeSaw Components.
 
 There is a separate example screen to demonstrate the Base SeeSaw Components.
 
+## DATASETS AND HTML RULES
+
+The sql scripts that load the demo database come in sets called datasets. With no option, the
+demo loads the original scripts. Pick another dataset with `--dataset=NAME`:
+
+    mvn exec:exec -Dargs="--dataset=html-default"
+
+| Dataset | Contents |
+| --- | --- |
+| html-inline | Inline html (`Rules.INLINE`) in names, cities and labels. |
+| html-default | html-inline plus multiline and block html (`Rules.DEFAULT`): br, p, pre, lists, tables, headings. |
+| html-restricted | html-default plus html no built-in Rules allows: img, style, form, frameset, deep nesting. |
+
+`--dataset-list` prints the datasets with their descriptions. `--dataset-check` shows, for each
+dataset and database server, which scripts the dataset has and which come from the original
+scripts. A dataset's scripts are in `src/main/resources/datasets/NAME/`, and the datasets are
+listed in `src/main/resources/datasets/datasets.txt`. A script missing from a dataset falls back
+to the original script; before loading, the demo then shows a dialog, where Cancel exits.
+
+A dataset is data only. H2 is the main path. With `mysql` or `-p`, the html datasets fall back to
+the original MySQL scripts, and `--dataset` can not be used with `-s`. `-d` writes a dataset's
+scripts as `dump.NAME.FILE`.
+
+`--rules=NAME` picks how database text that may be html is shown (the SsHtml set with
+`Globals.setOption`). The default is `DEFAULT`; `--rules-list` prints the names.
+
+| Rules | Effect |
+| --- | --- |
+| PASS | no checking, html is shown as Swing does; for comparison only |
+| PLAIN | html is never rendered |
+| INLINE, DEFAULT, BROAD | the SsHtml Rules of that name |
+| IMG | `Rules.DEFAULT` plus img with src, width and height |
+| INLINE-TEXT | `Rules.INLINE`, refused html shown as text only |
+
+Suggested runs:
+
+    --dataset=html-inline --rules=INLINE        all html renders, on one line
+    --dataset=html-default --rules=INLINE       multiline html is refused, shown literally
+    --dataset=html-default --rules=DEFAULT      multiline html renders
+    --dataset=html-restricted --rules=DEFAULT   img, style, form, deep nesting are refused
+    --dataset=html-restricted --rules=IMG       the img in part 5 is fetched and shown
+
+With `--rules=PASS`, html-restricted fetches URLs, and labels 10 and 11 break Swing.
+
 ## USING ALTERNATE DATABASE SERVERS
 
 seesaw-demo can work with user supplied connection properties and sql scripts to initialize a database that is then used for the demo. You should be in the directory `seesaw-demo-runner` or in the directory you created to run the demo without cloning the repository. Look at the help with

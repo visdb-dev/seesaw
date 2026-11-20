@@ -57,7 +57,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.JDBCType;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -69,7 +69,6 @@ import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -80,15 +79,48 @@ import static java.lang.System.Logger.Level.*;
 final class DemoDatabase {
   private static final Logger logger = JStuff.getLogger();
 
+  /** Puts the images in base_test_data; see {@link DemoScript#DEMO_IMAGES}. */
+  private static final String IMAGES_SQL = "UPDATE base_test_data"
+                                           + " SET ss_image = ? WHERE base_test_pk = ?";
+
   private DemoDatabase() {
   }
 
   static abstract class DatabaseSetup implements Runnable {
     private Connection conn;
+    final DemoOptions options;
+
+    DatabaseSetup(DemoOptions options) {
+      this.options = options;
+    }
 
     abstract Properties getDatabaseProperties();
 
+    /**
+     * The scripts to run, in order, as names that
+     * {@link #getBufferedReader(String)} opens.
+     */
     abstract List<String> getScripts();
+
+    /** The scripts that {@code -d} writes; by default the ones that run. */
+    List<String> getDumpScripts() {
+      return getScripts();
+    }
+
+    /** The resource that lists the images, see {@link DemoUtil#loadBinaries}. */
+    String getImagesResource() {
+      return "/" + DemoScript.DEMO_IMAGES.fileName(DbServer.H2);
+    }
+
+    /**
+     * The scripts, from the demo's resources, that this setup uses;
+     * empty if it does not use the resources.
+     * Used to find, before anything is loaded, what a dataset lacks.
+     * @param dump true for the scripts that {@code -d} writes
+     */
+    List<DemoScript> getDemoScripts(boolean dump) {
+      return List.of();
+    }
 
     Connection getConnection() {
       return conn;
@@ -143,7 +175,7 @@ final class DemoDatabase {
         return;
       }
 
-      if (MainClass.no_initialize_db) {
+      if (options.noInitializeDb()) {
         return;
       }
 
@@ -152,18 +184,16 @@ final class DemoDatabase {
         ok = false;
         BufferedReader br = getBufferedReader(script);
         if (br != null) {
-          ok = DemoUtil.runSqlStatements(conn, br, MainClass.verbose);
+          ok = DemoUtil.runSqlStatements(conn, br, options.verbose());
         }
         if (!ok) {
           break;
         }
       }
 
-      if (ok && !MainClass.no_load_images) {
+      if (ok && !options.noLoadImages()) {
         // Load up the images
-        String sql = "UPDATE base_test_data"
-                     + " SET ss_image = ? WHERE base_test_pk = ?";
-        ok = DemoUtil.loadBinaries(conn, "/demo-images.txt", sql, MainClass.verbose);
+        ok = DemoUtil.loadBinaries(conn, getImagesResource(), IMAGES_SQL, options.verbose());
       }
 
       if (!ok) {
@@ -186,12 +216,19 @@ final class DemoDatabase {
       return null;
     }
 
+    /** The file that {@code -d} writes for a script. */
+    String getDumpName(String script) {
+      DemoDataset dataset = options.dataset();
+      String prefix = dataset.isUnnamed() ? "dump." : "dump." + dataset.name() + ".";
+      return prefix + new File(script).getName();
+    }
+
     void dump() {
-      for (String script : getScripts()) {
+      for (String script : getDumpScripts()) {
         boolean ok = false;
         try (BufferedReader br = getBufferedReader(script)) {
           if (br != null) {
-            String name = "dump." + new File(script).getName();
+            String name = getDumpName(script);
             try (FileWriter fout = new FileWriter(name)) {
               char buf[] = new char[4 * 1024];
               int n;
@@ -211,11 +248,66 @@ final class DemoDatabase {
     }
   }
 
+  /**
+   * A setup whose scripts are the demo's resources for one database server,
+   * found through the dataset in the options.
+   */
+  static abstract class ResourceSetup extends DatabaseSetup {
+    private final DbServer server;
+
+    ResourceSetup(DemoOptions options, DbServer server) {
+      super(options);
+      this.server = server;
+    }
+
+    DbServer getServer() {
+      return server;
+    }
+
+    /** The scripts that run, in order. */
+    abstract List<DemoScript> getLoadScripts();
+
+    /** The scripts that {@code -d} writes, by default the ones that run. */
+    List<DemoScript> getDumpDemoScripts() {
+      return getLoadScripts();
+    }
+
+    @Override
+    List<DemoScript> getDemoScripts(boolean dump) {
+      if (dump)
+        return getDumpDemoScripts();
+      List<DemoScript> scripts = new ArrayList<>(getLoadScripts());
+      if (!options.noLoadImages())
+        scripts.add(DemoScript.DEMO_IMAGES);
+      return scripts;
+    }
+
+    private List<String> resolve(List<DemoScript> scripts) {
+      return scripts.stream().map(s -> options.dataset().resolve(s, server)).toList();
+    }
+
+    @Override
+    List<String> getScripts() {
+      return resolve(getLoadScripts());
+    }
+
+    @Override
+    List<String> getDumpScripts() {
+      return resolve(getDumpDemoScripts());
+    }
+
+    @Override
+    String getImagesResource() {
+      return options.dataset().resolve(DemoScript.DEMO_IMAGES, server);
+    }
+  }
+
   static class ExternalSetup extends DatabaseSetup {
     List<String> sqlFiles;
 
-    public ExternalSetup(List<String> _sqlFiles) {
-      sqlFiles = _sqlFiles;
+    public ExternalSetup(DemoOptions options) {
+      super(options);
+      sqlFiles = options.userSqlFiles();
     }
 
     @Override
@@ -231,7 +323,7 @@ final class DemoDatabase {
 
     @Override
     Properties getDatabaseProperties() {
-      Properties info = getFileProperties(MainClass.propertyFile);
+      Properties info = getFileProperties(options.propertyFile());
       return info;
     }
 
@@ -245,23 +337,49 @@ final class DemoDatabase {
    * The demo's own in memory H2 database, loaded from the scripts in the
    * resources. Also used to dump the H2 sql files.
    */
-  static class H2Setup extends DatabaseSetup {
+  static class H2Setup extends ResourceSetup {
     private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 
     private static final boolean USE_IN_MEMORY_DATABASE = true;
-
-    private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
-    private static final String DATABASE_SCRIPT_TEST = "tests.sql";
-    private static final String DATABASE_SCRIPT_TEST_IMAGES = "tests_load_blobs.sql";
-    private static final String DATABASE_SCRIPT_DEBUG = "debug.sql";
 
     private static final boolean RUN_DEMO_SQL_SCRIPTS = true;
     private static final boolean RUN_TEST_SQL_SCRIPTS = true;
     private static final boolean RUN_DEBUG_SQL_SCRIPTS = false;
 
+    H2Setup(DemoOptions options) {
+      super(options, DbServer.H2);
+    }
+
     @Override
     Properties getDatabaseProperties() {
       return null;
+    }
+
+    @Override
+    List<DemoScript> getLoadScripts() {
+      List<DemoScript> scripts = new ArrayList<>();
+      if (RUN_DEMO_SQL_SCRIPTS)
+        scripts.add(DemoScript.SUPPLIERS_AND_PARTS);
+      if (RUN_TEST_SQL_SCRIPTS)
+        scripts.add(DemoScript.COMPONENTS);
+      if (RUN_DEBUG_SQL_SCRIPTS)
+        scripts.add(DemoScript.DEBUG);
+      return scripts;
+    }
+
+    /** The dump includes the blob script, for running the dumped scripts by hand. */
+    @Override
+    List<DemoScript> getDumpDemoScripts() {
+      return List.of(DemoScript.SUPPLIERS_AND_PARTS, DemoScript.COMPONENTS,
+                     DemoScript.COMPONENTS_BLOBS);
+    }
+
+    @Override
+    List<DemoScript> getDemoScripts(boolean dump) {
+      List<DemoScript> scripts = super.getDemoScripts(dump);
+      if (!dump && !RUN_TEST_SQL_SCRIPTS)
+        scripts.remove(DemoScript.DEMO_IMAGES);
+      return scripts;
     }
 
     /**
@@ -276,51 +394,15 @@ final class DemoDatabase {
       try {
         Class.forName("org.h2.Driver");
 
-        logger.log(DEBUG, () -> sf("Resource path: %s.", MainClass.class.getPackage().getName()));
-        logger.log(DEBUG, "Resource path: %s.",
-                   MainClass.class.getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
-
-        InputStream inStreamDemo = null;
-        InputStream inStreamTest = null;
-        InputStream inStreamDebug = null;
-
-        boolean has_startup_error = false;
-
-        if (RUN_DEMO_SQL_SCRIPTS) {
-          inStreamDemo = MainClass.class.getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
-          if (inStreamDemo == null) {
-            logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_DEMO
-                                          + " to the classpath, package "
-                                          + MainClass.class.getPackage().getName());
-            has_startup_error = true;
+        // Open every script first; a missing script is fatal.
+        List<BufferedReader> readers = new ArrayList<>();
+        for (String script : getScripts()) {
+          BufferedReader br = getBufferedReader(script);
+          if (br == null) {
+            logger.log(Level.ERROR, "\n*******\n*******\n*******");
+            System.exit(1);
           }
-        }
-
-        if (RUN_TEST_SQL_SCRIPTS) {
-          inStreamTest = MainClass.class.getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
-          if (inStreamTest == null) {
-            logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_TEST + " and "
-                                          + DATABASE_SCRIPT_TEST_IMAGES
-                                          + " to the classpath, package "
-                                          + MainClass.class.getPackage().getName());
-            has_startup_error = true;
-          }
-        }
-
-        if (RUN_DEBUG_SQL_SCRIPTS) {
-          inStreamDebug
-              = MainClass.class.getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEBUG);
-          if (inStreamDebug == null) {
-            logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_DEBUG
-                                          + " to the classpath, package "
-                                          + MainClass.class.getPackage().getName());
-            has_startup_error = true;
-          }
-        }
-
-        if (has_startup_error) {
-          logger.log(Level.ERROR, "\n*******\n*******\n*******");
-          System.exit(1);
+          readers.add(br);
         }
 
         if (USE_IN_MEMORY_DATABASE) {
@@ -337,28 +419,13 @@ final class DemoDatabase {
         }
 
         // RUN SCRIPTS AND CLOSE STREAMS
-        if (RUN_DEMO_SQL_SCRIPTS) {
-          assert inStreamDemo != null;
-          RunScript.execute(result, new InputStreamReader(inStreamDemo));
-          inStreamDemo.close();
+        for (BufferedReader br : readers) {
+          RunScript.execute(result, br);
+          br.close();
         }
 
-        if (RUN_TEST_SQL_SCRIPTS) {
-          assert inStreamTest != null;
-          RunScript.execute(result, new InputStreamReader(inStreamTest));
-          inStreamTest.close();
-
-          if (!MainClass.no_load_images) {
-            String sql = "UPDATE base_test_data"
-                         + " SET ss_image = ? WHERE base_test_pk = ?";
-            DemoUtil.loadBinaries(result, "/demo-images.txt", sql, MainClass.verbose);
-          }
-        }
-
-        if (RUN_DEBUG_SQL_SCRIPTS) {
-          assert inStreamDebug != null;
-          RunScript.execute(result, new InputStreamReader(inStreamDebug));
-          inStreamDebug.close();
+        if (RUN_TEST_SQL_SCRIPTS && !options.noLoadImages()) {
+          DemoUtil.loadBinaries(result, getImagesResource(), IMAGES_SQL, options.verbose());
         }
 
       } catch (final IOException ioe) {
@@ -371,15 +438,13 @@ final class DemoDatabase {
 
       setConnection(result);
     }
-
-    @Override
-    List<String> getScripts() {
-      return Arrays.asList(new String[] {"/" + DATABASE_SCRIPT_DEMO, "/" + DATABASE_SCRIPT_TEST,
-                                         "/" + DATABASE_SCRIPT_TEST_IMAGES});
-    }
   }
 
-  static class MysqlSetup extends DatabaseSetup {
+  static class MysqlSetup extends ResourceSetup {
+    MysqlSetup(DemoOptions options) {
+      super(options, DbServer.MYSQL);
+    }
+
     @Override
     public void run() {
       super.run();
@@ -397,8 +462,8 @@ final class DemoDatabase {
       // <version>8.0.21</version>
       // </dependency>
       Properties info;
-      if (MainClass.propertyFile != null) {
-        info = getFileProperties(MainClass.propertyFile);
+      if (options.propertyFile() != null) {
+        info = getFileProperties(options.propertyFile());
       } else {
         info = new Properties();
         info.put("DB_DRIVER_CLASS", "com.mysql.cj.jdbc.Driver");
@@ -412,12 +477,8 @@ final class DemoDatabase {
     }
 
     @Override
-    List<String> getScripts() {
-      return Arrays.asList(
-          new String[] {
-            "/mysql.demo-app.sql",
-            "/mysql.demo-components.sql"
-          });
+    List<DemoScript> getLoadScripts() {
+      return List.of(DemoScript.SUPPLIERS_AND_PARTS, DemoScript.COMPONENTS);
     }
   }
 } // end final class DemoDatabase
