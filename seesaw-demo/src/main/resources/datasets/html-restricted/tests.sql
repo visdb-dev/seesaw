@@ -42,7 +42,7 @@
  * ****************************************************************************/
 
 /* Dataset html-restricted.
-   html-default plus html that no built-in Rules allows: img, a background,
+   html-multiline plus html that no built-in Rules allows: img, a background,
    style, a stylesheet import, a link, form fields, title, object, and
    nesting deeper than 32. With a checker these are shown literally, and
    logged. Refused rows are between accepted ones.

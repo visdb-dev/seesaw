@@ -16,7 +16,9 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -45,15 +47,22 @@ import dev.visdb.seesaw.utils.JStuff;
  * what the renderer will be given; the two can not read the markup
  * differently.
  * <p>
+ * Get a checker with {@link #get(Rules)}. For the {@code Rules} constants
+ * that is a shared instance.
  * To do something else with refused text, such as rewriting it,
- * override {@link #refused(String, Parsed)}.
+ * extend this class and override {@link #refused(String, Parsed)}.
+ * <p>
+ * A checker for each {@code Rules} constant is registered at
+ * {@link SsHtml#PATH}: {@link Inline}, {@link Multiline} and {@link Broad}.
+ * The registered instance is equal to the one {@code get} returns.
  */
-@ServiceProvider(path = SsHtml.PATH, service = SsHtml.class)
 public class SsHtmlChecker implements SsHtml {
   private static final Logger logger = JStuff.getLogger();
 
-  /** The shared checker for {@link Rules#DEFAULT}. */
-  static final SsHtmlChecker DEFAULT = new SsHtmlChecker();
+  private static final SsHtmlChecker INLINE = new Inline();
+  private static final SsHtmlChecker MULTILINE = new Multiline();
+  private static final SsHtmlChecker BROAD = new Broad();
+  private static final List<SsHtmlChecker> NAMED = List.of(INLINE, MULTILINE, BROAD);
 
   /** In {@link Display#notAllowed()} when the text is longer than the rules allow. */
   public static final String REFUSED_LENGTH = "(length)";
@@ -65,20 +74,54 @@ public class SsHtmlChecker implements SsHtml {
   private final Rules rules;
 
   /**
-   * Create a checker that uses {@link Rules#DEFAULT}.
-   * This is what is registered; see {@link SsHtml#checker()}.
+   * A checker that uses the given rules.
+   * For {@link Rules#INLINE}, {@link Rules#MULTILINE} and {@link Rules#BROAD},
+   * or rules equal to one of them, this is a shared instance.
+   * @param rules what is allowed
+   * @return a checker
    */
-  public SsHtmlChecker() {
-    this(Rules.DEFAULT);
+  public static SsHtmlChecker get(Rules rules) {
+    Objects.requireNonNull(rules, "rules");
+    for (SsHtmlChecker checker : NAMED) {
+      if (checker.rules.equals(rules))
+        return checker;
+    }
+    return new SsHtmlChecker(rules);
+  }
+
+  /** The registered checker for {@link Rules#INLINE}. */
+  @ServiceProvider(path = SsHtml.PATH, service = SsHtml.class)
+  public static final class Inline extends SsHtmlChecker {
+    /** For registration; use {@code SsHtmlChecker.get(Rules.INLINE)}. */
+    public Inline() {
+      super(Rules.INLINE);
+    }
+  }
+
+  /** The registered checker for {@link Rules#MULTILINE}. */
+  @ServiceProvider(path = SsHtml.PATH, service = SsHtml.class)
+  public static final class Multiline extends SsHtmlChecker {
+    /** For registration; use {@code SsHtmlChecker.get(Rules.MULTILINE)}. */
+    public Multiline() {
+      super(Rules.MULTILINE);
+    }
+  }
+
+  /** The registered checker for {@link Rules#BROAD}. */
+  @ServiceProvider(path = SsHtml.PATH, service = SsHtml.class)
+  public static final class Broad extends SsHtmlChecker {
+    /** For registration; use {@code SsHtmlChecker.get(Rules.BROAD)}. */
+    public Broad() {
+      super(Rules.BROAD);
+    }
   }
 
   /**
-   * Create a checker.
+   * Create a checker; for a subclass. Otherwise use {@link #get(Rules)}.
    * @param rules what is allowed
    */
-  public SsHtmlChecker(Rules rules) {
-    if (rules == null)
-      throw new NullPointerException("rules");
+  protected SsHtmlChecker(Rules rules) {
+    Objects.requireNonNull(rules, "rules");
     this.rules = rules;
   }
 
@@ -92,17 +135,17 @@ public class SsHtmlChecker implements SsHtml {
 
   /**
    * {@code CHECKER} with the rules in parentheses: {@code INLINE},
-   * {@code DEFAULT} or {@code BROAD} if the allowed elements and attributes
+   * {@code MULTILINE} or {@code BROAD} if the allowed elements and attributes
    * are those of that constant, otherwise {@code custom}; then
    * {@code TEXT_ONLY} if that is what is shown on refusal.
-   * For example {@code CHECKER(DEFAULT)}, {@code CHECKER(custom,TEXT_ONLY)}.
-   * A subclass should override this.
+   * For example {@code CHECKER(MULTILINE)}, {@code CHECKER(custom,TEXT_ONLY)}.
+   * A subclass that shows text differently should override this.
    */
   @Override
   public String getName() {
     String name = "custom";
-    if (sameAllowed(Rules.DEFAULT))
-      name = "DEFAULT";
+    if (sameAllowed(Rules.MULTILINE))
+      name = "MULTILINE";
     else if (sameAllowed(Rules.INLINE))
       name = "INLINE";
     else if (sameAllowed(Rules.BROAD))

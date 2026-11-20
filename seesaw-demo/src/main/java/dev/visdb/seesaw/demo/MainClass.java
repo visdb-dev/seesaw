@@ -466,9 +466,10 @@ public class MainClass extends JFrame {
   private static boolean datasetCheck = false;
   /**
    * How database text that may be HTML is shown; a name from DemoRules.
-   * The demo always sets the SsHtml; it does not use the library's default.
+   * Null: the library's defaults, by component type. Otherwise the SsHtml
+   * is set in Globals, which overrides the default for every component.
    */
-  private static String rules = "DEFAULT";
+  private static String rules = null;
   private static boolean rulesList = false;
 
   private static DemoDatabase.DatabaseSetup databaseSetup = null;
@@ -505,9 +506,11 @@ public class MainClass extends JFrame {
             --dataset-check
                            for each dataset, list the files it has and the
                            files that come from the unnamed dataset, exit
-            --rules=name   how database text that may be html is shown;
-                           DEFAULT is the default. PASS shows all html as
-                           Swing does, which may fetch URLs. See DemoRules.
+            --rules=name   how database text that may be html is shown, for
+                           every component; without it the library's
+                           defaults, by component type, are used. PASS shows
+                           all html as Swing does, which may fetch URLs.
+                           See DemoRules.
             --rules-list   list the names for --rules, exit
             -v             verbose; output initialization sql as executed
             -d             dump/create sql scripts in local directory, exit
@@ -635,14 +638,15 @@ public class MainClass extends JFrame {
     if(Boolean.FALSE) Globals.setOption(SVUtils.SimpleValidationBorderEnable.class,
                                         new SVUtils.SimpleValidationBorderEnable(false));
 
-    // Specify the default rules for component handling of html.
-    // After options processed: Globals.setOption(SsHtml.class, DemoRules.get(rules)), 
-    // html hanlding for demo:  "PASS", "PLAIN", "INLINE", "DEFAULT",
+    // Override the library's html defaults for every component; null keeps them.
+    // After options processed: Globals.setOption(SsHtml.class, DemoRules.get(rules)),
+    // html handling for demo:  "PASS", "PLAIN", "INLINE", "MULTILINE",
     //                          "BROAD", "IMG", "INLINE-TEXT"
-    if(Boolean.FALSE) rules = "DEFAULT";
+    if(Boolean.FALSE) rules = "MULTILINE";
+    if(Boolean.FALSE) rules = "PLAIN-TEXT";
     // Specify which dataset to use for this run. Points to scripts to load database.
-    // html data: "", "html-inline", "html-default", "html-restricted"
-    if(Boolean.FALSE) dataset = "html-inline";
+    // html data: "", "html-inline", "html-multiline", "html-restricted"
+    if(Boolean.FALSE) dataset = "html-multiline";
 
     //
     // Pick decorator style, BORDER is default
@@ -817,7 +821,8 @@ public class MainClass extends JFrame {
 
     SsHtml ssHtml = null;
     try {
-      ssHtml = DemoRules.get(rules);
+      if (rules != null)
+        ssHtml = DemoRules.get(rules);
     } catch (IllegalArgumentException ex) {
       System.err.println(ex.getMessage() + ". Exiting.");
       some_error = true;
@@ -835,13 +840,17 @@ public class MainClass extends JFrame {
     if (some_error) {
       System.exit(1);
     }
-    assert ssHtml != null;
     assert demoDataset != null;
 
-    // The demo always sets how html is shown; it does not rely on the default.
-    Globals.setOption(SsHtml.class, ssHtml);
-    System.err.printf("Rules: %s, SsHtml: %s\n", rules, ssHtml.getName());
-    if (ssHtml == SsHtml.pass()) {
+    if (ssHtml == null) {
+      System.err.println("Rules: the library's defaults, by component type");
+    } else {
+      // An override of the library's defaults, for every component.
+      Globals.setOption(SsHtml.class, ssHtml);
+      System.err.printf("Rules: %s, SsHtml: %s, for every component\n",
+                        rules, ssHtml.getName());
+    }
+    if (SsHtml.pass().equals(ssHtml)) {
       System.err.println("""
           WARNING: --rules=PASS shows database html as Swing does. Html from the
           html-restricted dataset fetches URLs, and two of its records make

@@ -8,5 +8,5 @@
 # A name is made of letters, digits, '.', '_' and '-', and does not start with '-'.
 
 html-inline: Inline html (Rules.INLINE) in names, cities and labels. Accepted html renders on one line; multiline html is refused by INLINE.
-html-default: html-inline plus multiline and block html (Rules.DEFAULT): br, p, pre, lists, tables, headings.
-html-restricted: html-default plus html no built-in Rules allows: img, style, form, frameset, deep nesting. With --rules=PASS it fetches URLs, and labels 10 and 11 break Swing.
+html-multiline: html-inline plus multiline and block html (Rules.MULTILINE): br, p, pre, lists, tables, headings.
+html-restricted: html-multiline plus html no built-in Rules allows: img, style, form, frameset, deep nesting. With --rules=PASS it fetches URLs, and labels 10 and 11 break Swing.

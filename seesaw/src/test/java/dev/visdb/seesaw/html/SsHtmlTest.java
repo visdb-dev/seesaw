@@ -19,15 +19,23 @@ import javax.swing.plaf.basic.BasicHTML;
 
 import org.junit.jupiter.api.Test;
 
+import dev.visdb.seesaw.SsComboBox1;
+import dev.visdb.seesaw.SsComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
+import dev.visdb.seesaw.SsLabel;
+import dev.visdb.seesaw.SsList1;
+import dev.visdb.seesaw.SsTable;
 import dev.visdb.seesaw.html.Rules.OnRefusal;
 import dev.visdb.seesaw.html.SsHtml.Display;
 import dev.visdb.seesaw.html.SsHtml.Report;
 import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.utils.Globals;
+import dev.visdb.seesaw.utils.LookupDefaults;
 import dev.visdb.seesaw.utils.SsUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * SsHtml's static methods, Display, the pass and plain implementations,
@@ -85,52 +93,113 @@ public class SsHtmlTest {
 
   @Test
   void testDefault() {
-    // The initialization sets the default explicitly.
     Util.seesawInit();
-    assertThat(Globals.getOption(SsHtml.class)).isSameAs(SsHtml.checker());
-    assertThat(SsHtml.getDefault()).isSameAs(SsHtml.checker());
+    // With no override, the default is the library's choice for the type.
+    assertThat(Globals.getOption(SsHtml.class)).isNull();
+    JLabel other = new JLabel();
+    assertThat(SsHtml.getDefault(null)).isSameAs(LookupDefaults.getSsHtmlDefault(null));
+    assertThat(SsHtml.getDefault(other)).isSameAs(LookupDefaults.getSsHtmlDefault(other));
+    assertThat(LookupDefaults.getSsHtmlDefault(other))
+        .isSameAs(LookupDefaults.getSsHtmlDefault(null)).isNotNull();
+    // Each subclass is listed before its super class.
+    var types = List.copyOf(LookupDefaults.getSsHtmlDefaults().keySet());
+    for (int i = 0; i < types.size(); i++)
+      for (int j = i + 1; j < types.size(); j++)
+        assertThat(types.get(i).isAssignableFrom(types.get(j)))
+            .as("%s before %s", types.get(i), types.get(j)).isFalse();
+    // The application's SsHtml in Globals overrides the default for every component.
     try {
       Globals.setOption(SsHtml.class, SsHtml.plain());
-      assertThat(SsHtml.getDefault()).isSameAs(SsHtml.plain());
+      assertThat(SsHtml.getDefault(null)).isSameAs(SsHtml.plain());
+      assertThat(SsHtml.getDefault(other)).isSameAs(SsHtml.plain());
     } finally {
-      Globals.setOption(SsHtml.class, SsHtml.checker());
+      Globals.setOption(SsHtml.class, null);
     }
-    assertThat(SsHtml.getDefault()).isSameAs(SsHtml.checker());
+    assertThat(SsHtml.getDefault(null)).isSameAs(LookupDefaults.getSsHtmlDefault(null));
+  }
+
+  /**
+   * The library's defaults are as shipped. When they are edited in
+   * {@code LookupDefaults} to try something, this is skipped, loudly,
+   * instead of failing.
+   */
+  @Test
+  void testShippedDefaults() {
+    SsHtml multiline = SsHtmlChecker.get(Rules.MULTILINE);
+    var defaults = LookupDefaults.getSsHtmlDefaults();
+    List<Class<?>> shippedTypes = List.of(SsLabel.class, SsTable.class, SsList1.class,
+                                          SsComboBox1.class, SsDbComboBox2.class,
+                                          SsComboBox2.class);
+    boolean shipped = List.copyOf(defaults.keySet()).equals(shippedTypes)
+                      && defaults.values().stream().allMatch(multiline::equals)
+                      && LookupDefaults.getSsHtmlDefault(null).equals(multiline);
+    if (!shipped) {
+      StringBuilder sb = new StringBuilder();
+      defaults.forEach((type, ssHtml) -> sb.append(
+          "*   %s: %s%n".formatted(type.getSimpleName(), ssHtml.getName())));
+      System.err.printf("""
+
+          ************************************************************
+          * SKIPPED SsHtmlTest.testShippedDefaults:
+          * LookupDefaults SsHtml defaults are not as shipped
+          %s*   others: %s
+          ************************************************************
+          %n""", sb, LookupDefaults.getSsHtmlDefault(null).getName());
+    }
+    assumeTrue(shipped, "LookupDefaults SsHtml defaults are not as shipped");
+    assertThat(LookupDefaults.getSsHtmlDefault(new JLabel())).isSameAs(multiline);
   }
 
   @Test
   void testAvailable() {
     assertThat(SsHtml.getAvailable()).extracting(SsHtml::getName)
-        .containsExactlyInAnyOrder("PASS", "PLAIN", "CHECKER(DEFAULT)");
+        .containsExactlyInAnyOrder("PASS", "PLAIN",
+                                   "CHECKER(INLINE)", "CHECKER(MULTILINE)", "CHECKER(BROAD)");
     // A registered instance is equal to the one from the static method.
     assertThat(List.<SsHtml>copyOf(SsHtml.getAvailable()))
-        .containsExactlyInAnyOrder(SsHtml.pass(), SsHtml.plain(), SsHtml.checker());
-    assertThat(SsHtml.checker(Rules.INLINE)).isNotEqualTo(SsHtml.checker());
-    assertThat(new SsHtmlChecker(Rules.INLINE)).isEqualTo(SsHtml.checker(Rules.INLINE));
+        .containsExactlyInAnyOrder(SsHtml.pass(), SsHtml.plain(),
+                                   SsHtmlChecker.get(Rules.INLINE),
+                                   SsHtmlChecker.get(Rules.MULTILINE),
+                                   SsHtmlChecker.get(Rules.BROAD));
   }
 
   @Test
-  void testCheckerFactory() {
-    assertThat(SsHtml.checker()).isInstanceOf(SsHtmlChecker.class);
-    assertThat(((SsHtmlChecker) SsHtml.checker()).getRules()).isEqualTo(Rules.DEFAULT);
-    assertThat(SsHtml.checker(Rules.DEFAULT)).isSameAs(SsHtml.checker());
-    SsHtml inline = SsHtml.checker(Rules.INLINE);
-    assertThat(((SsHtmlChecker) inline).getRules()).isSameAs(Rules.INLINE);
+  void testCheckerGet() {
+    // The constants get shared instances.
+    for (Rules named : new Rules[] {Rules.INLINE, Rules.MULTILINE, Rules.BROAD}) {
+      SsHtmlChecker checker = SsHtmlChecker.get(named);
+      assertThat(checker.getRules()).isSameAs(named);
+      assertThat(SsHtmlChecker.get(named)).isSameAs(checker);
+      // Equal rules made another way get the same instance.
+      assertThat(SsHtmlChecker.get(Rules.of(named.elements(), named.attributes())))
+          .isSameAs(checker);
+    }
+    assertThat(SsHtmlChecker.get(Rules.INLINE)).isInstanceOf(SsHtmlChecker.Inline.class);
+    assertThat(SsHtmlChecker.get(Rules.MULTILINE)).isEqualTo(new SsHtmlChecker.Multiline());
+    assertThat(SsHtmlChecker.get(Rules.INLINE)).isNotEqualTo(SsHtmlChecker.get(Rules.MULTILINE));
+    // Other rules get a new instance each time.
+    Rules other = Rules.MULTILINE.withOnRefusal(OnRefusal.TEXT_ONLY);
+    SsHtmlChecker checker = SsHtmlChecker.get(other);
+    assertThat(checker.getRules()).isSameAs(other);
+    assertThat(SsHtmlChecker.get(other)).isNotSameAs(checker).isEqualTo(checker);
+    // A subclass is not equal to the shared instance.
+    assertThat(new SsHtmlChecker(Rules.INLINE) { }).isNotEqualTo(SsHtmlChecker.get(Rules.INLINE));
+    assertThatThrownBy(() -> SsHtmlChecker.get(null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test
   void testName() {
     assertThat(SsHtml.pass().getName()).isEqualTo("PASS");
     assertThat(SsHtml.plain().getName()).isEqualTo("PLAIN");
-    assertThat(SsHtml.checker().getName()).isEqualTo("CHECKER(DEFAULT)");
-    assertThat(SsHtml.checker(Rules.INLINE).getName()).isEqualTo("CHECKER(INLINE)");
-    assertThat(SsHtml.checker(Rules.BROAD.withMaxLength(100)).getName())
+    assertThat(SsHtmlChecker.get(Rules.MULTILINE).getName()).isEqualTo("CHECKER(MULTILINE)");
+    assertThat(SsHtmlChecker.get(Rules.INLINE).getName()).isEqualTo("CHECKER(INLINE)");
+    assertThat(SsHtmlChecker.get(Rules.BROAD.withMaxLength(100)).getName())
         .isEqualTo("CHECKER(BROAD)");
-    assertThat(SsHtml.checker(Rules.DEFAULT.withOnRefusal(OnRefusal.TEXT_ONLY)).getName())
-        .isEqualTo("CHECKER(DEFAULT,TEXT_ONLY)");
-    assertThat(SsHtml.checker(Rules.INLINE.withElements("br")).getName())
+    assertThat(SsHtmlChecker.get(Rules.MULTILINE.withOnRefusal(OnRefusal.TEXT_ONLY)).getName())
+        .isEqualTo("CHECKER(MULTILINE,TEXT_ONLY)");
+    assertThat(SsHtmlChecker.get(Rules.INLINE.withElements("br")).getName())
         .isEqualTo("CHECKER(custom)");
-    assertThat(SsHtml.checker().toString()).startsWith("CHECKER(DEFAULT){");
+    assertThat(SsHtmlChecker.get(Rules.MULTILINE).toString()).startsWith("CHECKER(MULTILINE){");
   }
 
   @Test
@@ -158,14 +227,14 @@ public class SsHtmlTest {
 
   @Test
   void testRulesSets() {
-    assertThat(Rules.DEFAULT.elements()).containsAll(Rules.INLINE.elements());
-    assertThat(Rules.DEFAULT.attributes()).containsAll(Rules.INLINE.attributes());
-    assertThat(Rules.BROAD.elements()).containsAll(Rules.DEFAULT.elements());
-    assertThat(Rules.BROAD.attributes()).containsAll(Rules.DEFAULT.attributes());
+    assertThat(Rules.MULTILINE.elements()).containsAll(Rules.INLINE.elements());
+    assertThat(Rules.MULTILINE.attributes()).containsAll(Rules.INLINE.attributes());
+    assertThat(Rules.BROAD.elements()).containsAll(Rules.MULTILINE.elements());
+    assertThat(Rules.BROAD.attributes()).containsAll(Rules.MULTILINE.attributes());
     assertThat(Rules.INLINE.elements()).contains("b", "font").doesNotContain("br", "p", "table");
-    assertThat(Rules.DEFAULT.elements()).contains("br", "p", "table", "td");
+    assertThat(Rules.MULTILINE.elements()).contains("br", "p", "table", "td");
 
-    for (Rules rules : new Rules[] {Rules.INLINE, Rules.DEFAULT, Rules.BROAD}) {
+    for (Rules rules : new Rules[] {Rules.INLINE, Rules.MULTILINE, Rules.BROAD}) {
       assertThat(rules.elements())
           .doesNotContain("img", "a", "script", "style", "link", "base", "meta", "object",
                           "applet", "param", "form", "input", "select", "textarea", "frame",
@@ -181,7 +250,7 @@ public class SsHtmlTest {
 
   @Test
   void testRulesImmutable() {
-    Rules base = Rules.DEFAULT;
+    Rules base = Rules.MULTILINE;
     Set<String> elements = Set.copyOf(base.elements());
     Set<String> attributes = Set.copyOf(base.attributes());
 

@@ -1,6 +1,6 @@
 # SsHtml: a proposal for the SeeSaw main library
 
-Revision 6, 2026-11-17. Companion to the analysis of HTML in database text
+Revision 7, 2026-11-20. Companion to the analysis of HTML in database text
 (`SsHtml-analysis.md`).
 Measurements are from small tests on JDK 21.
 
@@ -20,22 +20,22 @@ implementing; where it differs from the earlier sections, section 10 is right.
   options for how to rewrite.
 - A component's verifier is held in `SsCommon`, not in a client property.
 - Dialogs are a separate, smaller fix.
-- Three rule sets: `Rules.INLINE`, `Rules.DEFAULT`, `Rules.BROAD` (section 5).
+- Three rule sets: `Rules.INLINE`, `Rules.MULTILINE`, `Rules.BROAD` (section 5).
 - Logging is immediate, once per new name (section 7).
-- The checker's default on refusal is `LITERAL`. A developer can move to `TEXT_ONLY` for release.
+- The built in rule sets show refused text `LITERAL`. A developer can move to `TEXT_ONLY` for
+  release.
 
 ## 2. How the default is found
 
 Recommendation: the Global holds the instance.
 
 ```java
-Globals.setOption(SsHtml.class, SsHtml.checker(Rules.INLINE));
+Globals.setOption(SsHtml.class, SsHtmlChecker.get(Rules.INLINE));
 ```
 
-`SsHtml.getDefault()` returns that instance. The library initialization sets it to
-`SsHtml.checker()` when the app has set nothing, following the pattern in `LookupDefaults`.
-`SsHtml.checker()` uses `Rules.DEFAULT`, a constant in the `Rules` class (section 5). So the
-default rules are in one place, and an app changes them with the one line above.
+`SsHtml.getDefault(comp)` returns that instance when the app has set one: it overrides the
+default for every component. Otherwise the library's default for the component's type comes from
+`LookupDefaults.getSsHtmlDefault(comp)`, the one place it is chosen. See section 10.
 
 Consistency: SeeSaw already does both.
 
@@ -60,14 +60,13 @@ public interface SsHtml {
   /** The test Swing uses: the first six characters are "<html>", ignoring case. */
   static boolean isHtml(String text) { ... }
 
-  /** The Global's instance, or checker() if none is set. */
-  static SsHtml getDefault() { ... }
+  /** The Global's instance; see section 10. */
+  static SsHtml getDefault(JComponent comp) { ... }
 
   // The implementations in core.
   static SsHtml pass() { ... }                 // show everything as Swing would
   static SsHtml plain() { ... }                // never render HTML
-  static SsHtml checker() { ... }              // checker(Rules.DEFAULT)
-  static SsHtml checker(Rules rules) { ... }
+  // A checker comes from SsHtmlChecker.get(Rules); see section 10.
 
   /** Decide how the text is displayed. Never throws, never returns null. */
   Display display(String text);
@@ -188,7 +187,7 @@ rewrite overrides that one method and inherits the parsing and the rules. Any ot
 ## 5. Rules
 
 `Rules` is an immutable value: the allowed elements, the allowed attributes, the refusal
-behaviour and a size limit. It is an argument of `SsHtml.checker(Rules)`. `pass()` and `plain()`
+behaviour and a size limit. It is the argument of `SsHtmlChecker.get(Rules)`. `pass()` and `plain()`
 have no rules. A contrib implementation may accept the same `Rules`, but nothing requires it.
 
 ### What is actually dangerous
@@ -222,8 +221,8 @@ one before:
 | Name | Contents | Meant for |
 |---|---|---|
 | `Rules.INLINE` | `b i u s em strong small big sub sup tt code font span`; attributes `color size face` | Table cells, combo and list items, one line labels |
-| `Rules.DEFAULT` | `INLINE` plus `br p div center pre blockquote hr`, `h1` to `h6`, `ul ol li dl dt dd`, `table tr td th caption`; attributes `align valign width height border bgcolor colspan rowspan cellpadding cellspacing nowrap` | Labels showing formatted text |
-| `Rules.BROAD` | `DEFAULT` plus `address basefont cite dfn dir kbd menu nobr samp var`; attributes `alink clear compact dir halign hspace lang link noshade start text title type value vlink vspace` | Apps with existing rich HTML that want to block only the known dangers |
+| `Rules.MULTILINE` | `INLINE` plus `br p div center pre blockquote hr`, `h1` to `h6`, `ul ol li dl dt dd`, `table tr td th caption`; attributes `align valign width height border bgcolor colspan rowspan cellpadding cellspacing nowrap` | Labels showing formatted text |
+| `Rules.BROAD` | `MULTILINE` plus `address basefont cite dfn dir kbd menu nobr samp var`; attributes `alink clear compact dir halign hspace lang link noshade start text title type value vlink vspace` | Apps with existing rich HTML that want to block only the known dangers |
 
 None of them allows `img`, `src`, `background` or `style`.
 
@@ -233,12 +232,12 @@ None of them allows `img`, `src`, `background` or `style`.
 returns a new one. The three sets are constants, and an app derives its own from one of them:
 
 ```java
-Rules.DEFAULT                                    // a constant; also INLINE and BROAD
-Rules.DEFAULT.withOnRefusal(OnRefusal.TEXT_ONLY) // a new Rules; DEFAULT is unchanged
+Rules.MULTILINE                                      // a constant; also INLINE and BROAD
+Rules.MULTILINE.withOnRefusal(OnRefusal.TEXT_ONLY)   // a new Rules; MULTILINE is unchanged
 Rules.INLINE.withElements("br").withMaxLength(4000)
-Rules.DEFAULT.withElements("img").withAttributes("img@src")   // the app's responsibility
-Rules.DEFAULT.withoutElements("table", "tr", "td", "th", "caption")
-Rules.of(elements, attributes)                   // from nothing
+Rules.MULTILINE.withElements("img").withAttributes("img@src")   // the app's responsibility
+Rules.MULTILINE.withoutElements("table", "tr", "td", "th", "caption")
+Rules.of(elements, attributes)                       // from nothing
 ```
 
 So the refusal behaviour is a property of the `Rules`, set with `withOnRefusal`. Because
@@ -257,7 +256,7 @@ tables. Block HTML does not work well in a cell anyway, since the row height is 
 ### Components
 
 `SsCommon` holds the component's verifier, with a setter and getter reached through
-`SsComponent`. Unset means `SsHtml.getDefault()`, resolved when text is displayed.
+`SsComponent`. Unset means `SsHtml.getDefault(comp)`, resolved when text is displayed.
 
 ```java
 setText(getSsCommon().displayText(this, text));                // SsLabel.java:162
@@ -331,23 +330,40 @@ are not changed.
 - **`Display.hasRisk()` is derived:** it is true when `notAllowed` is not empty. Text shown
   literally must name a reason, so `plain()` reports `html` as what it refused, and the limits
   report `(length)` and `(depth)`.
-- **`SsHtml.getName()`** gives a short name for logs: `PASS`, `PLAIN`, `CHECKER(DEFAULT)`,
+- **`SsHtml.getName()`** gives a short name for logs: `PASS`, `PLAIN`, `CHECKER(MULTILINE)`,
   `CHECKER(custom,TEXT_ONLY)`.
 - **The implementations register** with `@ServiceProvider` at the path `SS/Html`
-  (`SsHtml.PATH`): `SsHtmlPass`, `SsHtmlPlain` and `SsHtmlChecker`, whose no argument constructor
-  uses the default rules. `SsHtml.getAvailable()` lists them, and startup logs each one, so a
-  developer sees that there is a choice. A checker with other rules is a variation of a
-  registered one and is not listed.
-- **The default is set explicitly.** `LookupDefaults.initDefaults()` puts `SsHtml.checker()` in
-  `Globals` unless the application has set one, and logs the default. `SsHtml.getDefault()` only
-  falls back to the checker when nothing is set, which means the library was not initialized.
+  (`SsHtml.PATH`): `SsHtmlPass`, `SsHtmlPlain`, and for the three `Rules` constants
+  `SsHtmlChecker.Inline`, `.Multiline` and `.Broad`, small subclasses with a no argument
+  constructor. A registered instance equals (`equals`, not `==`) the one the static methods
+  return. `SsHtml.getAvailable()` lists them, and startup logs each one, so a developer sees that
+  there is a choice. A checker with other rules is not listed.
+- **The default is chosen in one place, by component type.** `SsHtml.getDefault(comp)` returns
+  the `SsHtml` in `Globals` if the application set one; that overrides the default for every
+  component. Otherwise it returns `LookupDefaults.getSsHtmlDefault(comp)`, which looks the
+  component up in a list of the SeeSaw components that show text that may be HTML (`SsLabel`,
+  `SsTable`, `SsList1`, `SsComboBox1`, `SsDbComboBox2`, `SsComboBox2`; each subclass before its
+  super class, and an unlisted subclass matches its super class) and has a default for any
+  other. For now each is `SsHtmlChecker.get(Rules.MULTILINE)`. `getSsHtmlDefaults()` returns
+  the list. Nothing in the `html` package says what the default is, and the library puts nothing
+  in `Globals`. Startup logs the application's `SsHtml`, or else the default for each type.
+  `Globals.setOption(cls, null)` now removes an option, so an application can drop its override.
+- **A presenter knows its owner**, the component whose text it shows, and asks
+  `getDefault(owner)`. For a renderer the owner is the table or list, not the renderer.
+  `SsCommon` passes its component and `SsTable` itself. A combo or list model has a presenter of
+  its own, with no owner, until its component installs its presenter; `SsList1` and
+  `SsComboBox2` always do.
+- **Checkers come from `SsHtmlChecker.get(Rules)`** (2026-11-20). For the three constants, or
+  rules equal to one, it returns a shared instance made eagerly; for other rules a new one. The
+  constructor is protected, for subclasses that override `refused()`. `SsHtml` has no `checker()`
+  methods: code that chooses rules uses `SsHtmlChecker`.
 - **`SsHtmlPresenter` instead of `SsCommon.displayText`.** The part that involves a component
   and the log is a small class of its own, because the table and the list models need it without
   an `SsCommon`. One presenter serves one source of text: `SsCommon` has one for its column, a
   combo or list model uses its component's, and `SsTable` has one for each column. A call site
   is `setText(presenter.prepare(this, text))`. It also holds the names already reported.
 - **`SsComponent` has `setSsHtml`, `getSsHtml` and `getSsHtmlPresenter`.** Unset means
-  `SsHtml.getDefault()`, resolved each time text is displayed.
+  `SsHtml.getDefault(comp)`, resolved each time text is displayed.
 - **`SsTable` has `setSsHtml` and `getSsHtml` for the whole table**, and a protected
   `TextRenderer` installed as the default renderer for `Object`. `ComboRenderer` and
   `DateRenderer` extend it. A renderer the application installs itself is not checked, unless
@@ -370,3 +386,44 @@ are not changed.
   constant allows: every element with every allowed attribute set to a URL, and every element
   inside every other. It fails on a fetch, a component in the label or an exception. It first
   proves that it can detect each of those.
+- **`Rules.DEFAULT` is renamed `Rules.MULTILINE`** (2026-11-20). The name says what the rule set
+  allows, and is no longer confused with the default `SsHtml`, which is whatever is in `Globals`.
+  A checker with `Rules.MULTILINE` is what the library sets when the application sets nothing.
+  Its name in the log is `CHECKER(MULTILINE)`. In the demo, `--rules=DEFAULT` is
+  now `--rules=MULTILINE` and the dataset `html-default` is now `html-multiline`.
+
+## 11. Performance
+
+Measured on JDK 21 with small tests (cloud container; absolute numbers vary, the ratios are the
+point).
+
+| Step | Cost | When |
+|---|---|---|
+| `SsHtml.isHtml(text)`, the `<html>` prefix test | about 2 ns | every text shown |
+| `SsHtml.getDefault(comp)` | about 260 ns | HTML text only, when no `SsHtml` is set on the component |
+| `SsHtmlChecker.display(text)`, parse of a short HTML string | about 3 to 10 us | HTML text only |
+| Swing's `setText` of HTML in a `JLabel` (builds the HTML view) | about 170 to 500 us | HTML text only; Swing's cost, with or without SsHtml |
+
+- **Plain text costs nothing.** The presenter returns before any lookup or parse unless the text
+  starts with `<html>`; a table of plain text pays only the prefix test per cell.
+- **Swing dominates for HTML.** The check adds a few percent to what Swing then does with the
+  text, so there is no cache of results. In a table the renderer is one component, so Swing
+  rebuilds the HTML view for each HTML cell on each paint; that is the main cost of HTML in a
+  table, and SsHtml does not change it.
+- **`getDefault(comp)`** is resolved each time, not fixed when the component is made, so an
+  override in `Globals` takes effect at once. Almost all of its 260 ns is
+  `Globals.getOption`, which makes a new `Lookup.Result` on each call; the walk over the per-type
+  list is a few ns. It could be near zero with `Globals.notifyOptionChange`, as in
+  `BorderDecorator.getBorderDecoratorPaint()`; note that a cached override must also handle the
+  option being removed (a null value), which that example ignores. Not done; not needed now.
+- **Limits stop work early.** Text longer than `maxLength` (32768) is refused without parsing.
+  `maxDepth` (32) stops nesting that would make Swing's renderer overflow the stack.
+- **`html.disable` on a shared renderer** is set and cleared as cells change. Swing reads the
+  flag only when the text changes, so when only the flag changes the presenter redoes the view
+  (`BasicHTML.updateRenderer`); that happens only for a refused cell next to an accepted one with
+  the same text, which is rare.
+- **Logging** is once per refused name per source, at most `SsHtmlPresenter.MAX_REPORTED` (20)
+  names, so a table full of refused HTML does not flood the log.
+- **Ideas, not done:** cache the `Globals` override as above; if HTML tables are ever slow, the
+  place to look is Swing's per-paint view building, for example a renderer that keeps the views
+  of recent cell texts, not the check.

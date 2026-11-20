@@ -44,6 +44,7 @@ import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
 import dev.visdb.seesaw.mock.Util;
 import dev.visdb.seesaw.navigate.RowsModel;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.SsUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,6 +69,9 @@ public class SsHtmlComponentsTest {
   @SuppressWarnings({"unused", "ConvertToTryWithResources"})
   static void setUpClass() throws Exception {
     Util.seesawInit();
+    // These tests expect the MULTILINE checker. Set it as the override so they
+    // do not depend on the library's defaults, which may be edited to try things.
+    Globals.setOption(SsHtml.class, SsHtmlChecker.get(Rules.MULTILINE));
     SsUtils.isJunit(); // Make sure it's set; it can not tell on the event thread.
     TestLogging.load();
     DbSupportFactory.setDbSupportGlobalOption(H2.getCon());
@@ -88,6 +92,7 @@ public class SsHtmlComponentsTest {
     // Anything that was fetched has arrived by now.
     Thread.sleep(500);
     server.stop(0);
+    Globals.setOption(SsHtml.class, null);
     assertThat(fetched).isEmpty();
   }
 
@@ -126,8 +131,8 @@ public class SsHtmlComponentsTest {
   @Test
   void testPresenter() throws Exception {
     onEdt(() -> {
-      SsHtmlPresenter presenter = new SsHtmlPresenter(() -> "testPresenter");
-      assertThat(presenter.getSsHtml()).isSameAs(SsHtml.getDefault());
+      SsHtmlPresenter presenter = new SsHtmlPresenter(null, () -> "testPresenter");
+      assertThat(presenter.getSsHtml()).isSameAs(SsHtml.getDefault(null));
       JLabel label = new JLabel();
 
       label.setText(presenter.prepare(label, PLAIN));
@@ -149,12 +154,12 @@ public class SsHtmlComponentsTest {
       label.setText(presenter.prepare(label, GOOD));
       assertShows(label, GOOD, false);
 
-      presenter.setSsHtml(SsHtml.checker(Rules.DEFAULT.withOnRefusal(OnRefusal.TEXT_ONLY)));
+      presenter.setSsHtml(SsHtmlChecker.get(Rules.MULTILINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
       label.setText(presenter.prepare(label, bad));
       assertShows(label, "bad", false);
 
       presenter.setSsHtml(null);
-      assertThat(presenter.getSsHtml()).isSameAs(SsHtml.getDefault());
+      assertThat(presenter.getSsHtml()).isSameAs(SsHtml.getDefault(null));
     });
   }
 
@@ -162,7 +167,7 @@ public class SsHtmlComponentsTest {
   @Test
   void testPresenterLeavesDisabled() throws Exception {
     onEdt(() -> {
-      SsHtmlPresenter presenter = new SsHtmlPresenter(() -> "testPresenterLeavesDisabled");
+      SsHtmlPresenter presenter = new SsHtmlPresenter(null, () -> "testPresenterLeavesDisabled");
       JLabel label = new JLabel();
       label.putClientProperty("html.disable", Boolean.TRUE);
       label.setText(presenter.prepare(label, bad));
@@ -199,7 +204,7 @@ public class SsHtmlComponentsTest {
 
     onEdt(() -> {
       Failing failing = new Failing();
-      SsHtmlPresenter presenter = new SsHtmlPresenter(() -> "testPresenterFailingSsHtml");
+      SsHtmlPresenter presenter = new SsHtmlPresenter(null, () -> "testPresenterFailingSsHtml");
       presenter.setSsHtml(failing);
       JLabel label = new JLabel();
       // Not HTML, so it is not asked.
@@ -219,7 +224,7 @@ public class SsHtmlComponentsTest {
   @Test
   void testPresenterManyReports() throws Exception {
     onEdt(() -> {
-      SsHtmlPresenter presenter = new SsHtmlPresenter(() -> "testPresenterManyReports");
+      SsHtmlPresenter presenter = new SsHtmlPresenter(null, () -> "testPresenterManyReports");
       JLabel label = new JLabel();
       for (int i = 0; i < 3 * SsHtmlPresenter.MAX_REPORTED; i++) {
         // An unknown element before any content is dropped by the parser.
@@ -280,7 +285,7 @@ public class SsHtmlComponentsTest {
     SsLabel refused = ssLabel(2);
     onEdt(() -> {
       assertShows(refused, bad, false);
-      assertThat(refused.getSsHtml()).isSameAs(SsHtml.getDefault());
+      assertThat(refused.getSsHtml()).isSameAs(SsHtml.getDefault(refused));
       // Text that the application sets is not checked.
       refused.setText(GOOD);
       assertThat(refused.getText()).isEqualTo(GOOD);
@@ -315,7 +320,7 @@ public class SsHtmlComponentsTest {
     onEdt(() -> {
       SsTable table = p_table[0];
       assertThat(table.getValueAt(1, 1)).isEqualTo(bad);
-      assertThat(table.getSsHtml()).isSameAs(SsHtml.getDefault());
+      assertThat(table.getSsHtml()).isSameAs(SsHtml.getDefault(table));
 
       // The renderer is one component; go down the column and back up.
       assertShows(cell(table, 0, 1), GOOD, true);
@@ -331,7 +336,7 @@ public class SsHtmlComponentsTest {
       assertShows(cell(table, 0, 1), GOOD, false);
       assertShows(cell(table, 1, 1), bad, false);
 
-      table.setSsHtml(SsHtml.checker(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
+      table.setSsHtml(SsHtmlChecker.get(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
       assertShows(cell(table, 0, 1), GOOD, true);
       assertShows(cell(table, 1, 1), "bad", false);
 
@@ -393,7 +398,7 @@ public class SsHtmlComponentsTest {
     assertShows(item(combo, 0), GOOD, false);
     assertShows(item(combo, 1), bad, false);
 
-    combo.setSsHtml(SsHtml.checker(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
+    combo.setSsHtml(SsHtmlChecker.get(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
     assertShows(item(combo, 0), GOOD, true);
     assertShows(item(combo, 1), "bad", false);
   }
