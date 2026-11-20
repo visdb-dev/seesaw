@@ -130,13 +130,13 @@ There is a separate example screen to demonstrate the Base SeeSaw Components.
 The sql scripts that load the demo database come in sets called datasets. With no option, the
 demo loads the original scripts. Pick another dataset with `--dataset=NAME`:
 
-    mvn exec:exec -Dargs="--dataset=html-default"
+    mvn exec:exec -Dargs="--dataset=html-multiline"
 
 | Dataset | Contents |
 | --- | --- |
 | html-inline | Inline html (`Rules.INLINE`) in names, cities and labels. |
-| html-default | html-inline plus multiline and block html (`Rules.DEFAULT`): br, p, pre, lists, tables, headings. |
-| html-restricted | html-default plus html no built-in Rules allows: img, style, form, frameset, deep nesting. |
+| html-multiline | html-inline plus multiline and block html (`Rules.MULTILINE`): br, p, pre, lists, tables, headings. |
+| html-restricted | html-multiline plus html no built-in Rules allows: img, style, form, frameset, deep nesting. |
 
 `--dataset-list` prints the datasets with their descriptions. `--dataset-check` shows, for each
 dataset and database server, which scripts the dataset has and which come from the original
@@ -148,24 +148,27 @@ A dataset is data only. H2 is the main path. With `mysql` or `-p`, the html data
 the original MySQL scripts, and `--dataset` can not be used with `-s`. `-d` writes a dataset's
 scripts as `dump.NAME.FILE`.
 
-`--rules=NAME` picks how database text that may be html is shown (the SsHtml set with
-`Globals.setOption`). The default is `DEFAULT`; `--rules-list` prints the names.
+`--rules=NAME` picks how database text that may be html is shown, for every component: the
+demo sets that SsHtml with `Globals.setOption`, which overrides the library's defaults. Without
+`--rules` the library's defaults, by component type, are used (see
+`LookupDefaults.getSsHtmlDefaults()`; today the MULTILINE checker for all). `--rules-list` prints
+the names.
 
 | Rules | Effect |
 | --- | --- |
 | PASS | no checking, html is shown as Swing does; for comparison only |
 | PLAIN | html is never rendered |
-| INLINE, DEFAULT, BROAD | the SsHtml Rules of that name |
-| IMG | `Rules.DEFAULT` plus img with src, width and height |
+| INLINE, MULTILINE, BROAD | the SsHtml Rules of that name |
+| IMG | `Rules.MULTILINE` plus img with src, width and height |
 | INLINE-TEXT | `Rules.INLINE`, refused html shown as text only |
 
 Suggested runs:
 
-    --dataset=html-inline --rules=INLINE        all html renders, on one line
-    --dataset=html-default --rules=INLINE       multiline html is refused, shown literally
-    --dataset=html-default --rules=DEFAULT      multiline html renders
-    --dataset=html-restricted --rules=DEFAULT   img, style, form, deep nesting are refused
-    --dataset=html-restricted --rules=IMG       the img in part 5 is fetched and shown
+    --dataset=html-inline --rules=INLINE          all html renders, on one line
+    --dataset=html-multiline --rules=INLINE       multiline html is refused, shown literally
+    --dataset=html-multiline --rules=MULTILINE    multiline html renders
+    --dataset=html-restricted --rules=MULTILINE   img, style, form, deep nesting are refused
+    --dataset=html-restricted --rules=IMG         the img in part 5 is fetched and shown
 
 With `--rules=PASS`, html-restricted fetches URLs, and labels 10 and 11 break Swing.
 

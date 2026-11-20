@@ -17,9 +17,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.JComponent;
+
 import org.openide.util.lookup.Lookups;
 
 import dev.visdb.seesaw.utils.Globals;
+import dev.visdb.seesaw.utils.LookupDefaults;
 
 /**
  * Decides how text that may be HTML is displayed.
@@ -37,21 +40,21 @@ import dev.visdb.seesaw.utils.Globals;
  * <ul>
  * <li>{@link #pass()}, everything is shown as Swing would show it;
  * <li>{@link #plain()}, text is never rendered as HTML;
- * <li>{@link #checker()} and {@link #checker(Rules)}, HTML that uses only
+ * <li>{@link SsHtmlChecker#get(Rules)}, HTML that uses only
  * the elements and attributes allowed by a {@link Rules} is shown as is,
- * anything else is shown literally; see {@link SsHtmlChecker}.
+ * anything else is shown literally.
  * </ul>
- * The default, {@link #getDefault()}, is the one in {@link Globals}.
- * The library initialization sets it to {@link #checker()} unless the
- * application has set one. For example, to never render HTML
+ * The default for a component is {@link #getDefault(JComponent)}.
+ * An application can override the default for every component
+ * by setting an {@code SsHtml} in {@link Globals}; for example, to never render HTML
  * {@snippet :
  * Globals.setOption(SsHtml.class, SsHtml.plain());
  * }
  * <p>
  * Implementations register at the lookup path {@link #PATH} so that
- * {@link #getAvailable()} can list the choices. A registered instance is
- * what its no argument constructor makes; a checker with other rules is
- * made with {@link #checker(Rules)}.
+ * {@link #getAvailable()} can list the choices. A checker with rules other
+ * than the {@code Rules} constants is made with {@link SsHtmlChecker#get(Rules)}
+ * and is not listed.
  * <p>
  * Text that is not HTML according to {@link #isHtml(String)} is never
  * a concern; every implementation returns it unchanged.
@@ -87,14 +90,17 @@ public interface SsHtml {
   }
 
   /**
-   * The default {@code SsHtml}: the one set in {@link Globals}.
-   * The library initialization sets {@link #checker()} if the application
-   * has not set one; see {@code LookupDefaults}.
-   * @return the default, never null; {@link #checker()} if none is set
+   * The default {@code SsHtml} for a component.
+   * If the application has set an {@code SsHtml} in {@link Globals},
+   * that is used for every component. Otherwise the library chooses,
+   * possibly by component type; see
+   * {@link LookupDefaults#getSsHtmlDefault(JComponent)}.
+   * @param comp the component that shows the text; null if there is none
+   * @return the default, never null
    */
-  static SsHtml getDefault() {
+  static SsHtml getDefault(JComponent comp) {
     SsHtml ssHtml = Globals.getOption(SsHtml.class);
-    return ssHtml != null ? ssHtml : checker();
+    return ssHtml != null ? ssHtml : LookupDefaults.getSsHtmlDefault(comp);
   }
 
   /**
@@ -114,25 +120,8 @@ public interface SsHtml {
   }
 
   /**
-   * A checker that uses {@link Rules#DEFAULT}.
-   * @return the default checker
-   */
-  static SsHtml checker() {
-    return SsHtmlChecker.DEFAULT;
-  }
-
-  /**
-   * A checker that uses the given rules.
-   * @param rules what is allowed
-   * @return a checker
-   */
-  static SsHtml checker(Rules rules) {
-    return rules.equals(Rules.DEFAULT) ? checker() : new SsHtmlChecker(rules);
-  }
-
-  /**
    * A short name for this {@code SsHtml}, for logs and messages;
-   * for example {@code PASS}, {@code PLAIN}, {@code CHECKER(DEFAULT)}.
+   * for example {@code PASS}, {@code PLAIN}, {@code CHECKER(MULTILINE)}.
    * It says which kind this is; it need not be unique.
    * @return the name
    */

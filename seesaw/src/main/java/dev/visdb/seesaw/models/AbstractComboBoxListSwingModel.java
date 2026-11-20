@@ -474,12 +474,13 @@ public abstract class AbstractComboBoxListSwingModel {
     return listItemFormatDelegate.listItemFormat;
   }
 
-  private SsHtmlPresenter htmlPresenter = new SsHtmlPresenter(() -> "list item");
+  // Until a component gives its own; the model does not know its component.
+  private SsHtmlPresenter htmlPresenter = new SsHtmlPresenter(null, () -> "list item");
 
   /**
    * Set the presenter that the cell renderers of this model use to show an
    * item's text, which may be HTML. Without this the renderers use
-   * {@link SsHtml#getDefault()}.
+   * {@code SsHtml.getDefault(null)}.
    * An {@code SsComponent} gives its own, see
    * {@link dev.visdb.seesaw.utils.SsComponent#getSsHtmlPresenter()}.
    * @param htmlPresenter the presenter to use

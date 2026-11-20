@@ -18,18 +18,30 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.System.Logger.Level;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import org.openide.util.lookup.Lookups;
 
 import dev.visdb.seesaw.SeeSaw;
+import dev.visdb.seesaw.SsComboBox1;
+import dev.visdb.seesaw.SsComboBox2;
+import dev.visdb.seesaw.SsDbComboBox2;
+import dev.visdb.seesaw.SsLabel;
+import dev.visdb.seesaw.SsList1;
+import dev.visdb.seesaw.SsTable;
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.Decorator;
 import dev.visdb.seesaw.decorators.DecoratorFactory;
 import dev.visdb.seesaw.decorators.TextStyles;
+import dev.visdb.seesaw.html.Rules;
 import dev.visdb.seesaw.html.SsHtml;
+import dev.visdb.seesaw.html.SsHtmlChecker;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.SsUtils.DecoratorPanelAdjustSOUTH;
 
@@ -166,6 +178,54 @@ public class LookupDefaults {
     }
   }
 
+  /**
+   * The library's default {@code SsHtml} for each SeeSaw component that
+   * shows database text that may be HTML; in order, a subclass before its
+   * super class. A subclass that is not listed gets the default of its
+   * super class.
+   */
+  private static final Map<Class<? extends JComponent>, SsHtml> SS_HTML_DEFAULTS;
+  /** The library's default {@code SsHtml} for any other component. */
+  private static final SsHtml SS_HTML_OTHERS = SsHtmlChecker.get(Rules.MULTILINE);
+  static {
+    // For now every component type has the same default.
+    Map<Class<? extends JComponent>, SsHtml> map = new LinkedHashMap<>();
+    map.put(SsLabel.class, SsHtmlChecker.get(Rules.MULTILINE));
+    map.put(SsTable.class, SsHtmlChecker.get(Rules.MULTILINE));
+    map.put(SsList1.class, SsHtmlChecker.get(Rules.MULTILINE));
+    map.put(SsComboBox1.class, SsHtmlChecker.get(Rules.MULTILINE));
+    map.put(SsDbComboBox2.class, SsHtmlChecker.get(Rules.MULTILINE));
+    map.put(SsComboBox2.class, SsHtmlChecker.get(Rules.MULTILINE));
+    SS_HTML_DEFAULTS = Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * The library's default {@code SsHtml} for a component, used when the
+   * application has not set one in {@link Globals}; see
+   * {@link SsHtml#getDefault(JComponent)}.
+   * This is the one place that the library's defaults are chosen.
+   * @param comp the component; null if there is none
+   * @return the default, never null
+   */
+  public static SsHtml getSsHtmlDefault(JComponent comp) {
+    if (comp != null) {
+      for (var entry : SS_HTML_DEFAULTS.entrySet()) {
+        if (entry.getKey().isInstance(comp))
+          return entry.getValue();
+      }
+    }
+    return SS_HTML_OTHERS;
+  }
+
+  /**
+   * The SeeSaw components that show database text that may be HTML,
+   * with the library's default {@code SsHtml} for each.
+   * @return the component types and their defaults, in lookup order
+   */
+  public static Map<Class<? extends JComponent>, SsHtml> getSsHtmlDefaults() {
+    return SS_HTML_DEFAULTS;
+  }
+
   private static void initDefaults() {
     initStyles();
 
@@ -187,16 +247,21 @@ public class LookupDefaults {
       logger.log(Level.INFO, sf("Available DecoratorFactory: '%s'", deco));
     }
 
-    // How text that may be HTML is displayed. The checker with the default
-    // rules, unless the app has chosen.
-    if (Globals.getOption(SsHtml.class) == null)
-      Globals.setOption(SsHtml.class, SsHtml.checker());
-
-    // For the record; these are the choices. An app may still set another.
+    // How text that may be HTML is displayed; see getSsHtmlDefault.
+    // For the record; these are the choices. An app may still set another,
+    // or a checker with its own Rules.
     for (SsHtml ssHtml : SsHtml.getAvailable()) {
       logger.log(Level.INFO, sf("Available SsHtml: '%s'", ssHtml.getName()));
     }
-    logger.log(Level.INFO, sf("SsHtml default: '%s'", SsHtml.getDefault().getName()));
+    SsHtml appSsHtml = Globals.getOption(SsHtml.class);
+    if (appSsHtml != null) {
+      logger.log(Level.INFO, sf("SsHtml default: '%s', set by the application",
+                                appSsHtml.getName()));
+    } else {
+      SS_HTML_DEFAULTS.forEach((type, ssHtml) -> logger.log(Level.INFO,
+          sf("SsHtml default for %s: '%s'", type.getSimpleName(), ssHtml.getName())));
+      logger.log(Level.INFO, sf("SsHtml default for others: '%s'", SS_HTML_OTHERS.getName()));
+    }
 
     // HACK for SimpleValidation, seems to be an off by one issue
     // TODO: could include style, allow multiple, then spin through

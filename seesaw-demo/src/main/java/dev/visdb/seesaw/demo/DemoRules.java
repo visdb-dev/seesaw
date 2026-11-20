@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import dev.visdb.seesaw.html.Rules;
 import dev.visdb.seesaw.html.Rules.OnRefusal;
 import dev.visdb.seesaw.html.SsHtml;
+import dev.visdb.seesaw.html.SsHtmlChecker;
 
 /**
  * The choices for {@code --rules}: how the demo shows database text that
@@ -35,14 +36,14 @@ final class DemoRules {
   static {
     add("PASS",        SsHtml::pass);
     add("PLAIN",       SsHtml::plain);
-    add("INLINE",      () -> SsHtml.checker(Rules.INLINE));
-    add("DEFAULT",     () -> SsHtml.checker(Rules.DEFAULT));
-    add("BROAD",       () -> SsHtml.checker(Rules.BROAD));
+    add("INLINE",      () -> SsHtmlChecker.get(Rules.INLINE));
+    add("MULTILINE",   () -> SsHtmlChecker.get(Rules.MULTILINE));
+    add("BROAD",       () -> SsHtmlChecker.get(Rules.BROAD));
     // An application that opts in to images.
-    add("IMG",         () -> SsHtml.checker(Rules.DEFAULT.withElements("img")
+    add("IMG",         () -> SsHtmlChecker.get(Rules.MULTILINE.withElements("img")
                                  .withAttributes("img@src", "img@width", "img@height")));
     // Refused text is shown with the markup removed, instead of literally.
-    add("INLINE-TEXT", () -> SsHtml.checker(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
+    add("INLINE-TEXT", () -> SsHtmlChecker.get(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
   }
 
   private DemoRules() {

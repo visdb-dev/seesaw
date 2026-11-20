@@ -13,7 +13,7 @@ Nov 19, 2026 · @Ernie Rael
 
 ## Summary
 
-Plan, updated after the review of 2026-11-19. A `db script set` is called a **dataset**. Each named dataset is a resource directory, `datasets/<name>/`. You select one with `--dataset=<name>`; the default, `""`, uses today's files where they are. Every script and load-list lookup goes through one small `DemoDataset` class. There are three html datasets, `html-inline`, `html-default` and `html-restricted`, and a `--rules=<name>` option picks the SsHtml the demo puts in `Globals`. Both options have static defaults in `main()`, and the demo never relies on a library default. All changes stay in seesaw-demo, and no code has been written yet.
+Plan, updated after the review of 2026-11-19. A `db script set` is called a **dataset**. Each named dataset is a resource directory, `datasets/<name>/`. You select one with `--dataset=<name>`; the default, `""`, uses today's files where they are. Every script and load-list lookup goes through one small `DemoDataset` class. There are three html datasets, `html-inline`, `html-multiline` and `html-restricted`, and a `--rules=<name>` option picks the SsHtml the demo puts in `Globals`. Both options have static defaults in `main()`, and the demo never relies on a library default. All changes stay in seesaw-demo, and no code has been written yet.
 
 Decided:
 
@@ -81,8 +81,8 @@ One resource, `/datasets/datasets.txt`, names the datasets and gives each a desc
 ```text
 # name: description          (the unnamed dataset "" is always present)
 html-inline: Inline html (Rules.INLINE) in names, cities and labels. Accepted html renders on one line; multiline html is refused.
-html-default: html-inline plus multiline and block html (Rules.DEFAULT): br, p, lists, tables, headings, pre.
-html-restricted: html-default plus html no built-in Rules allows: img, style, form, frameset. Records 8 and 9 break Swing with --rules=PASS.
+html-multiline: html-inline plus multiline and block html (Rules.MULTILINE): br, p, lists, tables, headings, pre.
+html-restricted: html-multiline plus html no built-in Rules allows: img, style, form, frameset. Records 8 and 9 break Swing with --rules=PASS.
 ```
 
 `--dataset-list` prints the names and descriptions and exits.
@@ -152,7 +152,7 @@ The database part only (agreed). The H2 path is the one used almost all the time
 
 ## Part 2: html datasets
 
-Three datasets, each a copy of `suppliers_and_parts.sql` and `tests.sql` with html added, and each a superset of the one before: `html-inline` (Rules.INLINE only), `html-default` (adds multiline, Rules.DEFAULT), `html-restricted` (adds what no built-in Rules allows). In each, only some rows get html, so plain, accepted and refused text alternate in the same column.
+Three datasets, each a copy of `suppliers_and_parts.sql` and `tests.sql` with html added, and each a superset of the one before: `html-inline` (Rules.INLINE only), `html-multiline` (adds multiline, Rules.MULTILINE), `html-restricted` (adds what no built-in Rules allows). In each, only some rows get html, so plain, accepted and refused text alternate in the same column.
 
 ### Where html is actually rendered
 
@@ -179,7 +179,7 @@ The combo and list items in TestBaseComponents (`comboItems`, `listItems`) are h
 
 ### Set 1: `html-inline`
 
-Only `b i u s strike em strong small big sub sup tt code font span` with `color size face`, so accepted html always renders on one line. Everything renders with `--rules=INLINE`, `DEFAULT` or `BROAD`. Includes three edge cases that are not html at all, so they show literally whatever `--rules` is.
+Only `b i u s strike em strong small big sub sup tt code font span` with `color size face`, so accepted html always renders on one line. Everything renders with `--rules=INLINE`, `MULTILINE` or `BROAD`. Includes three edge cases that are not html at all, so they show literally whatever `--rules` is.
 
 ```sql
 -- supplier_data: Example3 combo, Example7 grid
@@ -207,9 +207,9 @@ MERGE INTO part_data VALUES (1,'Nut', 0, 12, 'London');
 --   ss_text_area 1: '<html><b>Text Area</b> markup is shown literally here'
 ```
 
-### Set 2: `html-default`
+### Set 2: `html-multiline`
 
-Set 1 plus multiline and block html from Rules.DEFAULT (`br p div center pre blockquote hr h1-h6 ul ol li dl dt dd table tr td th caption`, `align valign width height border bgcolor colspan rowspan cellpadding cellspacing nowrap`). It renders with `--rules=DEFAULT` or `BROAD`. With `--rules=INLINE` the multiline rows show literally and one warning per column is logged; that is the main INLINE versus DEFAULT comparison.
+Set 1 plus multiline and block html from Rules.MULTILINE (`br p div center pre blockquote hr h1-h6 ul ol li dl dt dd table tr td th caption`, `align valign width height border bgcolor colspan rowspan cellpadding cellspacing nowrap`). It renders with `--rules=MULTILINE` or `BROAD`. With `--rules=INLINE` the multiline rows show literally and one warning per column is logged; that is the main INLINE versus MULTILINE comparison.
 
 "Multiline" covers both kinds: html that renders on several lines, and SQL literals that contain newlines.
 
@@ -238,7 +238,7 @@ The two-line part name is there to compare components: a combo popup cell should
 
 ### Set 3: `html-restricted`
 
-Set 2 plus html that none of Rules.INLINE, DEFAULT or BROAD allows. With any of those, each refused row shows literally and logs one WARNING per column with what was refused. Refused rows sit between accepted ones, which exercises the presenter turning `html.disable` on and off again on a shared renderer and on the SsLabel as you navigate. The last column says what Swing does with the row when nothing checks it, `--rules=PASS`.
+Set 2 plus html that none of Rules.INLINE, MULTILINE or BROAD allows. With any of those, each refused row shows literally and logs one WARNING per column with what was refused. Refused rows sit between accepted ones, which exercises the presenter turning `html.disable` on and off again on a shared renderer and on the SsLabel as you navigate. The last column says what Swing does with the row when nothing checks it, `--rules=PASS`.
 
 | Row (ss\_label unless noted) | Html | Refused as | Under `--rules=PASS` |
 | --- | --- | --- | --- |
@@ -255,12 +255,12 @@ Set 2 plus html that none of Rules.INLINE, DEFAULT or BROAD allows. With any of 
 
 #### What can throw or crash, and in which components
 
-Nothing that Rules.INLINE, DEFAULT or BROAD allows throws or crashes. `RulesRenderTest` renders everything each constant allows, alone and nested in each other, and fails on an exception, a fetch or a component in the label. Swing's two crash hazards are outside those lists, or are stopped by the checker's limits:
+Nothing that Rules.INLINE, MULTILINE or BROAD allows throws or crashes. `RulesRenderTest` renders everything each constant allows, alone and nested in each other, and fails on an exception, a fetch or a component in the label. Swing's two crash hazards are outside those lists, or are stopped by the checker's limits:
 
 | Hazard | Cause | Allowed by a Rules constant | Stopped by |
 | --- | --- | --- | --- |
 | `setText` throws a RuntimeException | `frame`, `frameset`, `noframes` | no | the element list |
-| StackOverflowError while rendering | nesting depth: fine at 256, failed at 512 nested tables | yes, the elements (`table`, `ul`, `blockquote`, ...) are in DEFAULT | `maxDepth` 32 and `maxLength` 32768 |
+| StackOverflowError while rendering | nesting depth: fine at 256, failed at 512 nested tables | yes, the elements (`table`, `ul`, `blockquote`, ...) are in MULTILINE | `maxDepth` 32 and `maxLength` 32768 |
 
 So a crash needs `--rules=PASS`, or a `DemoRules` entry a programmer adds that allows `frameset` or raises the limits.
 
@@ -286,9 +286,11 @@ All network targets are the project's own GitHub files or `.invalid`, so nothing
 
 `--rules=NAME` picks the SsHtml that `main()` puts in `Globals`. Like `--dataset`, it has a static default in `MainClass`. The demo never relies on the library's default SsHtml, which may change, perhaps per component type: `main()` always calls `Globals.setOption(SsHtml.class, ...)` before `SeeSaw.init()`.
 
+_Changed 2026-11-20:_ the `SsHtml` in `Globals` is now an override of the library's per-type defaults (PR 59). Without `--rules`, the demo sets nothing and the library's defaults apply; `--rules=NAME` sets the override for every component.
+
 ```java
 private static String dataset = "";
-private static String rules = "DEFAULT";
+private static String rules = "MULTILINE";
 ```
 
 The values live in one table, `DemoRules`. `PASS` and `PLAIN` are SsHtml kinds rather than Rules, but they are rules values too, so one option covers every choice. Adding a value is one line:
@@ -299,12 +301,12 @@ final class DemoRules {
   static {
     add("PASS",        SsHtml::pass);
     add("PLAIN",       SsHtml::plain);
-    add("INLINE",      () -> SsHtml.checker(Rules.INLINE));
-    add("DEFAULT",     () -> SsHtml.checker(Rules.DEFAULT));
-    add("BROAD",       () -> SsHtml.checker(Rules.BROAD));
-    add("IMG",         () -> SsHtml.checker(Rules.DEFAULT.withElements("img")
+    add("INLINE",      () -> SsHtmlChecker.get(Rules.INLINE));
+    add("MULTILINE",   () -> SsHtmlChecker.get(Rules.MULTILINE));
+    add("BROAD",       () -> SsHtmlChecker.get(Rules.BROAD));
+    add("IMG",         () -> SsHtmlChecker.get(Rules.MULTILINE.withElements("img")
                                  .withAttributes("img@src", "img@width", "img@height")));
-    add("INLINE-TEXT", () -> SsHtml.checker(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
+    add("INLINE-TEXT", () -> SsHtmlChecker.get(Rules.INLINE.withOnRefusal(OnRefusal.TEXT_ONLY)));
   }
   static void add(String name, Supplier<SsHtml> ssHtml);
   static SsHtml get(String name);   // ignores case; an unknown name is an error that lists the names
@@ -317,8 +319,8 @@ final class DemoRules {
 Suggested runs, each value given explicitly:
 
 1. `--dataset=html-inline --rules=INLINE`, then `--rules=PLAIN`.
-2. `--dataset=html-default --rules=DEFAULT`, then `--rules=INLINE`.
-3. `--dataset=html-restricted --rules=DEFAULT`, then `IMG`, then `PASS`.
+2. `--dataset=html-multiline --rules=MULTILINE`, then `--rules=INLINE`.
+3. `--dataset=html-restricted --rules=MULTILINE`, then `IMG`, then `PASS`.
 
 Interactive check of the write path: in Example1, type `<html><img src=...>` into a supplier name and save. Then open Example3 and see it refused in the combo.
 
@@ -329,7 +331,7 @@ One PR on one branch, as four commits that each build and run, so they can be re
 1. Move the database setup out of `MainClass` into `DemoDatabase.java` and give H2 a real `run()`. No behavior change.
 2. Add `DemoOptions`, `DemoScript`, `DemoDataset`, `--dataset`, `--dataset-list`, `--dataset-check` and the fallback dialog, with only the unnamed dataset. Same data as today.
 3. Add `DemoRules`, `--rules` and `--rules-list`.
-4. Add `datasets/datasets.txt` and the `html-inline`, `html-default` and `html-restricted` directories, plus a README section on datasets and the suggested runs.
+4. Add `datasets/datasets.txt` and the `html-inline`, `html-multiline` and `html-restricted` directories, plus a README section on datasets and the suggested runs.
 
 To verify during implementation (not questions):
 

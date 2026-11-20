@@ -665,7 +665,7 @@ in the SsComponent's constructor, but before bind.
    * or with a renderer, for example {@code SsLabel} and the combo and list
    * components; a text field never renders HTML.
    * @param ssHtml the {@code SsHtml} to use;
-   *        null to use {@link SsHtml#getDefault()}
+   *        null to use {@link SsHtml#getDefault(javax.swing.JComponent)}
    */
   default void setSsHtml(SsHtml ssHtml) {
     getSsHtmlPresenter().setSsHtml(ssHtml);
@@ -673,7 +673,7 @@ in the SsComponent's constructor, but before bind.
 
   /**
    * How text from the database that may be HTML is shown by this component.
-   * @return the {@code SsHtml} that was set, or else {@link SsHtml#getDefault()}
+   * @return the {@code SsHtml} that was set, or else {@link SsHtml#getDefault(javax.swing.JComponent)}
    */
   default SsHtml getSsHtml() {
     return getSsHtmlPresenter().getSsHtml();

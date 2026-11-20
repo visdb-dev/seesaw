@@ -865,10 +865,10 @@ public class SsTable extends JTable {
    * and by the combo and date renderers.
    * {@link dev.visdb.seesaw.html.Rules#INLINE} is meant for table cells, for example
    * {@snippet :
-   * table.setSsHtml(SsHtml.checker(Rules.INLINE));
+   * table.setSsHtml(SsHtmlChecker.get(Rules.INLINE));
    * }
    * @param ssHtml the {@code SsHtml} to use;
-   *        null to use {@link SsHtml#getDefault()}
+   *        null to use {@link SsHtml#getDefault(JComponent)}
    */
   public void setSsHtml(SsHtml ssHtml) {
     this.ssHtml = ssHtml;
@@ -879,10 +879,10 @@ public class SsTable extends JTable {
   /**
    * How text from the database that may be HTML is shown in the cells of
    * this table.
-   * @return the {@code SsHtml} that was set, or else {@link SsHtml#getDefault()}
+   * @return the {@code SsHtml} that was set, or else {@link SsHtml#getDefault(JComponent)}
    */
   public SsHtml getSsHtml() {
-    return ssHtml != null ? ssHtml : SsHtml.getDefault();
+    return ssHtml != null ? ssHtml : SsHtml.getDefault(this);
   }
 
   /**
@@ -893,7 +893,7 @@ public class SsTable extends JTable {
    */
   protected SsHtmlPresenter getSsHtmlPresenter(int modelColumn) {
     return htmlPresenters.computeIfAbsent(modelColumn, column -> {
-      SsHtmlPresenter presenter = new SsHtmlPresenter(() -> htmlSource(column));
+      SsHtmlPresenter presenter = new SsHtmlPresenter(this, () -> htmlSource(column));
       presenter.setSsHtml(ssHtml);
       return presenter;
     });

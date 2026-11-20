@@ -49,9 +49,11 @@ public class Globals {
    * Many items in the lookup act as options and an option can only have one value.
    * This method first removes any existing values of the given option type
    * and then adds the new option value to the lookup.
+   * A null option only removes the existing value.
    * @param <T> type of the Option to replace
    * @param clazz class of the option to remove
-   * @param option the item that replaces the existing value of the option
+   * @param option the item that replaces the existing value of the option;
+   *        null to remove it
    */
   public static <T> void setOption(Class<T> clazz, T option) {
     List<? extends T> all = (List<? extends T>)globals.lookupResult(clazz).allInstances();
@@ -59,7 +61,8 @@ public class Globals {
       throw new IllegalStateException(JStuff.sf("Only one value, not %s", all));
     if (!all.isEmpty())
       content.remove(all.get(0));
-    content.add(option);
+    if (option != null)
+      content.add(option);
   }
 
   /** Get the option from a lookup result.
