@@ -121,8 +121,8 @@ public class RulesRenderTest {
   }
 
   @Test
-  void testDefault() throws Exception {
-    checkRules("DEFAULT", Rules.DEFAULT);
+  void testMultiline() throws Exception {
+    checkRules("MULTILINE", Rules.MULTILINE);
   }
 
   @Test
@@ -142,7 +142,7 @@ public class RulesRenderTest {
   }
 
   private void checkRules(String name, Rules rules) throws Exception {
-    SsHtml checker = SsHtml.checker(rules);
+    SsHtml checker = SsHtmlChecker.get(rules);
     Set<String> elements = new TreeSet<>(rules.elements());
     elements.addAll(Rules.STRUCTURE);
     List<String> texts = new ArrayList<>();
@@ -187,10 +187,10 @@ public class RulesRenderTest {
     assertThat(fetched).as("fetched with Rules.%s", name).isEmpty();
   }
 
-  /** The deepest nesting that the default limit allows can be rendered. */
+  /** The deepest nesting that {@code DEFAULT_MAX_DEPTH} allows can be rendered. */
   @Test
   void testDepth() throws Exception {
-    SsHtml checker = SsHtml.checker(Rules.DEFAULT);
+    SsHtml checker = SsHtmlChecker.get(Rules.MULTILINE);
     int depth = Rules.DEFAULT_MAX_DEPTH;
     String[] texts = {
       "<html>" + "<table><tr><td>".repeat(depth / 3) + "x",

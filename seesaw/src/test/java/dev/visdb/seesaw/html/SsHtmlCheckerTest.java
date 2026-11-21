@@ -27,9 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * SsHtmlChecker: what it accepts, what it refuses and what it shows then.
  */
 public class SsHtmlCheckerTest {
-  private static final SsHtml CHECKER = SsHtml.checker();
+  private static final SsHtml CHECKER = SsHtmlChecker.get(Rules.MULTILINE);
   private static final SsHtml TEXT_ONLY
-      = SsHtml.checker(Rules.DEFAULT.withOnRefusal(OnRefusal.TEXT_ONLY));
+      = SsHtmlChecker.get(Rules.MULTILINE.withOnRefusal(OnRefusal.TEXT_ONLY));
 
   private static void assertAsIs(SsHtml ssHtml, String text) {
     Display display = ssHtml.display(text);
@@ -98,7 +98,7 @@ public class SsHtmlCheckerTest {
     assertRefused(CHECKER, "<html><head><title>t</title></head>x", "title");
     assertRefused(CHECKER, "<html><blockquote><title>t</title>", "title");
     // Elements that the parser adds are checked.
-    assertRefused(SsHtml.checker(Rules.INLINE.withElements("li")), "<html><li>x", "ul");
+    assertRefused(SsHtmlChecker.get(Rules.INLINE.withElements("li")), "<html><li>x", "ul");
     // One bad thing spoils good text.
     assertRefused(CHECKER, "<html><b>fine</b><i>fine</i><b onmouseover=x>no</b>",
                   "b@onmouseover");
@@ -117,17 +117,17 @@ public class SsHtmlCheckerTest {
 
   @Test
   void testRules() {
-    SsHtml inline = SsHtml.checker(Rules.INLINE);
+    SsHtml inline = SsHtmlChecker.get(Rules.INLINE);
     assertAsIs(inline, "<html><b>a</b><font color=red>b</font>");
     assertRefused(inline, "<html>a<br>b", "br");
     assertRefused(inline, "<html><p align=center>a", "p", "p@align");
     assertRefused(inline, "<html><table><tr><td>a", "table", "tr", "td");
 
-    SsHtml broad = SsHtml.checker(Rules.BROAD);
+    SsHtml broad = SsHtmlChecker.get(Rules.BROAD);
     assertAsIs(broad, "<html><kbd>a</kbd><ol start=3 type=a><li>x");
     assertRefused(CHECKER, "<html><kbd>a</kbd>", "kbd");
 
-    SsHtml img = SsHtml.checker(Rules.DEFAULT.withElements("img").withAttributes("img@src"));
+    SsHtml img = SsHtmlChecker.get(Rules.MULTILINE.withElements("img").withAttributes("img@src"));
     assertAsIs(img, "<html><img src=x>");
     // src is allowed on img only.
     assertRefused(img, "<html><img src=x><b src=y>z</b>", "b@src");
@@ -155,7 +155,7 @@ public class SsHtmlCheckerTest {
 
   @Test
   void testLimits() {
-    SsHtml small = SsHtml.checker(Rules.DEFAULT.withMaxLength(20).withMaxDepth(3));
+    SsHtml small = SsHtmlChecker.get(Rules.MULTILINE.withMaxLength(20).withMaxDepth(3));
     assertAsIs(small, "<html><b>12345</b>");
     assertRefused(small, "<html><b>123456789012</b>", SsHtmlChecker.REFUSED_LENGTH);
     Report report = small.inspect("<html><b>123456789012</b>");
@@ -163,14 +163,14 @@ public class SsHtmlCheckerTest {
     assertThat(report.elements()).isEmpty();
     assertThat(report.attributes()).isEmpty();
 
-    SsHtml shallow = SsHtml.checker(Rules.DEFAULT.withMaxDepth(3));
+    SsHtml shallow = SsHtmlChecker.get(Rules.MULTILINE.withMaxDepth(3));
     assertAsIs(shallow, "<html><body><table><tr><td>x");
     assertAsIs(shallow, "<html><b><i><u>x</u></i></b><b><i><u>y");
     assertRefused(shallow, "<html><table><tr><td><b>x", SsHtmlChecker.REFUSED_DEPTH);
 
     // Too long with TEXT_ONLY: nothing was parsed, so the original is shown.
-    SsHtml smallText = SsHtml.checker(
-        Rules.DEFAULT.withMaxLength(20).withOnRefusal(OnRefusal.TEXT_ONLY));
+    SsHtml smallText = SsHtmlChecker.get(
+        Rules.MULTILINE.withMaxLength(20).withOnRefusal(OnRefusal.TEXT_ONLY));
     assertRefused(smallText, "<html><b>123456789012</b>", SsHtmlChecker.REFUSED_LENGTH);
 
     // Deep nesting is refused, and does not break the parser.
@@ -234,7 +234,7 @@ public class SsHtmlCheckerTest {
   @Test
   void testRefusedOverrideFails() {
     String text = "<html><img src=x>";
-    SsHtml throwing = new SsHtmlChecker(Rules.DEFAULT) {
+    SsHtml throwing = new SsHtmlChecker(Rules.MULTILINE) {
       @Override
       protected Display refused(String text, Parsed parsed) {
         throw new IllegalStateException("test");
@@ -242,7 +242,7 @@ public class SsHtmlCheckerTest {
     };
     assertRefused(throwing, text, "img", "img@src");
 
-    SsHtml returnsNull = new SsHtmlChecker(Rules.DEFAULT) {
+    SsHtml returnsNull = new SsHtmlChecker(Rules.MULTILINE) {
       @Override
       protected Display refused(String text, Parsed parsed) {
         return null;
@@ -250,7 +250,7 @@ public class SsHtmlCheckerTest {
     };
     assertRefused(returnsNull, text, "img", "img@src");
 
-    SsHtml saysFine = new SsHtmlChecker(Rules.DEFAULT) {
+    SsHtml saysFine = new SsHtmlChecker(Rules.MULTILINE) {
       @Override
       protected Display refused(String text, Parsed parsed) {
         return Display.asIs(text);

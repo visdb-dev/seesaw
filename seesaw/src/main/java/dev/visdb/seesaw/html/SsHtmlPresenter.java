@@ -41,7 +41,8 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
  * for every cell.
  * <p>
  * The {@code SsHtml} used is the one given to {@link #setSsHtml(SsHtml)},
- * or else {@link SsHtml#getDefault()} at the time the text is shown.
+ * or else {@link SsHtml#getDefault(JComponent)} for the owner, at the time
+ * the text is shown.
  * <p>
  * Each thing that is refused is logged once, as a warning, the first time
  * it is seen from this source; see {@link #MAX_REPORTED}.
@@ -64,6 +65,7 @@ public final class SsHtmlPresenter {
 
   private static final int LOG_TEXT_LENGTH = 60;
 
+  private final JComponent owner;
   private final Supplier<String> source;
   private SsHtml ssHtml;
   private Set<String> reported;
@@ -71,16 +73,20 @@ public final class SsHtmlPresenter {
 
   /**
    * Create a presenter.
+   * @param owner the component whose text this shows, which may choose the
+   *        default {@code SsHtml}; for a renderer the table or list, not the
+   *        renderer. Null if there is none.
    * @param source names where the text comes from, for the log;
    *        for example a column name
    */
-  public SsHtmlPresenter(Supplier<String> source) {
+  public SsHtmlPresenter(JComponent owner, Supplier<String> source) {
+    this.owner = owner;
     this.source = source;
   }
 
   /**
    * Set the {@code SsHtml} to use for this source.
-   * @param ssHtml the {@code SsHtml}; null to use {@link SsHtml#getDefault()}
+   * @param ssHtml the {@code SsHtml}; null to use {@link SsHtml#getDefault(JComponent)}
    */
   public void setSsHtml(SsHtml ssHtml) {
     this.ssHtml = ssHtml;
@@ -90,10 +96,10 @@ public final class SsHtmlPresenter {
 
   /**
    * The {@code SsHtml} in use for this source.
-   * @return the one that was set, or else {@link SsHtml#getDefault()}
+   * @return the one that was set, or else {@link SsHtml#getDefault(JComponent)}
    */
   public SsHtml getSsHtml() {
-    return ssHtml != null ? ssHtml : SsHtml.getDefault();
+    return ssHtml != null ? ssHtml : SsHtml.getDefault(owner);
   }
 
   /**

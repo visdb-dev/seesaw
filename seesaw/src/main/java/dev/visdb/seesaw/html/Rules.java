@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -28,20 +29,20 @@ import java.util.TreeSet;
  * and a checker made from it, can be shared.
  * Start from one of the constants
  * {@snippet :
- * Rules.DEFAULT.withOnRefusal(OnRefusal.TEXT_ONLY);
+ * Rules.MULTILINE.withOnRefusal(OnRefusal.TEXT_ONLY);
  * Rules.INLINE.withElements("br").withMaxLength(4000);
- * Rules.DEFAULT.withoutElements("table", "tr", "td", "th", "caption");
+ * Rules.MULTILINE.withoutElements("table", "tr", "td", "th", "caption");
  * }
  * <p>
  * The three constants each contain the one before:
- * {@link #INLINE}, {@link #DEFAULT}, {@link #BROAD}.
+ * {@link #INLINE}, {@link #MULTILINE}, {@link #BROAD}.
  * None of them allows anything that was seen to fetch a URL, to put a
  * component in the label or to make {@code setText} throw; that is checked
  * by a test against the JDK's renderer. In particular none allows
  * {@code img}, or the attributes {@code src}, {@code background}
  * and {@code style}.
  * A {@code Rules} that adds such things can be made, for example
- * {@code Rules.DEFAULT.withElements("img").withAttributes("img@src")};
+ * {@code Rules.MULTILINE.withElements("img").withAttributes("img@src")};
  * the application is then responsible for where that text comes from.
  * <p>
  * Names are not case sensitive; they are kept in lower case.
@@ -74,10 +75,10 @@ public record Rules(Set<String> elements, Set<String> attributes, OnRefusal onRe
     TEXT_ONLY
   }
 
-  /** The default for {@link #maxLength()}. */
+  /** The {@link #maxLength()} of the constants and of {@link #of of}. */
   public static final int DEFAULT_MAX_LENGTH = 32 * 1024;
 
-  /** The default for {@link #maxDepth()}. */
+  /** The {@link #maxDepth()} of the constants and of {@link #of of}. */
   public static final int DEFAULT_MAX_DEPTH = 32;
 
   /** These elements are always allowed. */
@@ -97,7 +98,7 @@ public record Rules(Set<String> elements, Set<String> attributes, OnRefusal onRe
       names("color size face"));
 
   /**
-   * Formatted text; meant for labels. This is what {@link SsHtml#checker()} uses.
+   * Formatted text that may take several lines; meant for labels.
    * <p>
    * Adds to {@link #INLINE} the elements
    * {@code br p div center pre blockquote hr}, {@code h1} to {@code h6},
@@ -107,7 +108,7 @@ public record Rules(Set<String> elements, Set<String> attributes, OnRefusal onRe
    * <p>
    * It is a list of what is commonly useful, not of everything harmless.
    */
-  public static final Rules DEFAULT = INLINE
+  public static final Rules MULTILINE = INLINE
       .withElements(names("br p div center pre blockquote hr h1 h2 h3 h4 h5 h6"
                           + " ul ol li dl dt dd table tr td th caption"))
       .withAttributes(names("align valign width height border bgcolor"
@@ -117,7 +118,7 @@ public record Rules(Set<String> elements, Set<String> attributes, OnRefusal onRe
    * Nearly everything in which no harm was seen; meant for an application
    * that has existing rich HTML and wants to refuse only the known dangers.
    * <p>
-   * Adds to {@link #DEFAULT} the elements
+   * Adds to {@link #MULTILINE} the elements
    * {@code address basefont cite dfn dir kbd menu nobr samp var}
    * <br>and the attributes {@code alink clear compact dir halign hspace lang link
    * noshade start text title type value vlink vspace}.
@@ -128,7 +129,7 @@ public record Rules(Set<String> elements, Set<String> attributes, OnRefusal onRe
    * Also left out is {@code title}, which puts a component in the label
    * when it is written outside the {@code head}.
    */
-  public static final Rules BROAD = DEFAULT
+  public static final Rules BROAD = MULTILINE
       .withElements(names("address basefont cite dfn dir kbd menu nobr samp var"))
       .withAttributes(names("alink clear compact dir halign hspace lang link"
                             + " noshade start text title type value vlink vspace"));
@@ -141,15 +142,15 @@ public record Rules(Set<String> elements, Set<String> attributes, OnRefusal onRe
   public Rules {
     elements = normalize(elements);
     attributes = normalize(attributes);
-    if (onRefusal == null)
-      throw new NullPointerException("onRefusal");
+    Objects.requireNonNull(onRefusal, "onRefusal");
     if (maxLength < 0 || maxDepth < 0)
       throw new IllegalArgumentException("negative limit");
   }
 
   /**
    * A {@code Rules} that allows only the given elements and attributes,
-   * with {@link OnRefusal#LITERAL} and the default limits.
+   * with {@link OnRefusal#LITERAL}, {@link #DEFAULT_MAX_LENGTH}
+   * and {@link #DEFAULT_MAX_DEPTH}.
    * @param elements the allowed element names
    * @param attributes the allowed attributes, see {@link Rules}
    * @return the rules

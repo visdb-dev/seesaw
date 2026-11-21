@@ -41,8 +41,8 @@
  * copyright (C) 2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 
-/* Dataset html-default.
-   html-inline plus multiline and block html that Rules.DEFAULT accepts:
+/* Dataset html-multiline.
+   html-inline plus multiline and block html that Rules.MULTILINE accepts:
    br, p, pre, lists, tables, headings, hr, div. With --rules=INLINE those
    rows are shown literally. Label 6 is a literal with newlines in it;
    label 7 nests 30 div, just under the depth limit of 32.

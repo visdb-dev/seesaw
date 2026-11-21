@@ -150,6 +150,8 @@ final class SsCommon {
    */
   private SsCommon(SsComponent ssComponent, boolean finishInit) {
     this.ssComponent = ssComponent;
+    htmlPresenter = new SsHtmlPresenter(ssComponent instanceof JComponent comp ? comp : null,
+                                        this::getColumnForLog);
     decorator = Decorator.nullDecorator;
     textDecorator = TextDecorator.nullTextDecorator;
     validCondition = (ssComp) -> true;
@@ -966,7 +968,7 @@ final class SsCommon {
   }
 
   /** Shows this component's database text; holds its SsHtml. */
-  private final SsHtmlPresenter htmlPresenter = new SsHtmlPresenter(this::getColumnForLog);
+  private final SsHtmlPresenter htmlPresenter;
 
   /**
    * @return
