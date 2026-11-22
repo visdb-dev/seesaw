@@ -13,11 +13,8 @@ package dev.visdb.seesaw.html;
 
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.net.InetSocketAddress;
 import java.sql.JDBCType;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
 
 import javax.sql.RowSet;
 import javax.swing.JComboBox;
@@ -30,8 +27,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.sun.net.httpserver.HttpServer;
-
 import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.SsComboBox2;
 import dev.visdb.seesaw.SsLabel;
@@ -40,6 +35,7 @@ import dev.visdb.seesaw.SsTable;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
 import dev.visdb.seesaw.html.Rules.OnRefusal;
 import dev.visdb.seesaw.html.SsHtml.Display;
+import dev.visdb.seesaw.mock.FetchServer;
 import dev.visdb.seesaw.mock.H2;
 import dev.visdb.seesaw.mock.TestLogging;
 import dev.visdb.seesaw.mock.Util;
@@ -62,11 +58,10 @@ public class SsHtmlComponentsTest {
   private static final String PLAIN = "plain <b>text</b>";
   private static String bad;
 
-  private static HttpServer server;
-  private static final List<String> fetched = new CopyOnWriteArrayList<>();
+  private static FetchServer server;
 
   @BeforeAll
-  @SuppressWarnings({"unused", "ConvertToTryWithResources"})
+  @SuppressWarnings("unused")
   static void setUpClass() throws Exception {
     Util.seesawInit();
     // These tests expect the MULTILINE checker. Set it as the override so they
@@ -75,25 +70,18 @@ public class SsHtmlComponentsTest {
     SsUtils.isJunit(); // Make sure it's set; it can not tell on the event thread.
     TestLogging.load();
     DbSupportFactory.setDbSupportGlobalOption(H2.getCon());
-    server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-    server.createContext("/", exchange -> {
-      fetched.add(exchange.getRequestURI().getPath());
-      exchange.sendResponseHeaders(404, -1);
-      exchange.close();
-    });
-    server.setExecutor(Executors.newCachedThreadPool());
-    server.start();
-    bad = "<html><img src='http://127.0.0.1:" + server.getAddress().getPort() + "/x.png'>bad";
+    server = FetchServer.start();
+    bad = "<html><img src='" + server.url() + "x.png'>bad";
   }
 
   @AfterAll
   @SuppressWarnings("unused")
-  static void tearDownClass() throws InterruptedException {
-    // Anything that was fetched has arrived by now.
-    Thread.sleep(500);
-    server.stop(0);
+  static void tearDownClass() throws Exception {
+    // When the sentinel has arrived, anything that was fetched has.
+    List<String> others = server.awaitOthers();
+    server.stop();
     Globals.setOption(SsHtml.class, null);
-    assertThat(fetched).isEmpty();
+    assertThat(others).isEmpty();
   }
 
   private interface Body {

@@ -14,13 +14,10 @@ package dev.visdb.seesaw.html;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -29,7 +26,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.sun.net.httpserver.HttpServer;
+import dev.visdb.seesaw.mock.FetchServer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,30 +35,28 @@ import static org.assertj.core.api.Assertions.assertThat;
  * and check that nothing is fetched, no component is put in the label and
  * nothing is thrown. This is what backs the claim in {@link Rules}; it runs
  * against the JDK the tests run on.
+ * <p>
+ * Rendering does not depend on the Rules, only the checker does. Each Rules
+ * constant includes the one before it, so the texts that are the same for
+ * all of them, each element with one attribute and each element inside
+ * each other element, are rendered only for {@link Rules#BROAD}. The
+ * checker is asked about every text for every Rules.
  */
 public class RulesRenderTest {
-  private static HttpServer server;
+  private static FetchServer server;
   private static String url;
-  private static final List<String> fetched = new CopyOnWriteArrayList<>();
 
   @BeforeAll
-  @SuppressWarnings({"unused", "ConvertToTryWithResources"})
+  @SuppressWarnings("unused")
   static void startServer() throws IOException {
-    server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-    server.createContext("/", exchange -> {
-      fetched.add(exchange.getRequestURI().getPath());
-      exchange.sendResponseHeaders(404, -1);
-      exchange.close();
-    });
-    server.setExecutor(Executors.newCachedThreadPool());
-    server.start();
-    url = "http://127.0.0.1:" + server.getAddress().getPort() + "/";
+    server = FetchServer.start();
+    url = server.url();
   }
 
   @AfterAll
   @SuppressWarnings("unused")
   static void stopServer() {
-    server.stop(0);
+    server.stop();
   }
 
   /** What rendering did, other than a fetch. */
@@ -85,34 +80,27 @@ public class RulesRenderTest {
     return result[0];
   }
 
-  @SuppressWarnings("SleepWhileInLoop")
-  private static void awaitFetch() throws InterruptedException {
-    for (int i = 0; i < 100 && fetched.isEmpty(); i++) {
-      Thread.sleep(50);
-    }
-  }
-
   /** First make sure this test can see the things it claims do not happen. */
   @Test
   void testDetects() throws Exception {
-    fetched.clear();
+    server.clear();
     render("<html><img src='" + url + "detect.img'>");
-    awaitFetch();
-    assertThat(fetched).contains("/detect.img");
+    server.awaitAny();
+    assertThat(server.fetched()).contains("/detect.img");
 
-    fetched.clear();
+    server.clear();
     render("<html><table background='" + url + "detect.bg'><tr><td>x</table>");
-    awaitFetch();
-    assertThat(fetched).contains("/detect.bg");
+    server.awaitAny();
+    assertThat(server.fetched()).contains("/detect.bg");
 
-    fetched.clear();
+    server.clear();
     render("<html><ul style='list-style-image:url(" + url + "detect.css)'><li>x</ul>");
-    awaitFetch();
-    assertThat(fetched).contains("/detect.css");
+    server.awaitAny();
+    assertThat(server.fetched()).contains("/detect.css");
 
     assertThat(render("<html><input type=text>").components()).isGreaterThan(0);
     assertThat(render("<html><frameset><frame></frameset>").thrown()).isNotNull();
-    fetched.clear();
+    server.clear();
   }
 
   @Test
@@ -145,6 +133,18 @@ public class RulesRenderTest {
     SsHtml checker = SsHtmlChecker.get(rules);
     Set<String> elements = new TreeSet<>(rules.elements());
     elements.addAll(Rules.STRUCTURE);
+    // The shared texts are the same as BROAD's, apart from the names in the URLs;
+    // make sure of that, so that rendering them only for BROAD loses nothing.
+    boolean isBroad = rules.equals(Rules.BROAD);
+    if (!isBroad) {
+      assertThat(Rules.BROAD.elements()).containsAll(rules.elements());
+      assertThat(Rules.BROAD.attributes()).containsAll(rules.attributes());
+      for (String element : elements) {
+        assertThat(content(element, rules)).as(element)
+            .isEqualTo(content(element, Rules.BROAD));
+      }
+    }
+    List<String> shared = new ArrayList<>();
     List<String> texts = new ArrayList<>();
     for (String element : elements) {
       // The element with each allowed attribute by itself, then with all of them.
@@ -156,14 +156,14 @@ public class RulesRenderTest {
           continue;
         String attr = attribute.substring(at + 1);
         String value = " " + attr + "='" + url + name + "." + element + "." + attr + "'";
-        texts.add("<html><" + element + value + ">" + content + "</" + element + ">w");
+        shared.add("<html><" + element + value + ">" + content + "</" + element + ">w");
         all.append(value);
       }
       texts.add("<html><" + element + all + ">" + content + "</" + element + ">w");
       texts.add("<html><head><" + element + all + ">x</" + element + "></head>w");
       // Each element inside each other element.
       for (String inner : elements) {
-        texts.add("<html><" + element + ">a<" + inner + ">b</" + inner + ">c</" + element + ">");
+        shared.add("<html><" + element + ">a<" + inner + ">b</" + inner + ">c</" + element + ">");
       }
     }
     // Many at once, nested.
@@ -176,6 +176,14 @@ public class RulesRenderTest {
       texts.add(nested.toString());
     }
 
+    if (isBroad) {
+      texts.addAll(shared);
+    } else {
+      for (String text : shared) {
+        assertThat(checker.display(text).notAllowed()).as(text).isEmpty();
+      }
+    }
+    server.clear();
     for (String text : texts) {
       // The test is about what the checker accepts; it must accept all of these.
       assertThat(checker.display(text).notAllowed()).as(text).isEmpty();
@@ -183,8 +191,7 @@ public class RulesRenderTest {
       assertThat(rendered.thrown()).as(text).isNull();
       assertThat(rendered.components()).as(text).isZero();
     }
-    Thread.sleep(1000);
-    assertThat(fetched).as("fetched with Rules.%s", name).isEmpty();
+    assertThat(server.awaitOthers()).as("fetched with Rules.%s", name).isEmpty();
   }
 
   /** The deepest nesting that {@code DEFAULT_MAX_DEPTH} allows can be rendered. */
