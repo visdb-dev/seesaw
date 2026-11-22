@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import dev.visdb.seesaw.mock.FetchServer;
+import dev.visdb.seesaw.mock.TestMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,6 +42,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * all of them, each element with one attribute and each element inside
  * each other element, are rendered only for {@link Rules#BROAD}. The
  * checker is asked about every text for every Rules.
+ * <p>
+ * A quick run, see {@link TestMode}, renders an eighth of those texts.
  */
 public class RulesRenderTest {
   private static FetchServer server;
@@ -55,8 +58,11 @@ public class RulesRenderTest {
 
   @AfterAll
   @SuppressWarnings("unused")
-  static void stopServer() {
+  static void stopServer() throws Exception {
+    // In a full run, wait once more for anything loaded in the background.
+    List<String> others = server.awaitOthers(1000);
     server.stop();
+    assertThat(others).isEmpty();
   }
 
   /** What rendering did, other than a fetch. */
@@ -176,14 +182,16 @@ public class RulesRenderTest {
       texts.add(nested.toString());
     }
 
-    if (isBroad) {
-      texts.addAll(shared);
-    } else {
-      for (String text : shared) {
+    // The shared texts are rendered for BROAD; a quick run renders an eighth of them.
+    // The checker is asked about all of them.
+    int step = TestMode.fullOrQuick(1, 8);
+    for (int i = 0; i < shared.size(); i++) {
+      String text = shared.get(i);
+      if (isBroad && i % step == 0)
+        texts.add(text);
+      else
         assertThat(checker.display(text).notAllowed()).as(text).isEmpty();
-      }
     }
-    server.clear();
     for (String text : texts) {
       // The test is about what the checker accepts; it must accept all of these.
       assertThat(checker.display(text).notAllowed()).as(text).isEmpty();
@@ -191,7 +199,8 @@ public class RulesRenderTest {
       assertThat(rendered.thrown()).as(text).isNull();
       assertThat(rendered.components()).as(text).isZero();
     }
-    assertThat(server.awaitOthers()).as("fetched with Rules.%s", name).isEmpty();
+    // Fetched is not cleared, so a late fetch is seen by a later check, or in stopServer.
+    assertThat(server.awaitOthers(0)).as("fetched with Rules.%s", name).isEmpty();
   }
 
   /** The deepest nesting that {@code DEFAULT_MAX_DEPTH} allows can be rendered. */

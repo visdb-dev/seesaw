@@ -27,6 +27,34 @@ mvn -DskipTests package
 Build and test the Maven modules as appropriate for your environment; some
 demo/UI tests may need a graphical display.
 
+### Quick test runs
+
+Some tests mostly check the JDK, that its label renderer and image
+decoders do nothing unexpected, and some are fuzz tests. They take most of
+the test time. A quick run does a fraction of those cases; a full run is
+the default, and is what CI and an IDE run. For quick runs of your local
+Maven builds, add a profile to `~/.m2/settings.xml`:
+
+```xml
+<settings>
+  <profiles>
+    <profile>
+      <id>seesaw-quick-tests</id>
+      <properties>
+        <seesaw.test.quick>true</seesaw.test.quick>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>seesaw-quick-tests</activeProfile>
+  </activeProfiles>
+</settings>
+```
+
+For a full run, comment out the `activeProfile`, or run
+`mvn test -Dseesaw.test.quick=false`. Run the full tests from time to time,
+and when you change JDKs.
+
 ## Eclipse (m2e)
 
 1. Install Eclipse with Java support and **Maven Integration for Eclipse**

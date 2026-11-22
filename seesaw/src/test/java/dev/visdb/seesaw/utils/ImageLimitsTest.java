@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.Test;
 
+import dev.visdb.seesaw.mock.TestMode;
 import dev.visdb.seesaw.utils.ImageLimits.ImageLimitException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,9 +157,10 @@ public class ImageLimitsTest {
   void testCorruptImageIsIOException() throws IOException {
     // Whatever the decoder does with bad data, it is an IOException.
     Random random = new Random(42);
+    int count = TestMode.fullOrQuick(2000, 200);
     for (String format : new String[] {"png", "jpeg", "gif"}) {
       byte[] good = image(format);
-      for (int i = 0; i < 2000; i++) {
+      for (int i = 0; i < count; i++) {
         byte[] bytes = good.clone();
         for (int k = 0; k < 3; k++) {
           bytes[random.nextInt(bytes.length)] = (byte)random.nextInt();

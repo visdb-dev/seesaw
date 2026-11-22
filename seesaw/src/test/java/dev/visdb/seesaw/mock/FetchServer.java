@@ -105,12 +105,16 @@ public final class FetchServer {
   /**
    * Render a label that fetches, wait for its request, and return what
    * else was fetched since the last {@link #clear()}.
-   * @return 
-   * @throws java.lang.Exception 
+   * <p>
+   * In a full run, see {@link TestMode}, it then also waits graceMillis,
+   * in case some JDK loads an image in the background.
+   * @param graceMillis how long to wait after the sentinel in a full run
+   * @return the paths fetched, other than the sentinels
+   * @throws Exception from rendering the sentinel
    * @throws AssertionError if the sentinel's request does not arrive
    */
   @SuppressWarnings("SleepWhileInLoop")
-  public List<String> awaitOthers() throws Exception {
+  public List<String> awaitOthers(long graceMillis) throws Exception {
     String path = SENTINEL + sentinels.incrementAndGet() + ".png";
     SwingUtilities.invokeAndWait(() -> {
       JLabel label = new JLabel("<html><img src='" + url + path + "'>");
@@ -127,6 +131,8 @@ public final class FetchServer {
             + " so whether anything else was can not be told; fetched: " + fetched);
       Thread.sleep(10);
     }
+    if (!TestMode.quick())
+      Thread.sleep(graceMillis);
     List<String> others = new ArrayList<>();
     for (String p : fetched) {
       if (!p.startsWith("/" + SENTINEL))

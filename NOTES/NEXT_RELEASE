@@ -12,3 +12,8 @@ can allow it,
     Globals.setOption(SsHtml.class, SsHtmlChecker.get(Rules.MULTILINE.withElements("img").withAttributes("img@src")));
 or go back to the old behaviour with SsHtml.pass(); setSsHtml() does it
 for one component or one SsTable. See NOTES/SsHtml-design.md.
+
+Tests: a quick run does a fraction of the slowest test cases, those that
+mostly check the JDK's label renderer and image decoders, and the fuzz
+tests. Full runs are the default and what CI does; set the property
+seesaw.test.quick to true for quick local builds, see IDE_SETUP.md.

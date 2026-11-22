@@ -78,7 +78,7 @@ public class SsHtmlComponentsTest {
   @SuppressWarnings("unused")
   static void tearDownClass() throws Exception {
     // When the sentinel has arrived, anything that was fetched has.
-    List<String> others = server.awaitOthers();
+    List<String> others = server.awaitOthers(500);
     server.stop();
     Globals.setOption(SsHtml.class, null);
     assertThat(others).isEmpty();

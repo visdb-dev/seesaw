@@ -20,6 +20,7 @@ import dev.visdb.seesaw.html.Rules.OnRefusal;
 import dev.visdb.seesaw.html.SsHtml.Display;
 import dev.visdb.seesaw.html.SsHtml.Report;
 import dev.visdb.seesaw.html.SsHtmlChecker.Parsed;
+import dev.visdb.seesaw.mock.TestMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -268,8 +269,9 @@ public class SsHtmlCheckerTest {
       "html", "body", "head", "frameset", "x", "<b>", "</b>", "<table>", "<p", "<?", "<!",
     };
     Random random = new Random(20261116);
+    int count = TestMode.fullOrQuick(3000, 300);
     for (SsHtml ssHtml : new SsHtml[] {CHECKER, TEXT_ONLY}) {
-      for (int i = 0; i < 3000; i++) {
+      for (int i = 0; i < count; i++) {
         StringBuilder sb = new StringBuilder("<html>");
         int n = random.nextInt(40);
         for (int j = 0; j < n; j++) {
