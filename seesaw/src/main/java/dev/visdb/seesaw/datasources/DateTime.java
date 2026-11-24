@@ -38,10 +38,11 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
@@ -165,7 +166,7 @@ public class DateTime {
             .put(SsFormat.TIME_HHMMSS, List.of(strict(DateTimeFormatter.ISO_LOCAL_TIME),
                                                strict(DateTimeFormatter.ofPattern("HHmmss"))))
             .put(SsFormat.TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ,
-                 List.of(strict(DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]"))))
+                 List.of(getTimestampParser("uuuu-M-d")))
             .buildOrThrow();
 
   private static List<DateTimeFormatter> getInternalDateTimeParsers(RSC comp) {
@@ -185,10 +186,10 @@ public class DateTime {
             case MDY -> List.of(getMDYParser());
             case ISO ->
               List.of(strict(DateTimeFormatter.BASIC_ISO_DATE),
-                      strict(DateTimeFormatter.ISO_LOCAL_DATE));
+                      getRelaxedIsoLocalDateParser());
             case ALL ->
               List.of(getMDYParser(), strict(DateTimeFormatter.BASIC_ISO_DATE),
-                      strict(DateTimeFormatter.ISO_LOCAL_DATE));
+                      getRelaxedIsoLocalDateParser());
             default -> null;
           });
         case TIME -> new ArrayList<>(List.of(strict(DateTimeFormatter.ISO_LOCAL_TIME)));
@@ -230,11 +231,33 @@ public class DateTime {
     return strict(DateTimeFormatter.ofPattern("M/d/uuuu"));
   }
 
-  // These patterns have optional fraction and TZ.
+  /**
+   * Like {@link DateTimeFormatter#ISO_LOCAL_DATE}, but a one digit month
+   * or day is OK, as with {@link Date#valueOf(String)}; for example
+   * "2026-1-5". Everything ISO_LOCAL_DATE parses, this parses the same.
+   */
+  private static DateTimeFormatter getRelaxedIsoLocalDateParser() {
+    return strict(DateTimeFormatter.ofPattern("uuuu-M-d"));
+  }
+
+  // These patterns have an optional fraction.
   // The one with '-' is like ISO, but no 'T'.
   private static List<DateTimeFormatter> getLongTimestampParsers() {
-    return List.of(strict(DateTimeFormatter.ofPattern("M/d/uuuu HH:mm:ss[.SSS [xxx]]")),
-                   strict(DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]")));
+    return List.of(getTimestampParser("M/d/uuuu"), getTimestampParser("uuuu-M-d"));
+  }
+
+  /**
+   * A timestamp parser: the date pattern, then "HH:mm:ss", then an optional
+   * fraction of 1 to 9 digits, like {@link Timestamp#toString()}, for
+   * example ".0". There is no offset; a TIMESTAMP is a local date-time.
+   */
+  private static DateTimeFormatter getTimestampParser(String datePattern) {
+    return strict(new DateTimeFormatterBuilder()
+                      .appendPattern(datePattern + " HH:mm:ss")
+                      .optionalStart()
+                      .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+                      .optionalEnd()
+                      .toFormatter());
   }
 
   private record DtoParse(Temporal dto, boolean isError, Exception ex) {}
@@ -258,8 +281,8 @@ public class DateTime {
           case DATE -> dto = LocalDate.parse(text, formatter);
           case TIMESTAMP -> {
             // Prefer date/time but handle date only.
-            TemporalAccessor dt = formatter.parseBest(text, OffsetDateTime::from,
-                                                      LocalDateTime::from, LocalDate::from);
+            TemporalAccessor dt = formatter.parseBest(text, LocalDateTime::from,
+                                                      LocalDate::from);
             dto = switch (dt) {
               case LocalDateTime ldt -> ldt;
               case LocalDate ld -> LocalDateTime.of(ld, LocalTime.of(0, 0));
@@ -302,10 +325,10 @@ public class DateTime {
    */
   public static Object getSQLDateTimeObject(String text, RSC comp) {
     DtoParse dtoParse = internalDateTimeColumnParse(text, comp);
-    if (dtoParse.isError())
+    Temporal dto = dtoParse.dto();
+    if (dtoParse.isError() || dto == null) // null for blank text
       return null;
     JDBCType jdbcType = comp.getColumnJDBCType();
-    Temporal dto = dtoParse.dto();
     return switch (jdbcType) {
       case DATE -> Date.valueOf((LocalDate) dto);
       case TIME -> Time.valueOf((LocalTime) dto);

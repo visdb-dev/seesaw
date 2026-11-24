@@ -195,6 +195,26 @@ public class SsTableKeyAdapterTest {
   }
 
   @Test
+  void testPlainPasteDate() {
+    // Not an SsTable: a java.sql.Date column takes only yyyy-m-d.
+    DefaultTableModel model = new DefaultTableModel(
+        new Object[][] {{null}, {null}}, new Object[] {"D"}) {
+      @Override
+      public Class<?> getColumnClass(int column) {
+        return java.sql.Date.class;
+      }
+    };
+    JTable table = new JTable(model);
+    TestAdapter adapter = new TestAdapter(table);
+    select(table, 0, 0);
+    adapter.paste(table, "2026-1-5\n11/23/2026\n");
+    assertThat(table.getValueAt(0, 0)).isEqualTo(java.sql.Date.valueOf("2026-01-05"));
+    assertThat(table.getValueAt(1, 0)).isNull();
+    assertThat(adapter.messages).hasSize(1);
+    assertThat(adapter.messages.get(0)).contains("11/23/2026");
+  }
+
+  @Test
   void testPlainPasteTooManyColumnsOrRows() {
     JTable table = plainTable();
     TestAdapter adapter = new TestAdapter(table);
@@ -483,6 +503,45 @@ public class SsTableKeyAdapterTest {
       // The other cells were written.
       assertThat(dbRows()).containsExactly("text-1|31", "ok|7");
     });
+  }
+
+  @Test
+  void testPasteDates() throws Exception {
+    withSsTable((table) -> {
+      TestAdapter adapter = new TestAdapter(table);
+      // c_date is column 3. US, ISO and basic ISO dates; Feb 30 is refused.
+      select(table, 0, 3);
+      adapter.paste(table, "11/23/2026\n 2026-1-5 \n");
+      assertThat(adapter.messages).isEmpty();
+      select(table, 0, 3);
+      adapter.paste(table, "20260105\n2/30/2026\n");
+      assertThat(adapter.messages).hasSize(1);
+      assertThat(adapter.messages.get(0)).contains("Row 2").contains("2/30/2026");
+      assertThat(dbDates()).containsExactly("2026-01-05", "2026-01-05");
+    });
+  }
+
+  @Test
+  void testBadDateTextIsNotNull() throws Exception {
+    withSsTable((table) -> {
+      // Text that is not a date is refused; the cell is not set to null.
+      assertThat(table.getModel().trySetValueAt("not a date", 0, 3))
+          .contains("not a date").contains("DATE");
+      assertThat(table.getModel().trySetValueAt("11/23/2026", 1, 3)).isNull();
+      assertThat(dbDates()).containsExactly("2000-01-11", "2026-11-23");
+    });
+  }
+
+  /** @return c_date for each row, by primary key */
+  private static List<String> dbDates() throws SQLException, ClassNotFoundException {
+    List<String> rows = new ArrayList<>();
+    try (Statement stmt = H2.getCon().createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT c_date FROM tbl ORDER BY tbl_pk")) {
+      while (rs.next()) {
+        rows.add(String.valueOf(rs.getDate(1)));
+      }
+    }
+    return rows;
   }
 
   @Test

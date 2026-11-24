@@ -17,3 +17,13 @@ Tests: a quick run does a fraction of the slowest test cases, those that
 mostly check the JDK's label renderer and image decoders, and the fuzz
 tests. Full runs are the default and what CI does; set the property
 seesaw.test.quick to true for quick local builds, see IDE_SETUP.md.
+
+SsTable paste parses DATE, TIME and TIMESTAMP cells like the cell editor
+does, see DateTime; for example a date can be 11/23/2026, 2026-11-23,
+2026-1-5 or 20261123. Before, only yyyy-m-d was accepted for a date.
+Text that is not a valid date/time is reported as a cell that was not
+written; before, a TIME or TIMESTAMP cell was set to null. A timestamp
+fraction can have 1 to 9 digits, as Timestamp.toString() makes, so a
+copied timestamp can be pasted. A TIMESTAMP no longer takes an offset,
+such as " -08:00", since it is a local date-time; before, such text
+parsed but then set the cell to null.

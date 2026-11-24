@@ -552,6 +552,9 @@ rows.
         final JDBCType type = RowSetOps.getJDBCColumnType(rowset, column + 1);
         if (DateTime.isHandledDateTimeJDBCType(type) && value instanceof String string) {
           value = getSQLDateTimeObject(string, RSC.get(rowsModel, column + 1));
+          if (value == null && !string.isBlank())
+            return sf("'%s' is not a valid %s for column '%s'.", string, type.getName(),
+                      columnLabel(column));
         }
         if (cellEditing != null
             && !cellEditing.cellUpdateRequested(rowCount, column, null, value))
@@ -878,6 +881,11 @@ be done after row insertion, and deletion.
     // If copying values the date will come as string so convert it to date object.
     if (DateTime.isHandledDateTimeJDBCType(type) && value instanceof String string) {
       value = getSQLDateTimeObject(string, RSC.get(rowsModel, column + 1));
+      // Text that is not a date/time is an error; do not write null.
+      if (value == null && !string.isBlank()) {
+        messageDialog(sf("'%s' is not a valid %s.\n", string, type.getName()), null);
+        return;
+      }
     }
 
     // If cell editing interface implementation is provided info the user

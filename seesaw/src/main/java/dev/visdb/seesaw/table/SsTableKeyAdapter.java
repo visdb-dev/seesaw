@@ -66,6 +66,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 import dev.visdb.seesaw.SsTable;
+import dev.visdb.seesaw.datasources.DateTime;
+import dev.visdb.seesaw.datasources.RSC;
 import dev.visdb.seesaw.datasources.RowSetOps;
 import dev.visdb.seesaw.utils.JStuff;
 
@@ -93,6 +95,18 @@ public class SsTableKeyAdapter extends KeyAdapter {
    * @throws Exception catch all exception
    */
   protected static Object getObjectToSet(JTable jTable, int column, String value) throws Exception {
+    // A date/time is parsed like the cell editor parses it, see DateTime.
+    if (value != null && jTable instanceof SsTable ssTable) {
+      final RSC comp = RSC.get(ssTable.getRowsModel(),
+                               ssTable.convertColumnIndexToModel(column) + 1);
+      if (DateTime.isHandledDateTimeJDBCType(comp.getColumnJDBCType())) {
+        final Object dateTime = DateTime.getSQLDateTimeObject(value.trim(), comp);
+        if (dateTime == null)
+          throw new IllegalArgumentException(
+              sf("not a valid %s", comp.getColumnJDBCType().getName()));
+        return dateTime;
+      }
+    }
     // GET THE COLUMN CLASS
     final Class<?> objectClass = jTable.getColumnClass(column);
     Object newValue = null;
@@ -100,7 +114,7 @@ public class SsTableKeyAdapter extends KeyAdapter {
       // CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
       if (value != null) {
         // DATE CLASS DOESN'T HAVE A CONSTRUCTOR THAT TAKES A STRING
-        if (objectClass.equals(java.sql.Date.class)) {
+        if (java.sql.Date.class.isAssignableFrom(objectClass)) {
           newValue = Date.valueOf(value);
         } else if (objectClass.equals(Object.class)) {
           newValue = value;
