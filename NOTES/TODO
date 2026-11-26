@@ -177,12 +177,41 @@ Could
 
 ================================================================================
 
+SsHtml
+------
+- Can the comboboxes be setup with the editor doing html rendering? How much work?
+  Only if not-editable?
+- Show the Html in a tooltip?
+
+Demo/SsHtml
+-----------
+
+Later:
+- Maybe a csv directory with csv data. Develop scripts to load it into an
+  arbitrary DB server.
+
+- Adding a server later. May want to point the demo at a local directory,
+  instead of something from resources. Would that be a new kind of DbServer?
+  Codify file names? Just run the files you find?
+- SsHtml.getDefault() could listen for global value. Rather than doing getOption
+  each time.
+
+================================================================================
+
 SsTable (DataGrid)
 
 - SsTableModel.setMessageWindow sets dialog parent.
 - See LibDBMS "For error dialog, getting JTable from TableModel in Java"
 - ? Optionally throw an exception
 
+- sstable-paste-and-sshtml/SUMMARY.md in ClaudeScratch has a good "for later" list;
+  the next few item also from that SUMMARY.md.
+- table paste undo, both after failure and as a general option.
+- table paste coordinator; helper.
+- When selecting cells, like for a copy, display selected cells (not rows). Show some
+  kind of indicator on the window/table that indicates there's a selection.
+- table.setSsDataValue, see example in SsTable class description.
+  Can key generation have an assist in DbSupport
 - In DataGrid.bind(), callExecute. Is callExecute needed?
 - For setValueAt() cache current getValueAt from database.
 - date/time popup for editing
@@ -207,11 +236,16 @@ SsTable (DataGrid)
     FocusGained - cast "(JTextField)" was "(SSTextField)"
     constructor - "super(new TextField())" was "super(new SSTextField())"
         Does this need to be seesaw?
-
 ================================================================================
 
 Currently disabled. SSCommon.isRestoreOnError().  Inconsistently used:
 
+================================================================================
+Discrepency betwee column label and column name. Docs say "columnLabel - the label
+for the column specified with the SQL AS clause. If the SQL AS clause was not
+specified, then the label is the name of the column". But I think JdbcRowSetIml
+always uses columName. There's some experimental code around, probably in
+datasources, that tries to deal with this.
 ================================================================================
 DbOpsCreator, DbOpsBase
 -----------------------
@@ -283,7 +317,8 @@ Performance note. A lot of of dbOps.perform*Ops is to re-execute the query
 after insert/delete so that that the resultSet has all the rows. Could be
 expensive. (A lot cheaper than the engineering time to try an keep things
 in sync without accessing the database). H2 does this. There's metadata for
-whether or not added rows are visible in result set.
+whether or not added rows are visible in result set. Maybe CachedRowSet is the
+solution
 
 There is metadata
     boolean ownInsertsAreVisible(int) throws SQLException
@@ -325,8 +360,8 @@ non-intrusive dialog with please wait (but only if somethings taking too long)
 
 ================================================================================
 
-javadoc
--------
+javadoc or wiki
+---------------
 Supported column types and mention DbRead/DbWriter for other cases.
 
 KeyDisplayValueSwingModel document EventList lock and general locking
@@ -530,8 +565,11 @@ Examine, for CachedRowSet, SSUtils get/set PrimaryKey stuff, key_seq misused I t
 Many databases have extended metadata for example. lookup stuff for keys info.
 
 ================================================================================
-Create a ResultSet. AI recommends CachedRowSet. Some discussion on building
-an AbstractRowSet at /src/swingset/Code/ResultSetOptions.
+Create an arbitray RowSet (not one delived from a database); handle various data
+models. Data backed by a 2D array or <List<List>>, no additional allocation. Also a
+version that handles the data embedded in the RowSet. AI recommends building on top
+of CachedRowSet. Some discussion on building an AbstractRowSet in @RESULT_SET_PROXY
+file looks interesting. /src/swingset/Code/ResultSetOptions.
 ================================================================================
 
 What happens if on insert row and do an execute?
@@ -1053,11 +1091,10 @@ to be "final" in SSComponent. HARD TO DO and COMPILE.
 About using JavaRx instead of EventBus. For EventBus disadvantages see
     https://github.com/google/guava/wiki/EventBusExplained
 JavaRx has many features that are not needed for SS. Looking through the
-disadvantages, there is little that affects SS.
-It does have the advantages of a cleaner, albeit much more complex,
-UI; more complexity for
-little additional benefit. A real advantage would be if SS wants to use R8 and
-Proguard. If/when SS uses more features
+disadvantages, there is little that affects SeeSaw.
+It does have the advantages of a cleaner, albeit much more complex, API;
+more complexity for little additional benefit. A real advantage would be if SS wants
+to use R8 and Proguard. If/when SS uses more features
 
 EventBus replacement
 
@@ -1089,6 +1126,7 @@ https://stackoverflow.com/questions/29773390/getting-the-date-from-a-resultset-f
 
 Today most of us are using JDBC 4.2 compliant drivers, which improves the
 situation quite a bit compared to the answers from 2015.
+Require a minimum of JDBC 4.2 driver for SeeSaw?
 
 To get a LocalDate from your result set:
 
@@ -1203,3 +1241,4 @@ Bug with column name when "as xxx" phrase.
 - updateObject does the conversions specified by appendix B.5 for setObject.
 - overflow exceptions possible when narrowing
 
+================================================================================
