@@ -114,7 +114,7 @@
     <!-- Plugins -->
     <versions-maven-plugin.version>2.25.2</versions-maven-plugin.version>
     <maven-enforcer-plugin.version>3.7.0</maven-enforcer-plugin.version>
-    <extra-enforcer-rules.version>1.12.1</extra-enforcer-rules.version>
+    <extra-enforcer-rules.version>1.13.0</extra-enforcer-rules.version>
     <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
@@ -134,7 +134,7 @@
     <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
     <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
     <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
-    <flatten-maven-plugin.version>1.9.0</flatten-maven-plugin.version>
+    <flatten-maven-plugin.version>1.10.0</flatten-maven-plugin.version>
 
     <!-- Security -->
     <dependency-check-maven.version>13.0.0</dependency-check-maven.version>
