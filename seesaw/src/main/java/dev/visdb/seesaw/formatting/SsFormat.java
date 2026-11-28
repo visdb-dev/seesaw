@@ -74,11 +74,16 @@ public enum SsFormat {
   /** Time HHMMSS */
   TIME_HHMMSS(TIME),
 
-  /** default timestamp format */
+  /** default timestamp format, {@link #TIMESTAMP_YYYYMMDD_STROKE_HHMMSS} */
   TIMESTAMP,
-  /** Timestamp big */
+  /**
+   * Timestamp with milliseconds and an offset.
+   * @deprecated Not yet implemented. A TIMESTAMP is a local date-time,
+   * the offset shown is the JVM's and the text does not validate.
+   */
+  @Deprecated
   TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ(TIMESTAMP),
-  /** Timestamp date-time, no milliseconds timezone */
+  /** Timestamp date-time, no milliseconds, no offset */
   TIMESTAMP_YYYYMMDD_STROKE_HHMMSS(TIMESTAMP),
   /** Timestamp date, no date, milliseconds, timezone */
   TIMESTAMP_YYYYMMDD_STROKE(TIMESTAMP),
@@ -89,8 +94,7 @@ public enum SsFormat {
     return switch (format.getType()) {
       case DATE -> DATE_MMDDYYYY_SLASH;
       case TIME -> TIME_HHMMSS;
-      //case TIMESTAMP -> TIMESTAMP_YYYYMMDD_HHMMSS;
-      case TIMESTAMP -> TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ;
+      case TIMESTAMP -> TIMESTAMP_YYYYMMDD_STROKE_HHMMSS;
       default -> format; // XXX
     };
   }

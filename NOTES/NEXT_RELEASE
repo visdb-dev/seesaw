@@ -27,3 +27,11 @@ fraction can have 1 to 9 digits, as Timestamp.toString() makes, so a
 copied timestamp can be pasted. A TIMESTAMP no longer takes an offset,
 such as " -08:00", since it is a local date-time; before, such text
 parsed but then set the cell to null.
+
+The default SsTimestampField format, SsFormat.TIMESTAMP, is now
+TIMESTAMP_YYYYMMDD_STROKE_HHMMSS, for example "2026-11-23 10:15:30".
+Before, it was TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ, which showed
+milliseconds and the JVM's offset; that text never validated, so the
+field was marked as an error. TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ is
+deprecated, not yet implemented. Editing a value with a fraction of a
+second drops the fraction.
