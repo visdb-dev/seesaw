@@ -79,7 +79,8 @@ public class SsCurrencyField extends NumberField {
    *
    * @param precision     - number of digits needed for integer part of the number
    * @param decimals      - number of digits needed for the fraction part of the number
-   * @param editLocale  - locale to be used while in editing mode
+   * @param editLocale  - locale to be used while in editing mode;
+   *                      if null, displayLocale
    * @param displayLocale - locate to be used for displaying the number
    */
   public SsCurrencyField(int precision, int decimals, Locale editLocale, Locale displayLocale) {
@@ -100,7 +101,7 @@ public class SsCurrencyField extends NumberField {
    * @param ssFormat
    * @param precision - number of digits needed for integer part of the number
    * @param decimals - number of digits needed for fraction part of the number
-   * @param editLocale - locale while editing
+   * @param editLocale - locale while editing; if null, displayLocale
    * @param displayLocale - locale while not editing
    * @return FormatterFactory.
    */
@@ -117,7 +118,8 @@ public class SsCurrencyField extends NumberField {
                                      displayLocale != null ? displayLocale : defaultLocale));
     // For editing use a plain number
     NumberFormat editFormat = createNumberFormat(
-        () -> NumberFormat.getInstance(displayLocale != null ? displayLocale : defaultLocale));
+        () -> NumberFormat.getInstance(editLocale != null ? editLocale
+                                       : displayLocale != null ? displayLocale : defaultLocale));
 
     initPrecision(precision, editFormat, displayFormat);
     initDecimals(decimals, editFormat, displayFormat);

@@ -82,7 +82,6 @@ public class SsTimeField extends DateTimeField {
    */
   public SsTimeField(AbstractFormatterFactory factory) {
     super(factory);
-    setValue(new java.util.Date());
   }
 
   /**

@@ -211,7 +211,7 @@ public class MaskFormatterFactory extends FormatterFactory {
         mf.setValidCharacters(validCharacters);
       }
       if (invalidCharacters != null) {
-        mf.setValidCharacters(invalidCharacters);
+        mf.setInvalidCharacters(invalidCharacters);
       }
       if (placeholder != null) {
         mf.setPlaceholder(placeholder);

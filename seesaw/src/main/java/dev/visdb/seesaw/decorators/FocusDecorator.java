@@ -43,16 +43,27 @@
 
 package dev.visdb.seesaw.decorators;
 
+import java.awt.Component;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.lang.System.Logger;
 
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
+import dev.visdb.seesaw.utils.SsUtils;
 
 /**
  * Base class for decorators that use Focus.
+ * <p>
+ * Decorating does nothing until the component is inside a decorator panel,
+ * see {@link SsUtils#createDecoratorPanel(java.awt.Component)}; so
+ * the component is also decorated when it, or a panel holding it, is
+ * added to a decorator panel. A component bound, and so decorated,
+ * before then would otherwise show no error until the next decorate.
  */
 public abstract class FocusDecorator extends BaseDecorator implements Decorator {
   private SsCompFocusListener focusListener;
+  private HierarchyListener hierarchyListener;
 
   /** {@inheritDoc} */
   @Override
@@ -62,12 +73,21 @@ public abstract class FocusDecorator extends BaseDecorator implements Decorator 
       decorate();
     }, () -> logger());
     focusListener.addFocusListener();
+    hierarchyListener = (e) -> {
+      if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0
+          && SsUtils.findDecoratorPanel((Component)comp) != null)
+        decorate();
+    };
+    ((Component)comp).addHierarchyListener(hierarchyListener);
   }
 
   /** {@inheritDoc} */
   @Override
   public void uninstall() {
     focusListener.removeFocusListener();
+    if (getSsComponent() instanceof Component c)
+      c.removeHierarchyListener(hierarchyListener);
+    hierarchyListener = null;
     super.uninstall();
   }
 
