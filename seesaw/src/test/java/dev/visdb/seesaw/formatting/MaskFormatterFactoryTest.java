@@ -42,9 +42,13 @@
  * ****************************************************************************/
 package dev.visdb.seesaw.formatting;
 
+import java.sql.JDBCType;
+import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
 import javax.swing.text.MaskFormatter;
 
 import org.junit.jupiter.api.AfterAll;
@@ -53,6 +57,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import dev.visdb.seesaw.datasources.DateTime;
 import dev.visdb.seesaw.formatting.FormatterAssist.LiteralsAndPositions;
 import dev.visdb.seesaw.formatting.MaskFormatterFactory.SSMaskFormatter;
 import dev.visdb.seesaw.mock.Util;
@@ -193,6 +198,32 @@ public class MaskFormatterFactoryTest {
     String getChildParam() {
       return childParam;
     }
+  }
+
+  /**
+   * The default TIMESTAMP format is a local date-time; the text that
+   * setValue shows must validate and parse back to the same value.
+   */
+  @Test
+  public void testDefaultTimestampRoundTrip() throws Exception {
+    assertEquals(SsFormat.TIMESTAMP_YYYYMMDD_STROKE_HHMMSS,
+                 SsFormat.getActualFormat(SsFormat.TIMESTAMP));
+    SwingUtilities.invokeAndWait(() -> {
+      SsTimestampField field = new SsTimestampField() {
+        @Override
+        public JDBCType getColumnJDBCType() {
+          return JDBCType.TIMESTAMP;
+        }
+      };
+      Timestamp timestamp = Timestamp.valueOf("2026-11-23 10:15:30");
+      field.setValue(timestamp);
+      assertEquals("2026-11-23 10:15:30", field.getText());
+      assertTrue(field.isEditValid());
+      assertTrue(DateTime.dateTimeColumnValidate(field.getText(), field));
+      Object value = assertDoesNotThrow(
+          () -> field.getFormatter().stringToValue(field.getText()));
+      assertEquals(timestamp.getTime(), ((Date)value).getTime());
+    });
   }
 
   /** x */

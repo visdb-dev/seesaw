@@ -98,6 +98,7 @@ public class SsTimestampField extends DateTimeField {
    * @param _format - Format to use for timestamp while in editing mode.
    * @return a DefaultFormatterFactory for the specified time format
    */
+  @SuppressWarnings("deprecation") // TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ
   public static DefaultFormatterFactory createFormatterFactory(SsFormat _format) {
     SsFormat format = _format;
     if (_format.getType() != SsFormat.TIMESTAMP) {

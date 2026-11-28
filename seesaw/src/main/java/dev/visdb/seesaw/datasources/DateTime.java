@@ -155,6 +155,7 @@ public class DateTime {
     return Collections.unmodifiableList(getInternalDateTimeParsers(jdbcType, null));
   }
 
+  @SuppressWarnings("deprecation") // TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ
   private static final ImmutableMap<SsFormat, List<DateTimeFormatter>> ssFormatters
       = new ImmutableMap.Builder<SsFormat, List<DateTimeFormatter>>()
             .put(SsFormat.DATE_MMDDYYYY_SLASH,
