@@ -60,8 +60,9 @@ public abstract class DecoratorFactoryBase implements DecoratorFactory {
   public JPanel createDecoratorPanel(Component uiPanel) {
     // Could just do: uiPanel.putClientProperty return uiPanel;
     JPanel parentPanel = new JPanel(new BorderLayout());
-    parentPanel.add(uiPanel, BorderLayout.CENTER);
+    // Set the key first; adding uiPanel decorates its components.
     SsUtils.createDecoratorPanelKey(parentPanel, getDecoratorStyle());
+    parentPanel.add(uiPanel, BorderLayout.CENTER);
     return parentPanel;
   }
 

@@ -35,3 +35,11 @@ milliseconds and the JVM's offset; that text never validated, so the
 field was marked as an error. TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ is
 deprecated, not yet implemented. Editing a value with a fraction of a
 second drops the fraction.
+
+A component is decorated when it, or a panel holding it, is added to a
+decorator panel. Before, a component bound before it was in the
+decorator panel, as the demos do, showed no error until the next
+decorate, such as a record change. A new SsTimeField is empty; before,
+it was set to the current time. SsCurrencyField uses its editLocale
+while editing, or the displayLocale if there is no editLocale; before,
+editLocale was ignored.
